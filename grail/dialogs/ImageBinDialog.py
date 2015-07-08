@@ -1,0 +1,135 @@
+#!/usr/bin/env python
+# -*- coding: UTF-8 -*-
+
+# Grail - Lyrics software. Simple.
+# Copyright (C) 2014-2015 Oleksii Lytvyn
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
+
+from grail.utils import *
+from grail.widgets import *
+
+
+class ImageBinDialog(QDialog):
+
+    itemSelected = pyqtSignal(object)
+
+    def __init__( self, parent=None ):
+
+        super(ImageBinDialog, self).__init__(parent)
+
+        self.files_list = []
+
+        self.initUI()
+
+    def initUI( self ):
+
+        self.setStyleSheet( get_stylesheet() )
+
+        self.ui_layout = QVBoxLayout()
+        self.ui_layout.setObjectName( "media_dialog" )
+        self.ui_layout.setSpacing( 0 )
+        self.ui_layout.setContentsMargins( 0, 0, 0, 0 )
+
+        addAction = QAction( 'Add', self )
+        addAction.triggered.connect( self.addFilesAction )
+
+        clearAction = QAction( 'Clear', self )
+        clearAction.triggered.connect( self.clear )
+
+        blackoutAction = QAction( 'Blackout', self )
+        blackoutAction.triggered.connect( self.blackoutAction )
+
+        self.ui_expander = QWidget()
+        self.ui_expander.setSizePolicy( QSizePolicy.Expanding, QSizePolicy.Expanding )
+
+        self.ui_toolbar = QToolBar()
+        self.ui_toolbar.setObjectName( "mediaToolbar" )
+        self.ui_toolbar.addAction( addAction )
+        self.ui_toolbar.addAction( clearAction )
+        self.ui_toolbar.addWidget( self.ui_expander )
+        self.ui_toolbar.addAction( blackoutAction )
+
+        size = 128
+
+        self.ui_list = QListWidget()
+        self.ui_list.setObjectName( "mediaList" )
+        self.ui_list.setAttribute( Qt.WA_MacShowFocusRect, False )
+        self.ui_list.itemDoubleClicked.connect( self.itemDoubleClicked )
+
+        self.ui_list.setDragEnabled( True )
+        self.ui_list.setViewMode( QListView.IconMode )
+        self.ui_list.setIconSize( QSize( size, size ) )
+        self.ui_list.setSpacing( 1 )
+        self.ui_list.setAcceptDrops( True )
+        self.ui_list.setDropIndicatorShown( False )
+        self.ui_list.setWrapping( True )
+        self.ui_list.setLayoutMode( QListView.Batched )
+        self.ui_list.setMovement( QListView.Snap )
+        self.ui_list.setResizeMode( QListView.Adjust )
+        self.ui_list.setBatchSize( size )
+        self.ui_list.setGridSize( QSize( size, size ) )
+        self.ui_list.setUniformItemSizes( True )
+
+        self.ui_layout.addWidget( self.ui_list )
+        self.ui_layout.addWidget( self.ui_toolbar )
+
+        self.setLayout( self.ui_layout )
+
+        if not PLATFORM_MAC:
+            self.setWindowIcon( QIcon(':/icons/32.png') )
+
+        self.setWindowFlags( Qt.WindowCloseButtonHint )
+        self.setWindowTitle('Media')
+        self.setGeometry( 300, 300, 440, 380 )
+        self.setMinimumSize( 240, 380 )
+
+    def addFilesAction( self ):
+
+        dialog = QFileDialog()
+        dialog.setFileMode( QFileDialog.ExistingFiles )
+        dialog.setNameFilter( "Images (*.png *.jpeg *.jpg *.gif)" )
+
+        if dialog.exec():
+            for path in dialog.selectedFiles():
+                self.addListItem( path )
+
+    def clear( self ):
+
+        self.files_list = []
+        self.ui_list.clear()
+
+    def blackoutAction( self ):
+
+        self.itemSelected.emit( None )
+
+    def addListItem( self, path ):
+
+        if path not in self.files_list:
+            pieceItem = QListWidgetItem()
+            pieceItem.setIcon( QIcon( path ) )
+            pieceItem.setData( Qt.UserRole, path )
+            pieceItem.setFlags( Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDragEnabled)
+
+            self.files_list.append( path )
+            self.ui_list.addItem( pieceItem )
+
+    def itemDoubleClicked( self, item ):
+
+        self.itemSelected.emit( item.data( Qt.UserRole ) )

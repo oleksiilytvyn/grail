@@ -65,7 +65,8 @@ excludes = ['_ssl',
 includefiles = [('resources/bdist/bible.db-default', 'data/bible.db'),
                 ('resources/bdist//history.db-default', 'data/history.db'),
                 ('resources/bdist//songs.db-default', 'data/songs.db'),
-                ('resources/bdist//settings.db-default', 'data/settings.db')]
+                ('resources/bdist//settings.db-default', 'data/settings.db'),
+                ('LICENSE', 'LICENSE')]
 
 # add platform specific files
 if PLATFORM_WIN:

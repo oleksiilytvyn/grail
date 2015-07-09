@@ -476,16 +476,20 @@ class Grail(QMainWindow):
 
     def updateLabels( self ):
         qr = self.ui_songs_bar_label.geometry()
-        cp = self.ui_songs_panel.rect().center()
-        self.ui_songs_bar_label.resize( self.ui_songs_panel.rect().width(), qr.height() )
-        qr.moveCenter( cp )
-        qr.setY( qr.y() - 47 )
+        sr = self.ui_songs_panel.rect()
+        cp = sr.center()
+        self.ui_songs_bar_label.resize( sr.width(), qr.height() )
+
+        qr.moveTo( cp.x() - sr.width()/2, sr.height() / 2 - qr.height() / 2 - 47 )
+
         self.ui_songs_bar_label.move( qr.topLeft() )
 
         qr = self.ui_playlist_panel_label.geometry()
-        cp = self.ui_playlist_panel.rect().center()
+        sr = self.ui_playlist_panel.rect()
+        cp = sr.center()
         self.ui_playlist_panel_label.resize( self.ui_playlist_panel.rect().width(), qr.height() )
-        qr.moveCenter( cp )
+
+        qr.moveTo( cp.x() - sr.width()/2, sr.height() / 2 - qr.height() / 2 )
 
         self.ui_playlist_panel_label.move( qr.topLeft() )
 

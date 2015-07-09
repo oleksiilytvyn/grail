@@ -22,6 +22,7 @@ import sys
 import os
 import platform
 import re
+import grail
 
 from PyQt5.QtCore import QFile
 
@@ -71,6 +72,15 @@ def get_data_path():
 
     return get_path() + "/data"
 
+
+def get_version():
+
+    path = '.version'
+
+    if os.path.isfile( path ):
+        return open( path ).read()
+    else:
+        return grail.__version__
 
 def tr( word ):
     """

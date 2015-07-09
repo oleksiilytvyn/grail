@@ -44,6 +44,10 @@ try:
 except:
     pass
 
+# add version file to build
+with open("build/.version","w+") as f:
+    f.write(version)
+
 base = None
 if sys.platform == "win32":
     base = "Win32GUI"
@@ -66,7 +70,8 @@ includefiles = [('resources/bdist/bible.db-default', 'data/bible.db'),
                 ('resources/bdist//history.db-default', 'data/history.db'),
                 ('resources/bdist//songs.db-default', 'data/songs.db'),
                 ('resources/bdist//settings.db-default', 'data/settings.db'),
-                ('LICENSE', 'LICENSE')]
+                ('LICENSE', 'LICENSE'),
+                ('build/.version', '.version')]
 
 # add platform specific files
 if PLATFORM_WIN:
@@ -86,8 +91,8 @@ setup(
     version=version,
     url='http://grailapp.bitbucket.org/',
 
-    author='Alex Litvin',
-    author_email='programer95@gmail.com',
+    author='Oleksii Lytvyn',
+    author_email='grailapplication@gmail.com',
     description="Simple and fast lyrics application.",
     long_description="",
     keywords='open source osc church lyrics projection song bible display',

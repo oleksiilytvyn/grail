@@ -287,11 +287,11 @@ QScrollBar:vertical {
 
 	#displayprefs_toolbar QPushButton,
 	#displayprefs_toolbar QToolButton {
-		border: 1px solid #6a6a6a;
-		background: #6a6a6a;
+		border: 1px solid #ffffff;
+		background: #ffffff;
 		padding: 2px;
 		margin: 0;
-		color: #ffffff;
+		color: #000;
 		}
 
 	#displayprefs_toolbar QToolButton:hover,
@@ -300,6 +300,7 @@ QScrollBar:vertical {
 	#displayprefs_toolbar QPushButton:pressed {
 		background: #0069d9;
 		border: 1px solid #0069d9;
+		color: #ffffff;
 		}
 
 	#displayprefs_toolbar QToolButton:checked {
@@ -335,12 +336,65 @@ QScrollBar:vertical {
 		}
 
 	#displayprefs_toolbar QPushButton::menu-indicator {
+		image: url(:/icons/branch-open.png);
+		subcontrol-position: right center;
+		subcontrol-origin: padding;
+		left: -2px;
+		top: 0;
+		}
+
+	#displayprefs_toolbar QPushButton::menu-indicator:hover {
 		image: url(:/icons/branch-open-white.png);
 		subcontrol-position: right center;
 		subcontrol-origin: padding;
 		left: -2px;
 		top: 0;
 		}
+
+	QToolButton#displayprefs_action_font {
+    qproperty-icon: none;
+    image: url(":/icons/font.png");
+  	}
+
+	QToolButton#displayprefs_action_font:hover {
+    image: url(":/icons/font-white.png");
+  	}
+
+	QToolButton#displayprefs_action_align {
+    qproperty-icon: none;
+    image: url(":/icons/align.png");
+  	}
+
+	QToolButton#displayprefs_action_align:hover {
+    image: url(":/icons/align-white.png");
+  	}
+
+	QToolButton#displayprefs_action_padding {
+    qproperty-icon: none;
+    image: url(":/icons/selection-select.png");
+  	}
+
+	QToolButton#displayprefs_action_padding:hover {
+    image: url(":/icons/selection-select-white.png");
+  	}
+
+	QToolButton#displayprefs_action_testcard {
+    qproperty-icon: none;
+    image: url(":/icons/testcard.png");
+  	}
+
+	QToolButton#displayprefs_action_testcard:hover {
+    image: url(":/icons/testcard-white.png");
+  	}
+
+	QToolButton#displayprefs_action_box {
+    qproperty-icon: none;
+    image: url(":/icons/text-padding-box.png");
+  	}
+
+	QToolButton#displayprefs_action_box:hover {
+    image: url(":/icons/text-padding-box-white.png");
+  	}
 
 /*
  * Preferences dialog

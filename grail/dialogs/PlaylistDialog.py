@@ -243,6 +243,7 @@ class PlaylistTableWidget(QTableWidget):
 
         self.setVerticalScrollMode( QAbstractItemView.ScrollPerPixel )
         self.setVerticalScrollBarPolicy( Qt.ScrollBarAlwaysOff )
+        self.setAutoScroll( False )
 
         original = self.verticalScrollBar()
 
@@ -250,7 +251,6 @@ class PlaylistTableWidget(QTableWidget):
         self.scrollbar.valueChanged.connect( original.setValue )
 
         original.valueChanged.connect( self.scrollbar.setValue )
-
         self.updateScrollbar()
 
     def paintEvent( self, event ):
@@ -272,6 +272,8 @@ class PlaylistTableWidget(QTableWidget):
     def updateScrollbar( self ):
 
         original = self.verticalScrollBar()
+        if not hasattr(self, 'scrollbar'):
+            return
 
         if original.value() == original.maximum() and original.value() == 0:
             self.scrollbar.hide()

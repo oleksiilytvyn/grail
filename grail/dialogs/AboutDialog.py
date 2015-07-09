@@ -23,7 +23,6 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
 from grail.utils import *
-from grail import __version__
 
 
 class AboutDialog(QDialog):
@@ -41,12 +40,12 @@ class AboutDialog(QDialog):
         picture.setGeometry( 0, 0, 450, 144 )
         picture.setPixmap( QPixmap(":/about.png") )
 
-        copyright = QLabel( "Copyright © 2013. The Grail Authors. All rights reserved.\n" +
+        copyright = QLabel( "Copyright © 2014-2015. The Grail Authors. All rights reserved.\n" +
                             "Grail application made possible by open source software and icons", self )
         copyright.move( 22, 154 )
         copyright.setObjectName( "about_copyright" )
 
-        version = QLabel( "Version %s" % (__version__, ), self )
+        version = QLabel( "Version %s" % ( get_version(), ), self )
         version.move( 22, 56 )
         version.setObjectName( "about_version" )
 

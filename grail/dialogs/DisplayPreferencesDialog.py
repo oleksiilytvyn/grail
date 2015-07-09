@@ -117,17 +117,19 @@ class DisplayPreferencesDialog(QWidget):
         # toolbar buttons
 
         self.ui_font_action = QToolButton( self )
-        self.ui_font_action.setIcon( QIcon(':/icons/layer-shape-text.png') )
+        self.ui_font_action.setIcon( QIcon(':/icons/font.png') )
+        self.ui_font_action.setObjectName( "displayprefs_action_font" )
         self.ui_font_action.setProperty( "left", True )
         self.ui_font_action.clicked.connect( self.fontAction )
 
         self.ui_shadow_action = QToolButton( self )
-        self.ui_shadow_action.setIcon( QIcon(':/icons/edit-shadow.png') )
+        self.ui_shadow_action.setIcon( QIcon(':/icons/shadow.png') )
         self.ui_shadow_action.setProperty( "middle", True )
         self.ui_shadow_action.clicked.connect( self.shadowAction )
 
         self.ui_align_action = QToolButton( self )
-        self.ui_align_action.setIcon( QIcon(':/icons/edit-shadow.png') )
+        self.ui_align_action.setIcon( QIcon(':/icons/align.png') )
+        self.ui_align_action.setObjectName( "displayprefs_action_align" )
         self.ui_align_action.setProperty( "middle", True )
         self.ui_align_action.clicked.connect( self.alignAction )
 
@@ -137,7 +139,7 @@ class DisplayPreferencesDialog(QWidget):
         self.ui_color_action.clicked.connect( self.colorAction )
 
         self.ui_background_action = QToolButton( self )
-        self.ui_background_action.setIcon( QIcon(':/icons/paint-can.png') )
+        self.ui_background_action.setIcon( QIcon(':/icons/color.png') )
         self.ui_background_action.setProperty( "single", True )
         self.ui_background_action.clicked.connect( self.backgroundAction )
 
@@ -148,11 +150,13 @@ class DisplayPreferencesDialog(QWidget):
 
         self.ui_padding_action = QToolButton( self )
         self.ui_padding_action.setIcon( QIcon(':/icons/selection-select.png') )
+        self.ui_padding_action.setObjectName( "displayprefs_action_padding" )
         self.ui_padding_action.setProperty( "middle", True )
         self.ui_padding_action.clicked.connect( self.paddingAction )
 
         self.ui_testcard_action = QToolButton( self )
         self.ui_testcard_action.setIcon( QIcon(':/icons/testcard.png') )
+        self.ui_testcard_action.setObjectName( "displayprefs_action_testcard" )
         self.ui_testcard_action.setProperty( "middle", True )
         self.ui_testcard_action.setCheckable( True )
         self.ui_testcard_action.clicked.connect( self.testcardAction )
@@ -160,6 +164,7 @@ class DisplayPreferencesDialog(QWidget):
 
         self.ui_paddingbox_action = QToolButton( self )
         self.ui_paddingbox_action.setIcon( QIcon(':/icons/text-padding-box.png') )
+        self.ui_paddingbox_action.setObjectName( "displayprefs_action_box" )
         self.ui_paddingbox_action.setProperty( "right", True )
         self.ui_paddingbox_action.setCheckable( True )
         self.ui_paddingbox_action.clicked.connect( self.paddingboxAction )

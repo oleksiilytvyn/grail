@@ -37,28 +37,24 @@ class PlaylistsModel:
         if not os.path.isfile( path ):
             first_run = True
 
-        self.connection = ConnectionManager.get( path )
+        self.connection = ConnectionManager.get( path, get_path() + '/default/songs.db' )
 
-        if first_run:
+        if first_run and not ConnectionManager.iscopied( path ):
 
             cur = self.connection.cursor()
 
-            cur.execute("DROP TABLE IF EXISTS songs")
-            cur.execute("""CREATE TABLE songs(
+            cur.execute("""CREATE TABLE IF NOT EXISTS songs(
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         title TEXT,
                         artist TEXT,
                         album TEXT,
                         year INT)""")
 
-            cur.execute("DROP TABLE IF EXISTS pages")
-            cur.execute("CREATE TABLE pages(id INTEGER PRIMARY KEY AUTOINCREMENT, song INT, sort INT, page TEXT)")
+            cur.execute("CREATE TABLE IF NOT EXISTS pages(id INTEGER PRIMARY KEY AUTOINCREMENT, song INT, sort INT, page TEXT)")
 
-            cur.execute("DROP TABLE IF EXISTS playlists")
-            cur.execute("CREATE TABLE playlists(id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT)")
+            cur.execute("CREATE TABLE IF NOT EXISTS playlists(id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT)")
 
-            cur.execute("DROP TABLE IF EXISTS playlist")
-            cur.execute("""CREATE TABLE playlist(
+            cur.execute("""CREATE TABLE IF NOT EXISTS playlist(
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         playlist INT,
                         sort INT,

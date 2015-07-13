@@ -61,16 +61,14 @@ class BibleModel():
         if not os.path.isfile( path ):
             first_run = True
 
-        self.connection = ConnectionManager.get( path )
+        self.connection = ConnectionManager.get( path, get_path() + '/default/bible.db' )
 
-        if first_run:
+        if first_run and not ConnectionManager.iscopied( path ):
             cur = self.connection.cursor()
 
-            cur.execute("DROP TABLE IF EXISTS books")
-            cur.execute("CREATE TABLE books(id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, full TEXT, short TEXT )")
+            cur.execute("CREATE TABLE IF NOT EXISTS books(id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, full TEXT, short TEXT )")
 
-            cur.execute("DROP TABLE IF EXISTS verses")
-            cur.execute("CREATE TABLE verses(id INTEGER PRIMARY KEY AUTOINCREMENT, book INT, chapter INT, verse INT )")
+            cur.execute("CREATE TABLE IF NOT EXISTS verses(id INTEGER PRIMARY KEY AUTOINCREMENT, book INT, chapter INT, verse INT )")
 
     def close( self ):
         self.connection.commit()

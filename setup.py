@@ -66,10 +66,8 @@ excludes = ['_ssl',
             "nt",
             "ntpath"]
 
-includefiles = [('resources/bdist/bible.db-default', 'data/bible.db'),
-                ('resources/bdist//history.db-default', 'data/history.db'),
-                ('resources/bdist//songs.db-default', 'data/songs.db'),
-                ('resources/bdist//settings.db-default', 'data/settings.db'),
+includefiles = [('resources/bdist/bible.db-default', 'default/bible.db'),
+                ('resources/bdist//songs.db-default', 'default/songs.db'),
                 ('LICENSE', 'LICENSE'),
                 ('build/.version', '.version')]
 

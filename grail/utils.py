@@ -23,6 +23,7 @@ import os
 import platform
 import re
 import grail
+import shutil
 
 from PyQt5.QtCore import QFile
 
@@ -70,8 +71,27 @@ def get_stylesheet():
 
 def get_data_path():
 
-    return get_path() + "/data"
+    APPNAME = 'grail1'
 
+    if sys.platform == 'darwin':
+        from AppKit import NSSearchPathForDirectoriesInDomains
+        appdata = os.path.join(NSSearchPathForDirectoriesInDomains(14, 1, True)[0], APPNAME)
+    elif sys.platform == 'win32':
+        appdata = os.path.join(os.environ['APPDATA'], APPNAME)
+    else:
+        appdata = os.path.expanduser(os.path.join("~", "." + APPNAME))
+
+    return appdata
+
+
+def copy_file( a, b ):
+
+    directory = os.path.dirname(os.path.realpath( b ))
+
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
+    shutil.copyfile( a, b )
 
 def get_version():
 

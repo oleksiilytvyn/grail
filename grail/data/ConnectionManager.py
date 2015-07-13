@@ -31,9 +31,24 @@ class ConnectionManager:
     __list__ = {}
 
     def __init__( self ):
-        pass
+        
+        self.copied = []
+        self.first_run = True
 
-    def get( self, path ):
+    def get( self, path, copypath = None ):
+
+        # copy files from data to default
+        if self.first_run:
+            self.first_run = False
+
+            a = get_path() + '/data'
+            b = get_path() + '/default'
+
+            try:
+                if os.path.exists( a ):
+                    shutil.move( a, b )
+            except:
+                pass
 
         if path in self.__list__:
             connection = self.__list__[ path ]
@@ -44,7 +59,11 @@ class ConnectionManager:
                 os.makedirs(directory)
 
             if not os.path.isfile( path ):
-                open( path, 'w+' )
+                if copypath is not  None:
+                    copy_file( copypath, path )
+                    self.copied.append( path )
+                else:
+                    open( path, 'w+' )
 
             connection = lite.connect( path )
             connection.row_factory = lite.Row
@@ -63,6 +82,9 @@ class ConnectionManager:
             self.__list__[ path ] = connection
 
         return connection
+
+    def iscopied( self, path ):
+        return path in self.copied
 
     def closeAll( self ):
 

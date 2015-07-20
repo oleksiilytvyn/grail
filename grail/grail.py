@@ -22,6 +22,7 @@
 import re
 import os
 import sqlite3 as lite
+import traceback
 
 from grail import resources
 
@@ -41,6 +42,18 @@ from grail.utils import *
 from grail.threaded import *
 
 
+def hook_exception( exctype, value, traceback_object ):
+
+    out = open('errorlog.txt', 'a+')
+    out.write("=== Exception ===\n" +
+              "Platform: %s\n" % (platform.platform(), ) +
+              "Version: %s\n" % (get_version(), ) +
+              "Traceback: %s\n" % (''.join(traceback.format_exception(exctype, value, traceback_object)), ) )
+    out.close()
+
+sys.excepthook = hook_exception
+
+
 class Grail(QMainWindow):
     """
     Grail application class
@@ -48,6 +61,9 @@ class Grail(QMainWindow):
 
     def __init__( self, parent=None ):
         super(Grail, self).__init__(parent)
+
+        if self.isAlreadyRunning():
+            sys.exit()
 
         try:
             QApplication.setAttribute( Qt.AA_UseHighDpiPixmaps )
@@ -410,6 +426,38 @@ class Grail(QMainWindow):
 
             self.listeners.append( listener )
 
+
+    def exec_( self ):
+
+        QApplication.exec_()
+        self.sharedMemory.detach()
+
+    def isAlreadyRunning(self):
+        
+        self.sharedMemory = QSharedMemory('Grail')
+
+        if self.sharedMemory.attach():
+
+            msgBox = QMessageBox()
+            msgBox.setWindowTitle("Grail")
+            msgBox.setText("Another version of Grail is currently running")
+            msgBox.setStandardButtons( QMessageBox.Ok )
+            msgBox.setDefaultButton( QMessageBox.Ok )
+
+            if not PLATFORM_MAC:
+                msgBox.setWindowIcon( QIcon(':/icons/32.png') )
+
+            if PLATFORM_UNIX:
+                msgBox.setWindowIcon( QIcon(':/icons/256.png') )
+
+            ret = msgBox.exec_()
+
+            return True
+        else:
+            self.sharedMemory.create(1)
+        
+        return False
+
     def updateOSCConnections( self, list ):
 
         self.subscribers = []
@@ -581,6 +629,7 @@ class Grail(QMainWindow):
                 for page in Song.getPages( song['id'] ):
                     pageItem = PageTreeWidgetItem( )
                     pageItem.setPage( page )
+                    pageItem.setSong( song )
 
                     songItem.addChild( pageItem )
 
@@ -787,7 +836,18 @@ class Grail(QMainWindow):
         prefs.disabled = False
 
         display = DisplayDialog( None, prefs )
+
+        def updateDisplay( ):
+            mode = display.getMode()
+
+            if mode.disabled:
+                display.setAttribute( Qt.WA_DeleteOnClose, True )
+                display.close( True )
+                self.displays.remove( display )
+
+        display.modeChanged.connect( updateDisplay )
         display.show()
+
 
         self.displays.append( display )
 
@@ -1120,7 +1180,7 @@ class Grail(QMainWindow):
     def playlistItemCollapsed( self, item ):
 
         if item.song is not None:
-            Playlist.collapseSong( self.playlist["id"], item.id, item.isExpanded() )
+            Playlist.collapseSong( self.playlist["id"], item.pid, item.isExpanded() )
 
     def deletePlaylistSongAction( self ):
 
@@ -1128,15 +1188,17 @@ class Grail(QMainWindow):
 
         if type(item) == SongTreeWidgetItem:
             id = item.id
+            pid = item.pid
             index = self.ui_playlist_tree.indexOfTopLevelItem( item )
             self.ui_playlist_tree.takeTopLevelItem( index )
 
         if type(item) == PageTreeWidgetItem:
             id = item.song
+            pid = item.pid
             index = self.ui_playlist_tree.indexOfTopLevelItem( item.parent() )
             self.ui_playlist_tree.takeTopLevelItem( index )
 
-        Playlist.deleteSong( self.playlist['id'], id )
+        Playlist.deleteSong( self.playlist['id'], id, pid )
         self.updatePlaylist()
 
     def editPlaylistSongAction( self ):

@@ -42,5 +42,8 @@ class PageTreeWidgetItem(QTreeWidgetItem):
         self.setText( 0, self.page )
         self.data = page
 
+    def setSong( self, song ):
+        self.pid = song['pid']
+
     def getPage( self ):
         return self.data

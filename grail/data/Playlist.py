@@ -131,14 +131,19 @@ class PlaylistsModel:
                     (playlist, playlist, song))
         self.connection.commit()
 
-    def deleteSong( self, playlist, song ):
+    def deleteSong( self, playlist, song, pid = None ):
         cursor = self.connection.cursor()
-        cursor.execute("DELETE FROM playlist WHERE playlist = ? AND song = ?", (playlist, song))
+
+        if pid is None:
+            cursor.execute("DELETE FROM playlist WHERE playlist = ? AND song = ?", (playlist, song))
+        else:
+            cursor.execute("DELETE FROM playlist WHERE playlist = ? AND song = ? AND id = ?", (playlist, song, pid))
+
         self.connection.commit()
 
     def collapseSong( self, playlist, song, collapsed ):
         cur = self.connection.cursor()
-        cur.execute("UPDATE playlist SET collapsed=? WHERE playlist = ? AND song = ?", (int(collapsed), playlist, song))
+        cur.execute("UPDATE playlist SET collapsed=? WHERE playlist = ? AND id = ?", (int(collapsed), playlist, song))
         self.connection.commit()
 
     def sortSongs( self, playlist, item, index ):

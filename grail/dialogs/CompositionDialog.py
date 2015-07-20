@@ -56,12 +56,7 @@ class CompositionDialog(BalloonDialog):
         self.ui_preset = QComboBox()
         self.ui_preset.currentIndexChanged.connect( self.presetChanged )
 
-        presets = [("Full HD (1920x1080)", QRect(0, 0, 1920, 1080)),
-                   ("HD (1280x720)", QRect(0, 0, 1280, 720)),
-                   ("SD (800x600)", QRect(0, 0, 800, 600))]
-
-        for preset in presets:
-            self.ui_preset.addItem( preset[0], preset[1] )
+        self.updateList()
 
         self.ui_layout = QGridLayout()
         self.ui_layout.setSpacing( 8 )
@@ -79,21 +74,49 @@ class CompositionDialog(BalloonDialog):
 
     def updateUI( self ):
 
-        self.ui_width.setValue( self.composition.width() )
-        self.ui_height.setValue( self.composition.height() )
+        comp = self.composition
+
+        self.ui_width.setValue( comp.width() )
+        self.ui_height.setValue( comp.height() )
+
+        self.ui_preset.setItemText( 0, "Current (%dx%d)" % (comp.width(), comp.height()) )
+
+    def updateList( self ):
+
+        comp = self.composition
+        presets = [("Current (%dx%d)" % (comp.width(), comp.height()), comp),
+                   ("Full HD (1920x1080)", QRect(0, 0, 1920, 1080)),
+                   ("HD (1366x768)", QRect(0, 0, 1366, 768)),
+                   ("XGA (1024x768)", QRect(0, 0, 1024, 768)),
+                   ("WXGA (1280x800)", QRect(0, 0, 1280, 800)),
+                   ("SXGA (1280x1024)", QRect(0, 0, 1280, 1024)),
+                   ("UXGA (1600x1200)", QRect(0, 0, 1600, 1200)),
+                   ("SVGA (800x600)", QRect(0, 0, 800, 600))]
+
+        self.ui_preset.clear()
+
+        for preset in presets:
+            self.ui_preset.addItem( preset[0], preset[1] )
+
+        self.ui_preset.insertSeparator( 1 )
 
     def valueChanged( self, i ):
 
-        self.updated.emit( QRect(0, 0, self.ui_width.value(), self.ui_height.value() ) )
+        comp = QRect(0, 0, self.ui_width.value(), self.ui_height.value() )
+        
+        self.setCompositionGeometry( comp )
 
     def presetChanged( self, index ):
 
         rect = self.ui_preset.itemData( index )
 
+        if rect is None or index == 0:
+            return
+
         self.setCompositionGeometry( rect )
-        self.updateUI()
-        self.updated.emit( rect )
 
     def setCompositionGeometry( self, rect ):
 
         self.composition = rect
+        self.updated.emit( rect )
+        self.updateUI()

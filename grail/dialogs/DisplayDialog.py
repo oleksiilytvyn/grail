@@ -162,7 +162,9 @@ class DisplayDialog(QMainWindow):
         # padding box
         if prefs.padding_box:
             pen = QPen( Qt.red )
-            pen.setWidth( 1 )
+
+            size = output.width() / comp.width()
+            pen.setWidth( math.floor( size * 5 ) )
 
             painter.setPen( pen )
 

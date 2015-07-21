@@ -23,6 +23,7 @@ import re
 import os
 import sqlite3 as lite
 import traceback
+import time
 
 from grail import resources
 
@@ -99,7 +100,7 @@ class Grail(QMainWindow):
         self.prefs = DisplayPreferences()
         self.prefs.restore()
 
-        self.display = DisplayDialog( self, self.prefs )
+        self.display = DisplayDialog( None, self.prefs )
         self.display.modeChanged.connect( self.updateOutputMenu )
 
         self.dialog_imagebin = ImageBinDialog()
@@ -1257,6 +1258,7 @@ class Grail(QMainWindow):
         self.dialog_about.close()
         self.dialog_preferences.close()
         self.dialog_song.close()
+        self.display.setAttribute( Qt.WA_DeleteOnClose, True )
         self.display.close( True )
         self.dialog_imagebin.close()
 

@@ -47,7 +47,6 @@ class PlaylistTreeWidget(QTreeWidget):
 
         self.setAnimated( True )
         self.setSortingEnabled( False )
-        self.setDropIndicatorShown( True )
 
         self.keyPressed.connect( self.keyPressedEvent )
         self.setVerticalScrollMode( QAbstractItemView.ScrollPerPixel )

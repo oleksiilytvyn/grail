@@ -186,7 +186,10 @@ class Grail(QMainWindow):
         self.ui_menu_edit.addSeparator()
         self.ui_menu_edit.addAction( self.ui_importPlaylistAction )
         self.ui_menu_edit.addAction( self.ui_exportPlaylistAction )
-        self.ui_menu_edit.addSeparator()
+
+        if not PLATFORM_MAC:
+            self.ui_menu_edit.addSeparator()
+    
         self.ui_menu_edit.addAction( self.ui_preferencesAction )
 
         # display menu
@@ -1253,6 +1256,8 @@ class Grail(QMainWindow):
     # Events
 
     def closeEvent( self, event ):
+
+        self.sharedMemory.detach()
 
         self.prefs.save()
         self.dialog_about.close()

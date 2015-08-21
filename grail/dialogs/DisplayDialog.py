@@ -36,6 +36,8 @@ class DisplayDialog(QMainWindow):
     """
 
     modeChanged = pyqtSignal()
+    preferencesUpdated = pyqtSignal()
+    testCardChanged = pyqtSignal(bool)
 
     def __init__( self, parent=None, preferences=DisplayPreferences() ):
 
@@ -44,12 +46,13 @@ class DisplayDialog(QMainWindow):
         self.text = ""
         self.preferences = preferences
         self.oldcomposition = self.preferences.composition
+        self.oldTestCard = self.preferences.test
         self.image = None
         self.testcard = None
         self.mousePosition = None
 
         self.preferences_dialog = DisplayPreferencesDialog( self, self.preferences )
-        self.preferences_dialog.updated.connect( self.update )
+        self.preferences_dialog.updated.connect( self.preferencesUpdatedEvent )
 
         desktop = QApplication.desktop()
         desktop.resized.connect( self.screensChanged )
@@ -92,6 +95,13 @@ class DisplayDialog(QMainWindow):
 
     def recievedOSC( self, pattern, value ):
         pass
+
+    def preferencesUpdatedEvent( self ):
+
+        if not self.oldTestCard is self.preferences.test:
+            self.testCardChanged.emit( self.preferences.test )
+
+        self.update()
 
     def paintEvent(self, event):
 
@@ -281,6 +291,7 @@ class DisplayDialog(QMainWindow):
 
     def contextMenu( self, event ):
 
+        self.ui_test_card_action.setChecked( self.isTestCard() )
         self.ui_menu.exec_( self.mapToGlobal( event ) )
 
     def preferencesAction( self ):
@@ -289,7 +300,10 @@ class DisplayDialog(QMainWindow):
 
     def showTestCardAction( self ):
 
-        self.setTestCard( self.ui_test_card_action.isChecked() )
+        flag = self.ui_test_card_action.isChecked()
+
+        self.setTestCard( flag )
+        self.testCardChanged.emit( flag )
 
     def updateGeometry( self ):
 
@@ -337,6 +351,8 @@ class DisplayDialog(QMainWindow):
         self.preferences.test = enabled
         self.updateTestCard()
         self.update()
+
+        self.testCardChanged.emit( enabled )
 
     def isTestCard( self ):
 

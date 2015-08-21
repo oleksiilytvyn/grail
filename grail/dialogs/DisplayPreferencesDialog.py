@@ -47,6 +47,7 @@ class DisplayPreferencesDialog(QWidget):
         self.display = parent
 
         self.updated.connect( self.updatedEvent )
+        self.display.testCardChanged.connect( self.updateTestCard )
 
         def composition_updated( rect ):
 
@@ -206,6 +207,10 @@ class DisplayPreferencesDialog(QWidget):
         self.setWindowTitle( "Display Preferences" )
         self.setGeometry( 100, 100, 480, 360 )
         self.setMinimumSize( 300, 200 )
+
+    def updateTestCard( self ):
+
+        self.ui_testcard_action.setChecked( self.preferences.test )
 
     def updatedEvent( self ):
         pass

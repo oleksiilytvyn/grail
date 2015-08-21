@@ -102,6 +102,7 @@ class Grail(QMainWindow):
 
         self.display = DisplayDialog( None, self.prefs )
         self.display.modeChanged.connect( self.updateOutputMenu )
+        self.display.testCardChanged.connect( self.updateOutputMenu )
 
         self.dialog_imagebin = ImageBinDialog()
         self.dialog_imagebin.itemSelected.connect( self.imageSelected )
@@ -557,6 +558,7 @@ class Grail(QMainWindow):
 
     def updateOutputMenu( self ):
 
+        print( "output menu updated" )
         current = self.display.getMode()
         flag = True
 

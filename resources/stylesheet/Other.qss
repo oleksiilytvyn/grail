@@ -369,6 +369,15 @@ QScrollBar:vertical {
     image: url(":/icons/align-white.png");
   	}
 
+	QToolButton#displayprefs_action_case {
+    qproperty-icon: none;
+    image: url(":/icons/case.png");
+  	}
+
+	QToolButton#displayprefs_action_case:hover {
+    image: url(":/icons/case-white.png");
+  	}
+
 	QToolButton#displayprefs_action_padding {
     qproperty-icon: none;
     image: url(":/icons/selection-select.png");

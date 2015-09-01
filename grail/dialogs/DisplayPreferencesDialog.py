@@ -30,6 +30,7 @@ from .CompositionDialog import CompositionDialog
 from .PaddingDialog import PaddingDialog
 from .ShadowDialog import ShadowDialog
 from .AlignDialog import AlignDialog
+from .CaseDialog import CaseDialog
 from .OSCSourceDialog import OSCSourceDialog
 
 
@@ -75,6 +76,12 @@ class DisplayPreferencesDialog(QWidget):
 
             self.display.update()
 
+        def case_updated( case ):
+            
+            self.preferences.case = case
+
+            self.display.update()
+
         self.composition_dialog = CompositionDialog()
         self.composition_dialog.setCompositionGeometry( self.preferences.composition )
         self.composition_dialog.updated.connect( composition_updated )
@@ -89,6 +96,9 @@ class DisplayPreferencesDialog(QWidget):
 
         self.align_dialog = AlignDialog( p.align_horizontal, p.align_vertical )
         self.align_dialog.updated.connect( align_updated )
+
+        self.case_dialog = CaseDialog()
+        self.case_dialog.updated.connect( case_updated )
 
         self.initUI()
 
@@ -132,6 +142,12 @@ class DisplayPreferencesDialog(QWidget):
         self.ui_align_action.setObjectName( "displayprefs_action_align" )
         self.ui_align_action.setProperty( "middle", True )
         self.ui_align_action.clicked.connect( self.alignAction )
+
+        self.ui_case_action = QToolButton( self )
+        self.ui_case_action.setIcon( QIcon(':/icons/align.png') )
+        self.ui_case_action.setObjectName( "displayprefs_action_case" )
+        self.ui_case_action.setProperty( "middle", True )
+        self.ui_case_action.clicked.connect( self.caseAction )
 
         self.ui_color_action = QToolButton( self )
         self.ui_color_action.setIcon( QIcon(':/icons/color.png') )
@@ -178,6 +194,7 @@ class DisplayPreferencesDialog(QWidget):
         self.ui_toolbar.addWidget( self.ui_font_action )
         self.ui_toolbar.addWidget( self.ui_shadow_action )
         self.ui_toolbar.addWidget( self.ui_align_action )
+        self.ui_toolbar.addWidget( self.ui_case_action )
         self.ui_toolbar.addWidget( self.ui_color_action )
 
         self.ui_toolbar.addWidget( self.ui_background_action )
@@ -265,6 +282,10 @@ class DisplayPreferencesDialog(QWidget):
     def alignAction( self ):
 
         self.align_dialog.showAt( self.actionMapToGlobal( self.ui_align_action )  )
+
+    def caseAction( self ):
+
+        self.case_dialog.showAt( self.actionMapToGlobal( self.ui_case_action )  )
 
     def transformUpdated( self ):
         self.preferences.transform = self.ui_transform.getTransform()

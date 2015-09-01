@@ -37,6 +37,8 @@ class DisplayPreferences:
     align_horizontal = Qt.AlignHCenter
     align_vertical = Qt.AlignVCenter
 
+    case = 0
+
     shadow_x = 0
     shadow_y = 5
     shadow_blur = 0
@@ -109,6 +111,7 @@ class DisplayPreferences:
         Settings.set('display', self.display)
         Settings.set('disabled', self.disabled)
         Settings.set('test', self.test)
+        Settings.set('case', self.case)
 
     def restore( self ):
 
@@ -183,3 +186,7 @@ class DisplayPreferences:
         test = Settings.get('test')
         if test is not None:
             self.test = test == "1"
+
+        case = Settings.get('case')
+        if case is not None:
+            self.case = int(case)

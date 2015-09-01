@@ -301,6 +301,18 @@ class DisplayDialog(QMainWindow):
             self.show()
 
     def setMessage( self, message ):
+
+        case = self.preferences.case
+
+        if case == 1:
+            message = message.title()
+        elif case == 2:
+            message = message.upper()
+        elif case == 3:
+            message = message.lower()
+        elif case == 4:
+            message = message.capitalize()
+
         self.text = message
 
         self.update()

@@ -73,10 +73,7 @@ def get_data_path():
 
     APPNAME = 'grail1'
 
-    if sys.platform == 'darwin':
-        from AppKit import NSSearchPathForDirectoriesInDomains
-        appdata = os.path.join(NSSearchPathForDirectoriesInDomains(14, 1, True)[0], APPNAME)
-    elif sys.platform == 'win32':
+    if sys.platform == 'win32':
         appdata = os.path.join(os.environ['APPDATA'], APPNAME)
     else:
         appdata = os.path.expanduser(os.path.join("~", "." + APPNAME))
@@ -91,7 +88,8 @@ def copy_file( a, b ):
     if not os.path.exists(directory):
         os.makedirs(directory)
 
-    shutil.copyfile( a, b )
+    if os.path.exists( a ):
+        shutil.copyfile( a, b )
 
 def get_version():
 

@@ -102,6 +102,7 @@ class Grail(QMainWindow):
 
         self.display = DisplayDialog( None, self.prefs )
         self.display.modeChanged.connect( self.updateOutputMenu )
+        self.display.testCardChanged.connect( self.updateOutputMenu )
 
         self.dialog_imagebin = ImageBinDialog()
         self.dialog_imagebin.itemSelected.connect( self.imageSelected )
@@ -186,7 +187,10 @@ class Grail(QMainWindow):
         self.ui_menu_edit.addSeparator()
         self.ui_menu_edit.addAction( self.ui_importPlaylistAction )
         self.ui_menu_edit.addAction( self.ui_exportPlaylistAction )
-        self.ui_menu_edit.addSeparator()
+
+        if not PLATFORM_MAC:
+            self.ui_menu_edit.addSeparator()
+    
         self.ui_menu_edit.addAction( self.ui_preferencesAction )
 
         # display menu
@@ -554,6 +558,7 @@ class Grail(QMainWindow):
 
     def updateOutputMenu( self ):
 
+        print( "output menu updated" )
         current = self.display.getMode()
         flag = True
 
@@ -1253,6 +1258,8 @@ class Grail(QMainWindow):
     # Events
 
     def closeEvent( self, event ):
+
+        self.sharedMemory.detach()
 
         self.prefs.save()
         self.dialog_about.close()

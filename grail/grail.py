@@ -558,7 +558,6 @@ class Grail(QMainWindow):
 
     def updateOutputMenu( self ):
 
-        print( "output menu updated" )
         current = self.display.getMode()
         flag = True
 

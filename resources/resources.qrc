@@ -16,6 +16,8 @@
 		<file alias="icons/zone-select.png">icons/zone-select.png</file>
 		<file alias="icons/align.png">icons/align.png</file>
 		<file alias="icons/align-white.png">icons/align-white.png</file>
+		<file alias="icons/case.png">icons/case.png</file>
+		<file alias="icons/case-white.png">icons/case-white.png</file>
 
 		<file alias="icons/testcard.png">icons/testcard.png</file>
 		<file alias="icons/testcard-white.png">icons/testcard-white.png</file>

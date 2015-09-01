@@ -30,9 +30,8 @@ from .CompositionDialog import CompositionDialog
 from .PaddingDialog import PaddingDialog
 from .ShadowDialog import ShadowDialog
 from .AlignDialog import AlignDialog
-from .CaseDialog import CaseDialog
 from .OSCSourceDialog import OSCSourceDialog
-
+from .CaseDialog import CaseDialog
 
 class DisplayPreferencesDialog(QWidget):
 
@@ -48,6 +47,7 @@ class DisplayPreferencesDialog(QWidget):
         self.display = parent
 
         self.updated.connect( self.updatedEvent )
+        self.display.testCardChanged.connect( self.updateTestCard )
 
         def composition_updated( rect ):
 
@@ -77,7 +77,7 @@ class DisplayPreferencesDialog(QWidget):
             self.display.update()
 
         def case_updated( case ):
-            
+
             self.preferences.case = case
 
             self.display.update()
@@ -144,7 +144,7 @@ class DisplayPreferencesDialog(QWidget):
         self.ui_align_action.clicked.connect( self.alignAction )
 
         self.ui_case_action = QToolButton( self )
-        self.ui_case_action.setIcon( QIcon(':/icons/align.png') )
+        self.ui_case_action.setIcon( QIcon(':/icons/case.png') )
         self.ui_case_action.setObjectName( "displayprefs_action_case" )
         self.ui_case_action.setProperty( "middle", True )
         self.ui_case_action.clicked.connect( self.caseAction )
@@ -223,6 +223,10 @@ class DisplayPreferencesDialog(QWidget):
         self.setWindowTitle( "Display Preferences" )
         self.setGeometry( 100, 100, 480, 360 )
         self.setMinimumSize( 300, 200 )
+
+    def updateTestCard( self ):
+
+        self.ui_testcard_action.setChecked( self.preferences.test )
 
     def updatedEvent( self ):
         pass

@@ -25,6 +25,7 @@ from PyQt5.QtWidgets import *
 from grail.utils import *
 from grail.widgets import *
 
+import os
 
 class ImageBinDialog(QDialog):
 
@@ -68,10 +69,12 @@ class ImageBinDialog(QDialog):
 
         size = 128
 
-        self.ui_list = QListWidget()
+        self.ui_list = ImageListWidget()
         self.ui_list.setObjectName( "mediaList" )
         self.ui_list.setAttribute( Qt.WA_MacShowFocusRect, False )
         self.ui_list.itemDoubleClicked.connect( self.itemDoubleClicked )
+        self.ui_list.keyPressed.connect( self.itemKeypress )
+        self.ui_list.fileDropped.connect( self.fileDropped )
 
         self.ui_list.setDragEnabled( True )
         self.ui_list.setViewMode( QListView.IconMode )
@@ -110,6 +113,13 @@ class ImageBinDialog(QDialog):
             for path in dialog.selectedFiles():
                 self.addListItem( path )
 
+    def fileDropped( self, url ):
+
+        path, ext = os.path.splitext(url.toLocalFile())
+
+        if ext in [".png", ".jpeg", ".jpg", ".gif"]:
+            self.addListItem( url.toLocalFile() )
+
     def clear( self ):
 
         self.files_list = []
@@ -133,3 +143,86 @@ class ImageBinDialog(QDialog):
     def itemDoubleClicked( self, item ):
 
         self.itemSelected.emit( item.data( Qt.UserRole ) )
+
+    def itemKeypress( self, event ):
+
+        if event.key() == Qt.Key_Return:
+            item = self.ui_list.currentItem()
+            self.itemSelected.emit( item.data( Qt.UserRole ) )
+        else:
+            QListWidget.keyPressEvent( self.ui_list, event )
+
+class ImageListWidget(QListWidget):
+
+    keyPressed = pyqtSignal('QKeyEvent')
+    fileDropped = pyqtSignal('QUrl')
+
+    def __init__( self, parent=None ):
+        super(ImageListWidget, self).__init__(parent)
+
+        self.keyPressed.connect( self.keyPressedEvent )
+        self.setVerticalScrollMode( QAbstractItemView.ScrollPerPixel )
+        self.setHorizontalScrollBarPolicy( Qt.ScrollBarAlwaysOff )
+        self.setVerticalScrollBarPolicy( Qt.ScrollBarAlwaysOff )
+        self.setAttribute( Qt.WA_MacShowFocusRect, False )
+
+        original = self.verticalScrollBar()
+
+        self.scrollbar = QScrollBar( Qt.Vertical, self )
+        self.scrollbar.valueChanged.connect( original.setValue )
+
+        original.valueChanged.connect( self.scrollbar.setValue )
+
+        self.updateScrollbar()
+
+    def keyPressEvent( self, event ):
+        self.keyPressed.emit( event )
+
+    def keyPressedEvent( self, event ):
+        pass
+
+    def updateScrollbar( self ):
+
+        original = self.verticalScrollBar()
+
+        if original.value() == original.maximum() and original.value() == 0:
+            self.scrollbar.hide()
+        else:
+            self.scrollbar.show()
+
+        self.scrollbar.setPageStep( original.pageStep() )
+        self.scrollbar.setRange( original.minimum(), original.maximum() )
+        self.scrollbar.resize( 8, self.rect().height() )
+        self.scrollbar.move( self.rect().width() - 8, 0 )
+
+    def paintEvent( self, event ):
+
+        QListWidget.paintEvent( self, event )
+        self.updateScrollbar()
+
+    def dragEnterEvent( self, event ):
+
+        if event.mimeData().hasUrls():
+            event.acceptProposedAction()
+        else:
+            QListWidget.dragEnterEvent( self, event )
+
+    def dragMoveEvent( self, event ):
+        
+        if event.mimeData().hasUrls():
+            event.acceptProposedAction()
+        else:
+            QListWidget.dragMoveEvent( self, event )
+
+    def dropEvent( self, event ):
+
+        if event.mimeData().hasUrls():
+            urls = event.mimeData().urls()
+            
+            if urls:
+                for url in urls:
+                    self.fileDropped.emit( url )
+
+            event.acceptProposedAction()
+
+        QListWidget.dropEvent( self, event )

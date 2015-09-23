@@ -44,9 +44,11 @@ try:
 except:
     pass
 
+
 # add version file to build
-with open("build/.version","w+") as f:
-    f.write(version)
+if os.path.isfile("build/.version"):
+    with open("build/.version","w+") as f:
+        f.write(version)
 
 base = None
 if sys.platform == "win32":

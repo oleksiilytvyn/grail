@@ -39,7 +39,7 @@ class PlaylistsModel:
 
         self.connection = ConnectionManager.get( path, get_path() + '/default/songs.db' )
 
-        if first_run and not ConnectionManager.iscopied( path ):
+        if first_run:
 
             cur = self.connection.cursor()
 

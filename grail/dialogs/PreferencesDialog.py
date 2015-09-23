@@ -37,7 +37,7 @@ class PreferencesDialog(OSCSourceDialog):
 
         self.ui_itemsLabel.setText( '0 destinations' )
         self.ui_panel_label.setText( 'No destinations' )
-        self.setWindowTitle('Preferences')
+        self.setWindowTitle('OSC Output')
 
         self.changed.connect( self.listChanged )
 

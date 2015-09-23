@@ -134,6 +134,10 @@ class Grail(QMainWindow):
         self.ui_blackoutMediaAction.setShortcut('Ctrl+Shift+Z')
         self.ui_blackoutMediaAction.triggered.connect( self.blackoutMediaAction )
 
+        self.ui_blackoutTextAction = QAction('Blackout Text', self)
+        self.ui_blackoutTextAction.setShortcut('Alt+Z')
+        self.ui_blackoutTextAction.triggered.connect( self.blackoutTextAction )
+
         self.ui_nextPageAction = QAction('Next page', self)
         self.ui_nextPageAction.setShortcut('Ctrl+N')
         self.ui_nextPageAction.triggered.connect( self.nextPageAction )
@@ -146,7 +150,7 @@ class Grail(QMainWindow):
         self.ui_newDisplayAction.setShortcut('Ctrl+D')
         self.ui_newDisplayAction.triggered.connect( self.newDisplayAction )
 
-        self.ui_preferencesAction = QAction('Preferences', self)
+        self.ui_preferencesAction = QAction('OSC Output', self)
         self.ui_preferencesAction.setShortcut('Ctrl+P')
         self.ui_preferencesAction.triggered.connect( self.preferencesAction )
 
@@ -199,6 +203,7 @@ class Grail(QMainWindow):
         self.ui_menu_display.addSeparator()
         self.ui_menu_display.addAction( self.ui_showAction )
         self.ui_menu_display.addAction( self.ui_blackoutAction )
+        self.ui_menu_display.addAction( self.ui_blackoutTextAction )
         self.ui_menu_display.addAction( self.ui_blackoutMediaAction )
         self.ui_menu_display.addSeparator()
         self.ui_menu_display.addAction( self.ui_previousPageAction )
@@ -979,6 +984,10 @@ class Grail(QMainWindow):
                 self.updatePlaylist()
 
     def blackoutAction( self ):
+        self.blackoutTextAction()
+        self.blackoutMediaAction()
+
+    def blackoutTextAction( self ):
 
         text = " "
         item = HistoryItem( HistoryItem.TYPE_BLACKOUT, text, text )

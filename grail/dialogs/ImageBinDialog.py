@@ -76,7 +76,7 @@ class ImageBinDialog(QDialog):
         self.ui_list.keyPressed.connect( self.itemKeypress )
         self.ui_list.fileDropped.connect( self.fileDropped )
 
-        self.ui_list.setDragEnabled( True )
+        self.ui_list.setDragEnabled( False )
         self.ui_list.setViewMode( QListView.IconMode )
         self.ui_list.setIconSize( QSize( size, size ) )
         self.ui_list.setSpacing( 1 )

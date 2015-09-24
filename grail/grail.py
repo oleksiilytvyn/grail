@@ -128,34 +128,42 @@ class Grail(QMainWindow):
 
         self.ui_blackoutAction = QAction('Blackout', self)
         self.ui_blackoutAction.setShortcut('Ctrl+Z')
+        self.ui_blackoutAction.setShortcutContext(Qt.ApplicationShortcut)
         self.ui_blackoutAction.triggered.connect( self.blackoutAction )
 
         self.ui_blackoutMediaAction = QAction('Blackout Media', self)
         self.ui_blackoutMediaAction.setShortcut('Ctrl+Shift+Z')
+        self.ui_blackoutMediaAction.setShortcutContext(Qt.ApplicationShortcut)
         self.ui_blackoutMediaAction.triggered.connect( self.blackoutMediaAction )
 
         self.ui_blackoutTextAction = QAction('Blackout Text', self)
         self.ui_blackoutTextAction.setShortcut('Alt+Z')
+        self.ui_blackoutTextAction.setShortcutContext(Qt.ApplicationShortcut)
         self.ui_blackoutTextAction.triggered.connect( self.blackoutTextAction )
 
         self.ui_nextPageAction = QAction('Next page', self)
         self.ui_nextPageAction.setShortcut('Ctrl+N')
+        self.ui_nextPageAction.setShortcutContext(Qt.ApplicationShortcut)
         self.ui_nextPageAction.triggered.connect( self.nextPageAction )
 
         self.ui_previousPageAction = QAction('Previus page', self)
         self.ui_previousPageAction.setShortcut('Ctrl+Shift+N')
+        self.ui_previousPageAction.setShortcutContext(Qt.ApplicationShortcut)
         self.ui_previousPageAction.triggered.connect( self.previousPageAction )
 
         self.ui_newDisplayAction = QAction('Open new display', self)
         self.ui_newDisplayAction.setShortcut('Ctrl+D')
+        self.ui_newDisplayAction.setShortcutContext(Qt.ApplicationShortcut)
         self.ui_newDisplayAction.triggered.connect( self.newDisplayAction )
 
         self.ui_preferencesAction = QAction('OSC Output', self)
         self.ui_preferencesAction.setShortcut('Ctrl+P')
+        self.ui_preferencesAction.setShortcutContext(Qt.ApplicationShortcut)
         self.ui_preferencesAction.triggered.connect( self.preferencesAction )
 
         self.ui_showHistoryAction = QAction('History', self)
         self.ui_showHistoryAction.setShortcut('Ctrl+H')
+        self.ui_showHistoryAction.setShortcutContext(Qt.ApplicationShortcut)
         self.ui_showHistoryAction.triggered.connect( self.dialog_history.show )
 
         self.ui_showImagesDialogAction = QAction('Media', self)
@@ -173,16 +181,19 @@ class Grail(QMainWindow):
 
         self.outputDisabledAction = QAction('Disabled', self)
         self.outputDisabledAction.setShortcut('Ctrl+Shift+D')
+        self.outputDisabledAction.setShortcutContext(Qt.ApplicationShortcut)
         self.outputDisabledAction.triggered.connect( self.displayOutputDisabledAction )
         self.outputDisabledAction.setCheckable( True )
 
         self.showTestCardAction = QAction('Show Test Card', self)
         self.showTestCardAction.setShortcut('Ctrl+T')
+        self.showTestCardAction.setShortcutContext(Qt.ApplicationShortcut)
         self.showTestCardAction.triggered.connect( self.displayShowTestCardAction )
         self.showTestCardAction.setCheckable( True )
 
         self.outputPreferencesAction = QAction('Advanced Preferences', self)
         self.outputPreferencesAction.setShortcut('Ctrl+Shift+P')
+        self.outputPreferencesAction.setShortcutContext(Qt.ApplicationShortcut)
         self.outputPreferencesAction.triggered.connect( self.displayOutputPreferencesAction )
 
         # edit menu

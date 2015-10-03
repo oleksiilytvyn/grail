@@ -21,6 +21,7 @@
 # generic imports
 import re
 import os
+import sys
 import sqlite3 as lite
 import traceback
 import time
@@ -29,6 +30,7 @@ from grail import resources
 
 # OSC library
 from pythonosc import osc_message_builder, udp_client
+from osc import OSCMessage, OSCBundle, OSCClient
 
 # PyQt5
 from PyQt5.QtCore import *
@@ -40,7 +42,6 @@ from grail.data import *
 from grail.widgets import *
 from grail.dialogs import *
 from grail.utils import *
-from grail.threaded import *
 
 
 def hook_exception( exctype, value, traceback_object ):
@@ -432,21 +433,13 @@ class Grail(QMainWindow):
         self.displays = []
 
         for rule in Settings.getOSCOutputRules():
-            self.subscribers.append( udp_client.UDPClient(rule["host"], rule["port"]) )
+            self.subscribers.append( OSCClient(rule["host"], rule["port"]) )
 
         ports = []
 
         for rule in Settings.getOSCInputRules():
             if not rule['port'] in ports:
                 ports.append( rule['port'] )
-
-        for port in ports:
-            listener = OSCListenerThread("0.0.0.0", port)
-            listener.recieved.connect( self.recievedOSC, Qt.QueuedConnection )
-            listener.start()
-
-            self.listeners.append( listener )
-
 
     def exec_( self ):
 
@@ -484,25 +477,7 @@ class Grail(QMainWindow):
         self.subscribers = []
 
         for rule in Settings.getOSCOutputRules():
-            self.subscribers.append( udp_client.UDPClient(rule["host"], rule["port"]) )
-
-    def recievedOSC( self, pattern, value ):
-
-        rules = Settings.getOSCInputRules()
-
-        for rule in rules:
-            pattr = rule['message']
-            action = rule['action']
-
-            if pattr == pattern and value == 1:
-                if action == RemoteAction.ACTION_BLACKOUT:
-                    self.blackoutAction()
-                elif action == RemoteAction.ACTION_SHOW:
-                    self.showAction()
-                elif action == RemoteAction.ACTION_PREVIOUS:
-                    self.previousPageAction()
-                elif action == RemoteAction.ACTION_NEXT:
-                    self.nextPageAction()
+            self.subscribers.append( OSCClient(rule["host"], rule["port"]) )
 
     def send( self, item ):
 
@@ -519,7 +494,6 @@ class Grail(QMainWindow):
         msg = osc_message_builder.OscMessageBuilder( address="/grail/message" )
         msg.add_arg( bytes( text, "utf-8" ) )
         msg.add_arg( item.type )
-        msg = msg.build()
 
         for client in self.subscribers:
             client.send( msg )

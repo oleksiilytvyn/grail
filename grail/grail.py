@@ -29,7 +29,6 @@ import time
 from grail import resources
 
 # OSC library
-from pythonosc import osc_message_builder, udp_client
 from osc import OSCMessage, OSCBundle, OSCClient
 
 # PyQt5
@@ -46,7 +45,7 @@ from grail.utils import *
 
 def hook_exception( exctype, value, traceback_object ):
 
-    out = open('errorlog.txt', 'a+')
+    out = open('error.log', 'a+')
     out.write("=== Exception ===\n" +
               "Platform: %s\n" % (platform.platform(), ) +
               "Version: %s\n" % (get_version(), ) +

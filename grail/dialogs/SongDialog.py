@@ -101,7 +101,7 @@ class SongDialog(QDialog):
         self.setWindowTitle('Add song')
         self.setGeometry( 300, 300, 300, 400 )
         self.setMinimumSize( 300, 400 )
-        self.setWindowFlags( Qt.Dialog | Qt.WindowCloseButtonHint )
+        self.setWindowFlags( Qt.WindowCloseButtonHint )
 
     def rejectAction( self ):
 

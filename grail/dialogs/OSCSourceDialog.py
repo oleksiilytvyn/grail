@@ -101,7 +101,7 @@ class OSCSourceDialog(QDialog):
         if not PLATFORM_MAC:
             self.setWindowIcon( QIcon(':/icons/32.png') )
 
-        self.setWindowFlags( Qt.Dialog | Qt.WindowCloseButtonHint )
+        self.setWindowFlags( Qt.WindowCloseButtonHint )
         self.setWindowTitle('OSC Sources')
         self.setGeometry( 300, 300, 240, 380 )
         self.setMinimumSize( 240, 380 )

@@ -27,6 +27,7 @@ main_python_file = "grail.py"
 import os
 import sys
 import grail
+import shutil
 import platform
 from cx_Freeze import setup, Executable
 
@@ -45,10 +46,15 @@ except:
     pass
 
 
+directory = os.path.dirname(os.path.realpath( "build/.version" ))
+
+if not os.path.exists(directory):
+    os.makedirs(directory)
+
 # add version file to build
-if os.path.isfile("build/.version"):
-    with open("build/.version","w+") as f:
-        f.write(version)
+f = open("build/.version", "w+")
+f.write(version)
+f.close()
 
 base = None
 if sys.platform == "win32":
@@ -76,9 +82,6 @@ includefiles = [('resources/bdist/bible.db-default', 'default/bible.db'),
 # add platform specific files
 if PLATFORM_WIN:
     includefiles.append( ('resources/bdist/libEGL.dll', 'libEGL.dll') )
-
-if PLATFORM_MAC:
-    includefiles.append( ('resources/bdist/qt.conf', 'qt.conf') )
 
 # try to build resources file
 try:
@@ -138,3 +141,14 @@ setup(
                  compress=True,
                  shortcutName=application_title,
                  shortcutDir="ProgramMenuFolder")])
+
+# fix app file
+if PLATFORM_MAC:
+    app_resources = "build/%s-%s.app/Contents/Resources" % (application_title, version)
+    app_contents = "build/%s-%s.app/Contents" % (application_title, version)
+
+    if os.path.exists( app_resources ):
+        shutil.copyfile( "resources/bdist/qt.conf", app_resources + '/qt.conf' )
+
+    if os.path.exists( app_contents ):
+        shutil.copyfile( "resources/bdist/Info.plist", app_contents + '/Info.plist' )

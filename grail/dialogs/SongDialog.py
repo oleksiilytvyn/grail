@@ -39,7 +39,6 @@ class SongDialog(QDialog):
         super(SongDialog, self).__init__(parent)
 
         self.setObjectName( "song_dialog" )
-        self.setStyleSheet( get_stylesheet() )
 
         self.updateComplete.connect( self.updateCompleteEvent )
         self.initUI()

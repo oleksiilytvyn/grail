@@ -42,8 +42,6 @@ class CaseDialog(BalloonDialog):
 
     def initUI( self ):
 
-        self.setStyleSheet( get_stylesheet() )
-
         self.ui_case = QComboBox()
         self.ui_case.activated.connect( self.valueChanged )
 

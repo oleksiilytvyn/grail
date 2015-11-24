@@ -43,8 +43,6 @@ class CompositionDialog(BalloonDialog):
 
     def initUI( self ):
 
-        self.setStyleSheet( get_stylesheet() )
-
         self.ui_width = QSpinBox()
         self.ui_width.setRange( 100, 32000 )
         self.ui_width.valueChanged.connect( self.valueChanged )

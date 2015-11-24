@@ -42,8 +42,6 @@ class PaddingDialog(BalloonDialog):
 
     def initUI( self ):
 
-        self.setStyleSheet( get_stylesheet() )
-
         self.ui_left = QSpinBox()
         self.ui_left.setRange( 0, 1000 )
         self.ui_left.setValue( self.padding.left() )

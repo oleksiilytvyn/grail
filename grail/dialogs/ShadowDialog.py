@@ -43,8 +43,6 @@ class ShadowDialog(BalloonDialog):
 
     def initUI( self ):
 
-        self.setStyleSheet( get_stylesheet() )
-
         self.ui_color_button = QPushButton("Set Color")
         self.ui_color_button.clicked.connect( self.colorAction )
 

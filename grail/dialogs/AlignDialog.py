@@ -43,8 +43,6 @@ class AlignDialog(BalloonDialog):
 
     def initUI( self ):
 
-        self.setStyleSheet( get_stylesheet() )
-
         self.ui_horizontal = QComboBox()
         self.ui_horizontal.activated.connect( self.valueChanged )
 

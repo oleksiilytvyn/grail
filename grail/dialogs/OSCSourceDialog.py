@@ -42,8 +42,6 @@ class OSCSourceDialog(QDialog):
 
     def initUI( self ):
 
-        self.setStyleSheet( get_stylesheet() )
-
         self.ui_layout = QVBoxLayout()
         self.ui_layout.setObjectName( "songsBar" )
         self.ui_layout.setSpacing( 0 )

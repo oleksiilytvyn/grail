@@ -23,15 +23,30 @@ __version__ = '0.9.2'
 import sys
 import os
 
-from PyQt5.QtWidgets import QApplication
+# PyQt5
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
+
 from grail.utils import *
 from grail.grail import Grail
 
+class Application(QApplication):
+
+    def __init__( self, argv ):
+        super(Application, self).__init__(argv)
+
+        try:
+            self.setAttribute( Qt.AA_UseHighDpiPixmaps )
+        except:
+            pass
+
+        self.setStyleSheet( get_stylesheet() )
 
 def main():
     os.chdir( get_path() )
 
-    app = QApplication(sys.argv)
+    app = Application(sys.argv)
     win = Grail()
 
     sys.exit(app.exec_())

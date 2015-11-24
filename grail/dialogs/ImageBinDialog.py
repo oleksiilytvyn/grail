@@ -41,8 +41,6 @@ class ImageBinDialog(QDialog):
 
     def initUI( self ):
 
-        self.setStyleSheet( get_stylesheet() )
-
         self.ui_layout = QVBoxLayout()
         self.ui_layout.setObjectName( "media_dialog" )
         self.ui_layout.setSpacing( 0 )

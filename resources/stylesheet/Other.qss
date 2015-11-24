@@ -38,6 +38,35 @@
 		color: #fff;
 		}
 
+
+QLineEdit, 
+QTextEdit,
+QSpinBox,
+QComboBox {
+	border: 1px solid #ccc;
+	border-radius: 2px;
+	padding: 2px 5px;
+	margin: 0;
+	background: #fff;
+	min-height: 20px;
+	color: #000;
+	}
+	
+	QComboBox::drop-down {
+		border-image: none;
+		image: url(:/icons/branch-open.png);
+		position: relative;
+		top: 8px;
+		left: -2px;
+		background: #fff;
+		color: #000;
+		}
+
+	QComboBox QAbstractItemView::item{
+		background: #fff;
+		color: #000;
+		}
+
 /*  */
 
 QScrollBar:horizontal {
@@ -247,29 +276,30 @@ QScrollBar:vertical {
  * @section about dialog
  */
 
-#about_dialog {
-	background-color: #e3e3e3;
+AboutDialog {
+	background-color: #ececec;
 	}
 
-#about_title {
-	color: white; 
-	font-size: 24pt;
-	font-weight: bold;
-	font-family: "Myriad Pro", "Helvetica", sans-serif;
-	}
+	AboutDialog #about_title {
+		font-size: 18px;
+		font-weight: bold;
+		}
 
-#about_copyright {
-	color: #a1a1a1; 
-	font-size: 10pt;
-	}
+	AboutDialog #about_version {
+		font-size: 12px;
+		}
 
-#about_version {
-	color: white;
-	}
+	AboutDialog #about_copyright {
+		font-size: 14px;
+		}
 
 /**
  * @section display preferences dialog
  */
+
+QToolBar {
+	padding: 3px 5px;
+	}
 
 #displayprefs_dialog {
 	background: #262626;
@@ -282,7 +312,7 @@ QScrollBar:vertical {
 
 #displayprefs_toolbar {
 	background: #1f1f1f;
-	padding: 3px 5px;
+	padding: 8px;
 	}
 
 	#displayprefs_toolbar QPushButton,

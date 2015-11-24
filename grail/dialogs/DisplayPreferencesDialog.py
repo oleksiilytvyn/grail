@@ -105,7 +105,6 @@ class DisplayPreferencesDialog(QWidget):
     def initUI( self ):
 
         self.setObjectName( "displayprefs_dialog" )
-        self.setStyleSheet( get_stylesheet() )
 
         self.ui_transform = TransformWidget()
         self.ui_transform.setObjectName( "displayprefs_transform" )

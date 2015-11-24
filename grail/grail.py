@@ -66,11 +66,6 @@ class Grail(QMainWindow):
         if self.isAlreadyRunning():
             sys.exit()
 
-        try:
-            QApplication.setAttribute( Qt.AA_UseHighDpiPixmaps )
-        except:
-            pass
-
         self.initUI()
         self.initOSC()
 
@@ -78,8 +73,6 @@ class Grail(QMainWindow):
         """
         Initialize UI
         """
-
-        self.setStyleSheet( get_stylesheet() )
 
         # dialogs
         self.dialog_about = AboutDialog()
@@ -490,9 +483,9 @@ class Grail(QMainWindow):
         for display in self.displays:
             display.setMessage( text )
 
-        msg = osc_message_builder.OscMessageBuilder( address="/grail/message" )
-        msg.add_arg( bytes( text, "utf-8" ) )
-        msg.add_arg( item.type )
+        msg = OSCMessage( address="/grail/message" )
+        msg.add( bytes( text, "utf-8" ) )
+        msg.add( item.type )
 
         for client in self.subscribers:
             client.send( msg )
@@ -1269,6 +1262,8 @@ class Grail(QMainWindow):
             display.close( True )
 
         ConnectionManager.closeAll()
+
+        print("Grail %s" % (get_version(), ))
 
     def searchKeyEvent( self, event ):
 

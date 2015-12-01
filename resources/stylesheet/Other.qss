@@ -1,72 +1,4 @@
 
-#songsPanel {
-	background: #f9f9f9;
-	padding: 0;
-	margin: 0;
-	}
-
-#songsSearch {
-	border: 1px solid #b6b6b6;
-	border-radius: 11px;
-	margin: 12px 16px 10px 16px;
-	padding: 1px 8px;
-	background: qlineargradient( x1:0 y1:0, x2:0 y2:1, stop:0 #f1f1f1, stop:0.4 #ffffff);
-	min-height: 20px;
-	}
-
-	#songsSearch QToolButton {
-		margin-right: 18px;
-		}
-
-#songsList {
-	border: none;
-	background: #f9f9f9;
-	show-decoration-selected: 1;
-	outline: 0;
-	} 
-
-	#songsList::item { 
-		color: #212121;
-		padding: 4px 12px;
-		border-bottom: 1px solid #eee;
-		qproperty-wordWrap: true;
-		} 
-
-	#songsList::item:selected {
-		background: #0069d9;
-		border-bottom: 1px solid #0069d9;
-		color: #fff;
-		}
-
-
-QLineEdit, 
-QTextEdit,
-QSpinBox,
-QComboBox {
-	border: 1px solid #ccc;
-	border-radius: 2px;
-	padding: 2px 5px;
-	margin: 0;
-	background: #fff;
-	min-height: 20px;
-	color: #000;
-	}
-	
-	QComboBox::drop-down {
-		border-image: none;
-		image: url(:/icons/branch-open.png);
-		position: relative;
-		top: 8px;
-		left: -2px;
-		background: #fff;
-		color: #000;
-		}
-
-	QComboBox QAbstractItemView::item{
-		background: #fff;
-		color: #000;
-		}
-
 /*  */
 
 QScrollBar:horizontal {
@@ -125,6 +57,45 @@ QScrollBar:vertical {
 		height: 0px;
 		background: none;
 		border: none;
+		}
+
+#songsPanel {
+	background: #f9f9f9;
+	padding: 0;
+	margin: 0;
+	}
+
+#songsSearch {
+	border: 1px solid #b6b6b6;
+	border-radius: 11px;
+	margin: 12px 16px 10px 16px;
+	padding: 1px 8px;
+	background: qlineargradient( x1:0 y1:0, x2:0 y2:1, stop:0 #f1f1f1, stop:0.4 #ffffff);
+	min-height: 20px;
+	}
+
+	#songsSearch QToolButton {
+		margin-right: 18px;
+		}
+
+#songsList {
+	border: none;
+	background: #f9f9f9;
+	show-decoration-selected: 1;
+	outline: 0;
+	} 
+
+	#songsList::item { 
+		color: #212121;
+		padding: 4px 12px;
+		border-bottom: 1px solid #eee;
+		qproperty-wordWrap: true;
+		} 
+
+	#songsList::item:selected {
+		background: #0069d9;
+		border-bottom: 1px solid #0069d9;
+		color: #fff;
 		}
 
 #songsToolbar {

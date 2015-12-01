@@ -92,14 +92,14 @@ except:
 setup(
     name=application_title,
     version=version,
-    url='http://grailapp.bitbucket.org/',
+    url='http://grailapp.com/',
 
     author='Oleksii Lytvyn',
     author_email='grailapplication@gmail.com',
     description="Simple and fast lyrics application.",
     long_description="",
     keywords='open source osc church lyrics projection song bible display',
-    license='GNU General Public License v2',
+    license='GNU General Public License v3',
 
     classifiers=[
         'Development Status :: 4 - Beta',

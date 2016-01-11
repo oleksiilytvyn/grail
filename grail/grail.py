@@ -130,7 +130,7 @@ class Grail(QMainWindow):
         self.ui_blackoutMediaAction.triggered.connect( self.blackoutMediaAction )
 
         self.ui_blackoutTextAction = QAction('Blackout Text', self)
-        self.ui_blackoutTextAction.setShortcut('Alt+Z')
+        self.ui_blackoutTextAction.setShortcut('Ctrl+Alt+Z')
         self.ui_blackoutTextAction.setShortcutContext(Qt.ApplicationShortcut)
         self.ui_blackoutTextAction.triggered.connect( self.blackoutTextAction )
 

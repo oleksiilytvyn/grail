@@ -188,7 +188,6 @@ class DisplayPreferencesDialog(QWidget):
         self.ui_toolbar = QToolBar()
         self.ui_toolbar.setObjectName( "displayprefs_toolbar" )
         self.ui_toolbar.setIconSize( QSize(16, 16) )
-        self.ui_toolbar.setStyle( QStyleFactory.create("windows") )
 
         self.ui_toolbar.addWidget( self.ui_font_action )
         self.ui_toolbar.addWidget( self.ui_shadow_action )

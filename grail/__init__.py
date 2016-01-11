@@ -41,6 +41,11 @@ class Application(QApplication):
         except:
             pass
 
+        # use GTK style if available
+        for style in QStyleFactory.keys():
+            if "gtk" in style.lower():
+                self.setStyle( QStyleFactory.create("gtk") )
+
         self.setStyleSheet( get_stylesheet() )
 
 def main():

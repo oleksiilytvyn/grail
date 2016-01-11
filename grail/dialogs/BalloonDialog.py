@@ -32,7 +32,6 @@ class BalloonDialog(QDialog):
         super(BalloonDialog, self).__init__( parent )
 
         self.setWindowFlags( Qt.Widget | Qt.FramelessWindowHint | Qt.X11BypassWindowManagerHint )
-        self.setStyleSheet("background: transparent;")
         self.setAttribute( Qt.WA_NoSystemBackground, True )
         self.setAttribute( Qt.WA_TranslucentBackground, True )
 

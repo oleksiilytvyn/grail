@@ -103,13 +103,13 @@ class PlaylistDialog(BalloonDialog):
         self.ui_list.insertRow( x )
 
         self.ui_list.setItem( x, 0, item )
-        self.ui_list.editItem( self.ui_list.item(x, 0) )
 
         button = PlaylistRemoveButton( self, playlist )
         button.triggered.connect( self.listRemoveClicked )
         self.ui_list.setCellWidget( x, 1, button)
-
         self.ui_list.setCurrentCell( x, 0 )
+
+        self.ui_list.editItem( self.ui_list.item(x, 0) )
 
     def editAction( self ):
 
@@ -138,6 +138,7 @@ class PlaylistDialog(BalloonDialog):
             if int(playlist['id']) == id:
                 self.ui_list.setCurrentItem( item )
                 self.listItemClicked( item )
+                self.ui_list.scrollToItem( self.ui_list.item(x, 0) )
 
             button = PlaylistRemoveButton( self, playlist )
             button.triggered.connect( self.listRemoveClicked )
@@ -184,6 +185,12 @@ class PlaylistDialog(BalloonDialog):
 
     def selectedEvent( self, id ):
         pass
+
+    def showAt( self, point ):
+        
+        super(PlaylistDialog, self).showAt( point )
+
+        self.ui_list.update()
 
 
 class PlaylistDialogItem(QTableWidgetItem):
@@ -247,11 +254,14 @@ class PlaylistTableWidget(QTableWidget):
 
         self.scrollbar = QScrollBar( Qt.Vertical, self )
         self.scrollbar.valueChanged.connect( original.setValue )
+        self.scrollbar.rangeChanged.connect( self.scrollToSelected )
 
         original.valueChanged.connect( self.scrollbar.setValue )
+
         self.updateScrollbar()
 
     def paintEvent( self, event ):
+
         QTableWidget.paintEvent( self, event )
 
         self.updateScrollbar()
@@ -267,9 +277,15 @@ class PlaylistTableWidget(QTableWidget):
             elif b:
                 b.setIconState( True )
 
+    def update( self ):
+
+        super(PlaylistTableWidget, self).update()
+        self.updateScrollbar()
+
     def updateScrollbar( self ):
 
         original = self.verticalScrollBar()
+
         if not hasattr(self, 'scrollbar'):
             return
 
@@ -282,3 +298,15 @@ class PlaylistTableWidget(QTableWidget):
         self.scrollbar.setRange( original.minimum(), original.maximum() )
         self.scrollbar.resize( 8, self.rect().height() )
         self.scrollbar.move( self.rect().width() - 8, 0 )
+
+    def scrollToSelected( self ):
+
+        selected = self.selectedIndexes()
+
+        if len(selected) == 0:
+            x = 0
+            self.setCurrentCell( x, 0 )
+        else:
+            x = selected[0].row()
+
+        self.scrollToItem( self.item(x, 0) )

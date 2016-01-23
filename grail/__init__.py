@@ -18,7 +18,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-__version__ = '0.9.2'
+__version__ = '0.9.3'
 
 import sys
 import os
@@ -31,10 +31,18 @@ from PyQt5.QtWidgets import *
 from grail.utils import *
 from grail.grail import Grail
 
+
 class Application(QApplication):
+    """Grail application"""
 
     def __init__( self, argv ):
         super(Application, self).__init__(argv)
+
+        self.shared_memory = None
+
+        # prevent from running more than one instance
+        if self.isAlreadyRunning():
+            self.quit()
 
         try:
             self.setAttribute( Qt.AA_UseHighDpiPixmaps )
@@ -48,7 +56,58 @@ class Application(QApplication):
 
         self.setStyleSheet( get_stylesheet() )
 
+    def isAlreadyRunning(self):
+        """Check for another instances of Grail
+
+        Returns: Boolean
+        """
+
+        self.shared_memory = QSharedMemory('Grail')
+
+        if self.shared_memory.attach():
+
+            msgBox = QMessageBox()
+            msgBox.setWindowTitle("Grail")
+            msgBox.setText("Another version of Grail is currently running")
+            msgBox.setStandardButtons( QMessageBox.Ok )
+            msgBox.setDefaultButton( QMessageBox.Ok )
+
+            if not PLATFORM_MAC:
+                msgBox.setWindowIcon( QIcon(':/icons/32.png') )
+
+            if PLATFORM_UNIX:
+                msgBox.setWindowIcon( QIcon(':/icons/256.png') )
+
+            ret = msgBox.exec_()
+
+            return True
+        else:
+            self.shared_memory.create(1)
+        
+        return False
+
+    def quit( self ):
+        """Quit application and close all connections"""
+
+        super(Application, self).quit()
+        self.shared_memory.detach()
+
+
+def hook_exception( exctype, value, traceback_object ):
+    """Hook exception to be written to file"""
+
+    out = open('error.log', 'a+')
+    out.write("=== Exception ===\n" +
+              "Platform: %s\n" % (platform.platform(), ) +
+              "Version: %s\n" % (get_version(), ) +
+              "Traceback: %s\n" % (''.join(traceback.format_exception(exctype, value, traceback_object)), ) )
+    out.close()
+
+sys.excepthook = hook_exception
+
+
 def main():
+    """Launch Grail application"""
     os.chdir( get_path() )
 
     app = Application(sys.argv)

@@ -42,19 +42,6 @@ from grail.widgets import *
 from grail.dialogs import *
 from grail.utils import *
 
-
-def hook_exception( exctype, value, traceback_object ):
-
-    out = open('error.log', 'a+')
-    out.write("=== Exception ===\n" +
-              "Platform: %s\n" % (platform.platform(), ) +
-              "Version: %s\n" % (get_version(), ) +
-              "Traceback: %s\n" % (''.join(traceback.format_exception(exctype, value, traceback_object)), ) )
-    out.close()
-
-sys.excepthook = hook_exception
-
-
 class Grail(QMainWindow):
     """
     Grail application class
@@ -62,9 +49,6 @@ class Grail(QMainWindow):
 
     def __init__( self, parent=None ):
         super(Grail, self).__init__(parent)
-
-        if self.isAlreadyRunning():
-            sys.exit()
 
         self.initUI()
         self.initOSC()
@@ -432,37 +416,6 @@ class Grail(QMainWindow):
         for rule in Settings.getOSCInputRules():
             if not rule['port'] in ports:
                 ports.append( rule['port'] )
-
-    def exec_( self ):
-
-        QApplication.exec_()
-        self.sharedMemory.detach()
-
-    def isAlreadyRunning(self):
-        
-        self.sharedMemory = QSharedMemory('Grail')
-
-        if self.sharedMemory.attach():
-
-            msgBox = QMessageBox()
-            msgBox.setWindowTitle("Grail")
-            msgBox.setText("Another version of Grail is currently running")
-            msgBox.setStandardButtons( QMessageBox.Ok )
-            msgBox.setDefaultButton( QMessageBox.Ok )
-
-            if not PLATFORM_MAC:
-                msgBox.setWindowIcon( QIcon(':/icons/32.png') )
-
-            if PLATFORM_UNIX:
-                msgBox.setWindowIcon( QIcon(':/icons/256.png') )
-
-            ret = msgBox.exec_()
-
-            return True
-        else:
-            self.sharedMemory.create(1)
-        
-        return False
 
     def updateOSCConnections( self, list ):
 
@@ -1244,8 +1197,6 @@ class Grail(QMainWindow):
 
     def closeEvent( self, event ):
 
-        self.sharedMemory.detach()
-
         self.prefs.save()
         self.dialog_about.close()
         self.dialog_preferences.close()
@@ -1262,8 +1213,6 @@ class Grail(QMainWindow):
             display.close( True )
 
         ConnectionManager.closeAll()
-
-        print("Grail %s" % (get_version(), ))
 
     def searchKeyEvent( self, event ):
 

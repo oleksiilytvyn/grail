@@ -18,67 +18,69 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-__version__ = '0.9.3'
+__version__ = '1.0.0'
 
 import sys
 import os
+import re
 
 # PyQt5
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
+from PyQt5 import QtCore
+from PyQt5 import QtGui
+from PyQt5 import QtWidgets
 
-from grail.utils import *
-from grail.grail import Grail
+# grail
+from grail.sdk.utils import script_path
+from grail.ui import MainWindow
 
 
-class Application(QApplication):
+class GrailApplication(QtWidgets.QApplication):
     """Grail application"""
 
     def __init__( self, argv ):
-        super(Application, self).__init__(argv)
+        super(GrailApplication, self).__init__(argv)
 
         self.shared_memory = None
 
+        self.setOrganizationName("Oleksii Lytvyn")
+        self.setOrganizationDomain("grailapp.com")
+        self.setApplicationName("grail")
+
         # prevent from running more than one instance
-        if self.isAlreadyRunning():
+        if self.is_already_running():
             self.quit()
 
         try:
-            self.setAttribute( Qt.AA_UseHighDpiPixmaps )
+            self.setAttribute( QtCore.Qt.AA_UseHighDpiPixmaps )
         except:
             pass
 
         # use GTK style if available
-        for style in QStyleFactory.keys():
+        for style in QtWidgets.QStyleFactory.keys():
             if "gtk" in style.lower():
-                self.setStyle( QStyleFactory.create("gtk") )
+                self.setStyle( QtWidgets.QStyleFactory.create("gtk") )
 
-        self.setStyleSheet( get_stylesheet() )
+        self.setStyleSheet( self.get_stylesheet() )
 
-    def isAlreadyRunning(self):
+    def is_already_running(self):
         """Check for another instances of Grail
 
         Returns: Boolean
         """
 
-        self.shared_memory = QSharedMemory('Grail')
+        self.shared_memory = QtCore.QSharedMemory('grail')
 
         if self.shared_memory.attach():
 
-            msgBox = QMessageBox()
+            msgBox = QtGui.QMessageBox()
             msgBox.setWindowTitle("Grail")
             msgBox.setText("Another version of Grail is currently running")
-            msgBox.setStandardButtons( QMessageBox.Ok )
-            msgBox.setDefaultButton( QMessageBox.Ok )
+            msgBox.setStandardButtons( QtGui.QMessageBox.Ok )
+            msgBox.setDefaultButton( QtGui.QMessageBox.Ok )
+            msgBox.setIcon( QtGui.QMessageBox.Warning )
+            msgBox.setWindowIcon( QtGui.QIcon(':/icons/256.png') )
 
-            if not PLATFORM_MAC:
-                msgBox.setWindowIcon( QIcon(':/icons/32.png') )
-
-            if PLATFORM_UNIX:
-                msgBox.setWindowIcon( QIcon(':/icons/256.png') )
-
-            ret = msgBox.exec_()
+            msgBox.exec_()
 
             return True
         else:
@@ -89,30 +91,61 @@ class Application(QApplication):
     def quit( self ):
         """Quit application and close all connections"""
 
-        super(Application, self).quit()
         self.shared_memory.detach()
+        super(GrailApplication, self).quit()
+        sys.exit()
 
 
-def hook_exception( exctype, value, traceback_object ):
-    """Hook exception to be written to file"""
+    def hook_exception( self, exctype, value, traceback_object ):
+        """Hook exception to be written to file"""
 
-    out = open('error.log', 'a+')
-    out.write("=== Exception ===\n" +
-              "Platform: %s\n" % (platform.platform(), ) +
-              "Version: %s\n" % (get_version(), ) +
-              "Traceback: %s\n" % (''.join(traceback.format_exception(exctype, value, traceback_object)), ) )
-    out.close()
+        out = open('error.log', 'a+')
+        out.write("=== Exception ===\n" +
+                  "Platform: %s\n" % ( platform.platform(), ) +
+                  "Version: %s\n" % ( version(), ) +
+                  "Traceback: %s\n" % ( ''.join(traceback.format_exception(exctype, value, traceback_object)), ) )
+        out.close()
 
-sys.excepthook = hook_exception
+    def get_stylesheet( self ):
+        """
+        Get the application stylesheet
+
+        :returns: string
+        """
+
+        data = ""
+        stream = QtCore.QFile(":/stylesheet/app.qss")
+
+        if stream.open(QtCore.QFile.ReadOnly):
+            data = str(stream.readAll())
+            stream.close()
+
+        data = re.sub(r'\\n', '', data)
+        data = re.sub(r'\\t', '', data)
+
+        return data[2:-1]
 
 
-def main():
+def version():
+    """Returns version of Grail"""
+
+    path = '.version'
+
+    if os.path.isfile( path ):
+        return open( path ).read()
+    else:
+        return __version__
+
+
+def main(args=None):
     """Launch Grail application"""
-    os.chdir( get_path() )
 
-    app = Application(sys.argv)
-    win = Grail()
+    os.chdir( script_path() )
 
+    app = GrailApplication(sys.argv)
+    win = MainWindow()
+
+    sys.excepthook = app.hook_exception
     sys.exit(app.exec_())
 
 if __name__ == '__main__':

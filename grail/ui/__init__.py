@@ -18,10 +18,4 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-
-class RemoteAction():
-
-    ACTION_BLACKOUT = 0
-    ACTION_NEXT = 1
-    ACTION_PREVIOUS = 2
-    ACTION_SHOW = 3
+from grail.ui.main_window import MainWindow

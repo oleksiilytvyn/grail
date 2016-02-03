@@ -28,6 +28,7 @@ class SearchListItem(QListWidgetItem):
     TYPE_SONG = 1
     TYPE_BIBLE = 2
     TYPE_REFERENCE = 3
+    TYPE_HISTORY = 4
 
     def __init__( self, parent=None ):
         super(SearchListItem, self).__init__(parent)

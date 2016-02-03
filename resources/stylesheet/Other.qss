@@ -109,12 +109,15 @@ QScrollBar:vertical {
 		background: none;
 		border-radius: 3px;
 		padding: 2px;
+		font-weight: bold;
+		color: #000;
 		}
 
 	#songsToolbar QToolButton:hover,
 	#songsToolbar QToolButton:pressed {
 		background: #d1e3f7;
 		border: 1px solid #d1e3f7;
+		color: #000;
 		}
 
 #playlistTree {

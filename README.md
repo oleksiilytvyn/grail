@@ -8,6 +8,7 @@ Grail uses latest technology to made flexible application that looks great.
 
 * Python 3.3 or higer
 * PyQt 5 or higer
+* osc library (https://bitbucket.org/grailapp/osc)
 
 ### Build dependencies ###
 * cx_Freeze 5.0 or higer

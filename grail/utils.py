@@ -57,7 +57,7 @@ def get_stylesheet():
     """
 
     data = ""
-    stream = QFile(":/stylesheet/Other.qss")
+    stream = QFile(":/stylesheet/app.qss")
 
     if stream.open(QFile.ReadOnly):
         data = str(stream.readAll())

@@ -27,3 +27,4 @@ from .PlaylistTreeWidget import PlaylistTreeWidget
 from .SongTreeWidgetItem import SongTreeWidgetItem
 from .PageTreeWidgetItem import PageTreeWidgetItem
 from .QuickTextEdit import QuickTextEdit
+from .MediaWidget import MediaWidget

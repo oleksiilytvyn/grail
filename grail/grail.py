@@ -67,9 +67,6 @@ class Grail(QMainWindow):
         self.dialog_song.updateComplete.connect( self.updateSearch )
         self.dialog_song.updateComplete.connect( self.updatePlaylist )
 
-        self.dialog_history = HistoryDialog()
-        self.dialog_history.itemSelected.connect( self.historyItemSelected )
-
         self.dialog_playlist = PlaylistDialog()
         self.dialog_playlist.selected.connect( self.playlistSelectedAction )
         self.dialog_playlist.renamed.connect( self.playlistSelectedAction )
@@ -81,8 +78,9 @@ class Grail(QMainWindow):
         self.display.modeChanged.connect( self.updateOutputMenu )
         self.display.testCardChanged.connect( self.updateOutputMenu )
 
-        self.dialog_imagebin = ImageBinDialog()
-        self.dialog_imagebin.itemSelected.connect( self.imageSelected )
+        self.ui_media_panel = MediaWidget()
+        self.ui_media_panel.itemSelected.connect( self.imageSelected )
+        self.ui_media_panel.switchMode.connect( self.showLibraryPanel )
 
         # menubar
         self.ui_menubar = QMenuBar( self )
@@ -138,13 +136,13 @@ class Grail(QMainWindow):
         self.ui_preferencesAction.setShortcutContext(Qt.ApplicationShortcut)
         self.ui_preferencesAction.triggered.connect( self.preferencesAction )
 
-        self.ui_showHistoryAction = QAction('History', self)
-        self.ui_showHistoryAction.setShortcut('Ctrl+H')
-        self.ui_showHistoryAction.setShortcutContext(Qt.ApplicationShortcut)
-        self.ui_showHistoryAction.triggered.connect( self.dialog_history.show )
+        self.ui_showLibraryAction = QAction('Show Library', self)
+        self.ui_showLibraryAction.setShortcut('Ctrl+L')
+        self.ui_showLibraryAction.triggered.connect( self.showLibraryPanel )
 
-        self.ui_showImagesDialogAction = QAction('Media', self)
-        self.ui_showImagesDialogAction.triggered.connect( self.dialog_imagebin.show )
+        self.ui_showMediaAction = QAction('Show Media', self)
+        self.ui_showMediaAction.setShortcut('Ctrl+M')
+        self.ui_showMediaAction.triggered.connect( self.showMediaPanel )
 
         self.ui_toggleLibraryAction = QAction('Toggle Library sidebar', self)
         self.ui_toggleLibraryAction.triggered.connect( self.toggleLibrary )
@@ -199,8 +197,8 @@ class Grail(QMainWindow):
 
         # view menu
         self.ui_menu_view = self.ui_menubar.addMenu('&View')
-        self.ui_menu_view.addAction( self.ui_showHistoryAction )
-        self.ui_menu_view.addAction( self.ui_showImagesDialogAction )
+        self.ui_menu_view.addAction( self.ui_showLibraryAction )
+        self.ui_menu_view.addAction( self.ui_showMediaAction )
         self.ui_menu_view.addSeparator()
         self.ui_menu_view.addAction( self.ui_toggleLibraryAction )
         self.ui_menu_view.addAction( self.ui_togglePreviewAction )
@@ -239,14 +237,23 @@ class Grail(QMainWindow):
         self.ui_songs_list.setContextMenuPolicy( Qt.CustomContextMenu )
         self.ui_songs_list.customContextMenuRequested.connect( self.songContextMenu )
 
-        addSongAction = QAction( QIcon(':/icons/add.png'), 'Add', self )
+        addSongAction = QAction( 'Add', self )
         addSongAction.setIconVisibleInMenu( True )
         addSongAction.triggered.connect( self.addSongAction )
+
+        switchViewAction = QAction( 'Media', self )
+        switchViewAction.setIconVisibleInMenu( True )
+        switchViewAction.triggered.connect( self.toggleLeftView )
+
+        spacer = QWidget()
+        spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
         self.ui_songs_toolbar = QToolBar()
         self.ui_songs_toolbar.setObjectName( "songsToolbar" )
         self.ui_songs_toolbar.setIconSize( QSize(16, 16) )
         self.ui_songs_toolbar.addAction( addSongAction )
+        self.ui_songs_toolbar.addWidget( spacer )
+        self.ui_songs_toolbar.addAction( switchViewAction )
 
         self.ui_songs_bar.addWidget( self.ui_songs_search )
         self.ui_songs_bar.addWidget( self.ui_songs_list )
@@ -363,12 +370,21 @@ class Grail(QMainWindow):
         self.ui_vertical_spliter.setSizes( [400, 120] )
         self.ui_vertical_spliter.setHandleWidth( 1 )
 
+        # stacked widget
+        self.ui_left_sidebar = QStackedWidget()
+        self.ui_left_sidebar.addWidget( self.ui_songs_panel )
+        self.ui_left_sidebar.addWidget( self.ui_media_panel )
+
         # spliter
         self.ui_spliter = QSplitter()
         self.ui_spliter.setObjectName( "spliter" )
-        self.ui_spliter.addWidget( self.ui_songs_panel )
+
+        self.ui_spliter.addWidget( self.ui_left_sidebar )
         self.ui_spliter.addWidget( self.ui_playlist_panel )
         self.ui_spliter.addWidget( self.ui_vertical_spliter )
+
+        self.ui_left_sidebar.setCurrentIndex( 0 )
+
         self.ui_spliter.setCollapsible( 0, False )
         self.ui_spliter.setCollapsible( 2, False )
         self.ui_spliter.setHandleWidth( 1 )
@@ -400,6 +416,7 @@ class Grail(QMainWindow):
         self.updateLabels()
         self.updateOutputMenu()
 
+        History.changed.connect( self.updateSearch )
     # OSC
 
     def initOSC( self ):
@@ -447,6 +464,19 @@ class Grail(QMainWindow):
             History.add( item.type, item.title, text )
 
     # UI
+
+    def toggleLeftView( self ):
+
+        index = self.ui_left_sidebar.currentIndex()
+        self.ui_left_sidebar.setCurrentIndex( 0 if index == 1 else 1 )
+
+    def showLibraryPanel( self ):
+
+        self.ui_left_sidebar.setCurrentIndex( 0 )
+
+    def showMediaPanel( self ):
+
+        self.ui_left_sidebar.setCurrentIndex( 1 )
 
     def center( self ):
         qr = self.frameGeometry()
@@ -539,11 +569,15 @@ class Grail(QMainWindow):
         self.ui_songs_list.clear()
 
         if not items:
-            items = Song.getList()
+            items = History.getLast(35)
 
             for item in items:
                 listitem = SearchListItem()
-                listitem.setSong( item )
+                listitem.setType( SearchListItem.TYPE_HISTORY )
+                listitem.setText( item['title'] )
+                listitem.setMessage( item['message'] )
+                listitem.setItemData( item )
+
                 self.ui_songs_list.addItem( listitem )
         else:
             for item in items:
@@ -936,6 +970,10 @@ class Grail(QMainWindow):
             text = '\n\n'.join( page['page'] for page in Song.getPages( item.data["id"] ) )
             self.ui_preview_label.setText( text )
 
+        if item.type == SearchListItem.TYPE_HISTORY:
+            text = item.data["message"]
+            self.ui_preview_label.setText( text )
+
         if item.type == SearchListItem.TYPE_REFERENCE:
             data = item.getData()
 
@@ -976,11 +1014,17 @@ class Grail(QMainWindow):
                 self.ui_preview_label.setText( text_verse )
                 self.ui_preview_edit.setPlainText( text_verse )
 
-                item = HistoryItem( HistoryItem.TYPE_BIBLE, data[0], text_verse )
+                hitem = HistoryItem( HistoryItem.TYPE_BIBLE, data[0], text_verse )
 
-                self.send( item )
+                self.send( hitem )
             except:
                 pass
+
+        if item.type == SearchListItem.TYPE_HISTORY:
+            data = item.getData()
+
+            hitem = HistoryItem( HistoryItem.TYPE_QUICK, data["title"], data["message"] )
+            self.send( hitem )
 
     def songKeyEvent( self, event ):
 
@@ -1203,9 +1247,7 @@ class Grail(QMainWindow):
         self.dialog_song.close()
         self.display.setAttribute( Qt.WA_DeleteOnClose, True )
         self.display.close( True )
-        self.dialog_imagebin.close()
 
-        self.dialog_history.close()
         self.dialog_playlist.close()
 
         for display in self.displays:

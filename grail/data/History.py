@@ -70,6 +70,13 @@ class HistoryModel(QObject):
 
         return cursor.fetchall()
 
+    def getLast( self, size = 10 ):
+
+        cursor = self.connection.cursor()
+        cursor.execute("SELECT * FROM history ORDER BY added DESC LIMIT ?", (size,))
+
+        return cursor.fetchall()
+
     def search( self, keyword ):
 
         keyword = "%" + keyword + "%"

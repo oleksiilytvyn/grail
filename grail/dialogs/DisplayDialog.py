@@ -29,7 +29,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
 
-class DisplayDialog(QMainWindow):
+class DisplayDialog(QDialog):
 
     """
     Display Window
@@ -336,8 +336,7 @@ class DisplayDialog(QMainWindow):
         screen_available = False
 
         for screen in QGuiApplication.screens():
-            if name == screen.name():
-                geometry = screen.availableGeometry()
+                geometry = screen.geometry()
                 screen_available = True
 
                 self.preferences.fullscreen = True

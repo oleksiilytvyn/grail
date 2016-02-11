@@ -22,6 +22,7 @@ __version__ = '0.9.4'
 
 import sys
 import os
+import traceback
 
 # PyQt5
 from PyQt5.QtCore import *
@@ -89,8 +90,8 @@ class Application(QApplication):
     def quit( self ):
         """Quit application and close all connections"""
 
-        super(Application, self).quit()
         self.shared_memory.detach()
+        super(Application, self).quit()
 
 
 def hook_exception( exctype, value, traceback_object ):

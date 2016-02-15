@@ -47,7 +47,11 @@ class DisplayDialog(QDialog):
         self.preferences = preferences
         self.oldcomposition = self.preferences.composition
         self.oldTestCard = self.preferences.test
+        
         self.image = None
+        self.image_blackout = None
+        self.image_text = None
+
         self.testcard = None
         self.mousePosition = None
 
@@ -138,15 +142,31 @@ class DisplayDialog(QDialog):
         if not prefs.test:
             painter.fillRect( comp, prefs.background )
 
-            if self.image:
-                pixSize = self.image.size()
+            # text blackout
+            if self.text == " " or self.text == "" and self.image_blackout:
+                pixSize = self.image_blackout.size()
                 pixSize.scale( comp.width(), comp.height(), Qt.KeepAspectRatio )
 
                 painter.drawPixmap( comp.width() / 2 - pixSize.width() / 2,
                                     comp.height() / 2 - pixSize.height() / 2,
                                     pixSize.width(),
                                     pixSize.height(),
-                                    self.image )
+                                    self.image_blackout )
+
+            background_image = self.image
+
+            if self.text != " " and self.text != "" and not self.image:
+                background_image = self.image_text
+
+            if background_image:
+                pixSize = background_image.size()
+                pixSize.scale( comp.width(), comp.height(), Qt.KeepAspectRatio )
+
+                painter.drawPixmap( comp.width() / 2 - pixSize.width() / 2,
+                                    comp.height() / 2 - pixSize.height() / 2,
+                                    pixSize.width(),
+                                    pixSize.height(),
+                                    background_image )
 
             painter.setFont( prefs.font )
             painter.setPen( prefs.shadow_color )
@@ -447,5 +467,23 @@ class DisplayDialog(QDialog):
             self.image = QPixmap( path )
         else:
             self.image = None
+
+        self.update()
+
+    def setBlackoutImage( self, path ):
+
+        if path:
+            self.image_blackout = QPixmap( path )
+        else:
+            self.image_blackout = None
+
+        self.update()
+
+    def setTextImage( self, path ):
+
+        if path:
+            self.image_text = QPixmap( path )
+        else:
+            self.image_text = None
 
         self.update()

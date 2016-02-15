@@ -81,6 +81,8 @@ class Grail(QMainWindow):
         self.ui_media_panel = MediaWidget()
         self.ui_media_panel.itemSelected.connect( self.imageSelected )
         self.ui_media_panel.switchMode.connect( self.showLibraryPanel )
+        self.ui_media_panel.blackoutImage.connect( self.setBlackoutImage )
+        self.ui_media_panel.textImage.connect( self.setTextImage )
 
         # menubar
         self.ui_menubar = QMenuBar( self )
@@ -96,6 +98,10 @@ class Grail(QMainWindow):
         # Export Playlist
         self.ui_exportPlaylistAction = QAction('Export playlist', self)
         self.ui_exportPlaylistAction.triggered.connect( self.exportPlaylistAction )
+
+        # Clear history
+        self.ui_clearHistoryAction = QAction('Clear history', self)
+        self.ui_clearHistoryAction.triggered.connect( self.clearHistoryAction )
 
         # Display
         self.ui_showAction = QAction('Show', self)
@@ -177,6 +183,9 @@ class Grail(QMainWindow):
         self.ui_menu_edit.addSeparator()
         self.ui_menu_edit.addAction( self.ui_importPlaylistAction )
         self.ui_menu_edit.addAction( self.ui_exportPlaylistAction )
+
+        self.ui_menu_edit.addSeparator()
+        self.ui_menu_edit.addAction( self.ui_clearHistoryAction )
 
         if not PLATFORM_MAC:
             self.ui_menu_edit.addSeparator()
@@ -754,6 +763,9 @@ class Grail(QMainWindow):
         connection.commit()
         connection.close()
 
+    def clearHistoryAction( self ):
+        History.clear()
+
     def displayShowTestCardAction( self ):
 
         self.display.setTestCard( self.showTestCardAction.isChecked() )
@@ -1297,3 +1309,16 @@ class Grail(QMainWindow):
 
         for display in self.displays:
             display.setImage( path )
+
+    def setBlackoutImage( self, path ):
+
+        self.display.setBlackoutImage( path )
+
+        for display in self.displays:
+            display.setBlackoutImage( path )
+
+    def setTextImage( self, path ):
+        self.display.setTextImage( path )
+
+        for display in self.displays:
+            display.setTextImage( path )

@@ -31,6 +31,8 @@ class MediaWidget(QWidget):
 
     itemSelected = pyqtSignal(object)
     switchMode = pyqtSignal()
+    blackoutImage = pyqtSignal(object)
+    textImage = pyqtSignal(object)
 
     def __init__( self, parent=None ):
 
@@ -95,6 +97,8 @@ class MediaWidget(QWidget):
 
     def contextMenu( self, pos ):
 
+        item = self.ui_list.itemAt(pos)
+
         menu = QMenu("Context Menu", self)
 
         clearAction = QAction('Clear list', menu)
@@ -103,8 +107,26 @@ class MediaWidget(QWidget):
         addAction = QAction('Add', menu)
         addAction.triggered.connect( self.addFilesAction )
 
-        menu.addAction( addAction )
+        def setBlackoutImageAction():
+            self.blackoutImage.emit( item.data( Qt.UserRole ) )
+
+        backgroundAction = QAction('Set as blackout image', menu)
+        backgroundAction.triggered.connect( setBlackoutImageAction )
+
+        def setTextImageAction():
+            self.textImage.emit( item.data( Qt.UserRole ) )
+
+        textAction = QAction('Set as default text image', menu)
+        textAction.triggered.connect( setTextImageAction )
+
+        if not item:
+            backgroundAction.setEnabled( False )
+            textAction.setEnabled( False )
+
+        menu.addAction( backgroundAction )
+        menu.addAction( textAction )
         menu.addSeparator()
+        menu.addAction( addAction )
         menu.addAction( clearAction )
 
         ret = menu.exec_( self.mapToGlobal(pos) )

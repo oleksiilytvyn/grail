@@ -35,16 +35,19 @@ class SongDialog(QDialog):
     updateComplete = pyqtSignal()
 
     def __init__(self, parent=None, song=None):
-
         super(SongDialog, self).__init__(parent)
 
-        self.setObjectName( "song_dialog" )
+        self.setObjectName("song_dialog")
+        self.updateComplete.connect(self.updateCompleteEvent)
 
-        self.updateComplete.connect( self.updateCompleteEvent )
-        self.initUI()
         self.mode = SongDialog.MODE_ADD
 
-    def initUI( self ):
+        if song:
+            self.setSong(song)
+
+        self.initUI()
+
+    def initUI(self):
 
         title = QLabel('Title')
         artist = QLabel('Artist')
@@ -53,27 +56,27 @@ class SongDialog(QDialog):
         pages = QLabel('Lyrics')
 
         self.titleEdit = QLineEdit()
-        self.titleEdit.setAttribute( Qt.WA_MacShowFocusRect, 0 )
+        self.titleEdit.setAttribute(Qt.WA_MacShowFocusRect, 0)
         self.artistEdit = QLineEdit()
-        self.artistEdit.setAttribute( Qt.WA_MacShowFocusRect, 0 )
+        self.artistEdit.setAttribute(Qt.WA_MacShowFocusRect, 0)
         self.albumEdit = QLineEdit()
-        self.albumEdit.setAttribute( Qt.WA_MacShowFocusRect, 0 )
+        self.albumEdit.setAttribute(Qt.WA_MacShowFocusRect, 0)
         self.yearEdit = QLineEdit()
-        self.yearEdit.setAttribute( Qt.WA_MacShowFocusRect, 0 )
+        self.yearEdit.setAttribute(Qt.WA_MacShowFocusRect, 0)
         self.pagesEdit = QTextEdit()
-        self.pagesEdit.setAttribute( Qt.WA_MacShowFocusRect, 0 )
-        self.pagesEdit.setAcceptRichText( False )
+        self.pagesEdit.setAttribute(Qt.WA_MacShowFocusRect, 0)
+        self.pagesEdit.setAcceptRichText(False)
 
         buttonBox = QDialogButtonBox()
         buttonBox.setContentsMargins(0, 0, 0, 0)
-        buttonBox.setStandardButtons( QDialogButtonBox.Cancel | QDialogButtonBox.Ok )
-        buttonBox.accepted.connect( self.acceptAction )
-        buttonBox.rejected.connect( self.rejectAction )
+        buttonBox.setStandardButtons(QDialogButtonBox.Cancel | QDialogButtonBox.Ok)
+        buttonBox.accepted.connect(self.acceptAction)
+        buttonBox.rejected.connect(self.rejectAction)
 
         grid = QGridLayout()
-        grid.setSpacing( 6 )
-        grid.setContentsMargins( 8, 8, 8, 8 )
-        grid.setColumnMinimumWidth( 0, 200 )
+        grid.setSpacing(6)
+        grid.setContentsMargins(8, 8, 8, 8)
+        grid.setColumnMinimumWidth(0, 200)
 
         grid.addWidget(title, 0, 0, 1, 2)
         grid.addWidget(self.titleEdit, 1, 0, 1, 2)
@@ -95,18 +98,18 @@ class SongDialog(QDialog):
         self.setLayout(grid)
 
         if not PLATFORM_MAC:
-            self.setWindowIcon( QIcon(':/icons/32.png') )
+            self.setWindowIcon(QIcon(':/icons/32.png'))
 
         self.setWindowTitle('Add song')
-        self.setGeometry( 300, 300, 300, 400 )
-        self.setMinimumSize( 300, 400 )
-        self.setWindowFlags( Qt.WindowCloseButtonHint )
+        self.setGeometry(300, 300, 300, 400)
+        self.setMinimumSize(300, 400)
+        self.setWindowFlags(Qt.WindowCloseButtonHint)
 
-    def rejectAction( self ):
+    def rejectAction(self):
 
         self.reject()
 
-    def acceptAction( self ):
+    def acceptAction(self):
 
         title = str(self.titleEdit.text())
         album = str(self.albumEdit.text())
@@ -121,62 +124,62 @@ class SongDialog(QDialog):
         if self.mode == SongDialog.MODE_UPDATE:
             id = self.song['id']
 
-            Song.update( id, title, artist, album, year )
-            Song.deletePages( id )
+            Song.update(id, title, artist, album, year)
+            Song.deletePages(id)
         else:
-            id = Song.add( title, artist, album, year )
+            id = Song.add(title, artist, album, year)
 
         for page in pages.split("\n\n"):
-            Song.addPage( id, page )
+            Song.addPage(id, page)
 
-        self.updateComplete.emit( )
+        self.updateComplete.emit()
         self.accept()
 
-    def setMode( self, mode ):
+    def setMode(self, mode):
 
         self.mode = mode
 
-    def setSong( self, song ):
+    def setSong(self, song):
 
-        self.setMode( SongDialog.MODE_UPDATE )
+        self.setMode(SongDialog.MODE_UPDATE)
         self.song = song
 
-        self.setWindowTitle( 'Editing - ' + song['title'] )
+        self.setWindowTitle('Editing - ' + song['title'])
 
-        self.titleEdit.setText( song['title'] )
-        self.artistEdit.setText( song['artist'] )
-        self.albumEdit.setText( song['album'] )
-        self.yearEdit.setText( str(song['year']) )
+        self.titleEdit.setText(song['title'])
+        self.artistEdit.setText(song['artist'])
+        self.albumEdit.setText(song['album'])
+        self.yearEdit.setText(str(song['year']))
 
-        pages = Song.getPages( song['id'] )
+        pages = Song.getPages(song['id'])
 
-        self.pagesEdit.setText( "\n\n".join( page['page'] for page in pages ) )
+        self.pagesEdit.setText("\n\n".join(page['page'] for page in pages))
 
-    def addSong( self ):
+    def addSong(self):
 
-        self.setMode( SongDialog.MODE_ADD )
-        self.setWindowTitle( 'Add new' )
+        self.setMode(SongDialog.MODE_ADD)
+        self.setWindowTitle('Add new')
 
-        self.titleEdit.setText( "" )
-        self.artistEdit.setText( "" )
-        self.albumEdit.setText( "" )
-        self.yearEdit.setText( "" )
-        self.pagesEdit.setText( "" )
+        self.titleEdit.setText("")
+        self.artistEdit.setText("")
+        self.albumEdit.setText("")
+        self.yearEdit.setText("")
+        self.pagesEdit.setText("")
 
-    def showOnTop( self ):
+    def showOnTop(self):
 
-        self.setGeometry( 300, 300, 300, 400 )
+        self.setGeometry(300, 300, 300, 400)
         self.center()
-        self.setWindowState( self.windowState() & ~Qt.WindowMinimized | Qt.WindowActive)
+        self.setWindowState(self.windowState() & ~Qt.WindowMinimized | Qt.WindowActive)
         self.activateWindow()
         self.raise_()
         self.show()
 
-    def center( self ):
+    def center(self):
         qr = self.frameGeometry()
         cp = QDesktopWidget().availableGeometry().center()
-        qr.moveCenter( cp )
-        self.move( qr.topLeft() )
+        qr.moveCenter(cp)
+        self.move(qr.topLeft())
 
-    def updateCompleteEvent( self ):
+    def updateCompleteEvent(self):
         pass

@@ -36,7 +36,7 @@ from grail.grail import Grail
 class Application(QApplication):
     """Grail application"""
 
-    def __init__( self, argv ):
+    def __init__(self, argv):
         super(Application, self).__init__(argv)
 
         self.shared_memory = None
@@ -46,16 +46,16 @@ class Application(QApplication):
             self.quit()
 
         try:
-            self.setAttribute( Qt.AA_UseHighDpiPixmaps )
+            self.setAttribute(Qt.AA_UseHighDpiPixmaps)
         except:
             pass
 
         # use GTK style if available
         for style in QStyleFactory.keys():
             if "gtk" in style.lower():
-                self.setStyle( QStyleFactory.create("gtk") )
+                self.setStyle(QStyleFactory.create("gtk"))
 
-        self.setStyleSheet( get_stylesheet() )
+        self.setStyleSheet(get_stylesheet())
 
     def isAlreadyRunning(self):
         """Check for another instances of Grail
@@ -70,51 +70,53 @@ class Application(QApplication):
             msgBox = QMessageBox()
             msgBox.setWindowTitle("Grail")
             msgBox.setText("Another version of Grail is currently running")
-            msgBox.setStandardButtons( QMessageBox.Ok )
-            msgBox.setDefaultButton( QMessageBox.Ok )
+            msgBox.setStandardButtons(QMessageBox.Ok)
+            msgBox.setDefaultButton(QMessageBox.Ok)
 
             if not PLATFORM_MAC:
-                msgBox.setWindowIcon( QIcon(':/icons/32.png') )
+                msgBox.setWindowIcon(QIcon(':/icons/32.png'))
 
             if PLATFORM_UNIX:
-                msgBox.setWindowIcon( QIcon(':/icons/256.png') )
+                msgBox.setWindowIcon(QIcon(':/icons/256.png'))
 
-            ret = msgBox.exec_()
+            msgBox.exec_()
 
             return True
         else:
             self.shared_memory.create(1)
-        
+
         return False
 
-    def quit( self ):
+    def quit(self):
         """Quit application and close all connections"""
 
         self.shared_memory.detach()
         super(Application, self).quit()
 
 
-def hook_exception( exctype, value, traceback_object ):
+def hook_exception(exctype, value, traceback_object):
     """Hook exception to be written to file"""
 
     out = open('error.log', 'a+')
     out.write("=== Exception ===\n" +
-              "Platform: %s\n" % (platform.platform(), ) +
-              "Version: %s\n" % (get_version(), ) +
-              "Traceback: %s\n" % (''.join(traceback.format_exception(exctype, value, traceback_object)), ) )
+              "Platform: %s\n" % (platform.platform(),) +
+              "Version: %s\n" % (get_version(),) +
+              "Traceback: %s\n" % (''.join(traceback.format_exception(exctype, value, traceback_object)),))
     out.close()
+
 
 sys.excepthook = hook_exception
 
 
 def main():
     """Launch Grail application"""
-    os.chdir( get_path() )
+    os.chdir(get_path())
 
     app = Application(sys.argv)
     win = Grail()
 
     sys.exit(app.exec_())
+
 
 if __name__ == '__main__':
     main()

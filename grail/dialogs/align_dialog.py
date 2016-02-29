@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 # Grail - Lyrics software. Simple.
-# Copyright (C) 2014-2015 Oleksii Lytvyn
+# Copyright (C) 2014-2016 Oleksii Lytvyn
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@ from grail.utils import *
 from grail.data import Playlist, Settings
 from grail.widgets import *
 
-from .BalloonDialog import BalloonDialog
+from .balloon_dialog import BalloonDialog
 
 
 class AlignDialog(BalloonDialog):

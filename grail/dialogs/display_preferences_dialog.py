@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 # Grail - Lyrics software. Simple.
-# Copyright (C) 2014-2015 Oleksii Lytvyn
+# Copyright (C) 2014-2016 Oleksii Lytvyn
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -26,12 +26,12 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
-from .CompositionDialog import CompositionDialog
-from .PaddingDialog import PaddingDialog
-from .ShadowDialog import ShadowDialog
-from .AlignDialog import AlignDialog
-from .OSCSourceDialog import OSCSourceDialog
-from .CaseDialog import CaseDialog
+from .composition_dialog import CompositionDialog
+from .padding_dialog import PaddingDialog
+from .shadow_dialog import ShadowDialog
+from .align_dialog import AlignDialog
+from .osc_source_dialog import OSCSourceDialog
+from .case_dialog import CaseDialog
 
 class DisplayPreferencesDialog(QWidget):
 

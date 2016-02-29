@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 # Grail - Lyrics software. Simple.
-# Copyright (C) 2014-2015 Oleksii Lytvyn
+# Copyright (C) 2014-2016 Oleksii Lytvyn
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -42,18 +42,19 @@ from grail.widgets import *
 from grail.dialogs import *
 from grail.utils import *
 
+
 class Grail(QMainWindow):
     """
     Grail application class
     """
 
-    def __init__( self, parent=None ):
+    def __init__(self, parent=None):
         super(Grail, self).__init__(parent)
 
         self.initUI()
         self.initOSC()
 
-    def initUI( self ):
+    def initUI(self):
         """
         Initialize UI
         """
@@ -61,350 +62,350 @@ class Grail(QMainWindow):
         # dialogs
         self.dialog_about = AboutDialog()
         self.dialog_preferences = PreferencesDialog()
-        self.dialog_preferences.osc_out_changed.connect( self.updateOSCConnections )
+        self.dialog_preferences.osc_out_changed.connect(self.updateOSCConnections)
 
         self.dialog_song = SongDialog()
-        self.dialog_song.updateComplete.connect( self.updateSearch )
-        self.dialog_song.updateComplete.connect( self.updatePlaylist )
+        self.dialog_song.updateComplete.connect(self.updateSearch)
+        self.dialog_song.updateComplete.connect(self.updatePlaylist)
 
         self.dialog_playlist = PlaylistDialog()
-        self.dialog_playlist.selected.connect( self.playlistSelectedAction )
-        self.dialog_playlist.renamed.connect( self.playlistSelectedAction )
+        self.dialog_playlist.selected.connect(self.playlistSelectedAction)
+        self.dialog_playlist.renamed.connect(self.playlistSelectedAction)
 
         self.prefs = DisplayPreferences()
         self.prefs.restore()
 
-        self.display = DisplayDialog( None, self.prefs )
-        self.display.modeChanged.connect( self.updateOutputMenu )
-        self.display.testCardChanged.connect( self.updateOutputMenu )
+        self.display = DisplayDialog(None, self.prefs)
+        self.display.modeChanged.connect(self.updateOutputMenu)
+        self.display.testCardChanged.connect(self.updateOutputMenu)
 
         self.ui_media_panel = MediaWidget()
-        self.ui_media_panel.itemSelected.connect( self.imageSelected )
-        self.ui_media_panel.switchMode.connect( self.showLibraryPanel )
-        self.ui_media_panel.blackoutImage.connect( self.setBlackoutImage )
-        self.ui_media_panel.textImage.connect( self.setTextImage )
+        self.ui_media_panel.itemSelected.connect(self.imageSelected)
+        self.ui_media_panel.switchMode.connect(self.showLibraryPanel)
+        self.ui_media_panel.blackoutImage.connect(self.setBlackoutImage)
+        self.ui_media_panel.textImage.connect(self.setTextImage)
 
         # menubar
-        self.ui_menubar = QMenuBar( self )
+        self.ui_menubar = QMenuBar(self)
 
         # Help
         self.ui_aboutAction = QAction('About Grail', self)
-        self.ui_aboutAction.triggered.connect( self.aboutAction )
+        self.ui_aboutAction.triggered.connect(self.aboutAction)
 
         # Import Playlist
         self.ui_importPlaylistAction = QAction('Import playlist', self)
-        self.ui_importPlaylistAction.triggered.connect( self.importPlaylistAction )
+        self.ui_importPlaylistAction.triggered.connect(self.importPlaylistAction)
 
         # Export Playlist
         self.ui_exportPlaylistAction = QAction('Export playlist', self)
-        self.ui_exportPlaylistAction.triggered.connect( self.exportPlaylistAction )
+        self.ui_exportPlaylistAction.triggered.connect(self.exportPlaylistAction)
 
         # Clear history
         self.ui_clearHistoryAction = QAction('Clear history', self)
-        self.ui_clearHistoryAction.triggered.connect( self.clearHistoryAction )
+        self.ui_clearHistoryAction.triggered.connect(self.clearHistoryAction)
 
         # Display
         self.ui_showAction = QAction('Show', self)
-        self.ui_showAction.triggered.connect( self.showAction )
+        self.ui_showAction.triggered.connect(self.showAction)
 
         self.ui_blackoutAction = QAction('Blackout', self)
         self.ui_blackoutAction.setShortcut('Ctrl+Z')
         self.ui_blackoutAction.setShortcutContext(Qt.ApplicationShortcut)
-        self.ui_blackoutAction.triggered.connect( self.blackoutAction )
+        self.ui_blackoutAction.triggered.connect(self.blackoutAction)
 
         self.ui_blackoutMediaAction = QAction('Blackout Media', self)
         self.ui_blackoutMediaAction.setShortcut('Ctrl+Shift+Z')
         self.ui_blackoutMediaAction.setShortcutContext(Qt.ApplicationShortcut)
-        self.ui_blackoutMediaAction.triggered.connect( self.blackoutMediaAction )
+        self.ui_blackoutMediaAction.triggered.connect(self.blackoutMediaAction)
 
         self.ui_blackoutTextAction = QAction('Blackout Text', self)
         self.ui_blackoutTextAction.setShortcut('Ctrl+Alt+Z')
         self.ui_blackoutTextAction.setShortcutContext(Qt.ApplicationShortcut)
-        self.ui_blackoutTextAction.triggered.connect( self.blackoutTextAction )
+        self.ui_blackoutTextAction.triggered.connect(self.blackoutTextAction)
 
         self.ui_nextPageAction = QAction('Next page', self)
         self.ui_nextPageAction.setShortcut('Ctrl+N')
         self.ui_nextPageAction.setShortcutContext(Qt.ApplicationShortcut)
-        self.ui_nextPageAction.triggered.connect( self.nextPageAction )
+        self.ui_nextPageAction.triggered.connect(self.nextPageAction)
 
         self.ui_previousPageAction = QAction('Previus page', self)
         self.ui_previousPageAction.setShortcut('Ctrl+Shift+N')
         self.ui_previousPageAction.setShortcutContext(Qt.ApplicationShortcut)
-        self.ui_previousPageAction.triggered.connect( self.previousPageAction )
+        self.ui_previousPageAction.triggered.connect(self.previousPageAction)
 
         self.ui_newDisplayAction = QAction('Open new display', self)
         self.ui_newDisplayAction.setShortcut('Ctrl+D')
         self.ui_newDisplayAction.setShortcutContext(Qt.ApplicationShortcut)
-        self.ui_newDisplayAction.triggered.connect( self.newDisplayAction )
+        self.ui_newDisplayAction.triggered.connect(self.newDisplayAction)
 
         self.ui_preferencesAction = QAction('OSC Output', self)
         self.ui_preferencesAction.setShortcut('Ctrl+P')
         self.ui_preferencesAction.setShortcutContext(Qt.ApplicationShortcut)
-        self.ui_preferencesAction.triggered.connect( self.preferencesAction )
+        self.ui_preferencesAction.triggered.connect(self.preferencesAction)
 
         self.ui_showLibraryAction = QAction('Show Library', self)
         self.ui_showLibraryAction.setShortcut('Ctrl+L')
-        self.ui_showLibraryAction.triggered.connect( self.showLibraryPanel )
+        self.ui_showLibraryAction.triggered.connect(self.showLibraryPanel)
 
         self.ui_showMediaAction = QAction('Show Media', self)
         self.ui_showMediaAction.setShortcut('Ctrl+M')
-        self.ui_showMediaAction.triggered.connect( self.showMediaPanel )
+        self.ui_showMediaAction.triggered.connect(self.showMediaPanel)
 
         self.ui_toggleLibraryAction = QAction('Toggle Library sidebar', self)
-        self.ui_toggleLibraryAction.triggered.connect( self.toggleLibrary )
+        self.ui_toggleLibraryAction.triggered.connect(self.toggleLibrary)
 
         self.ui_togglePreviewAction = QAction('Toggle Preview sidebar', self)
-        self.ui_togglePreviewAction.triggered.connect( self.togglePreview )
+        self.ui_togglePreviewAction.triggered.connect(self.togglePreview)
 
         # Songs and playlists
-        self.ui_addSongAction = QAction( 'Add new Song', self)
-        self.ui_addSongAction.triggered.connect( self.addSongAction )
+        self.ui_addSongAction = QAction('Add new Song', self)
+        self.ui_addSongAction.triggered.connect(self.addSongAction)
 
         self.outputDisabledAction = QAction('Disabled', self)
         self.outputDisabledAction.setShortcut('Ctrl+Shift+D')
         self.outputDisabledAction.setShortcutContext(Qt.ApplicationShortcut)
-        self.outputDisabledAction.triggered.connect( self.displayOutputDisabledAction )
-        self.outputDisabledAction.setCheckable( True )
+        self.outputDisabledAction.triggered.connect(self.displayOutputDisabledAction)
+        self.outputDisabledAction.setCheckable(True)
 
         self.showTestCardAction = QAction('Show Test Card', self)
         self.showTestCardAction.setShortcut('Ctrl+T')
         self.showTestCardAction.setShortcutContext(Qt.ApplicationShortcut)
-        self.showTestCardAction.triggered.connect( self.displayShowTestCardAction )
-        self.showTestCardAction.setCheckable( True )
+        self.showTestCardAction.triggered.connect(self.displayShowTestCardAction)
+        self.showTestCardAction.setCheckable(True)
 
         self.outputPreferencesAction = QAction('Advanced Preferences', self)
         self.outputPreferencesAction.setShortcut('Ctrl+Shift+P')
         self.outputPreferencesAction.setShortcutContext(Qt.ApplicationShortcut)
-        self.outputPreferencesAction.triggered.connect( self.displayOutputPreferencesAction )
+        self.outputPreferencesAction.triggered.connect(self.displayOutputPreferencesAction)
 
         # edit menu
         self.ui_menu_edit = self.ui_menubar.addMenu('&Edit')
-        self.ui_menu_edit.addAction( self.ui_addSongAction )
+        self.ui_menu_edit.addAction(self.ui_addSongAction)
         self.ui_menu_edit.addSeparator()
-        self.ui_menu_edit.addAction( self.ui_importPlaylistAction )
-        self.ui_menu_edit.addAction( self.ui_exportPlaylistAction )
+        self.ui_menu_edit.addAction(self.ui_importPlaylistAction)
+        self.ui_menu_edit.addAction(self.ui_exportPlaylistAction)
 
         self.ui_menu_edit.addSeparator()
-        self.ui_menu_edit.addAction( self.ui_clearHistoryAction )
+        self.ui_menu_edit.addAction(self.ui_clearHistoryAction)
 
         if not PLATFORM_MAC:
             self.ui_menu_edit.addSeparator()
-    
-        self.ui_menu_edit.addAction( self.ui_preferencesAction )
+
+        self.ui_menu_edit.addAction(self.ui_preferencesAction)
 
         # display menu
         self.ui_menu_display = self.ui_menubar.addMenu('&Display')
-        self.ui_menu_display.addAction( self.ui_newDisplayAction )
+        self.ui_menu_display.addAction(self.ui_newDisplayAction)
         self.ui_menu_display.addSeparator()
-        self.ui_menu_display.addAction( self.ui_showAction )
-        self.ui_menu_display.addAction( self.ui_blackoutAction )
-        self.ui_menu_display.addAction( self.ui_blackoutTextAction )
-        self.ui_menu_display.addAction( self.ui_blackoutMediaAction )
+        self.ui_menu_display.addAction(self.ui_showAction)
+        self.ui_menu_display.addAction(self.ui_blackoutAction)
+        self.ui_menu_display.addAction(self.ui_blackoutTextAction)
+        self.ui_menu_display.addAction(self.ui_blackoutMediaAction)
         self.ui_menu_display.addSeparator()
-        self.ui_menu_display.addAction( self.ui_previousPageAction )
-        self.ui_menu_display.addAction( self.ui_nextPageAction )
+        self.ui_menu_display.addAction(self.ui_previousPageAction)
+        self.ui_menu_display.addAction(self.ui_nextPageAction)
 
         # view menu
         self.ui_menu_view = self.ui_menubar.addMenu('&View')
-        self.ui_menu_view.addAction( self.ui_showLibraryAction )
-        self.ui_menu_view.addAction( self.ui_showMediaAction )
+        self.ui_menu_view.addAction(self.ui_showLibraryAction)
+        self.ui_menu_view.addAction(self.ui_showMediaAction)
         self.ui_menu_view.addSeparator()
-        self.ui_menu_view.addAction( self.ui_toggleLibraryAction )
-        self.ui_menu_view.addAction( self.ui_togglePreviewAction )
+        self.ui_menu_view.addAction(self.ui_toggleLibraryAction)
+        self.ui_menu_view.addAction(self.ui_togglePreviewAction)
 
         # output menu
         self.ui_menu_output = self.ui_menubar.addMenu('&Output')
 
         # help menu
         self.ui_menu_help = self.ui_menubar.addMenu('&Help')
-        self.ui_menu_help.addAction( self.ui_aboutAction )
+        self.ui_menu_help.addAction(self.ui_aboutAction)
 
         if not PLATFORM_MAC:
-            self.setMenuBar( self.ui_menubar )
+            self.setMenuBar(self.ui_menubar)
 
         # left
         self.ui_songs_bar = QVBoxLayout()
-        self.ui_songs_bar.setObjectName( "songsBar" )
-        self.ui_songs_bar.setSpacing( 0 )
-        self.ui_songs_bar.setContentsMargins( 0, 0, 0, 0 )
+        self.ui_songs_bar.setObjectName("songsBar")
+        self.ui_songs_bar.setSpacing(0)
+        self.ui_songs_bar.setContentsMargins(0, 0, 0, 0)
 
         self.ui_songs_search = QSearchEdit()
-        self.ui_songs_search.setObjectName( "songsSearch" )
-        self.ui_songs_search.setAttribute( Qt.WA_MacShowFocusRect, False )
-        self.ui_songs_search.textChanged.connect( self.searchAction )
-        self.ui_songs_search.keyPressed.connect( self.searchKeyEvent )
+        self.ui_songs_search.setObjectName("songsSearch")
+        self.ui_songs_search.setAttribute(Qt.WA_MacShowFocusRect, False)
+        self.ui_songs_search.textChanged.connect(self.searchAction)
+        self.ui_songs_search.keyPressed.connect(self.searchKeyEvent)
 
         self.ui_songs_list = SearchListWidget()
-        self.ui_songs_list.setObjectName( "songsList" )
-        self.ui_songs_list.setContextMenuPolicy( Qt.CustomContextMenu )
+        self.ui_songs_list.setObjectName("songsList")
+        self.ui_songs_list.setContextMenuPolicy(Qt.CustomContextMenu)
 
-        self.ui_songs_list.itemClicked.connect( self.songClicked )
-        self.ui_songs_list.itemDoubleClicked.connect( self.songDoubleClicked )
-        self.ui_songs_list.currentItemChanged.connect( self.songClicked )
-        self.ui_songs_list.keyPressed.connect( self.songKeyEvent )
+        self.ui_songs_list.itemClicked.connect(self.songClicked)
+        self.ui_songs_list.itemDoubleClicked.connect(self.songDoubleClicked)
+        self.ui_songs_list.currentItemChanged.connect(self.songClicked)
+        self.ui_songs_list.keyPressed.connect(self.songKeyEvent)
 
-        self.ui_songs_list.setContextMenuPolicy( Qt.CustomContextMenu )
-        self.ui_songs_list.customContextMenuRequested.connect( self.songContextMenu )
+        self.ui_songs_list.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.ui_songs_list.customContextMenuRequested.connect(self.songContextMenu)
 
-        addSongAction = QAction( 'Add', self )
-        addSongAction.setIconVisibleInMenu( True )
-        addSongAction.triggered.connect( self.addSongAction )
+        addSongAction = QAction('Add', self)
+        addSongAction.setIconVisibleInMenu(True)
+        addSongAction.triggered.connect(self.addSongAction)
 
-        switchViewAction = QAction( 'Media', self )
-        switchViewAction.setIconVisibleInMenu( True )
-        switchViewAction.triggered.connect( self.toggleLeftView )
+        switchViewAction = QAction('Media', self)
+        switchViewAction.setIconVisibleInMenu(True)
+        switchViewAction.triggered.connect(self.toggleLeftView)
 
         spacer = QWidget()
         spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
         self.ui_songs_toolbar = QToolBar()
-        self.ui_songs_toolbar.setObjectName( "songsToolbar" )
-        self.ui_songs_toolbar.setIconSize( QSize(16, 16) )
-        self.ui_songs_toolbar.addAction( addSongAction )
-        self.ui_songs_toolbar.addWidget( spacer )
-        self.ui_songs_toolbar.addAction( switchViewAction )
+        self.ui_songs_toolbar.setObjectName("songsToolbar")
+        self.ui_songs_toolbar.setIconSize(QSize(16, 16))
+        self.ui_songs_toolbar.addAction(addSongAction)
+        self.ui_songs_toolbar.addWidget(spacer)
+        self.ui_songs_toolbar.addAction(switchViewAction)
 
-        self.ui_songs_bar.addWidget( self.ui_songs_search )
-        self.ui_songs_bar.addWidget( self.ui_songs_list )
-        self.ui_songs_bar.addWidget( self.ui_songs_toolbar )
+        self.ui_songs_bar.addWidget(self.ui_songs_search)
+        self.ui_songs_bar.addWidget(self.ui_songs_list)
+        self.ui_songs_bar.addWidget(self.ui_songs_toolbar)
 
         self.ui_songs_panel = QWidget()
-        self.ui_songs_panel.setObjectName( "songsPanel" )
-        self.ui_songs_panel.setLayout( self.ui_songs_bar )
-        self.ui_songs_panel.setMinimumSize( 100, 100 )
+        self.ui_songs_panel.setObjectName("songsPanel")
+        self.ui_songs_panel.setLayout(self.ui_songs_bar)
+        self.ui_songs_panel.setMinimumSize(100, 100)
 
         self.ui_songs_bar_label = QLabel("Nothing in library.", self.ui_songs_list)
-        self.ui_songs_bar_label.setAlignment( Qt.AlignCenter )
-        self.ui_songs_bar_label.setFont( QFont('Decorative', 12) )
+        self.ui_songs_bar_label.setAlignment(Qt.AlignCenter)
+        self.ui_songs_bar_label.setFont(QFont('Decorative', 12))
 
         # center
         self.ui_playlist_bar = QVBoxLayout()
-        self.ui_playlist_bar.setSpacing( 0 )
-        self.ui_playlist_bar.setContentsMargins( 0, 0, 0, 0 )
+        self.ui_playlist_bar.setSpacing(0)
+        self.ui_playlist_bar.setContentsMargins(0, 0, 0, 0)
 
         self.ui_playlist_toolbar = QToolBar()
-        self.ui_playlist_toolbar.setObjectName( "playlistToolbar" )
+        self.ui_playlist_toolbar.setObjectName("playlistToolbar")
 
         spacer = QWidget()
         spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
         self.ui_playlist_label = PlaylistLabel()
-        self.ui_playlist_label.setObjectName( "playlistLabel" )
+        self.ui_playlist_label.setObjectName("playlistLabel")
         self.ui_playlist_label.setText("Playlist (0 Songs)")
         self.ui_playlist_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.ui_playlist_label.setContextMenuPolicy( Qt.CustomContextMenu )
-        self.ui_playlist_label.clicked.connect( self.playlistLabelClicked )
+        self.ui_playlist_label.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.ui_playlist_label.clicked.connect(self.playlistLabelClicked)
 
-        self.ui_playlist_toolbar.addWidget( self.ui_playlist_label )
+        self.ui_playlist_toolbar.addWidget(self.ui_playlist_label)
 
         self.ui_playlist_tree = PlaylistTreeWidget()
 
-        self.ui_playlist_tree.setContextMenuPolicy( Qt.CustomContextMenu )
-        self.ui_playlist_tree.itemClicked.connect( self.pageClicked )
-        self.ui_playlist_tree.itemDoubleClicked.connect( self.pageDoubleClicked )
-        self.ui_playlist_tree.customContextMenuRequested.connect( self.playlistContextMenu )
-        self.ui_playlist_tree.keyPressed.connect( self.playlistKeyEvent )
-        self.ui_playlist_tree.orderChanged.connect( self.playlistReordered )
+        self.ui_playlist_tree.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.ui_playlist_tree.itemClicked.connect(self.pageClicked)
+        self.ui_playlist_tree.itemDoubleClicked.connect(self.pageDoubleClicked)
+        self.ui_playlist_tree.customContextMenuRequested.connect(self.playlistContextMenu)
+        self.ui_playlist_tree.keyPressed.connect(self.playlistKeyEvent)
+        self.ui_playlist_tree.orderChanged.connect(self.playlistReordered)
 
-        self.ui_playlist_tree.itemCollapsed.connect( self.playlistItemCollapsed )
-        self.ui_playlist_tree.itemExpanded.connect( self.playlistItemCollapsed )
+        self.ui_playlist_tree.itemCollapsed.connect(self.playlistItemCollapsed)
+        self.ui_playlist_tree.itemExpanded.connect(self.playlistItemCollapsed)
 
-        self.ui_playlist_bar.addWidget( self.ui_playlist_tree )
-        self.ui_playlist_bar.addWidget( self.ui_playlist_toolbar )
+        self.ui_playlist_bar.addWidget(self.ui_playlist_tree)
+        self.ui_playlist_bar.addWidget(self.ui_playlist_toolbar)
 
         self.ui_playlist_panel = QWidget()
-        self.ui_playlist_panel.setLayout( self.ui_playlist_bar )
-        self.ui_playlist_panel.setMinimumSize( 100, 100 )
+        self.ui_playlist_panel.setLayout(self.ui_playlist_bar)
+        self.ui_playlist_panel.setMinimumSize(100, 100)
 
         self.ui_playlist_panel_label = QLabel("Nothing in playlist.", self.ui_playlist_panel)
-        self.ui_playlist_panel_label.setAlignment( Qt.AlignCenter )
-        self.ui_playlist_panel_label.setFont( QFont('Decorative', 12) )
+        self.ui_playlist_panel_label.setAlignment(Qt.AlignCenter)
+        self.ui_playlist_panel_label.setFont(QFont('Decorative', 12))
 
         # right
         self.ui_preview_bar = QVBoxLayout()
-        self.ui_preview_bar.setSpacing( 0 )
-        self.ui_preview_bar.setContentsMargins( 0, 0, 0, 0 )
+        self.ui_preview_bar.setSpacing(0)
+        self.ui_preview_bar.setContentsMargins(0, 0, 0, 0)
 
         self.ui_preview_label = QLabel()
-        self.ui_preview_label.setObjectName( "previewLabel" )
+        self.ui_preview_label.setObjectName("previewLabel")
         self.ui_preview_label.setAlignment(Qt.AlignCenter | Qt.AlignCenter)
 
         self.ui_preview_edit = QuickTextEdit()
-        self.ui_preview_edit.setObjectName( "quickEdit" )
-        self.ui_preview_edit.textChanged.connect( self.quickEditChanged )
+        self.ui_preview_edit.setObjectName("quickEdit")
+        self.ui_preview_edit.textChanged.connect(self.quickEditChanged)
 
         self.ui_preview_toolbar = QToolBar()
-        self.ui_preview_toolbar.setObjectName( "quickToolbar" )
-        self.ui_preview_toolbar.setIconSize( QSize(16, 16) )
+        self.ui_preview_toolbar.setObjectName("quickToolbar")
+        self.ui_preview_toolbar.setIconSize(QSize(16, 16))
 
         blackoutAction = QAction(QIcon(':/icons/stop.png'), 'Blackout', self)
-        blackoutAction.triggered.connect( self.blackoutAction )
+        blackoutAction.triggered.connect(self.blackoutAction)
 
         showQuickAction = QAction(QIcon(':/icons/play.png'), 'Show', self)
-        showQuickAction.triggered.connect( self.showQuickAction )
-        showQuickAction.setIconVisibleInMenu( True )
+        showQuickAction.triggered.connect(self.showQuickAction)
+        showQuickAction.setIconVisibleInMenu(True)
 
         saveQuickAction = QAction(QIcon(':/icons/save.png'), 'Save', self)
-        saveQuickAction.triggered.connect( self.saveAction )
-        saveQuickAction.setIconVisibleInMenu( True )
+        saveQuickAction.triggered.connect(self.saveAction)
+        saveQuickAction.setIconVisibleInMenu(True)
 
         self.ui_preview_liveAction = QAction(QIcon(':/icons/live.png'), 'Live', self)
-        self.ui_preview_liveAction.setCheckable( True )
-        self.ui_preview_liveAction.setChecked( False )
-        self.ui_preview_liveAction.setIconVisibleInMenu( True )
+        self.ui_preview_liveAction.setCheckable(True)
+        self.ui_preview_liveAction.setChecked(False)
+        self.ui_preview_liveAction.setIconVisibleInMenu(True)
 
-        self.ui_preview_toolbar.addAction( showQuickAction )
-        self.ui_preview_toolbar.addAction( saveQuickAction )
-        self.ui_preview_toolbar.addAction( blackoutAction )
+        self.ui_preview_toolbar.addAction(showQuickAction)
+        self.ui_preview_toolbar.addAction(saveQuickAction)
+        self.ui_preview_toolbar.addAction(blackoutAction)
 
         spacer = QWidget()
-        spacer.setSizePolicy( QSizePolicy.Expanding, QSizePolicy.Expanding )
+        spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
-        self.ui_preview_toolbar.addWidget( spacer )
-        self.ui_preview_toolbar.addAction( self.ui_preview_liveAction )
+        self.ui_preview_toolbar.addWidget(spacer)
+        self.ui_preview_toolbar.addAction(self.ui_preview_liveAction)
 
-        self.ui_preview_bar.addWidget( self.ui_preview_edit )
-        self.ui_preview_bar.addWidget( self.ui_preview_toolbar )
+        self.ui_preview_bar.addWidget(self.ui_preview_edit)
+        self.ui_preview_bar.addWidget(self.ui_preview_toolbar)
 
         self.ui_preview_panel = QWidget()
-        self.ui_preview_panel.setLayout( self.ui_preview_bar )
-        self.ui_preview_panel.setMinimumSize( 200, 100 )
+        self.ui_preview_panel.setLayout(self.ui_preview_bar)
+        self.ui_preview_panel.setMinimumSize(200, 100)
 
         # vertical spliter
-        self.ui_vertical_spliter = QSplitter( Qt.Vertical )
-        self.ui_vertical_spliter.setObjectName( "verticalSpliter" )
-        self.ui_vertical_spliter.addWidget( self.ui_preview_label )
-        self.ui_vertical_spliter.addWidget( self.ui_preview_panel )
-        self.ui_vertical_spliter.setCollapsible( 1, False )
-        self.ui_vertical_spliter.setSizes( [400, 120] )
-        self.ui_vertical_spliter.setHandleWidth( 1 )
+        self.ui_vertical_spliter = QSplitter(Qt.Vertical)
+        self.ui_vertical_spliter.setObjectName("verticalSpliter")
+        self.ui_vertical_spliter.addWidget(self.ui_preview_label)
+        self.ui_vertical_spliter.addWidget(self.ui_preview_panel)
+        self.ui_vertical_spliter.setCollapsible(1, False)
+        self.ui_vertical_spliter.setSizes([400, 120])
+        self.ui_vertical_spliter.setHandleWidth(1)
 
         # stacked widget
         self.ui_left_sidebar = QStackedWidget()
-        self.ui_left_sidebar.addWidget( self.ui_songs_panel )
-        self.ui_left_sidebar.addWidget( self.ui_media_panel )
+        self.ui_left_sidebar.addWidget(self.ui_songs_panel)
+        self.ui_left_sidebar.addWidget(self.ui_media_panel)
 
         # spliter
         self.ui_spliter = QSplitter()
-        self.ui_spliter.setObjectName( "spliter" )
+        self.ui_spliter.setObjectName("spliter")
 
-        self.ui_spliter.addWidget( self.ui_left_sidebar )
-        self.ui_spliter.addWidget( self.ui_playlist_panel )
-        self.ui_spliter.addWidget( self.ui_vertical_spliter )
+        self.ui_spliter.addWidget(self.ui_left_sidebar)
+        self.ui_spliter.addWidget(self.ui_playlist_panel)
+        self.ui_spliter.addWidget(self.ui_vertical_spliter)
 
-        self.ui_left_sidebar.setCurrentIndex( 0 )
+        self.ui_left_sidebar.setCurrentIndex(0)
 
-        self.ui_spliter.setCollapsible( 0, False )
-        self.ui_spliter.setCollapsible( 2, False )
-        self.ui_spliter.setHandleWidth( 1 )
-        self.ui_spliter.splitterMoved.connect( self.splitterMoved )
+        self.ui_spliter.setCollapsible(0, False)
+        self.ui_spliter.setCollapsible(2, False)
+        self.ui_spliter.setHandleWidth(1)
+        self.ui_spliter.splitterMoved.connect(self.splitterMoved)
 
-        self.setCentralWidget( self.ui_spliter )
+        self.setCentralWidget(self.ui_spliter)
 
-        playlist_id = Settings.get( 'playlist' )
+        playlist_id = Settings.get('playlist')
 
         if playlist_id is not None:
-            self.playlist = Playlist.get( playlist_id )
+            self.playlist = Playlist.get(playlist_id)
         else:
             self.playlist = Playlist.getPlaylists()[0]
 
@@ -412,143 +413,144 @@ class Grail(QMainWindow):
         self.updatePlaylist()
 
         if not PLATFORM_MAC:
-            self.setWindowIcon( QIcon(':/icons/32.png') )
+            self.setWindowIcon(QIcon(':/icons/32.png'))
 
         if PLATFORM_UNIX:
-            self.setWindowIcon( QIcon(':/icons/256.png') )
+            self.setWindowIcon(QIcon(':/icons/256.png'))
 
-        self.setGeometry( 300, 300, 800, 480 )
-        self.setMinimumSize( 320, 240 )
-        self.setWindowTitle( "Grail" )
+        self.setGeometry(300, 300, 800, 480)
+        self.setMinimumSize(320, 240)
+        self.setWindowTitle("Grail")
         self.center()
         self.show()
         self.updateLabels()
         self.updateOutputMenu()
 
-        History.changed.connect( self.updateSearch )
+        History.changed.connect(self.updateSearch)
+
     # OSC
 
-    def initOSC( self ):
+    def initOSC(self):
 
         self.subscribers = []
         self.listeners = []
         self.displays = []
 
         for rule in Settings.getOSCOutputRules():
-            self.subscribers.append( OSCClient(rule["host"], rule["port"]) )
+            self.subscribers.append(OSCClient(rule["host"], rule["port"]))
 
         ports = []
 
         for rule in Settings.getOSCInputRules():
             if not rule['port'] in ports:
-                ports.append( rule['port'] )
+                ports.append(rule['port'])
 
-    def updateOSCConnections( self, list ):
+    def updateOSCConnections(self, list):
 
         self.subscribers = []
 
         for rule in Settings.getOSCOutputRules():
-            self.subscribers.append( OSCClient(rule["host"], rule["port"]) )
+            self.subscribers.append(OSCClient(rule["host"], rule["port"]))
 
-    def send( self, item ):
+    def send(self, item):
 
         text = item.message
 
         if text == "":
             text = " "
 
-        self.display.setMessage( text )
+        self.display.setMessage(text)
 
         for display in self.displays:
-            display.setMessage( text )
+            display.setMessage(text)
 
-        msg = OSCMessage( address="/grail/message" )
-        msg.add( bytes( text, "utf-8" ) )
-        msg.add( item.type )
+        msg = OSCMessage(address="/grail/message")
+        msg.add(bytes(text, "utf-8"))
+        msg.add(item.type)
 
         for client in self.subscribers:
-            client.send( msg )
+            client.send(msg)
 
         if item.type != HistoryItem.TYPE_QUICK and item.type != HistoryItem.TYPE_BLACKOUT:
-            History.add( item.type, item.title, text )
+            History.add(item.type, item.title, text)
 
     # UI
 
-    def toggleLeftView( self ):
+    def toggleLeftView(self):
 
         index = self.ui_left_sidebar.currentIndex()
-        self.ui_left_sidebar.setCurrentIndex( 0 if index == 1 else 1 )
+        self.ui_left_sidebar.setCurrentIndex(0 if index == 1 else 1)
 
-    def showLibraryPanel( self ):
+    def showLibraryPanel(self):
 
-        self.ui_left_sidebar.setCurrentIndex( 0 )
+        self.ui_left_sidebar.setCurrentIndex(0)
 
-    def showMediaPanel( self ):
+    def showMediaPanel(self):
 
-        self.ui_left_sidebar.setCurrentIndex( 1 )
+        self.ui_left_sidebar.setCurrentIndex(1)
 
-    def center( self ):
+    def center(self):
         qr = self.frameGeometry()
         cp = QDesktopWidget().availableGeometry().center()
-        qr.moveCenter( cp )
-        self.move( qr.topLeft() )
+        qr.moveCenter(cp)
+        self.move(qr.topLeft())
 
-    def splitterMoved( self, pos, index ):
-
-        self.updateLabels()
-
-    def resizeEvent( self, event ):
+    def splitterMoved(self, pos, index):
 
         self.updateLabels()
 
-    def updateLabels( self ):
+    def resizeEvent(self, event):
+
+        self.updateLabels()
+
+    def updateLabels(self):
         qr = self.ui_songs_bar_label.geometry()
         sr = self.ui_songs_panel.rect()
         cp = sr.center()
-        self.ui_songs_bar_label.resize( sr.width(), qr.height() )
+        self.ui_songs_bar_label.resize(sr.width(), qr.height())
 
-        qr.moveTo( cp.x() - sr.width()/2, sr.height() / 2 - qr.height() / 2 - 47 )
+        qr.moveTo(cp.x() - sr.width() / 2, sr.height() / 2 - qr.height() / 2 - 47)
 
-        self.ui_songs_bar_label.move( qr.topLeft() )
+        self.ui_songs_bar_label.move(qr.topLeft())
 
         qr = self.ui_playlist_panel_label.geometry()
         sr = self.ui_playlist_panel.rect()
         cp = sr.center()
-        self.ui_playlist_panel_label.resize( self.ui_playlist_panel.rect().width(), qr.height() )
+        self.ui_playlist_panel_label.resize(self.ui_playlist_panel.rect().width(), qr.height())
 
-        qr.moveTo( cp.x() - sr.width()/2, sr.height() / 2 - qr.height() / 2 )
+        qr.moveTo(cp.x() - sr.width() / 2, sr.height() / 2 - qr.height() / 2)
 
-        self.ui_playlist_panel_label.move( qr.topLeft() )
+        self.ui_playlist_panel_label.move(qr.topLeft())
 
         if self.ui_songs_list.count() > 0:
             self.ui_songs_bar_label.hide()
         else:
             self.ui_songs_bar_label.show()
 
-        if self.ui_playlist_tree.topLevelItem( 0 ):
+        if self.ui_playlist_tree.topLevelItem(0):
             self.ui_playlist_panel_label.hide()
         else:
             self.ui_playlist_panel_label.show()
 
-    def updateOutputMenu( self ):
+    def updateOutputMenu(self):
 
         current = self.display.getMode()
         flag = True
 
         self.ui_menu_output.clear()
 
-        self.showTestCardAction.setChecked( self.display.isTestCard() )
-        self.outputDisabledAction.setChecked( self.display.isEnabled() )
+        self.showTestCardAction.setChecked(self.display.isTestCard())
+        self.outputDisabledAction.setChecked(self.display.isEnabled())
 
-        self.ui_menu_output.addAction( self.outputDisabledAction )
+        self.ui_menu_output.addAction(self.outputDisabledAction)
         self.ui_menu_output.addSeparator()
 
-        def triggered( action ):
+        def triggered(action):
 
             def fn(item=action):
                 a = self.updateOutputMenu()
-                b = self.display.setMode( action.property("mode") )
-                c = self.outputDisabledAction.setChecked( False )
+                b = self.display.setMode(action.property("mode"))
+                c = self.outputDisabledAction.setChecked(False)
 
                 return a or b or c
 
@@ -563,17 +565,17 @@ class Grail(QMainWindow):
                 self.ui_menu_output.addSeparator()
                 flag = False
 
-            action = QAction( mode.name, self )
-            action.setProperty( "mode", QVariant( mode ) )
-            action.triggered.connect( triggered( action ) )
+            action = QAction(mode.name, self)
+            action.setProperty("mode", QVariant(mode))
+            action.triggered.connect(triggered(action))
 
-            self.ui_menu_output.addAction( action )
+            self.ui_menu_output.addAction(action)
 
         self.ui_menu_output.addSeparator()
-        self.ui_menu_output.addAction( self.showTestCardAction )
-        self.ui_menu_output.addAction( self.outputPreferencesAction )
+        self.ui_menu_output.addAction(self.showTestCardAction)
+        self.ui_menu_output.addAction(self.outputPreferencesAction)
 
-    def updateSearch( self, items=None ):
+    def updateSearch(self, items=None):
 
         self.ui_songs_list.clear()
 
@@ -582,54 +584,54 @@ class Grail(QMainWindow):
 
             for item in items:
                 listitem = SearchListItem()
-                listitem.setType( SearchListItem.TYPE_HISTORY )
-                listitem.setText( item['title'] )
-                listitem.setMessage( item['message'] )
-                listitem.setItemData( item )
+                listitem.setType(SearchListItem.TYPE_HISTORY)
+                listitem.setText(item['title'])
+                listitem.setMessage(item['message'])
+                listitem.setItemData(item)
 
-                self.ui_songs_list.addItem( listitem )
+                self.ui_songs_list.addItem(listitem)
         else:
             for item in items:
-                self.ui_songs_list.addItem( item )
+                self.ui_songs_list.addItem(item)
 
         self.updateLabels()
 
-    def updatePlaylist( self ):
+    def updatePlaylist(self):
 
         self.ui_playlist_tree.clear()
 
         playlists = Playlist.getPlaylists()
 
         if self.playlist:
-            songs = Playlist.getSongs( self.playlist['id'] )
+            songs = Playlist.getSongs(self.playlist['id'])
 
-            self.ui_playlist_label.setText( "%s (%d songs)" % (self.playlist['title'], len(songs)) )
+            self.ui_playlist_label.setText("%s (%d songs)" % (self.playlist['title'], len(songs)))
 
             for song in songs:
-                songItem = SongTreeWidgetItem( self.ui_playlist_tree )
-                songItem.setSong( song )
+                songItem = SongTreeWidgetItem(self.ui_playlist_tree)
+                songItem.setSong(song)
 
-                for page in Song.getPages( song['id'] ):
-                    pageItem = PageTreeWidgetItem( )
-                    pageItem.setPage( page )
-                    pageItem.setSong( song )
+                for page in Song.getPages(song['id']):
+                    pageItem = PageTreeWidgetItem()
+                    pageItem.setPage(page)
+                    pageItem.setSong(song)
 
-                    songItem.addChild( pageItem )
+                    songItem.addChild(pageItem)
 
-                self.ui_playlist_tree.addTopLevelItem( songItem )
+                self.ui_playlist_tree.addTopLevelItem(songItem)
 
         self.updateLabels()
 
     # Actions
 
-    def importPlaylistAction( self ):
+    def importPlaylistAction(self):
 
         path, ext = QFileDialog.getOpenFileName(self, "Open File...", "", "*.grail1")
 
-        if not os.path.isfile( path ):
+        if not os.path.isfile(path):
             return
 
-        connection = lite.connect( path )
+        connection = lite.connect(path)
         connection.row_factory = lite.Row
 
         cursor = connection.cursor()
@@ -637,7 +639,7 @@ class Grail(QMainWindow):
         # create new playlist
 
         cursor.execute("SELECT * FROM playlists WHERE id = 1")
-        pid = Playlist.add( cursor.fetchone()['title'] )
+        pid = Playlist.add(cursor.fetchone()['title'])
 
         # add songs to playlist
         cursor.execute(
@@ -661,30 +663,29 @@ class Grail(QMainWindow):
         for song in songs:
 
             available = False
-            for search_item in Song.search( song['title'] ):
+            for search_item in Song.search(song['title']):
                 if (search_item['title'] == song['title'] and search_item['artist'] == song['artist']
-                   and search_item['album'] == song['album'] and search_item['year'] == song['year']):
-
+                    and search_item['album'] == song['album'] and search_item['year'] == song['year']):
                     available = True
                     sid = search_item['id']
 
             if not available:
-                sid = Song.add( song['title'], song['artist'], song['album'], song['year'] )
+                sid = Song.add(song['title'], song['artist'], song['album'], song['year'])
 
                 cursor.execute("SELECT * FROM pages WHERE song = ? ORDER BY sort ASC", (song['id'],))
                 for page in cursor.fetchall():
-                    Song.addPage( sid, page['page'] )
+                    Song.addPage(sid, page['page'])
 
-            Playlist.addSong( pid, sid )
-            Playlist.collapseSong( pid, sid, song['collapsed'] )
+            Playlist.addSong(pid, sid)
+            Playlist.collapseSong(pid, sid, song['collapsed'])
 
-        self.playlist = Playlist.get( pid )
+        self.playlist = Playlist.get(pid)
         self.updateSearch()
         self.updatePlaylist()
 
         connection.close()
 
-    def exportPlaylistAction( self ):
+    def exportPlaylistAction(self):
 
         if not self.playlist:
             return
@@ -695,22 +696,22 @@ class Grail(QMainWindow):
             return thestring
 
         path, ext = QFileDialog.getSaveFileName(self, "Save file", self.playlist['title'], "*.grail1")
-        filepath = rchop( path, '.grail1' ) + '.grail1'
+        filepath = rchop(path, '.grail1') + '.grail1'
 
         if not path:
             return
 
-        directory = os.path.dirname(os.path.realpath( filepath ))
+        directory = os.path.dirname(os.path.realpath(filepath))
 
         if not os.path.exists(directory):
             os.makedirs(directory)
 
-        if not os.path.isfile( filepath ):
-            open( filepath, 'w+' )
+        if not os.path.isfile(filepath):
+            open(filepath, 'w+')
         else:
-            open( filepath, 'w')
+            open(filepath, 'w')
 
-        connection = lite.connect( filepath )
+        connection = lite.connect(filepath)
         connection.row_factory = lite.Row
 
         cursor = connection.cursor()
@@ -739,7 +740,7 @@ class Grail(QMainWindow):
 
         cursor.execute("INSERT INTO playlists VALUES(?, ?)", (1, self.playlist['title']))
 
-        songs = Playlist.getSongs( self.playlist['id'] )
+        songs = Playlist.getSongs(self.playlist['id'])
         songids = []
         playlistsort = 0
 
@@ -749,10 +750,10 @@ class Grail(QMainWindow):
                 record = (song['id'], song['title'], song['artist'], song['album'], song['year'])
                 cursor.execute("INSERT INTO songs VALUES(?, ?, ?, ?, ?)", record)
 
-                songids.append( song['id'] )
+                songids.append(song['id'])
 
                 sort = 0
-                for page in Song.getPages( song['id'] ):
+                for page in Song.getPages(song['id']):
                     cursor.execute("INSERT INTO pages VALUES(NULL, ?, ?, ?)", (song['id'], sort, page['page']))
                     sort = sort + 1
 
@@ -763,28 +764,28 @@ class Grail(QMainWindow):
         connection.commit()
         connection.close()
 
-    def clearHistoryAction( self ):
+    def clearHistoryAction(self):
         History.clear()
 
-    def displayShowTestCardAction( self ):
+    def displayShowTestCardAction(self):
 
-        self.display.setTestCard( self.showTestCardAction.isChecked() )
+        self.display.setTestCard(self.showTestCardAction.isChecked())
 
-    def displayOutputDisabledAction( self ):
+    def displayOutputDisabledAction(self):
 
-        self.display.setDisabled( True )
-        self.outputDisabledAction.setChecked( True )
+        self.display.setDisabled(True)
+        self.outputDisabledAction.setChecked(True)
 
-    def displayOutputPreferencesAction( self ):
+    def displayOutputPreferencesAction(self):
 
         dialog = self.display.getPreferencesDialog()
         dialog.show()
 
-    def addSongAction( self ):
+    def addSongAction(self):
         self.dialog_song.addSong()
         self.dialog_song.showOnTop()
 
-    def togglePreview( self ):
+    def togglePreview(self):
 
         sizes = self.ui_spliter.sizes()
 
@@ -792,15 +793,15 @@ class Grail(QMainWindow):
             self.ui_spliter.size_preview = sizes[2]
             sizes[2] = 0
 
-            self.ui_spliter.setCollapsible( 2, True )
-            self.ui_spliter.setSizes( sizes )
+            self.ui_spliter.setCollapsible(2, True)
+            self.ui_spliter.setSizes(sizes)
         else:
             sizes[2] = self.ui_spliter.size_preview
 
-            self.ui_spliter.setCollapsible( 2, False )
-            self.ui_spliter.setSizes( sizes )
+            self.ui_spliter.setCollapsible(2, False)
+            self.ui_spliter.setSizes(sizes)
 
-    def toggleLibrary( self ):
+    def toggleLibrary(self):
 
         sizes = self.ui_spliter.sizes()
 
@@ -808,72 +809,71 @@ class Grail(QMainWindow):
             self.ui_spliter.size_library = sizes[0]
             sizes[0] = 0
 
-            self.ui_spliter.setCollapsible( 0, True )
-            self.ui_spliter.setSizes( sizes )
+            self.ui_spliter.setCollapsible(0, True)
+            self.ui_spliter.setSizes(sizes)
         else:
             sizes[0] = self.ui_spliter.size_library
 
-            self.ui_spliter.setCollapsible( 0, False )
-            self.ui_spliter.setSizes( sizes )
+            self.ui_spliter.setCollapsible(0, False)
+            self.ui_spliter.setSizes(sizes)
 
-    def newDisplayAction( self ):
+    def newDisplayAction(self):
 
         prefs = DisplayPreferences()
         prefs.disabled = False
 
-        display = DisplayDialog( None, prefs )
+        display = DisplayDialog(None, prefs)
 
-        def updateDisplay( ):
+        def updateDisplay():
             mode = display.getMode()
 
             if mode.disabled:
-                display.setAttribute( Qt.WA_DeleteOnClose, True )
-                display.close( True )
-                self.displays.remove( display )
+                display.setAttribute(Qt.WA_DeleteOnClose, True)
+                display.close(True)
+                self.displays.remove(display)
 
-        display.modeChanged.connect( updateDisplay )
+        display.modeChanged.connect(updateDisplay)
         display.show()
 
+        self.displays.append(display)
 
-        self.displays.append( display )
-
-    def aboutAction( self ):
+    def aboutAction(self):
 
         self.dialog_about.show()
         self.dialog_about.raise_()
-        self.dialog_about.setWindowState( self.dialog_about.windowState() & ~Qt.WindowMinimized | Qt.WindowActive)
+        self.dialog_about.setWindowState(self.dialog_about.windowState() & ~Qt.WindowMinimized | Qt.WindowActive)
         self.dialog_about.activateWindow()
 
-    def preferencesAction( self ):
+    def preferencesAction(self):
 
         self.dialog_preferences.show()
         self.dialog_preferences.raise_()
-        self.dialog_preferences.setWindowState( self.dialog_about.windowState() & ~Qt.WindowMinimized | Qt.WindowActive)
+        self.dialog_preferences.setWindowState(self.dialog_about.windowState() & ~Qt.WindowMinimized | Qt.WindowActive)
         self.dialog_preferences.activateWindow()
 
-    def searchAction( self, text ):
+    def searchAction(self, text):
         keyword = str(self.ui_songs_search.text())
 
         if keyword:
             items = []
-            songs = Song.search( keyword )
-            references = Bible.matchReference( keyword )
+            songs = Song.search(keyword)
+            references = Bible.match_reference(keyword)
 
             for item in references:
                 listitem = SearchListItem()
-                listitem.setType( SearchListItem.TYPE_REFERENCE )
-                listitem.setText( item[0] )
-                listitem.setItemData( item )
-                items.append( listitem )
+                listitem.setType(SearchListItem.TYPE_REFERENCE)
+                listitem.setText(item[0])
+                listitem.setItemData(item)
+                items.append(listitem)
 
             for item in songs:
                 listitem = SearchListItem()
-                listitem.setSong( item )
-                items.append( listitem )
+                listitem.setSong(item)
+                items.append(listitem)
 
             if len(references) > 0:
                 try:
-                    text = Bible.get( references[0][1][0], references[0][1][1], references[0][1][2] )
+                    text = Bible.get(references[0][1][0], references[0][1][1], references[0][1][2])
 
                     text = re.sub(r'[\[\_\]]', '', text)
                     text = re.sub(r'\_', '', text)
@@ -881,16 +881,16 @@ class Grail(QMainWindow):
 
                     text_verse = text + "\n" + references[0][0]
 
-                    self.ui_preview_label.setText( text_verse )
-                    self.ui_preview_edit.setPlainText( text_verse )
+                    self.ui_preview_label.setText(text_verse)
+                    self.ui_preview_edit.setPlainText(text_verse)
                 except:
                     pass
 
-            self.updateSearch( items )
+            self.updateSearch(items)
         else:
             self.updateSearch()
 
-    def showAction( self ):
+    def showAction(self):
         """
         Show selected song page or first page of first song in selected playlist
         """
@@ -902,41 +902,41 @@ class Grail(QMainWindow):
 
             text = ''
 
-            if type( item ) == SongTreeWidgetItem:
-                pages = Song.getPages( item.id )
+            if type(item) == SongTreeWidgetItem:
+                pages = Song.getPages(item.id)
 
                 if len(pages) > 0:
                     text = pages[0]['page']
 
-            elif type( item ) == PageTreeWidgetItem:
+            elif type(item) == PageTreeWidgetItem:
                 text = item.page
 
-            self.ui_preview_label.setText( text )
+            self.ui_preview_label.setText(text)
 
-            item = HistoryItem( HistoryItem.TYPE_SONG, text.split('\n')[0], text )
+            item = HistoryItem(HistoryItem.TYPE_SONG, text.split('\n')[0], text)
 
-            self.send( item )
+            self.send(item)
 
-    def showQuickAction( self ):
+    def showQuickAction(self):
 
         text = str(self.ui_preview_edit.toPlainText())
 
         if text.split('\n')[-1].find(':') > -1:
-            item = HistoryItem( HistoryItem.TYPE_BIBLE, text.split('\n')[-1], text )
+            item = HistoryItem(HistoryItem.TYPE_BIBLE, text.split('\n')[-1], text)
         else:
-            item = HistoryItem( HistoryItem.TYPE_SONG, text.split('\n')[0], text )
+            item = HistoryItem(HistoryItem.TYPE_SONG, text.split('\n')[0], text)
 
-        self.send( item )
+        self.send(item)
 
-    def quickEditChanged( self ):
+    def quickEditChanged(self):
 
         if self.ui_preview_liveAction.isChecked():
             text = str(self.ui_preview_edit.toPlainText())
-            item = HistoryItem( HistoryItem.TYPE_QUICK, text, text )
+            item = HistoryItem(HistoryItem.TYPE_QUICK, text, text)
 
-            self.send( item )
+            self.send(item)
 
-    def saveAction( self ):
+    def saveAction(self):
         items = self.ui_playlist_tree.selectedItems()
 
         if len(items) > 0:
@@ -944,53 +944,53 @@ class Grail(QMainWindow):
             song = -1
             page = -1
 
-            if type( item ) == SongTreeWidgetItem:
-                pages = Song.getPages( item.id )
+            if type(item) == SongTreeWidgetItem:
+                pages = Song.getPages(item.id)
 
                 if len(pages) > 0:
                     song = item.id
                     page = pages[0]['id']
-            elif type( item ) == PageTreeWidgetItem:
+            elif type(item) == PageTreeWidgetItem:
                 song = item.song
                 page = item.id
 
             if song > -1 and page > -1:
                 text = str(self.ui_preview_edit.toPlainText()).strip()
-                Song.updatePage( song, page, text )
+                Song.updatePage(song, page, text)
                 self.updatePlaylist()
 
-    def blackoutAction( self ):
+    def blackoutAction(self):
         self.blackoutTextAction()
         self.blackoutMediaAction()
 
-    def blackoutTextAction( self ):
+    def blackoutTextAction(self):
 
         text = " "
-        item = HistoryItem( HistoryItem.TYPE_BLACKOUT, text, text )
-        self.send( item )
+        item = HistoryItem(HistoryItem.TYPE_BLACKOUT, text, text)
+        self.send(item)
 
-    def blackoutMediaAction( self ):
+    def blackoutMediaAction(self):
 
-        self.imageSelected( None )
+        self.imageSelected(None)
 
-    def songClicked( self, item ):
+    def songClicked(self, item):
 
         if not item:
             return
 
         if item.type == SearchListItem.TYPE_SONG:
-            text = '\n\n'.join( page['page'] for page in Song.getPages( item.data["id"] ) )
-            self.ui_preview_label.setText( text )
+            text = '\n\n'.join(page['page'] for page in Song.getPages(item.data["id"]))
+            self.ui_preview_label.setText(text)
 
         if item.type == SearchListItem.TYPE_HISTORY:
             text = item.data["message"]
-            self.ui_preview_label.setText( text )
+            self.ui_preview_label.setText(text)
 
         if item.type == SearchListItem.TYPE_REFERENCE:
             data = item.getData()
 
             try:
-                text = Bible.get( data[1][0], data[1][1], data[1][2] )
+                text = Bible.get(data[1][0], data[1][1], data[1][2])
 
                 text = re.sub(r'[\[\_\]]', '', text)
                 text = re.sub(r'\_', '', text)
@@ -998,24 +998,24 @@ class Grail(QMainWindow):
 
                 text_verse = text + "\n" + data[0]
 
-                self.ui_preview_label.setText( text_verse )
-                self.ui_preview_edit.setPlainText( text_verse )
+                self.ui_preview_label.setText(text_verse)
+                self.ui_preview_edit.setPlainText(text_verse)
             except:
                 pass
 
-    def songDoubleClicked( self, item ):
+    def songDoubleClicked(self, item):
 
         if item.type == SearchListItem.TYPE_SONG:
             id = item.data["id"]
 
-            Playlist.addSong( self.playlist['id'], id )
+            Playlist.addSong(self.playlist['id'], id)
             self.updatePlaylist()
 
         if item.type == SearchListItem.TYPE_REFERENCE:
             data = item.getData()
 
             try:
-                text = Bible.get( data[1][0], data[1][1], data[1][2] )
+                text = Bible.get(data[1][0], data[1][1], data[1][2])
 
                 text = re.sub(r'[\[\_\]]', '', text)
                 text = re.sub(r'\_', '', text)
@@ -1023,36 +1023,36 @@ class Grail(QMainWindow):
 
                 text_verse = text + "\n" + data[0]
 
-                self.ui_preview_label.setText( text_verse )
-                self.ui_preview_edit.setPlainText( text_verse )
+                self.ui_preview_label.setText(text_verse)
+                self.ui_preview_edit.setPlainText(text_verse)
 
-                hitem = HistoryItem( HistoryItem.TYPE_BIBLE, data[0], text_verse )
+                hitem = HistoryItem(HistoryItem.TYPE_BIBLE, data[0], text_verse)
 
-                self.send( hitem )
+                self.send(hitem)
             except:
                 pass
 
         if item.type == SearchListItem.TYPE_HISTORY:
             data = item.getData()
 
-            hitem = HistoryItem( HistoryItem.TYPE_QUICK, data["title"], data["message"] )
-            self.send( hitem )
+            hitem = HistoryItem(HistoryItem.TYPE_QUICK, data["title"], data["message"])
+            self.send(hitem)
 
-    def songKeyEvent( self, event ):
+    def songKeyEvent(self, event):
 
         if event.key() == Qt.Key_Return:
             self.songAddToPlaylist()
         else:
-            QListWidget.keyPressEvent( self.ui_songs_list, event )
+            QListWidget.keyPressEvent(self.ui_songs_list, event)
 
-    def songAddToPlaylist( self ):
+    def songAddToPlaylist(self):
 
         items = self.ui_songs_list.selectedItems()
 
         if len(items) > 0:
-            self.songDoubleClicked( items[0] )
+            self.songDoubleClicked(items[0])
 
-    def songContextMenu( self, pos ):
+    def songContextMenu(self, pos):
 
         item = self.ui_songs_list.itemAt(pos)
 
@@ -1061,21 +1061,21 @@ class Grail(QMainWindow):
                 menu = QMenu("Context Menu", self)
 
                 editAction = QAction('Edit song', menu)
-                editAction.triggered.connect( self.updateSongAction )
+                editAction.triggered.connect(self.updateSongAction)
 
                 deleteAction = QAction('Delete song', menu)
-                deleteAction.triggered.connect( self.deleteSongAction )
+                deleteAction.triggered.connect(self.deleteSongAction)
 
                 addAction = QAction('Add to playlist', menu)
-                addAction.triggered.connect( self.songAddToPlaylist )
+                addAction.triggered.connect(self.songAddToPlaylist)
 
-                menu.addAction( editAction )
-                menu.addAction( deleteAction )
-                menu.addAction( addAction )
+                menu.addAction(editAction)
+                menu.addAction(deleteAction)
+                menu.addAction(addAction)
 
-                menu.exec_( self.ui_songs_list.mapToGlobal(pos) )
+                menu.exec_(self.ui_songs_list.mapToGlobal(pos))
 
-    def deleteSongAction( self ):
+    def deleteSongAction(self):
 
         items = self.ui_songs_list.selectedItems()
 
@@ -1083,125 +1083,125 @@ class Grail(QMainWindow):
             item = items[0]
 
             if item.type == SearchListItem.TYPE_SONG:
-                Song.delete( item.data["id"] )
+                Song.delete(item.data["id"])
 
                 self.updateSearch()
 
-    def updateSongAction( self ):
+    def updateSongAction(self):
         items = self.ui_songs_list.selectedItems()
 
         if len(items) > 0:
             item = items[0]
 
             if item.type == SearchListItem.TYPE_SONG:
-                self.dialog_song.setSong( item.getData() )
+                self.dialog_song.setSong(item.getData())
 
                 self.dialog_song.showOnTop()
 
                 self.updateSearch()
                 self.updatePlaylist()
 
-    def pageClicked( self, item ):
+    def pageClicked(self, item):
 
         text = ''
 
-        if type( item ) == SongTreeWidgetItem:
-            pages = Song.getPages( item.id )
+        if type(item) == SongTreeWidgetItem:
+            pages = Song.getPages(item.id)
 
             if len(pages) > 0:
                 text = pages[0]['page']
 
-        elif type( item ) == PageTreeWidgetItem:
+        elif type(item) == PageTreeWidgetItem:
             text = item.page
 
-        self.ui_preview_label.setText( text )
-        self.ui_preview_edit.setPlainText( text )
+        self.ui_preview_label.setText(text)
+        self.ui_preview_edit.setPlainText(text)
 
-    def pageDoubleClicked( self, item ):
+    def pageDoubleClicked(self, item):
 
         text = ''
 
-        if type( item ) == SongTreeWidgetItem:
-            pages = Song.getPages( item.id )
+        if type(item) == SongTreeWidgetItem:
+            pages = Song.getPages(item.id)
 
             if len(pages) > 0:
                 text = pages[0]['page']
 
-        elif type( item ) == PageTreeWidgetItem:
+        elif type(item) == PageTreeWidgetItem:
             text = item.page
 
-        self.ui_preview_label.setText( text )
-        self.ui_preview_edit.setPlainText( text )
+        self.ui_preview_label.setText(text)
+        self.ui_preview_edit.setPlainText(text)
 
-        item = HistoryItem( HistoryItem.TYPE_SONG, text.split('\n')[0], text )
+        item = HistoryItem(HistoryItem.TYPE_SONG, text.split('\n')[0], text)
 
-        self.send( item )
+        self.send(item)
 
-    def playlistContextMenu( self, pos ):
+    def playlistContextMenu(self, pos):
         item = self.ui_playlist_tree.itemAt(pos)
 
         if item is not None:
             menu = QMenu("Context Menu", self)
 
             deleteAction = QAction('Delete from playlist', menu)
-            deleteAction.triggered.connect( self.deletePlaylistSongAction )
+            deleteAction.triggered.connect(self.deletePlaylistSongAction)
 
             editAction = QAction('Edit', menu)
-            editAction.triggered.connect( self.editPlaylistSongAction )
+            editAction.triggered.connect(self.editPlaylistSongAction)
 
-            menu.addAction( editAction )
+            menu.addAction(editAction)
             menu.addSeparator()
-            menu.addAction( deleteAction )
+            menu.addAction(deleteAction)
 
-            ret = menu.exec_( self.ui_playlist_tree.mapToGlobal(pos) )
+            ret = menu.exec_(self.ui_playlist_tree.mapToGlobal(pos))
 
-    def playlistKeyEvent( self, event ):
+    def playlistKeyEvent(self, event):
         item = self.ui_playlist_tree.currentItem()
 
         if event.key() == Qt.Key_Return and item:
-            self.pageDoubleClicked( item )
+            self.pageDoubleClicked(item)
         elif event.key() == Qt.Key_Delete and item:
             self.deletePlaylistSongAction()
         elif event.key() == Qt.Key_Up and item:
-            QTreeWidget.keyPressEvent( self.ui_playlist_tree, event )
-            self.pageClicked( self.ui_playlist_tree.currentItem() )
+            QTreeWidget.keyPressEvent(self.ui_playlist_tree, event)
+            self.pageClicked(self.ui_playlist_tree.currentItem())
         elif event.key() == Qt.Key_Down and item:
-            QTreeWidget.keyPressEvent( self.ui_playlist_tree, event )
-            self.pageClicked( self.ui_playlist_tree.currentItem() )
+            QTreeWidget.keyPressEvent(self.ui_playlist_tree, event)
+            self.pageClicked(self.ui_playlist_tree.currentItem())
         else:
-            QTreeWidget.keyPressEvent( self.ui_playlist_tree, event )
+            QTreeWidget.keyPressEvent(self.ui_playlist_tree, event)
 
-    def playlistReordered( self ):
+    def playlistReordered(self):
 
-        for index in range( self.ui_playlist_tree.topLevelItemCount() ):
-            item = self.ui_playlist_tree.topLevelItem( index )
-            Playlist.sortSongs( int(self.playlist['id']), item.pid, index )
+        for index in range(self.ui_playlist_tree.topLevelItemCount()):
+            item = self.ui_playlist_tree.topLevelItem(index)
+            Playlist.sortSongs(int(self.playlist['id']), item.pid, index)
 
-    def playlistItemCollapsed( self, item ):
+    def playlistItemCollapsed(self, item):
 
         if item.song is not None:
-            Playlist.collapseSong( self.playlist["id"], item.pid, item.isExpanded() )
+            Playlist.collapseSong(self.playlist["id"], item.pid, item.isExpanded())
 
-    def deletePlaylistSongAction( self ):
+    def deletePlaylistSongAction(self):
 
         item = self.ui_playlist_tree.currentItem()
 
         if type(item) == SongTreeWidgetItem:
             id = item.id
             pid = item.pid
-            index = self.ui_playlist_tree.indexOfTopLevelItem( item )
-            self.ui_playlist_tree.takeTopLevelItem( index )
+            index = self.ui_playlist_tree.indexOfTopLevelItem(item)
+            self.ui_playlist_tree.takeTopLevelItem(index)
 
         if type(item) == PageTreeWidgetItem:
             id = item.song
             pid = item.pid
-            index = self.ui_playlist_tree.indexOfTopLevelItem( item.parent() )
-            self.ui_playlist_tree.takeTopLevelItem( index )
+            index = self.ui_playlist_tree.indexOfTopLevelItem(item.parent())
+            self.ui_playlist_tree.takeTopLevelItem(index)
 
-        Playlist.deleteSong( self.playlist['id'], id, pid )
+        Playlist.deleteSong(self.playlist['id'], id, pid)
         self.updatePlaylist()
 
-    def editPlaylistSongAction( self ):
+    def editPlaylistSongAction(self):
 
         item = self.ui_playlist_tree.currentItem()
 
@@ -1211,64 +1211,64 @@ class Grail(QMainWindow):
         if type(item) == PageTreeWidgetItem:
             id = item.song
 
-        self.dialog_song.setSong( Song.get( id ) )
+        self.dialog_song.setSong(Song.get(id))
         self.dialog_song.showOnTop()
 
-    def playlistLabelClicked( self, event ):
+    def playlistLabelClicked(self, event):
 
-        self.dialog_playlist.showAt( self.ui_playlist_label.mapToGlobal( self.ui_playlist_label.rect().center() ) )
+        self.dialog_playlist.showAt(self.ui_playlist_label.mapToGlobal(self.ui_playlist_label.rect().center()))
 
-    def playlistSelectedAction( self, id ):
+    def playlistSelectedAction(self, id):
 
-        self.playlist = Playlist.get( id )
+        self.playlist = Playlist.get(id)
         self.updatePlaylist()
 
-        Settings.set( 'playlist', id )
+        Settings.set('playlist', id)
 
         self.updateLabels()
 
-    def previousPageAction( self ):
+    def previousPageAction(self):
 
-        item = self.ui_playlist_tree.itemAbove( self.ui_playlist_tree.currentItem() )
+        item = self.ui_playlist_tree.itemAbove(self.ui_playlist_tree.currentItem())
 
         if not item:
-            item = self.ui_playlist_tree.itemAt( 0, 0 )
+            item = self.ui_playlist_tree.itemAt(0, 0)
 
         if item:
-            self.ui_playlist_tree.setCurrentItem( item )
+            self.ui_playlist_tree.setCurrentItem(item)
             self.showAction()
 
-    def nextPageAction( self ):
+    def nextPageAction(self):
 
-        item = self.ui_playlist_tree.itemBelow( self.ui_playlist_tree.currentItem() )
+        item = self.ui_playlist_tree.itemBelow(self.ui_playlist_tree.currentItem())
 
         if not item and not self.ui_playlist_tree.currentItem():
-            item = self.ui_playlist_tree.itemAt( 0, 0 )
+            item = self.ui_playlist_tree.itemAt(0, 0)
 
         if item:
-            self.ui_playlist_tree.setCurrentItem( item )
+            self.ui_playlist_tree.setCurrentItem(item)
             self.showAction()
 
     # Events
 
-    def closeEvent( self, event ):
+    def closeEvent(self, event):
 
         self.prefs.save()
         self.dialog_about.close()
         self.dialog_preferences.close()
         self.dialog_song.close()
-        self.display.setAttribute( Qt.WA_DeleteOnClose, True )
-        self.display.close( True )
+        self.display.setAttribute(Qt.WA_DeleteOnClose, True)
+        self.display.close(True)
 
         self.dialog_playlist.close()
 
         for display in self.displays:
-            display.setAttribute( Qt.WA_DeleteOnClose, True )
-            display.close( True )
+            display.setAttribute(Qt.WA_DeleteOnClose, True)
+            display.close(True)
 
-        ConnectionManager.closeAll()
+        ConnectionManager.close()
 
-    def searchKeyEvent( self, event ):
+    def searchKeyEvent(self, event):
 
         if event.key() == Qt.Key_Return:
             self.showQuickAction()
@@ -1277,48 +1277,48 @@ class Grail(QMainWindow):
         elif event.key() == Qt.Key_Up:
             keyword = str(self.ui_songs_search.text())
 
-            def up( match ):
+            def up(match):
                 return str(int(match.group(0)) + 1)
 
             keyword = re.sub(r'([0-9]+)$', up, keyword)
 
-            self.ui_songs_search.setText( keyword )
-            self.searchAction( "" )
+            self.ui_songs_search.setText(keyword)
+            self.searchAction("")
         elif event.key() == Qt.Key_Down:
             keyword = str(self.ui_songs_search.text())
 
-            def down( match ):
+            def down(match):
                 return str(max(int(match.group(0)) - 1, 1))
 
             keyword = re.sub(r'([0-9]+)$', down, keyword)
 
-            self.ui_songs_search.setText( keyword )
-            self.searchAction( "" )
+            self.ui_songs_search.setText(keyword)
+            self.searchAction("")
         elif event.key() == Qt.Key_Escape:
             self.ui_songs_search.setText("")
         else:
-            QLineEdit.keyPressEvent( self.ui_songs_search, event )
+            QLineEdit.keyPressEvent(self.ui_songs_search, event)
 
-    def historyItemSelected( self, item ):
+    def historyItemSelected(self, item):
 
-        self.send( item )
+        self.send(item)
 
-    def imageSelected( self, path ):
+    def imageSelected(self, path):
 
-        self.display.setImage( path )
-
-        for display in self.displays:
-            display.setImage( path )
-
-    def setBlackoutImage( self, path ):
-
-        self.display.setBlackoutImage( path )
+        self.display.setImage(path)
 
         for display in self.displays:
-            display.setBlackoutImage( path )
+            display.setImage(path)
 
-    def setTextImage( self, path ):
-        self.display.setTextImage( path )
+    def setBlackoutImage(self, path):
+
+        self.display.setBlackoutImage(path)
 
         for display in self.displays:
-            display.setTextImage( path )
+            display.setBlackoutImage(path)
+
+    def setTextImage(self, path):
+        self.display.setTextImage(path)
+
+        for display in self.displays:
+            display.setTextImage(path)

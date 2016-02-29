@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 # Grail - Lyrics software. Simple.
-# Copyright (C) 2014-2015 Oleksii Lytvyn
+# Copyright (C) 2014-2016 Oleksii Lytvyn
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,10 +18,19 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+from PyQt5.QtCore import *
 
-class RemoteAction():
+from grail.data import DisplayPreferences
+from grail.dialogs import DisplayDialog
 
-    ACTION_BLACKOUT = 0
-    ACTION_NEXT = 1
-    ACTION_PREVIOUS = 2
-    ACTION_SHOW = 3
+
+class DisplayThread(QThread):
+    """Each display runs in separate thread"""
+
+    def __init__(self):
+        super(DisplayThread, self).__init__()
+
+        self.display = DisplayDialog(None, DisplayPreferences())
+
+    def run(self):
+        self.display.show()

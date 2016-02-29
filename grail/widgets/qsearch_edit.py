@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 # Grail - Lyrics software. Simple.
-# Copyright (C) 2014-2015 Oleksii Lytvyn
+# Copyright (C) 2014-2016 Oleksii Lytvyn
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -54,11 +54,7 @@ class QSearchEdit(QLineEdit):
 
     def resizeEvent( self, event ):
         sz = self.clearButton.sizeHint()
-        frameWidth = self.style().pixelMetric( QStyle.PM_DefaultFrameWidth )
-        x = self.rect().right() - frameWidth - sz.width() - 18
-        y = (self.rect().bottom() + 5 - sz.height()) / 2
-
-        self.clearButton.move( x, y )
+        self.clearButton.move( self.rect().right() - sz.width(), (self.rect().bottom() + 5 - sz.height()) / 2 )
 
     def updateClearButton( self, text ):
         self.clearButton.setVisible( len(text) > 0 )

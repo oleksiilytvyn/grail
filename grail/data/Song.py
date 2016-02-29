@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 # Grail - Lyrics software. Simple.
-# Copyright (C) 2014-2015 Oleksii Lytvyn
+# Copyright (C) 2014-2016 Oleksii Lytvyn
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,29 +19,24 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from grail.utils import *
-import sqlite3 as lite
 
-from .ConnectionManager import ConnectionManager
+from .connection_manager import ConnectionManager
 
 
 class SongModel:
+    """Songs data model"""
 
-    '''
-    Songs data model
-    '''
-
-    def __init__( self ):
+    def __init__(self):
 
         path = get_data_path() + '/songs.db'
         first_run = False
 
-        if not os.path.isfile( path ):
+        if not os.path.isfile(path):
             first_run = True
 
-        self.connection = ConnectionManager.get( path, get_path() + '/default/songs.db' )
+        self.connection = ConnectionManager.get(path, get_path() + '/default/songs.db')
 
         if first_run:
-
             cur = self.connection.cursor()
 
             cur.execute("""CREATE TABLE IF NOT EXISTS songs(
@@ -51,7 +46,8 @@ class SongModel:
                         album TEXT,
                         year INT)""")
 
-            cur.execute("CREATE TABLE IF NOT EXISTS pages(id INTEGER PRIMARY KEY AUTOINCREMENT, song INT, sort INT, page TEXT)")
+            cur.execute(
+                "CREATE TABLE IF NOT EXISTS pages(id INTEGER PRIMARY KEY AUTOINCREMENT, song INT, sort INT, page TEXT)")
 
             cur.execute("CREATE TABLE IF NOT EXISTS playlists(id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT)")
 
@@ -62,22 +58,22 @@ class SongModel:
                         song INT,
                         collapsed INTEGER)""")
 
-            cur.execute("INSERT INTO playlists VALUES(NULL, ?)", ("Default", ))
+            cur.execute("INSERT INTO playlists VALUES(NULL, ?)", ("Default",))
 
-    def close( self ):
+    def close(self):
         self.connection.commit()
         self.connection.close()
 
-    def getConnection( self ):
+    def getConnection(self):
         return self.connection
 
-    def get( self, id ):
+    def get(self, id):
         cur = self.connection.cursor()
         cur.execute("SELECT * FROM songs WHERE id = ?", (id,))
 
         return cur.fetchone()
 
-    def search( self, keyword ):
+    def search(self, keyword):
         keyword = "%" + keyword + "%"
 
         cur = self.connection.cursor()
@@ -94,7 +90,7 @@ class SongModel:
 
         return cur.fetchall()
 
-    def add( self, title, artist="unknown", album="unknown", year=0 ):
+    def add(self, title, artist="unknown", album="unknown", year=0):
         record = (title, artist, album, year)
 
         cur = self.connection.cursor()
@@ -103,14 +99,14 @@ class SongModel:
 
         return cur.lastrowid
 
-    def update( self, id, title, artist, album, year ):
+    def update(self, id, title, artist, album, year):
         cur = self.connection.cursor()
 
         cur.execute("UPDATE songs SET title=?, artist=?, album=?, year=? WHERE id=?", (title, artist, album, year, id))
         self.connection.commit()
 
-    def delete( self, id ):
-        # if song in any playlist dont delete it
+    def delete(self, id):
+        # if song in any playlist don't delete it
         cursor = self.connection.cursor()
 
         cursor.execute("SELECT * FROM playlist WHERE song = ?", (id,))
@@ -119,41 +115,42 @@ class SongModel:
             cursor.execute("DELETE FROM songs WHERE id = ?", (id,))
             cursor.execute("DELETE FROM pages WHERE song = ?", (id,))
 
-    def getList( self ):
+    def getList(self):
         cursor = self.connection.cursor()
         cursor.execute("SELECT * FROM songs ORDER BY title")
 
         return cursor.fetchall()
 
-    def getPage( self, id, index ):
+    def getPage(self, page_id, index):
         cursor = self.connection.cursor()
-        cursor.execute("SELECT * FROM pages WHERE song = ? AND sort = ?", (id, index))
+        cursor.execute("SELECT * FROM pages WHERE song = ? AND sort = ?", (page_id, index))
 
         return cursor.fetchone()
 
-    def getPages( self, id ):
+    def getPages(self, page_id):
         cursor = self.connection.cursor()
-        cursor.execute("SELECT * FROM pages WHERE song = ? ORDER BY sort ASC", (id,))
+        cursor.execute("SELECT * FROM pages WHERE song = ? ORDER BY sort ASC", (page_id,))
 
         return cursor.fetchall()
 
-    def addPage( self, id, text ):
+    def addPage(self, page_id, text):
         cur = self.connection.cursor()
         cur.execute("INSERT INTO pages VALUES(NULL, ?, (SELECT max(sort) FROM pages WHERE song = ?) + 1, ?)",
-                    (id, id, text))
+                    (page_id, page_id, text))
 
-    def deletePage( self, id, index ):
+    def deletePage(self, page_id, index):
         cursor = self.connection.cursor()
-        cursor.execute("DELETE FROM pages WHERE song = ? AND sort = ?", (id, index))
+        cursor.execute("DELETE FROM pages WHERE song = ? AND sort = ?", (page_id, index))
 
-    def deletePages( self, id ):
+    def deletePages(self, page_id):
         cursor = self.connection.cursor()
-        cursor.execute("DELETE FROM pages WHERE song = ?", (id, ))
+        cursor.execute("DELETE FROM pages WHERE song = ?", (page_id,))
 
-    def updatePage( self, id, index, page ):
+    def updatePage(self, page_id, index, page):
         cur = self.connection.cursor()
 
-        cur.execute("UPDATE pages SET page=? WHERE song=? AND id=?", (page, id, index))
+        cur.execute("UPDATE pages SET page=? WHERE song=? AND id=?", (page, page_id, index))
         self.connection.commit()
+
 
 Song = SongModel()

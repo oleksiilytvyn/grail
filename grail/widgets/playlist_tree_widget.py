@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 # Grail - Lyrics software. Simple.
-# Copyright (C) 2014-2015 Oleksii Lytvyn
+# Copyright (C) 2014-2016 Oleksii Lytvyn
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,8 +22,8 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
-from .SongTreeWidgetItem import SongTreeWidgetItem
-from .PageTreeWidgetItem import PageTreeWidgetItem
+from .song_tree_widget_item import SongTreeWidgetItem
+from .page_tree_widget_item import PageTreeWidgetItem
 
 
 class PlaylistTreeWidget(QTreeWidget):

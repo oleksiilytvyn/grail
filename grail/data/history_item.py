@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 # Grail - Lyrics software. Simple.
-# Copyright (C) 2014-2015 Oleksii Lytvyn
+# Copyright (C) 2014-2016 Oleksii Lytvyn
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,18 +18,19 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from grail.data import DisplayPreferences
-from grail.dialogs import DisplayDialog
-from PyQt5.QtCore import *
+from datetime import datetime
 
 
-class DisplayThread(QThread):
+class HistoryItem:
+    """Representation of history item"""
 
-    def __init__( self ):
-        super(DisplayThread, self).__init__()
+    TYPE_SONG = 0
+    TYPE_BIBLE = 1
+    TYPE_QUICK = 3
+    TYPE_BLACKOUT = 4
 
-        self.display = DisplayDialog( None, DisplayPreferences() )
-
-    def run( self ):
-
-        self.display.show()
+    def __init__(self, item_type=0, title="Untitled", message=""):
+        self.title = title
+        self.message = message
+        self.type = item_type
+        self.date = datetime.now()

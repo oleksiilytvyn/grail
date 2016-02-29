@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 # Grail - Lyrics software. Simple.
-# Copyright (C) 2014-2015 Oleksii Lytvyn
+# Copyright (C) 2014-2016 Oleksii Lytvyn
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,47 +19,37 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
 
 
 class DisplayMode:
 
-    def __init__( self, name="Untitled", geometry=QRect( 0, 0, 800, 600 ),
-                  fullscreen=True, display="none", disabled=False ):
-
+    def __init__(self, name="Untitled", geometry=QRect(0, 0, 800, 600),
+                 fullscreen=True, display="none", disabled=False):
         self.name = name
         self.geometry = geometry
         self.fullscreen = fullscreen
         self.display = display
         self.disabled = disabled
 
-    def isEqual( self, mode ):
-
+    def isEqual(self, mode):
         return self.geometry == mode.geometry and self.fullscreen == mode.fullscreen
 
-    def setName( self, name ):
-
+    def setName(self, name):
         self.name = name
 
-    def setDisabled( self, flag ):
-
+    def setDisabled(self, flag):
         self.disabled = bool(flag)
 
-    def setGeometry( self, geometry ):
-
+    def setGeometry(self, geometry):
         self.geometry = geometry
 
-    def setFullscreen( self, flag ):
-
+    def setFullscreen(self, flag):
         self.fullscreen = bool(flag)
 
-    def setDisplay( self, name ):
-
+    def setDisplay(self, name):
         self.display = name
 
-    def getName( self ):
-
+    def getName(self):
         data = ("Windowed" if not self.fullscreen else self.display, self.geometry.width(), self.geometry.height())
 
         return "Disabled" if self.disabled else "%s (%dx%d)" % data

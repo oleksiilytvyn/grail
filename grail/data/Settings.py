@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 # Grail - Lyrics software. Simple.
-# Copyright (C) 2014-2015 Oleksii Lytvyn
+# Copyright (C) 2014-2016 Oleksii Lytvyn
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,20 +19,20 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from grail.utils import *
-from .ConnectionManager import ConnectionManager
+from .connection_manager import ConnectionManager
 
 
 class SettingsModel:
 
-    def __init__( self ):
+    def __init__(self):
 
         path = get_data_path() + '/settings.db'
         first_run = False
 
-        if not os.path.isfile( path ):
+        if not os.path.isfile(path):
             first_run = True
 
-        self.connection = ConnectionManager.get( path )
+        self.connection = ConnectionManager.get(path)
 
         if first_run:
             cur = self.connection.cursor()
@@ -51,13 +51,13 @@ class SettingsModel:
             cur.execute("DROP TABLE IF EXISTS oscout")
             cur.execute("CREATE TABLE oscout(id INTEGER PRIMARY KEY AUTOINCREMENT, host TEXT, port INT )")
 
-            self.set( 'playlist', 1 )
+            self.set('playlist', 1)
 
-    def close( self ):
+    def close(self):
         self.connection.commit()
         self.connection.close()
 
-    def get( self, property ):
+    def get(self, property):
         cursor = self.connection.cursor()
         cursor.execute("SELECT * FROM properties WHERE key = ?", (property,))
         self.connection.commit()
@@ -68,7 +68,7 @@ class SettingsModel:
         else:
             return None
 
-    def set( self, property, value ):
+    def set(self, property, value):
         cur = self.connection.cursor()
         cur.execute("DELETE FROM properties WHERE key = ?", (property,))
         cur.execute("INSERT INTO properties VALUES(?, ?)", (property, value))
@@ -76,39 +76,40 @@ class SettingsModel:
 
         return cur.lastrowid
 
-    def addOSCInputRule( self, host, port, message, action ):
+    def addOSCInputRule(self, host, port, message, action):
         cur = self.connection.cursor()
         cur.execute("INSERT INTO oscin VALUES(NULL, ?, ?, ?, ?)", (host, port, message, action))
         self.connection.commit()
 
-    def deleteOSCInputRules( self ):
+    def deleteOSCInputRules(self):
         cursor = self.connection.cursor()
         cursor.execute("DELETE FROM oscin")
         self.connection.commit()
 
-    def getOSCInputRules( self ):
+    def getOSCInputRules(self):
         cursor = self.connection.cursor()
         cursor.execute("SELECT * FROM oscin")
 
         return cursor.fetchall()
 
-    def addOSCOutputRule( self, host, port ):
+    def addOSCOutputRule(self, host, port):
         cur = self.connection.cursor()
         cur.execute("INSERT INTO oscout VALUES(NULL, ?, ?)", (host, port))
         self.connection.commit()
 
-    def deleteOSCOutputRules( self ):
+    def deleteOSCOutputRules(self):
         cursor = self.connection.cursor()
         cursor.execute("DELETE FROM oscout")
         self.connection.commit()
 
-    def getOSCOutputRules( self ):
+    def getOSCOutputRules(self):
         cursor = self.connection.cursor()
         cursor.execute("SELECT * FROM oscout")
 
         return cursor.fetchall()
 
-    def save( self ):
+    def save(self):
         self.connection.commit()
+
 
 Settings = SettingsModel()

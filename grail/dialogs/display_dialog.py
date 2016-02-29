@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 # Grail - Lyrics software. Simple.
-# Copyright (C) 2014-2015 Oleksii Lytvyn
+# Copyright (C) 2014-2016 Oleksii Lytvyn
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@ import math
 
 from grail.utils import *
 from grail.data import Settings, DisplayPreferences, DisplayMode
-from grail.dialogs.DisplayPreferencesDialog import DisplayPreferencesDialog
+from grail.dialogs.display_preferences_dialog import DisplayPreferencesDialog
 
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *

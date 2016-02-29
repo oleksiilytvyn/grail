@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 # Grail - Lyrics software. Simple.
-# Copyright (C) 2014-2015 Oleksii Lytvyn
+# Copyright (C) 2014-2016 Oleksii Lytvyn
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,20 +19,19 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from grail.utils import *
-from .ConnectionManager import ConnectionManager
+from .connection_manager import ConnectionManager
 
 
 def indexof(s, char):
     return s.find(char)
 
 
-def string_rank( S, H ):
-    s = S.lower()
-    h = H.lower()
+def string_rank(this, other):
+    s = this.lower()
+    h = other.lower()
     sl = len(s)
     hl = len(h)
     si = indexof(s, h)
-    a = 0
     i = 0
     j = 0
 
@@ -44,62 +43,75 @@ def string_rank( S, H ):
 
     while i < min(sl, hl):
         if h[j] == s[i]:
-            j = j + 1
+            j += 1
 
-        i = i + 1
+        i += 1
 
     return j / sl + ((sl - indexof(s, h[0])) / sl if indexof(s, h[0]) >= 0 else 0)
 
 
-class BibleModel():
+class BibleModel:
 
-    def __init__( self ):
+    def __init__(self):
 
         path = get_data_path() + '/bible.db'
         first_run = False
 
-        if not os.path.isfile( path ):
+        if not os.path.isfile(path):
             first_run = True
 
-        self.connection = ConnectionManager.get( path, get_path() + '/default/bible.db' )
+        self.connection = ConnectionManager.get(path, get_path() + '/default/bible.db')
 
-        if first_run and not ConnectionManager.iscopied( path ):
+        if first_run and not ConnectionManager.iscopied(path):
             cur = self.connection.cursor()
 
-            cur.execute("CREATE TABLE IF NOT EXISTS books(id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, full TEXT, short TEXT )")
+            cur.execute(
+                """CREATE TABLE IF NOT EXISTS
+                   books(id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, full TEXT, short TEXT )""")
 
-            cur.execute("CREATE TABLE IF NOT EXISTS verses(id INTEGER PRIMARY KEY AUTOINCREMENT, book INT, chapter INT, verse INT )")
+            cur.execute(
+                """CREATE TABLE IF NOT EXISTS
+                   verses(id INTEGER PRIMARY KEY AUTOINCREMENT, book INT, chapter INT, verse INT )""")
 
-    def close( self ):
+    def close(self):
         self.connection.commit()
         self.connection.close()
 
-    def get( self, book, chapter, index ):
+    def get(self, book, chapter, index):
+        """Get single verse"""
+
         cursor = self.connection.cursor()
         cursor.execute("SELECT * FROM verses WHERE book = ? AND chapter = ? AND verse = ?", (book, chapter, index))
 
-        return cursor.fetchone()[ 3 ]
+        return cursor.fetchone()[3]
 
-    def getChapter( self, book, chapter ):
+    def get_chapter(self, book, chapter):
+        """Get all verses in chapter"""
+
         cursor = self.connection.cursor()
         cursor.execute("SELECT * FROM verses WHERE book = ? AND chapter = ? ORDER BY verse ASC", (book, chapter))
 
         return cursor.fetchall()
 
-    def getBook( self, book ):
+    def get_book(self, book):
+        """Get single book by id"""
+
         cursor = self.connection.cursor()
-        cursor.execute("SELECT * FROM books WHERE id = ?", (book, ))
+        cursor.execute("SELECT * FROM books WHERE id = ?", (book,))
 
         return cursor.fetchone()
 
-    def getBooks( self ):
+    def get_books(self):
+        """Get all available books"""
 
         cursor = self.connection.cursor()
         cursor.execute("SELECT * FROM books")
 
         return cursor.fetchall()
 
-    def matchBook( self, keyword ):
+    def match_book(self, keyword):
+        """Find book by name"""
+
         keyword = "%" + keyword + "%"
 
         cursor = self.connection.cursor()
@@ -109,47 +121,50 @@ class BibleModel():
              lowercase(title) LIKE lowercase( ? )
              OR lowercase(short) LIKE lowercase( ? )
              OR lowercase(full) LIKE lowercase( ? )
-            """, (keyword, keyword, keyword ))
+            """, (keyword, keyword, keyword))
 
         return cursor.fetchall()
 
-    def matchReference( self, keyword ):
+    def match_reference(self, keyword):
+        """Find bible references by given string"""
+
         possible = []
         chapter = 1
         verse = 1
 
-        match_c = re.search( r'([0-9]+)$', keyword)
-        match_cv = re.search( r'([0-9]+)([\D]{1})([0-9]+)$', keyword )
-        match_ce = re.search( r'([0-9]+)([\D]{1})([0-9]+)\-([0-9]+)$', keyword )
+        match_c = re.search(r'([0-9]+)$', keyword)
+        match_cv = re.search(r'([0-9]+)([\D]{1})([0-9]+)$', keyword)
+        match_ce = re.search(r'([0-9]+)([\D]{1})([0-9]+)\-([0-9]+)$', keyword)
 
         if match_ce:
             chapter = match_ce.group(1)
             verse = match_ce.group(3)
-            keyword = re.sub( r'([0-9]+)([\D]{1})([0-9]+)\-([0-9]+)$', '', keyword )
+            keyword = re.sub(r'([0-9]+)([\D]{1})([0-9]+)\-([0-9]+)$', '', keyword)
         elif match_cv:
             chapter = match_cv.group(1)
             verse = match_cv.group(3)
-            keyword = re.sub( r'([0-9]+)([\D]{1})([0-9]+)$', '', keyword )
+            keyword = re.sub(r'([0-9]+)([\D]{1})([0-9]+)$', '', keyword)
         elif match_c:
             chapter = match_c.group(1)
-            keyword = re.sub( r'([0-9]+)$', '', keyword )
+            keyword = re.sub(r'([0-9]+)$', '', keyword)
 
-        books = self.getBooks()
+        books = self.get_books()
 
         keyword = keyword.lstrip().rstrip()
 
         for book in books:
-            m1 = string_rank( book['title'], keyword )
-            m2 = string_rank( book['full'], keyword )
-            m3 = string_rank( book['short'], keyword )
+            m1 = string_rank(book['title'], keyword)
+            m2 = string_rank(book['full'], keyword)
+            m3 = string_rank(book['short'], keyword)
             r = (m1 + m2 + m3) / 3
 
             if r >= 1.1:
-                possible.append([ "%s %s:%s" % (book['title'], chapter, verse), [book['id'], chapter, verse], r ])
+                possible.append(["%s %s:%s" % (book['title'], chapter, verse), [book['id'], chapter, verse], r])
 
-        def getKey(item):
+        def get_key(item):
             return -item[2]
 
-        return sorted(possible, key=getKey)[0:3]
+        return sorted(possible, key=get_key)[0:3]
+
 
 Bible = BibleModel()

@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 # Grail - Lyrics software. Simple.
-# Copyright (C) 2014-2015 Oleksii Lytvyn
+# Copyright (C) 2014-2016 Oleksii Lytvyn
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,19 +18,21 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from datetime import date, datetime
+from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtWidgets import QLabel
 
 
-class HistoryItem:
+class PlaylistLabel(QLabel):
 
-    TYPE_SONG = 0
-    TYPE_BIBLE = 1
-    TYPE_QUICK = 3
-    TYPE_BLACKOUT = 4
+    clicked = pyqtSignal('QMouseEvent')
 
-    def __init__( self, item_type=0, title="Untitled", message="" ):
+    def __init__( self, parent=None ):
+        super( PlaylistLabel, self ).__init__( parent )
 
-        self.title = title
-        self.message = message
-        self.type = item_type
-        self.date = datetime.now()
+        self.clicked.connect( self.mouseClick )
+
+    def mousePressEvent( self, event ):
+        self.clicked.emit( event )
+
+    def mouseClick( self, event ):
+        pass

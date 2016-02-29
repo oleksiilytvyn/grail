@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 # Grail - Lyrics software. Simple.
-# Copyright (C) 2014-2015 Oleksii Lytvyn
+# Copyright (C) 2014-2016 Oleksii Lytvyn
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,33 +22,28 @@ from PyQt5.QtCore import *
 from PyQt5.QtWidgets import QTreeWidgetItem
 
 
-class SongTreeWidgetItem(QTreeWidgetItem):
+class PageTreeWidgetItem(QTreeWidgetItem):
 
     def __init__( self, parent=None ):
-        super(SongTreeWidgetItem, self).__init__(parent)
+        super(PageTreeWidgetItem, self).__init__(parent)
 
-        self.setFlags( Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDragEnabled )
+        self.setFlags( Qt.ItemIsEnabled | Qt.ItemIsSelectable )
 
         self.id = 0
-        self.title = ''
-        self.artist = ''
-        self.album = ''
-        self.year = 0
+        self.page = ""
+        self.song = 0
+        self.data = None
 
-        self.song = None
+    def setPage( self, page ):
+        self.id = page['id']
+        self.page = page['page']
+        self.song = page['song']
+
+        self.setText( 0, self.page )
+        self.data = page
 
     def setSong( self, song ):
         self.pid = song['pid']
-        self.id = song['id']
-        self.title = song['title']
-        self.artist = song['artist']
-        self.album = song['album']
-        self.year = song['year']
 
-        self.setText( 0, self.title )
-        self.setExpanded( bool(song["collapsed"]) )
-
-        self.song = song
-
-    def getSong( self ):
-        return self.song
+    def getPage( self ):
+        return self.data

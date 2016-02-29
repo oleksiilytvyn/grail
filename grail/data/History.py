@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 # Grail - Lyrics software. Simple.
-# Copyright (C) 2014-2015 Oleksii Lytvyn
+# Copyright (C) 2014-2016 Oleksii Lytvyn
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@ from PyQt5.QtWidgets import *
 from grail.utils import *
 from datetime import date, datetime
 
-from .ConnectionManager import ConnectionManager
+from .connection_manager import ConnectionManager
 
 
 class HistoryModel(QObject):

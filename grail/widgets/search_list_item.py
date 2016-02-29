@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 # Grail - Lyrics software. Simple.
-# Copyright (C) 2014-2015 Oleksii Lytvyn
+# Copyright (C) 2014-2016 Oleksii Lytvyn
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,20 +19,41 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtWidgets import QLabel
+from PyQt5.QtWidgets import QListWidgetItem
 
 
-class PlaylistLabel(QLabel):
+class SearchListItem(QListWidgetItem):
 
-    clicked = pyqtSignal('QMouseEvent')
+    TYPE_DEFAULT = 0
+    TYPE_SONG = 1
+    TYPE_BIBLE = 2
+    TYPE_REFERENCE = 3
+    TYPE_HISTORY = 4
 
     def __init__( self, parent=None ):
-        super( PlaylistLabel, self ).__init__( parent )
+        super(SearchListItem, self).__init__(parent)
 
-        self.clicked.connect( self.mouseClick )
+        self.data = None
+        self.type = None
+        self.message = ""
 
-    def mousePressEvent( self, event ):
-        self.clicked.emit( event )
+    def setType( self, item_type ):
+        self.type = item_type
 
-    def mouseClick( self, event ):
-        pass
+    def setSong( self, song ):
+        self.data = song
+
+        self.setType( SearchListItem.TYPE_SONG )
+        self.setText( '%s - %s' % (song["title"], song["artist"]) )
+
+    def setMessage( self, text ):
+        self.message = text
+
+    def getMessage( self ):
+        return self.message
+
+    def setItemData( self, data ):
+        self.data = data
+
+    def getData( self ):
+        return self.data

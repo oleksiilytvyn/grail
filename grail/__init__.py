@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 # Grail - Lyrics software. Simple.
-# Copyright (C) 2014-2015 Oleksii Lytvyn
+# Copyright (C) 2014-2016 Oleksii Lytvyn
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,10 +18,6 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-__version__ = '0.9.4'
-
-import sys
-import os
 import traceback
 
 # PyQt5
@@ -31,6 +27,8 @@ from PyQt5.QtWidgets import *
 
 from grail.utils import *
 from grail.grail import Grail
+
+__version__ = '0.9.4'
 
 
 class Application(QApplication):
@@ -93,9 +91,13 @@ class Application(QApplication):
         self.shared_memory.detach()
         super(Application, self).quit()
 
+old_excepthook = sys.excepthook
+
 
 def hook_exception(exctype, value, traceback_object):
     """Hook exception to be written to file"""
+
+    old_excepthook(exctype, value, traceback_object)
 
     out = open('error.log', 'a+')
     out.write("=== Exception ===\n" +
@@ -113,7 +115,7 @@ def main():
     os.chdir(get_path())
 
     app = Application(sys.argv)
-    win = Grail()
+    Grail()
 
     sys.exit(app.exec_())
 

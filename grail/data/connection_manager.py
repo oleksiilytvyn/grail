@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 # Grail - Lyrics software. Simple.
-# Copyright (C) 2014-2015 Oleksii Lytvyn
+# Copyright (C) 2014-2016 Oleksii Lytvyn
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -24,18 +24,16 @@ import os
 
 
 class ConnectionManager:
-    """
-    Manage SQlite connections
-    """
+    """Manage SQLite connections"""
 
     __list__ = {}
 
-    def __init__( self ):
-        
+    def __init__(self):
+
         self.copied = []
         self.first_run = True
 
-    def get( self, path, copypath = None ):
+    def get(self, path, copypath=None):
 
         # copy files from data to default
         if self.first_run:
@@ -45,33 +43,33 @@ class ConnectionManager:
             b = get_path() + '/default'
 
             try:
-                if os.path.exists( a ):
-                    shutil.move( a, b )
+                if os.path.exists(a):
+                    shutil.move(a, b)
             except:
                 pass
 
         if path in self.__list__:
-            connection = self.__list__[ path ]
+            connection = self.__list__[path]
         else:
-            directory = os.path.dirname(os.path.realpath( path ))
+            directory = os.path.dirname(os.path.realpath(path))
 
             if not os.path.exists(directory):
                 os.makedirs(directory)
 
-            if not os.path.isfile( path ):
-                if copypath is not  None:
-                    copy_file( copypath, path )
-                    self.copied.append( path )
+            if not os.path.isfile(path):
+                if copypath is not None:
+                    copy_file(copypath, path)
+                    self.copied.append(path)
                 else:
-                    open( path, 'w+' )
+                    open(path, 'w+')
 
-            connection = lite.connect( path )
+            connection = lite.connect(path)
             connection.row_factory = lite.Row
 
-            def lowercase( char ):
+            def lowercase(char):
                 return char.lower()
 
-            def searchprep( char ):
+            def searchprep(char):
                 char = re.sub(r'[\[\_\]\.\-\,\!\(\)\"\'\:\;]', '', char)
 
                 return char.lower()
@@ -79,19 +77,20 @@ class ConnectionManager:
             connection.create_function("lowercase", 1, lowercase)
             connection.create_function("searchprep", 1, searchprep)
 
-            self.__list__[ path ] = connection
+            self.__list__[path] = connection
 
         return connection
 
-    def iscopied( self, path ):
+    def iscopied(self, path):
         return path in self.copied
 
-    def closeAll( self ):
+    def close(self):
 
         for key in self.__list__:
-            connection = self.__list__[ key ]
+            connection = self.__list__[key]
 
             connection.commit()
             connection.close()
+
 
 ConnectionManager = ConnectionManager()

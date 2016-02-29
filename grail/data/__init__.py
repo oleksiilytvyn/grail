@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 # Grail - Lyrics software. Simple.
-# Copyright (C) 2014-2015 Oleksii Lytvyn
+# Copyright (C) 2014-2016 Oleksii Lytvyn
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,13 +18,12 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from .DisplayPreferences import DisplayPreferences
-from .Settings import Settings
-from .DisplayMode import DisplayMode
-from .Bible import Bible
-from .Playlist import Playlist
-from .Song import Song
-from .RemoteAction import RemoteAction
-from .History import History
-from .HistoryItem import HistoryItem
-from .ConnectionManager import ConnectionManager
+from .display_preferences import DisplayPreferences
+from .settings import Settings
+from .display_mode import DisplayMode
+from .bible import Bible
+from .playlist import Playlist
+from .song import Song
+from .history import History
+from .history_item import HistoryItem
+from .connection_manager import ConnectionManager

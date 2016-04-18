@@ -19,7 +19,8 @@ SongDialog QToolButton {
 	color: #31343a;
 	border: none;
 	border-radius: 3px;
-	padding: 6px 16px;
+	padding: 5px 12px;
+	margin: 3px;
 	}
 
 DisplayPreferencesDialog QToolButton,
@@ -229,12 +230,13 @@ QScrollBar:vertical {
 		background: #4b5056;
 		border-top: 1px solid #4b5056;
 		padding: 5px;
+		min-height: 24px;
 		}
 
 		#playlist_label {
 			qproperty-alignment: AlignCenter AlignCenter;
 			color: #e0e0e1;
-			margin: 6px 3px;
+			margin: 3px;
 			}
 
 /**
@@ -366,7 +368,6 @@ SongDialog {
 	SongDialog QLabel {
 		color: #959595;
 		margin: 0;
-		font-size: 9pt;
 		}
 
 	SongDialog QLineEdit, 

@@ -104,10 +104,8 @@ class DisplayPreferencesDialog(QWidget):
 
     def initUI( self ):
 
-        self.setObjectName( "displayprefs_dialog" )
-
         self.ui_transform = TransformWidget()
-        self.ui_transform.setObjectName( "displayprefs_transform" )
+        self.ui_transform.setObjectName( "display_transform" )
         self.ui_transform.updated.connect( self.transformUpdated )
 
         # output
@@ -127,7 +125,7 @@ class DisplayPreferencesDialog(QWidget):
 
         self.ui_font_action = QToolButton( self )
         self.ui_font_action.setIcon( QIcon(':/icons/font.png') )
-        self.ui_font_action.setObjectName( "displayprefs_action_font" )
+        self.ui_font_action.setObjectName( "display_action_font" )
         self.ui_font_action.setProperty( "left", True )
         self.ui_font_action.clicked.connect( self.fontAction )
 
@@ -138,13 +136,13 @@ class DisplayPreferencesDialog(QWidget):
 
         self.ui_align_action = QToolButton( self )
         self.ui_align_action.setIcon( QIcon(':/icons/align.png') )
-        self.ui_align_action.setObjectName( "displayprefs_action_align" )
+        self.ui_align_action.setObjectName( "display_action_align" )
         self.ui_align_action.setProperty( "middle", True )
         self.ui_align_action.clicked.connect( self.alignAction )
 
         self.ui_case_action = QToolButton( self )
         self.ui_case_action.setIcon( QIcon(':/icons/case.png') )
-        self.ui_case_action.setObjectName( "displayprefs_action_case" )
+        self.ui_case_action.setObjectName( "display_action_case" )
         self.ui_case_action.setProperty( "middle", True )
         self.ui_case_action.clicked.connect( self.caseAction )
 
@@ -154,7 +152,7 @@ class DisplayPreferencesDialog(QWidget):
         self.ui_color_action.clicked.connect( self.colorAction )
 
         self.ui_background_action = QToolButton( self )
-        self.ui_background_action.setIcon( QIcon(':/icons/color.png') )
+        self.ui_background_action.setIcon( QIcon(':/icons/background.png') )
         self.ui_background_action.setProperty( "single", True )
         self.ui_background_action.clicked.connect( self.backgroundAction )
 
@@ -165,13 +163,13 @@ class DisplayPreferencesDialog(QWidget):
 
         self.ui_padding_action = QToolButton( self )
         self.ui_padding_action.setIcon( QIcon(':/icons/selection-select.png') )
-        self.ui_padding_action.setObjectName( "displayprefs_action_padding" )
+        self.ui_padding_action.setObjectName( "display_action_padding" )
         self.ui_padding_action.setProperty( "middle", True )
         self.ui_padding_action.clicked.connect( self.paddingAction )
 
         self.ui_testcard_action = QToolButton( self )
         self.ui_testcard_action.setIcon( QIcon(':/icons/testcard.png') )
-        self.ui_testcard_action.setObjectName( "displayprefs_action_testcard" )
+        self.ui_testcard_action.setObjectName( "display_action_testcard" )
         self.ui_testcard_action.setProperty( "middle", True )
         self.ui_testcard_action.setCheckable( True )
         self.ui_testcard_action.clicked.connect( self.testcardAction )
@@ -179,14 +177,14 @@ class DisplayPreferencesDialog(QWidget):
 
         self.ui_paddingbox_action = QToolButton( self )
         self.ui_paddingbox_action.setIcon( QIcon(':/icons/text-padding-box.png') )
-        self.ui_paddingbox_action.setObjectName( "displayprefs_action_box" )
+        self.ui_paddingbox_action.setObjectName( "display_action_box" )
         self.ui_paddingbox_action.setProperty( "right", True )
         self.ui_paddingbox_action.setCheckable( True )
         self.ui_paddingbox_action.clicked.connect( self.paddingboxAction )
         self.ui_paddingbox_action.setChecked( self.preferences.padding_box )
 
         self.ui_toolbar = QToolBar()
-        self.ui_toolbar.setObjectName( "displayprefs_toolbar" )
+        self.ui_toolbar.setObjectName( "display_toolbar" )
         self.ui_toolbar.setIconSize( QSize(16, 16) )
         self.ui_toolbar.setStyle( QStyleFactory.create("windows") )
 
@@ -355,3 +353,6 @@ class DisplayPreferencesDialog(QWidget):
     def updateCurrentMode( self ):
 
         self.ui_output_action.setText( DisplayMode.getName(self.preferences) )
+
+    def className(self):
+        return 'DisplayPreferencesDialog'

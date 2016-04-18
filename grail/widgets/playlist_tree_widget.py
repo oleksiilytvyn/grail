@@ -34,7 +34,8 @@ class PlaylistTreeWidget(QTreeWidget):
     def __init__( self, parent=None ):
         super(PlaylistTreeWidget, self).__init__(parent)
 
-        self.setObjectName( "playlistTree" )
+        self.setObjectName("playlist_tree")
+        self.setAlternatingRowColors(True)
         self.setAttribute( Qt.WA_MacShowFocusRect, False )
         self.header().close()
 

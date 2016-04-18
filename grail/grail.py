@@ -225,19 +225,20 @@ class Grail(QMainWindow):
 
         # left
         self.ui_songs_bar = QVBoxLayout()
-        self.ui_songs_bar.setObjectName("songsBar")
+        self.ui_songs_bar.setObjectName("library_bar")
         self.ui_songs_bar.setSpacing(0)
         self.ui_songs_bar.setContentsMargins(0, 0, 0, 0)
 
         self.ui_songs_search = QSearchEdit()
-        self.ui_songs_search.setObjectName("songsSearch")
+        self.ui_songs_search.setObjectName("library_search")
         self.ui_songs_search.setAttribute(Qt.WA_MacShowFocusRect, False)
         self.ui_songs_search.textChanged.connect(self.searchAction)
         self.ui_songs_search.keyPressed.connect(self.searchKeyEvent)
 
         self.ui_songs_list = SearchListWidget()
-        self.ui_songs_list.setObjectName("songsList")
+        self.ui_songs_list.setObjectName("library_list")
         self.ui_songs_list.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.ui_songs_list.setAlternatingRowColors(True)
 
         self.ui_songs_list.itemClicked.connect(self.songClicked)
         self.ui_songs_list.itemDoubleClicked.connect(self.songDoubleClicked)
@@ -247,11 +248,11 @@ class Grail(QMainWindow):
         self.ui_songs_list.setContextMenuPolicy(Qt.CustomContextMenu)
         self.ui_songs_list.customContextMenuRequested.connect(self.songContextMenu)
 
-        addSongAction = QAction('Add', self)
+        addSongAction = QAction(QIcon(':/icons/add.png'), 'Add', self)
         addSongAction.setIconVisibleInMenu(True)
         addSongAction.triggered.connect(self.addSongAction)
 
-        switchViewAction = QAction('Media', self)
+        switchViewAction = QAction(QIcon(':/icons/media.png'), 'Media', self)
         switchViewAction.setIconVisibleInMenu(True)
         switchViewAction.triggered.connect(self.toggleLeftView)
 
@@ -259,7 +260,7 @@ class Grail(QMainWindow):
         spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
         self.ui_songs_toolbar = QToolBar()
-        self.ui_songs_toolbar.setObjectName("songsToolbar")
+        self.ui_songs_toolbar.setObjectName("library_toolbar")
         self.ui_songs_toolbar.setIconSize(QSize(16, 16))
         self.ui_songs_toolbar.addAction(addSongAction)
         self.ui_songs_toolbar.addWidget(spacer)
@@ -270,11 +271,11 @@ class Grail(QMainWindow):
         self.ui_songs_bar.addWidget(self.ui_songs_toolbar)
 
         self.ui_songs_panel = QWidget()
-        self.ui_songs_panel.setObjectName("songsPanel")
+        self.ui_songs_panel.setObjectName("library_panel")
         self.ui_songs_panel.setLayout(self.ui_songs_bar)
         self.ui_songs_panel.setMinimumSize(100, 100)
 
-        self.ui_songs_bar_label = QLabel("Nothing in library.", self.ui_songs_list)
+        self.ui_songs_bar_label = QLabel("There are no results", self.ui_songs_list)
         self.ui_songs_bar_label.setAlignment(Qt.AlignCenter)
         self.ui_songs_bar_label.setFont(QFont('Decorative', 12))
 
@@ -284,13 +285,13 @@ class Grail(QMainWindow):
         self.ui_playlist_bar.setContentsMargins(0, 0, 0, 0)
 
         self.ui_playlist_toolbar = QToolBar()
-        self.ui_playlist_toolbar.setObjectName("playlistToolbar")
+        self.ui_playlist_toolbar.setObjectName("playlist_toolbar")
 
         spacer = QWidget()
         spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
         self.ui_playlist_label = PlaylistLabel()
-        self.ui_playlist_label.setObjectName("playlistLabel")
+        self.ui_playlist_label.setObjectName("playlist_label")
         self.ui_playlist_label.setText("Playlist (0 Songs)")
         self.ui_playlist_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.ui_playlist_label.setContextMenuPolicy(Qt.CustomContextMenu)
@@ -314,10 +315,11 @@ class Grail(QMainWindow):
         self.ui_playlist_bar.addWidget(self.ui_playlist_toolbar)
 
         self.ui_playlist_panel = QWidget()
+        self.ui_playlist_panel.setObjectName("playlist_panel")
         self.ui_playlist_panel.setLayout(self.ui_playlist_bar)
         self.ui_playlist_panel.setMinimumSize(100, 100)
 
-        self.ui_playlist_panel_label = QLabel("Nothing in playlist.", self.ui_playlist_panel)
+        self.ui_playlist_panel_label = QLabel("Nothing in playlist", self.ui_playlist_panel)
         self.ui_playlist_panel_label.setAlignment(Qt.AlignCenter)
         self.ui_playlist_panel_label.setFont(QFont('Decorative', 12))
 
@@ -327,15 +329,15 @@ class Grail(QMainWindow):
         self.ui_preview_bar.setContentsMargins(0, 0, 0, 0)
 
         self.ui_preview_label = QLabel()
-        self.ui_preview_label.setObjectName("previewLabel")
+        self.ui_preview_label.setObjectName("preview_label")
         self.ui_preview_label.setAlignment(Qt.AlignCenter | Qt.AlignCenter)
 
         self.ui_preview_edit = QuickTextEdit()
-        self.ui_preview_edit.setObjectName("quickEdit")
+        self.ui_preview_edit.setObjectName("preview_edit")
         self.ui_preview_edit.textChanged.connect(self.quickEditChanged)
 
         self.ui_preview_toolbar = QToolBar()
-        self.ui_preview_toolbar.setObjectName("quickToolbar")
+        self.ui_preview_toolbar.setObjectName("preview_toolbar")
         self.ui_preview_toolbar.setIconSize(QSize(16, 16))
 
         blackoutAction = QAction(QIcon(':/icons/stop.png'), 'Blackout', self)

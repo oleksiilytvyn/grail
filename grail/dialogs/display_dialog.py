@@ -292,7 +292,7 @@ class DisplayDialog(QDialog):
         painter.setPen(pen)
 
         radius = min(comp.height(), comp.width()) / 2
-        circles = math.ceil((comp.width() / radius) / 2)
+        circles = math.ceil((comp.width() / radius) / 2) + 1
 
         for index in range(-circles, circles):
             ox = index * (radius * 1.25)

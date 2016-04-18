@@ -28,7 +28,7 @@ from PyQt5.QtWidgets import *
 from grail.utils import *
 from grail.grail import Grail
 
-__version__ = '0.9.4'
+__version__ = '0.9.5'
 
 
 class Application(QApplication):

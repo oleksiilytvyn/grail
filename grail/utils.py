@@ -57,7 +57,7 @@ def get_stylesheet():
     """
 
     data = ""
-    stream = QFile(":/stylesheet/Other.qss")
+    stream = QFile(":/stylesheet/app.qss")
 
     if stream.open(QFile.ReadOnly):
         data = str(stream.readAll())
@@ -70,7 +70,6 @@ def get_stylesheet():
 
 
 def get_data_path():
-
     APPNAME = 'grail1'
 
     if sys.platform == 'win32':
@@ -81,26 +80,26 @@ def get_data_path():
     return appdata
 
 
-def copy_file( a, b ):
-
-    directory = os.path.dirname(os.path.realpath( b ))
+def copy_file(a, b):
+    directory = os.path.dirname(os.path.realpath(b))
 
     if not os.path.exists(directory):
         os.makedirs(directory)
 
-    if os.path.exists( a ):
-        shutil.copyfile( a, b )
+    if os.path.exists(a):
+        shutil.copyfile(a, b)
+
 
 def get_version():
-
     path = '.version'
 
-    if os.path.isfile( path ):
-        return open( path ).read()
+    if os.path.isfile(path):
+        return open(path).read()
     else:
         return grail.__version__
 
-def tr( word ):
+
+def tr(word):
     """
     translate string
 

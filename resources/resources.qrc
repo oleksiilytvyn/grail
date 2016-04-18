@@ -8,6 +8,7 @@
 		<file alias="icons/search-clear.png">icons/search-clear.png</file>
 
 		<file alias="icons/color.png">icons/color.png</file>
+		<file alias="icons/background.png">icons/background.png</file>
 		<file alias="icons/shadow.png">icons/shadow.png</file>
 		<file alias="icons/font.png">icons/font.png</file>
 		<file alias="icons/font-white.png">icons/font-white.png</file>
@@ -20,11 +21,13 @@
 		<file alias="icons/case-white.png">icons/case-white.png</file>
 
 		<file alias="icons/testcard.png">icons/testcard.png</file>
-		<file alias="icons/testcard-white.png">icons/testcard-white.png</file>
+		<file alias="icons/testcard-selected.png">icons/testcard-selected.png</file>
 		<file alias="icons/text-padding-box.png">icons/text-padding-box.png</file>
-		<file alias="icons/text-padding-box-white.png">icons/text-padding-box-white.png</file>
+		<file alias="icons/text-padding-box-selected.png">icons/text-padding-box-selected.png</file>
 
 		<file alias="icons/add.png">icons/add.png</file>
+		<file alias="icons/media.png">icons/media.png</file>
+		<file alias="icons/library.png">icons/library.png</file>
 		<file alias="icons/stop.png">icons/stop.png</file>
 		<file alias="icons/save.png">icons/save.png</file>
 		<file alias="icons/play.png">icons/play.png</file>
@@ -37,7 +40,6 @@
 		<file alias="icons/128.png">../icon/128.png</file>
 		<file alias="icons/256.png">../icon/256.png</file>
 
-		<file alias="stylesheet/Other.qss">stylesheet/Other.qss</file>
-		<file alias="stylesheet/Darwin.qss">stylesheet/Darwin.qss</file>
+		<file alias="stylesheet/app.qss">stylesheet/app.qss</file>
 	</qresource>
 </RCC>

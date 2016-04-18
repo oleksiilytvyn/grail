@@ -37,7 +37,6 @@ class SongDialog(QDialog):
     def __init__(self, parent=None, song=None):
         super(SongDialog, self).__init__(parent)
 
-        self.setObjectName("song_dialog")
         self.updateComplete.connect(self.updateCompleteEvent)
 
         self.mode = SongDialog.MODE_ADD
@@ -68,14 +67,14 @@ class SongDialog(QDialog):
         self.pagesEdit.setAcceptRichText(False)
 
         buttonBox = QDialogButtonBox()
-        buttonBox.setContentsMargins(0, 0, 0, 0)
+        buttonBox.setContentsMargins(0, 12, 0, 0)
         buttonBox.setStandardButtons(QDialogButtonBox.Cancel | QDialogButtonBox.Ok)
         buttonBox.accepted.connect(self.acceptAction)
         buttonBox.rejected.connect(self.rejectAction)
 
         grid = QGridLayout()
-        grid.setSpacing(6)
-        grid.setContentsMargins(8, 8, 8, 8)
+        grid.setSpacing(10)
+        grid.setContentsMargins(12, 12, 12, 12)
         grid.setColumnMinimumWidth(0, 200)
 
         grid.addWidget(title, 0, 0, 1, 2)
@@ -183,3 +182,6 @@ class SongDialog(QDialog):
 
     def updateCompleteEvent(self):
         pass
+
+    def className(self):
+        return 'SongDialog'

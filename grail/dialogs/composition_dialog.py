@@ -82,14 +82,22 @@ class CompositionDialog(BalloonDialog):
     def updateList( self ):
 
         comp = self.composition
-        presets = [("Current (%dx%d)" % (comp.width(), comp.height()), comp),
+        presets = [("Current (%dx%d)" % (comp.width(), comp.height()), comp)]
+
+        for screen in QGuiApplication.screens():
+            mode = (screen.name() + " (%dx%d)" % (screen.size().width(), screen.size().height()),
+                               QRect(0, 0, screen.size().width(), screen.size().height()))
+
+            presets.append(mode)
+
+        presets.extend([
                    ("Full HD (1920x1080)", QRect(0, 0, 1920, 1080)),
                    ("HD (1366x768)", QRect(0, 0, 1366, 768)),
                    ("XGA (1024x768)", QRect(0, 0, 1024, 768)),
                    ("WXGA (1280x800)", QRect(0, 0, 1280, 800)),
                    ("SXGA (1280x1024)", QRect(0, 0, 1280, 1024)),
                    ("UXGA (1600x1200)", QRect(0, 0, 1600, 1200)),
-                   ("SVGA (800x600)", QRect(0, 0, 800, 600))]
+                   ("SVGA (800x600)", QRect(0, 0, 800, 600))])
 
         self.ui_preset.clear()
 

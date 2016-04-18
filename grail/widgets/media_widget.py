@@ -49,17 +49,18 @@ class MediaWidget(QWidget):
         self.ui_layout.setSpacing(0)
         self.ui_layout.setContentsMargins(0, 0, 0, 0)
 
-        addAction = QAction('Add', self)
+        addAction = QAction(QIcon(':/icons/add.png'), 'Add', self)
         addAction.triggered.connect(self.addFilesAction)
 
-        toggleAction = QAction('Library', self)
+        toggleAction = QAction(QIcon(':/icons/library.png'), 'Library', self)
         toggleAction.triggered.connect(self.toggleAction)
 
         self.ui_expander = QWidget()
         self.ui_expander.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
         self.ui_toolbar = QToolBar()
-        self.ui_toolbar.setObjectName("mediaToolbar")
+        self.ui_toolbar.setObjectName("media_toolbar")
+        self.ui_toolbar.setIconSize(QSize(16, 16))
         self.ui_toolbar.addAction(addAction)
         self.ui_toolbar.addWidget(self.ui_expander)
         self.ui_toolbar.addAction(toggleAction)
@@ -67,7 +68,7 @@ class MediaWidget(QWidget):
         size = 128
 
         self.ui_list = ImageListWidget()
-        self.ui_list.setObjectName("mediaList")
+        self.ui_list.setObjectName("media_list")
         self.ui_list.setAttribute(Qt.WA_MacShowFocusRect, False)
         self.ui_list.itemDoubleClicked.connect(self.itemDoubleClicked)
         self.ui_list.keyPressed.connect(self.itemKeypress)

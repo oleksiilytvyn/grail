@@ -93,7 +93,7 @@ class TransformWidget(QWidget):
         painter.begin( self )
         painter.setRenderHints( QPainter.Antialiasing | QPainter.TextAntialiasing )
 
-        painter.fillRect( event.rect(), QColor( "#383838" ) )
+        painter.fillRect( event.rect(), QColor( "#626364" ) )
 
         rect = event.rect()
         scale = min( rect.width() / self.screen.width(), rect.height() / self.screen.height() ) * 0.9
@@ -120,13 +120,13 @@ class TransformWidget(QWidget):
 
         painter.drawPolygon( QPolygonF(points) )
 
-        painter.setPen( QColor("#0069d9") )
-        painter.setBrush( QColor("#0069d9") )
+        painter.setPen( QColor("#8a9fbb") )
+        painter.setBrush( QColor("#8a9fbb") )
 
         for point in points:
             painter.drawEllipse( point, 4, 4 )
 
-        painter.setPen( QColor("#ffffff") )
+        painter.setPen( QColor("#e6e6e6") )
         painter.setFont( self.font )
         painter.drawText( event.rect(), Qt.AlignCenter | Qt.TextWordWrap, self.text )
 

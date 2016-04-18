@@ -26,39 +26,75 @@ from grail.utils import *
 
 
 class AboutDialog(QDialog):
-
     """About Window"""
 
     def __init__(self, parent=None):
+        """A basic about dialog"""
+
         super(AboutDialog, self).__init__(parent)
 
-        self.setObjectName("about_dialog")
+        self._window_title = "About Grail"
+        self._title = "Grail %s" % (get_version(),)
+        self._description = "Copyright © 2014-2016 Grail Team.\nAll rights reserved."
 
-        self.ui_picture = QLabel(self)
-        self.ui_picture.setPixmap(QPixmap(":/icons/128.png"))
-        self.ui_picture.setAlignment(Qt.AlignCenter)
-        self.ui_picture.setGeometry(0, 16, 400, 128)
+        self.url_report = "http://grailapp.com/"
+        self.url_help = "http://grailapp.com/help"
 
-        self.ui_title = QLabel("Grail", self)
-        self.ui_title.setAlignment(Qt.AlignCenter)
-        self.ui_title.setGeometry(0, 148, 400, 20)
-        self.ui_title.setObjectName("about_title")
+        self._init_ui()
 
-        self.ui_version = QLabel("Version %s" % (get_version(),), self)
-        self.ui_version.setAlignment(Qt.AlignCenter)
-        self.ui_version.setGeometry(0, 168, 400, 20)
-        self.ui_version.setObjectName("about_version")
+    def _init_ui(self):
 
-        self.ui_copyright = QLabel("Copyright © 2014-2015 Grail Team.\nAll rights reserved.", self)
-        self.ui_copyright.setAlignment(Qt.AlignCenter)
-        self.ui_copyright.setGeometry(0, 196, 400, 40)
-        self.ui_copyright.setObjectName("about_copyright")
+        self._ui_icon = QLabel(self)
+        self._ui_icon.setPixmap(QPixmap(":/icons/64.png"))
+        self._ui_icon.setAlignment(Qt.AlignCenter)
+        self._ui_icon.setGeometry(48, 52, 64, 64)
 
-        self.setWindowTitle('About Grail')
+        self._ui_title = QLabel(self._title, self)
+        self._ui_title.setGeometry(160, 34, 311, 26)
+        self._ui_title.setObjectName("about_title")
+
+        self._ui_description = QPlainTextEdit(self._description, self)
+        self._ui_description.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self._ui_description.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self._ui_description.setReadOnly(True)
+        self._ui_description.setGeometry(156, 74, 311, 88)
+        self._ui_description.setObjectName("about_description")
+
+        self._ui_btn_help = QPushButton("Help")
+        self._ui_btn_help.clicked.connect(self.help)
+
+        self._ui_btn_report = QPushButton("Web-page")
+        self._ui_btn_report.clicked.connect(self.report)
+
+        self.ui_btn_close = QPushButton("Close")
+        self.ui_btn_close.setDefault(True)
+        self.ui_btn_close.clicked.connect(self.close)
+
+        self._ui_buttons_layout = QBoxLayout(QBoxLayout.LeftToRight)
+        self._ui_buttons_layout.addWidget(self._ui_btn_help)
+        self._ui_buttons_layout.addStretch()
+        self._ui_buttons_layout.addWidget(self._ui_btn_report)
+        self._ui_buttons_layout.addWidget(self.ui_btn_close)
+
+        self._ui_buttons = QWidget(self)
+        self._ui_buttons.setLayout(self._ui_buttons_layout)
+        self._ui_buttons.setGeometry(8, 172, 484 - 16, 50)
+
+        self.setWindowTitle(self._window_title)
         self.setWindowIcon(QIcon(':/icons/32.png'))
         self.setWindowFlags(Qt.WindowCloseButtonHint)
-        self.setGeometry(100, 100, 400, 248)
-        self.setFixedSize(400, 248)
+        self.setGeometry(100, 100, 484, 224)
+        self.setFixedSize(484, 224)
+
+    def help(self):
+        """Open a web page"""
+        url = QUrl(self.url_help)
+        QDesktopServices.openUrl(url)
+
+    def report(self):
+        """Open a web page"""
+        url = QUrl(self.url_report)
+        QDesktopServices.openUrl(url)
 
     def className(self):
         return 'AboutDialog'

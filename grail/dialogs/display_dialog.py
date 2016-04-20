@@ -368,6 +368,9 @@ class DisplayDialog(QDialog):
             self.preferences.fullscreen = True
             self.preferences.disabled = False
 
+            if name == screen.name():
+                break
+
         if screen_available:
             self.preferences.geometry = geometry
         elif name == "none":

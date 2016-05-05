@@ -138,7 +138,7 @@ class Grail(QMainWindow):
         self.ui_newDisplayAction.setShortcutContext(Qt.ApplicationShortcut)
         self.ui_newDisplayAction.triggered.connect(self.newDisplayAction)
 
-        self.ui_preferencesAction = QAction('OSC Output', self)
+        self.ui_preferencesAction = QAction('Preferences', self)
         self.ui_preferencesAction.setShortcut('Ctrl+P')
         self.ui_preferencesAction.setShortcutContext(Qt.ApplicationShortcut)
         self.ui_preferencesAction.triggered.connect(self.preferencesAction)

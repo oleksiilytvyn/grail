@@ -19,51 +19,96 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
 
+from grail.utils import *
 from grail.data import Settings
-from .osc_source_dialog import OSCSourceDialog
+from grail.widgets import SearchListWidget, SearchListItem
+from grail.dialogs.osc_source_dialog import OSCSourceWidget
 
 
-class PreferencesDialog(OSCSourceDialog):
+class PreferencesDialog(QDialog):
 
+    osc_in_changed = pyqtSignal(object)
     osc_out_changed = pyqtSignal(object)
 
     def __init__(self, parent=None):
         super(PreferencesDialog, self).__init__(parent)
 
-        self.ui_itemsLabel.setText('0 destinations')
-        self.ui_panel_label.setText('No destinations')
-        self.setWindowTitle('OSC Output')
+        self._init_ui()
 
-        self.changed.connect(self.listChanged)
+    def _init_ui(self):
 
-        oscout = Settings.getOSCOutputRules()
+        self.ui_sidebar = SearchListWidget()
+        self.ui_sidebar.setObjectName("library_list")
+        self.ui_sidebar.setAlternatingRowColors(True)
+        self.ui_sidebar.itemClicked.connect(self.page_clicked)
 
-        for item in oscout:
-            self.addItem(item['host'], str(item['port']))
+        items = ['General', 'OSC Output', 'Bible']
 
-    def updateLabel(self):
+        for index, item in enumerate(items):
+            listitem = SearchListItem()
+            listitem.setText(item)
+            listitem.setMessage(item)
+            listitem.setItemData(index)
 
-        self.ui_itemsLabel.setText("%d destinations" % (self.ui_list.rowCount(),))
+            self.ui_sidebar.addItem(listitem)
 
-        qr = self.ui_panel_label.geometry()
-        cp = self.rect().center()
-        self.ui_panel_label.resize(self.rect().width(), qr.height())
-        qr.moveCenter(cp)
-        qr.setY(qr.y() - 47)
-        self.ui_panel_label.move(qr.topLeft())
+        self.ui_panel = QStackedWidget()
+        self.ui_panel.addWidget(GeneralPanel())
+        self.ui_panel.addWidget(OSCOutputPanel())
+        self.ui_panel.addWidget(BiblePanel())
 
-        if self.ui_list.rowCount() > 0:
-            self.ui_panel_label.hide()
-        else:
-            self.ui_panel_label.show()
+        # splitter
+        self.ui_splitter = QSplitter()
+        self.ui_splitter.setObjectName("spliter")
 
-    def listChanged(self, items):
+        self.ui_splitter.addWidget(self.ui_sidebar)
+        self.ui_splitter.addWidget(self.ui_panel)
 
-        Settings.deleteOSCOutputRules()
+        self.ui_panel.setCurrentIndex(0)
 
-        for item in items:
-            if item[0] and item[1]:
-                Settings.addOSCOutputRule(item[0], int(item[1]))
+        self.ui_splitter.setCollapsible(0, False)
+        self.ui_splitter.setCollapsible(1, False)
+        self.ui_splitter.setHandleWidth(1)
+        self.ui_splitter.setSizes([200, 400])
 
-        self.osc_out_changed.emit(items)
+        self.ui_layout = QVBoxLayout()
+        self.ui_layout.setSpacing(0)
+        self.ui_layout.setContentsMargins(0, 0, 0, 0)
+        self.ui_layout.addWidget(self.ui_splitter)
+
+        self.setLayout(self.ui_layout)
+
+        if not PLATFORM_MAC:
+            self.setWindowIcon(QIcon(':/icons/32.png'))
+
+        self.setWindowTitle('Preferences')
+        self.setGeometry(300, 300, 600, 400)
+        self.setMinimumSize(600, 400)
+        self.setWindowFlags(Qt.WindowCloseButtonHint)
+
+    def page_clicked(self, item):
+
+        self.ui_panel.setCurrentIndex(item.data)
+
+
+class GeneralPanel(QWidget):
+
+    def __init__(self, parent=None):
+        super(GeneralPanel, self).__init__(parent)
+
+        self._init_ui()
+
+    def _init_ui(self):
+        self.ui_label = QLabel("General", self)
+        self.ui_label.move(20, 20)
+
+
+class OSCOutputPanel(OSCSourceWidget):
+    pass
+
+
+class BiblePanel(QWidget):
+    pass

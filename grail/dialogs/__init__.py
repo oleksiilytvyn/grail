@@ -27,5 +27,4 @@ from .playlist_dialog import PlaylistDialog
 from .history_dialog import HistoryDialog
 from .composition_dialog import CompositionDialog
 from .padding_dialog import PaddingDialog
-from .osc_source_dialog import OSCSourceDialog
 from .align_dialog import AlignDialog

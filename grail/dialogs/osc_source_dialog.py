@@ -26,13 +26,13 @@ from grail.utils import *
 from grail.widgets import *
 
 
-class OSCSourceDialog(QDialog):
+class OSCSourceWidget(QWidget):
 
     changed = pyqtSignal(object)
 
-    def __init__( self, parent=None ):
+    def __init__(self, parent=None):
 
-        super(OSCSourceDialog, self).__init__(parent)
+        super(OSCSourceWidget, self).__init__(parent)
 
         self.initPort = 9000
         self.initHost = 1
@@ -40,170 +40,176 @@ class OSCSourceDialog(QDialog):
 
         self.initUI()
 
-    def initUI( self ):
+    def initUI(self):
 
         self.ui_layout = QVBoxLayout()
-        self.ui_layout.setObjectName( "songsBar" )
-        self.ui_layout.setSpacing( 0 )
-        self.ui_layout.setContentsMargins( 0, 0, 0, 0 )
+        self.ui_layout.setObjectName("songsBar")
+        self.ui_layout.setSpacing(0)
+        self.ui_layout.setContentsMargins(0, 0, 0, 0)
 
         self.ui_list = SourcesTableWidget()
-        self.ui_list.setObjectName( "oscSourcesList" )
-        self.ui_list.setShowGrid( False )
-        self.ui_list.setColumnCount( 3 )
-        self.ui_list.horizontalHeader().setVisible( False )
-        self.ui_list.verticalHeader().setVisible( False )
-        self.ui_list.setHorizontalHeaderLabels( ["Host", "Port", "Action"] )
+        self.ui_list.setObjectName("oscSourcesList")
+        self.ui_list.setShowGrid(False)
+        self.ui_list.setColumnCount(3)
+        self.ui_list.horizontalHeader().setVisible(False)
+        self.ui_list.verticalHeader().setVisible(False)
+        self.ui_list.setHorizontalHeaderLabels(["Host", "Port", "Action"])
         self.ui_list.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.ui_list.setSelectionMode(QAbstractItemView.SingleSelection)
 
-        self.ui_list.itemChanged.connect( self.listItemChanged )
+        self.ui_list.itemChanged.connect(self.listItemChanged)
 
         header = self.ui_list.horizontalHeader()
         header.setSectionResizeMode(0, QHeaderView.Stretch)
         header.setSectionResizeMode(1, QHeaderView.Stretch)
         header.setSectionResizeMode(2, QHeaderView.Fixed)
 
-        self.ui_list.setColumnWidth( 2, 42 )
+        self.ui_list.setColumnWidth(2, 42)
 
-        clearAction = QAction( 'Clear', self )
-        clearAction.triggered.connect( self.clearAction )
+        clearAction = QAction('Clear', self)
+        clearAction.triggered.connect(self.clearAction)
 
-        addAction = QAction( 'Add', self )
-        addAction.triggered.connect( self.addAction )
+        addAction = QAction('Add', self)
+        addAction.triggered.connect(self.addAction)
 
         self.ui_itemsLabel = QLabel("0 sources")
-        self.ui_itemsLabel.setObjectName( "oscSourcesLabel" )
-        self.ui_itemsLabel.setAlignment( Qt.AlignCenter )
-        self.ui_itemsLabel.setSizePolicy( QSizePolicy.Expanding, QSizePolicy.Expanding )
+        self.ui_itemsLabel.setObjectName("oscSourcesLabel")
+        self.ui_itemsLabel.setAlignment(Qt.AlignCenter)
+        self.ui_itemsLabel.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
-        self.ui_panel_label = QLabel("No sources", self.ui_list )
-        self.ui_panel_label.setAlignment( Qt.AlignCenter )
-        self.ui_panel_label.setFont( QFont('Decorative', 12) )
-        self.ui_panel_label.setObjectName( "oscSourcesPanelLabel" )
+        self.ui_panel_label = QLabel("No sources", self.ui_list)
+        self.ui_panel_label.setAlignment(Qt.AlignCenter)
+        self.ui_panel_label.setFont(QFont('Decorative', 12))
+        self.ui_panel_label.setObjectName("oscSourcesPanelLabel")
 
         self.ui_toolbar = QToolBar()
-        self.ui_toolbar.setObjectName( "oscSourcesDialogToolbar" )
-        self.ui_toolbar.addAction( clearAction )
-        self.ui_toolbar.addWidget( self.ui_itemsLabel )
-        self.ui_toolbar.addAction( addAction )
+        self.ui_toolbar.setObjectName("oscSourcesDialogToolbar")
+        self.ui_toolbar.addAction(clearAction)
+        self.ui_toolbar.addWidget(self.ui_itemsLabel)
+        self.ui_toolbar.addAction(addAction)
 
-        self.ui_layout.addWidget( self.ui_list )
-        self.ui_layout.addWidget( self.ui_toolbar )
+        self.ui_layout.addWidget(self.ui_list)
+        self.ui_layout.addWidget(self.ui_toolbar)
 
-        self.setLayout( self.ui_layout )
+        self.setLayout(self.ui_layout)
 
         self.update()
         self.updateLabel()
 
-        if not PLATFORM_MAC:
-            self.setWindowIcon( QIcon(':/icons/32.png') )
+    def clearAction(self):
 
-        self.setWindowFlags( Qt.WindowCloseButtonHint )
-        self.setWindowTitle('OSC Sources')
-        self.setGeometry( 300, 300, 240, 380 )
-        self.setMinimumSize( 240, 380 )
-
-    def clearAction( self ):
-
-        self.ui_list.setRowCount( 0 )
+        self.ui_list.setRowCount(0)
         self.updateLabel()
 
         self.listChangedEvent()
 
-    def addItem( self, host, port ):
+    def addItem(self, host, port):
 
         index = self.ui_list.rowCount()
-        self.ui_list.insertRow( index )
+        self.ui_list.insertRow(index)
 
-        host_item = QTableWidgetItem( host )
-        port_item = QTableWidgetItem( port )
+        host_item = QTableWidgetItem(host)
+        port_item = QTableWidgetItem(port)
 
-        action = SourcesRemoveButton( self, self.itemId )
-        action.triggered.connect( self.listRemoveClicked )
+        action = SourcesRemoveButton(self, self.itemId)
+        action.triggered.connect(self.listRemoveClicked)
 
-        self.ui_list.setItem( index, 0, host_item )
-        self.ui_list.setItem( index, 1, port_item )
-        self.ui_list.setCellWidget( index, 2, action )
+        self.ui_list.setItem(index, 0, host_item)
+        self.ui_list.setItem(index, 1, port_item)
+        self.ui_list.setCellWidget(index, 2, action)
 
-        self.ui_list.setCurrentCell( index, 0 )
-        self.ui_list.editItem( host_item )
+        self.ui_list.setCurrentCell(index, 0)
+        self.ui_list.editItem(host_item)
         self.updateLabel()
 
-    def addAction( self ):
+    def addAction(self):
 
         self.initHost = self.initHost + 1
         self.initPort = self.initPort + 1
         self.itemId = self.itemId + 1
 
-        self.addItem( "127.0.0." + str(self.initHost), str(self.initPort) )
+        self.addItem("127.0.0." + str(self.initHost), str(self.initPort))
 
-    def listRemoveClicked( self, action ):
+    def listRemoveClicked(self, action):
 
         for index in range(self.ui_list.rowCount()):
-            item = self.ui_list.cellWidget( index, 2 )
+            item = self.ui_list.cellWidget(index, 2)
 
             if item and action.id == item.id:
-                self.ui_list.removeRow( index )
+                self.ui_list.removeRow(index)
 
         self.listChangedEvent()
 
-    def resizeEvent( self, event ):
+    def resizeEvent(self, event):
 
         self.updateLabel()
 
-    def updateLabel( self ):
+    def updateLabel(self):
 
-        self.ui_itemsLabel.setText( "%d sources" % (self.ui_list.rowCount(), ) )
+        self.ui_itemsLabel.setText("%d sources" % (self.ui_list.rowCount(),))
 
         qr = self.ui_panel_label.geometry()
         cp = self.rect().center()
-        self.ui_panel_label.resize( self.rect().width(), qr.height() )
-        qr.moveCenter( cp )
-        qr.setY( qr.y() - 47 )
-        self.ui_panel_label.move( qr.topLeft() )
+        self.ui_panel_label.resize(self.rect().width(), qr.height())
+        qr.moveCenter(cp)
+        qr.setY(qr.y() - 47)
+        self.ui_panel_label.move(qr.topLeft())
 
         if self.ui_list.rowCount() > 0:
             self.ui_panel_label.hide()
         else:
             self.ui_panel_label.show()
 
-    def listChangedEvent( self ):
+    def listChangedEvent(self):
 
         items = []
 
         for index in range(self.ui_list.rowCount()):
-            host = self.ui_list.item( index, 0 )
-            port = self.ui_list.item( index, 1 )
+            host = self.ui_list.item(index, 0)
+            port = self.ui_list.item(index, 1)
 
             if host and port:
-                items.append( [host.text(), port.text()] )
+                items.append([host.text(), port.text()])
 
-        self.changed.emit( items )
+        self.changed.emit(items)
 
-    def listItemChanged( self, item ):
+    def listItemChanged(self, item):
         self.listChangedEvent()
+
+
+class OSCSourceDialog(OSCSourceWidget):
+
+    def __init__(self, parent=None):
+        super(OSCSourceDialog, self).__init__(parent)
+
+        if not PLATFORM_MAC:
+            self.setWindowIcon(QIcon(':/icons/32.png'))
+
+        self.setWindowFlags(Qt.WindowCloseButtonHint)
+        self.setWindowTitle('OSC Sources')
+        self.setGeometry(300, 300, 240, 380)
+        self.setMinimumSize(240, 380)
 
 
 class SourcesTableWidget(QTableWidget):
 
-    def __init__( self, parent=None ):
-        super(SourcesTableWidget, self).__init__( parent )
+    def __init__(self, parent=None):
+        super(SourcesTableWidget, self).__init__(parent)
 
-        self.setVerticalScrollMode( QAbstractItemView.ScrollPerPixel )
-        self.setVerticalScrollBarPolicy( Qt.ScrollBarAlwaysOff )
+        self.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
         original = self.verticalScrollBar()
 
-        self.scrollbar = QScrollBar( Qt.Vertical, self )
-        self.scrollbar.valueChanged.connect( original.setValue )
+        self.scrollbar = QScrollBar(Qt.Vertical, self)
+        self.scrollbar.valueChanged.connect(original.setValue)
 
-        original.valueChanged.connect( self.scrollbar.setValue )
+        original.valueChanged.connect(self.scrollbar.setValue)
 
         self.updateScrollbar()
 
-    def paintEvent( self, event ):
-        QTableWidget.paintEvent( self, event )
+    def paintEvent(self, event):
+        QTableWidget.paintEvent(self, event)
 
         self.updateScrollbar()
 
@@ -211,14 +217,14 @@ class SourcesTableWidget(QTableWidget):
         y = self.selectedIndexes()
 
         for i in range(0, x):
-            b = self.cellWidget( i, 2 )
+            b = self.cellWidget(i, 2)
 
             if b and y and y[0].row() == i:
-                b.setIconState( False)
+                b.setIconState(False)
             elif b:
-                b.setIconState( True )
+                b.setIconState(True)
 
-    def updateScrollbar( self ):
+    def updateScrollbar(self):
 
         original = self.verticalScrollBar()
 
@@ -227,38 +233,37 @@ class SourcesTableWidget(QTableWidget):
         else:
             self.scrollbar.show()
 
-        self.scrollbar.setPageStep( original.pageStep() )
-        self.scrollbar.setRange( original.minimum(), original.maximum() )
-        self.scrollbar.resize( 8, self.rect().height() )
-        self.scrollbar.move( self.rect().width() - 8, 0 )
+        self.scrollbar.setPageStep(original.pageStep())
+        self.scrollbar.setRange(original.minimum(), original.maximum())
+        self.scrollbar.resize(8, self.rect().height())
+        self.scrollbar.move(self.rect().width() - 8, 0)
 
 
 class SourcesRemoveButton(QToolButton):
-
     triggered = pyqtSignal("QToolButton")
 
-    def __init__( self, parent, itemid ):
-        super(SourcesRemoveButton, self).__init__( parent )
+    def __init__(self, parent, itemid):
+        super(SourcesRemoveButton, self).__init__(parent)
 
-        self.setIconState( True )
-        self.setMinimumSize( 16, 16 )
+        self.setIconState(True)
+        self.setMinimumSize(16, 16)
         self.id = itemid
 
         self.setStyleSheet("QToolButton {background: transparent;border: none;padding: 0;margin: 0;}")
 
-        self.clicked.connect( self.clickedEvent )
-        self.triggered.connect( self.triggeredEvent )
+        self.clicked.connect(self.clickedEvent)
+        self.triggered.connect(self.triggeredEvent)
 
-    def clickedEvent( self, checked ):
+    def clickedEvent(self, checked):
 
-        self.triggered.emit( self )
+        self.triggered.emit(self)
 
-    def triggeredEvent( self, button ):
+    def triggeredEvent(self, button):
         pass
 
-    def setIconState( self, b ):
+    def setIconState(self, b):
 
         if b:
-            self.setIcon( QIcon(':/icons/remove.png') )
+            self.setIcon(QIcon(':/icons/remove.png'))
         else:
-            self.setIcon( QIcon(':/icons/remove-white.png') )
+            self.setIcon(QIcon(':/icons/remove-white.png'))

@@ -18,7 +18,12 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+import os
+import glob
+import sqlite3 as lite
+
 from grail.utils import *
+from grail.data import Settings
 from .connection_manager import ConnectionManager
 
 
@@ -54,6 +59,12 @@ class BibleModel:
 
     def __init__(self):
 
+        bible_path = Settings.get('bible.path')
+
+        if bible_path is not None:
+            self.change_bible(bible_path)
+            return None
+
         path = get_data_path() + '/bible.db'
         first_run = False
 
@@ -72,6 +83,14 @@ class BibleModel:
             cur.execute(
                 """CREATE TABLE IF NOT EXISTS
                    verses(id INTEGER PRIMARY KEY AUTOINCREMENT, book INT, chapter INT, verse INT )""")
+
+    def change_bible(self, path):
+
+        new_connection = ConnectionManager.get(path)
+
+        if new_connection:
+            self.connection = new_connection
+            Settings.set('bible.path', path)
 
     def close(self):
         self.connection.commit()
@@ -166,5 +185,53 @@ class BibleModel:
 
         return sorted(possible, key=get_key)[0:3]
 
-
 Bible = BibleModel()
+
+
+class BibleManager:
+
+    @staticmethod
+    def getAll():
+
+        files = glob.glob(get_data_path() + "/bibles/*.db")
+        items = []
+
+        for file in files:
+            path = os.path.abspath(file)
+
+            items.append({
+                'name': os.path.basename(path)[:-3],
+                'path': path
+                 })
+
+        return items
+
+    @staticmethod
+    def set(path):
+        Bible.change_bible(path)
+
+    @staticmethod
+    def install(path):
+
+        if BibleManager.verify(path):
+            copy_file(os.path.normpath(path), os.path.normpath(get_data_path() + '/bibles/' + os.path.basename(path)))
+
+    @staticmethod
+    def verify(path):
+
+        if not (os.path.exists(path) and os.path.isfile(path)):
+            return False
+
+        try:
+            db = lite.connect(path)
+            db.row_factory = lite.Row
+
+            cursor = db.cursor()
+            cursor.execute("SELECT book, chapter, verse FROM verses")
+            cursor.execute("SELECT id, title, full, short FROM books")
+
+            db.close()
+        except:
+            return False
+
+        return True

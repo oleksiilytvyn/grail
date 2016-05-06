@@ -90,6 +90,14 @@ def copy_file(a, b):
         shutil.copyfile(a, b)
 
 
+def remove_file(path):
+
+    try:
+        os.remove(path)
+    except OSError as e:
+        print(e)
+
+
 def get_version():
     path = '.version'
 

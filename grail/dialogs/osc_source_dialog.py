@@ -66,10 +66,11 @@ class OSCSourceWidget(QWidget):
 
         self.ui_list.setColumnWidth(2, 42)
 
-        clearAction = QAction('Clear', self)
+        clearAction = QAction(QIcon(':/icons/remove-white.png'), 'Clear', self)
         clearAction.triggered.connect(self.clearAction)
 
-        addAction = QAction('Add', self)
+        addAction = QAction(QIcon(':/icons/add.png'), 'Add', self)
+        addAction.setIconVisibleInMenu(True)
         addAction.triggered.connect(self.addAction)
 
         self.ui_itemsLabel = QLabel("0 sources")
@@ -84,6 +85,7 @@ class OSCSourceWidget(QWidget):
 
         self.ui_toolbar = QToolBar()
         self.ui_toolbar.setObjectName("oscSourcesDialogToolbar")
+        self.ui_toolbar.setIconSize(QSize(16, 16))
         self.ui_toolbar.addAction(clearAction)
         self.ui_toolbar.addWidget(self.ui_itemsLabel)
         self.ui_toolbar.addAction(addAction)

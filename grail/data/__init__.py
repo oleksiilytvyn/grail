@@ -21,7 +21,7 @@
 from .display_preferences import DisplayPreferences
 from .settings import Settings
 from .display_mode import DisplayMode
-from .bible import Bible
+from .bible import Bible, BibleManager
 from .playlist import Playlist
 from .song import Song
 from .history import History

@@ -1,3 +1,5 @@
+![grail.png](https://bitbucket.org/repo/xxy864/images/3941624082-grail.png)
+
 # Grail #
 
 Grail is an application for managing and displaying lyrics and images.

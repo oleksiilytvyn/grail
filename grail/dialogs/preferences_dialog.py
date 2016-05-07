@@ -46,20 +46,28 @@ class PreferencesDialog(QDialog):
 
     def _init_ui(self):
 
-        self.ui_sidebar = SearchListWidget()
-        self.ui_sidebar.setObjectName("library_list")
-        self.ui_sidebar.setAlternatingRowColors(True)
-        self.ui_sidebar.itemClicked.connect(self.page_clicked)
+
+        self.ui_sidebar_layout = QVBoxLayout()
+        self.ui_sidebar_layout.setSpacing(0)
+        self.ui_sidebar_layout.setContentsMargins(0, 0, 0, 0)
+
+        self.ui_sidebar_list = SearchListWidget()
+        self.ui_sidebar_list.setObjectName("preferences_tabs")
+        self.ui_sidebar_list.setAlternatingRowColors(True)
+        self.ui_sidebar_list.itemClicked.connect(self.page_clicked)
+
+        self.ui_sidebar = QWidget()
+        self.ui_sidebar.setLayout(self.ui_sidebar_layout)
+        self.ui_sidebar_layout.addWidget(self.ui_sidebar_list)
 
         items = ['General', 'OSC Input', 'OSC Output', 'Bible']
 
         for index, item in enumerate(items):
             listitem = SearchListItem()
             listitem.setText(item)
-            listitem.setMessage(item)
             listitem.setItemData(index)
 
-            self.ui_sidebar.addItem(listitem)
+            self.ui_sidebar_list.addItem(listitem)
 
         self.ui_panel = QStackedWidget()
         self.ui_panel.addWidget(GeneralPanel())
@@ -144,8 +152,12 @@ class GeneralPanel(QWidget):
         self.ui_export_label = QLabel("Save my library of songs to file.")
 
         self.ui_layout = QVBoxLayout()
-        self.ui_layout.setSpacing(0)
         self.ui_layout.setContentsMargins(12, 12, 12, 12)
+
+        if PLATFORM_MAC:
+            self.ui_layout.setSpacing(8)
+        else:
+            self.ui_layout.setSpacing(0)
 
         self.ui_layout.addWidget(self.ui_reset_btn, 0, Qt.AlignLeft)
         self.ui_layout.addWidget(self.ui_reset_label)
@@ -324,6 +336,7 @@ class GeneralPanel(QWidget):
 
 
 class OSCInputPanel(QWidget):
+
     changed = pyqtSignal(object)
 
     def __init__(self, parent=None):
@@ -337,6 +350,7 @@ class OSCInputPanel(QWidget):
 
 
 class OSCOutputPanel(OSCSourceWidget):
+
     def __init__(self):
         super(OSCOutputPanel, self).__init__()
 
@@ -373,6 +387,7 @@ class BiblePanel(QWidget):
         self.update_list()
 
     def _init_ui(self):
+
         self.ui_layout = QVBoxLayout()
         self.ui_layout.setSpacing(0)
         self.ui_layout.setContentsMargins(0, 0, 0, 0)
@@ -423,15 +438,24 @@ class BiblePanel(QWidget):
         if len(items) > 0:
             BibleManager.set(items[0].data['path'])
 
-    def update_list(self):
-        self.ui_list.clear()
-        items = BibleManager.getAll()
+        self.update_list()
 
+    def update_list(self):
+
+        items = BibleManager.getAll()
+        selected_path = Settings.get('bible.path')
+
+        self.ui_list.clear()
         self.ui_toolbar_label.setText("%d installed" % len(items))
 
         for item in items:
+
             listitem = SearchListItem()
-            listitem.setText(item['name'])
             listitem.setItemData(item)
+
+            if item['path'] == selected_path:
+                listitem.setText("%s - selected" % (item['name'],))
+            else:
+                listitem.setText(item['name'])
 
             self.ui_list.addItem(listitem)

@@ -27,31 +27,31 @@ class SearchListWidget(QListWidget):
 
     keyPressed = pyqtSignal('QKeyEvent')
 
-    def __init__( self, parent=None ):
+    def __init__(self, parent=None):
         super(SearchListWidget, self).__init__(parent)
 
-        self.keyPressed.connect( self.keyPressedEvent )
-        self.setVerticalScrollMode( QAbstractItemView.ScrollPerPixel )
-        self.setHorizontalScrollBarPolicy( Qt.ScrollBarAlwaysOff )
-        self.setVerticalScrollBarPolicy( Qt.ScrollBarAlwaysOff )
-        self.setAttribute( Qt.WA_MacShowFocusRect, False )
+        self.keyPressed.connect(self.keyPressedEvent)
+        self.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setAttribute(Qt.WA_MacShowFocusRect, False)
 
         original = self.verticalScrollBar()
 
-        self.scrollbar = QScrollBar( Qt.Vertical, self )
-        self.scrollbar.valueChanged.connect( original.setValue )
+        self.scrollbar = QScrollBar(Qt.Vertical, self)
+        self.scrollbar.valueChanged.connect(original.setValue)
 
-        original.valueChanged.connect( self.scrollbar.setValue )
+        original.valueChanged.connect(self.scrollbar.setValue)
 
         self.updateScrollbar()
 
-    def keyPressEvent( self, event ):
-        self.keyPressed.emit( event )
+    def keyPressEvent(self, event):
+        self.keyPressed.emit(event)
 
-    def keyPressedEvent( self, event ):
+    def keyPressedEvent(self, event):
         pass
 
-    def updateScrollbar( self ):
+    def updateScrollbar(self):
 
         original = self.verticalScrollBar()
 
@@ -60,12 +60,12 @@ class SearchListWidget(QListWidget):
         else:
             self.scrollbar.show()
 
-        self.scrollbar.setPageStep( original.pageStep() )
-        self.scrollbar.setRange( original.minimum(), original.maximum() )
-        self.scrollbar.resize( 8, self.rect().height() )
-        self.scrollbar.move( self.rect().width() - 8, 0 )
+        self.scrollbar.setPageStep(original.pageStep())
+        self.scrollbar.setRange(original.minimum(), original.maximum())
+        self.scrollbar.resize(8, self.rect().height())
+        self.scrollbar.move(self.rect().width() - 8, 0)
 
-    def paintEvent( self, event ):
+    def paintEvent(self, event):
 
-        QListWidget.paintEvent( self, event )
+        QListWidget.paintEvent(self, event)
         self.updateScrollbar()

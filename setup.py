@@ -31,48 +31,49 @@ import shutil
 import platform
 from cx_Freeze import setup, Executable
 
+# constants
 PLATFORM_WIN = platform.system() == "Windows"
 PLATFORM_MAC = platform.system() == "Darwin"
 PLATFORM_UNIX = platform.system() == "Linux"
 
 version = grail.__version__
+version_path = "build/.version"
 
 # try to add revision number to version
 try:
     import hgapi
-    repo = hgapi.Repo( os.path.abspath(os.curdir) )
-    version = "%sb%d" % (version, repo['tip'].rev)
-except:
-    pass
 
+    repo = hgapi.Repo(os.path.abspath(os.curdir))
+    version = "%s.dev%d" % (version, repo['tip'].rev)
+except ImportError:
+    print("Failed to get revision number. Install hgapi python library")
 
-directory = os.path.dirname(os.path.realpath( "build/.version" ))
+directory = os.path.dirname(os.path.realpath(version_path))
 
 if not os.path.exists(directory):
     os.makedirs(directory)
 
 # add version file to build
-f = open("build/.version", "w+")
-f.write(version)
-f.close()
-
-base = None
-if sys.platform == "win32":
-    base = "Win32GUI"
+try:
+    f = open(version_path, "w+")
+    f.write(version)
+    f.close()
+except:
+    print("Failed to create a version file")
 
 includes = ["atexit"]
-
-excludes = ['_ssl',
-            'pyreadline',
+excludes = ["nt",
             'pdb',
-            "matplotlib",
+            '_ssl',
+            "Pyrex",
+            "ntpath",
             'doctest',
+            "tkinter",
+            'pyreadline',
+            "matplotlib",
             "scipy.linalg",
             "scipy.special",
-            "Pyrex",
-            "numpy.core._dotblas",
-            "nt",
-            "ntpath"]
+            "numpy.core._dotblas"]
 
 includefiles = [('resources/bdist/bible.db-default', 'default/bible.db'),
                 ('resources/bdist//songs.db-default', 'default/songs.db'),
@@ -81,13 +82,14 @@ includefiles = [('resources/bdist/bible.db-default', 'default/bible.db'),
 
 # add platform specific files
 if PLATFORM_WIN:
-    includefiles.append( ('resources/bdist/libEGL.dll', 'libEGL.dll') )
+    includefiles.append(('resources/bdist/libEGL.dll', 'libEGL.dll'))
 
 # try to build resources file
 try:
+    print("Building resource file")
     os.system("pyrcc5 -o grail/resources.py resources/resources.qrc")
 except:
-    pass
+    print("Failed to build resource file")
 
 setup(
     name=application_title,
@@ -129,26 +131,34 @@ setup(
         "build_exe": {
             "includes": includes,
             "include_files": includefiles,
-            "excludes": excludes},
+            # To-Do: test msvcr dll
+            # "include_msvcr": True,
+            "excludes": excludes,
+            "silent": True
+            },
+        "bdist_msi": {
+            "upgrade_code": "{1f82a4c1-681d-43c3-b1b6-d63788c147a0}"
+            },
         "bdist_mac": {
-            "iconfile": "icon/grail.icns"},
+            "bundle_name": application_title,
+            "custom_info_plist": "resources/bdist/Info.plist",
+            "iconfile": "icon/grail.icns"
+            },
         "bdist_dmg": {
-            "volume_label": application_title,
-            "applications-shortcut": True}},
+            "volume_label": application_title
+            }
+        },
     executables=[Executable(main_python_file,
-                 base=base,
-                 icon="icon/grail.ico",
-                 compress=True,
-                 shortcutName=application_title,
-                 shortcutDir="ProgramMenuFolder")])
+                            base="Win32GUI" if sys.platform == "win32" else None,
+                            icon="icon/grail.ico",
+                            compress=True,
+                            shortcutName=application_title,
+                            shortcutDir="ProgramMenuFolder")])
 
-# fix app file
+# fix Mac OS app file
 if PLATFORM_MAC:
     app_resources = "build/%s-%s.app/Contents/Resources" % (application_title, version)
     app_contents = "build/%s-%s.app/Contents" % (application_title, version)
 
-    if os.path.exists( app_resources ):
-        shutil.copyfile( "resources/bdist/qt.conf", app_resources + '/qt.conf' )
-
-    if os.path.exists( app_contents ):
-        shutil.copyfile( "resources/bdist/Info.plist", app_contents + '/Info.plist' )
+    if os.path.exists(app_resources):
+        shutil.copyfile("resources/bdist/qt.conf", app_resources + '/qt.conf')

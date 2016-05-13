@@ -1,20 +1,21 @@
 syntax: glob
 
+*~
+.db
+*.db
+.pyc
+*.pyc
+*.pyo
+*.log
+Thumbs.db
+.db-journal
+*.db-journal
+
 bin/*
 dist/*
 build/*
-__pycache__/*
-*.pyc
-.pyc
-*.pyo
-*~
-*.db
-.db
-*.db-journal
-.db-journal
-Thumbs.db
-*.log
 .idea/*
+__pycache__/*
 
 osc/*
-grail/sdk/*
+grailkit/*

@@ -46,7 +46,6 @@ class PreferencesDialog(QDialog):
 
     def _init_ui(self):
 
-
         self.ui_sidebar_layout = QVBoxLayout()
         self.ui_sidebar_layout.setSpacing(0)
         self.ui_sidebar_layout.setContentsMargins(0, 0, 0, 0)
@@ -76,9 +75,9 @@ class PreferencesDialog(QDialog):
         osc_in_panel.changed.connect(self.osc_in_changed_event)
         self.ui_panel.addWidget(osc_in_panel)
 
-        osc_out_panel = OSCOutputPanel()
-        osc_out_panel.changed.connect(self.osc_out_changed_event)
-        self.ui_panel.addWidget(osc_out_panel)
+        self.osc_out_panel = OSCOutputPanel()
+        self.osc_out_panel.changed.connect(self.osc_out_changed_event)
+        self.ui_panel.addWidget(self.osc_out_panel)
 
         self.ui_panel.addWidget(BiblePanel())
 
@@ -117,6 +116,11 @@ class PreferencesDialog(QDialog):
 
         self.ui_panel.setCurrentIndex(item.data)
 
+        panel = self.ui_panel.widget(item.data)
+
+        if panel:
+            panel.update()
+
     def osc_in_changed_event(self, items):
         pass
 
@@ -132,6 +136,7 @@ class PreferencesDialog(QDialog):
 
 
 class GeneralPanel(QWidget):
+
     def __init__(self, parent=None):
         super(GeneralPanel, self).__init__(parent)
 
@@ -303,7 +308,7 @@ class GeneralPanel(QWidget):
 
     def reset_action(self):
 
-        message = QMessageBox()
+        message = QMessageBox(self)
         message.setWindowTitle("Grail")
         message.setText("Restore settings")
         message.setInformativeText("Do you want to restore all setting and library to defaults?")
@@ -357,10 +362,19 @@ class OSCOutputPanel(OSCSourceWidget):
         self.ui_itemsLabel.setText('0 destinations')
         self.ui_panel_label.setText('No destinations')
 
+        self.changed.connect(self._items_changed)
+
         osc_out = Settings.getOSCOutputRules()
 
         for item in osc_out:
             self.addItem(item['host'], str(item['port']))
+
+        self.updateLabel()
+
+    def update(self):
+        super(OSCOutputPanel, self).update()
+
+        self.updateLabel()
 
     def updateLabel(self):
 
@@ -378,8 +392,12 @@ class OSCOutputPanel(OSCSourceWidget):
         else:
             self.ui_panel_label.show()
 
+    def _items_changed(self, items):
+        self.updateLabel()
+
 
 class BiblePanel(QWidget):
+
     def __init__(self):
         super(BiblePanel, self).__init__()
 

@@ -19,17 +19,10 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 # generic imports
-import re
-import os
-import sys
 import sqlite3 as lite
-import traceback
-import time
-
-from grail import resources
 
 # OSC library
-from osc import OSCMessage, OSCBundle, OSCClient
+from osc import OSCMessage, OSCClient
 
 # PyQt5
 from PyQt5.QtCore import *
@@ -37,6 +30,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
 # grail library
+from grail import resources
 from grail.data import *
 from grail.widgets import *
 from grail.dialogs import *
@@ -50,6 +44,8 @@ class Grail(QMainWindow):
 
     def __init__(self, parent=None):
         super(Grail, self).__init__(parent)
+
+        self.subscribers = []
 
         self.initUI()
         self.initOSC()
@@ -157,6 +153,14 @@ class Grail(QMainWindow):
         self.ui_togglePreviewAction = QAction('Toggle Preview sidebar', self)
         self.ui_togglePreviewAction.triggered.connect(self.togglePreview)
 
+        self.ui_navigateToSearchAction = QAction('Search library', self)
+        self.ui_navigateToSearchAction.setShortcut('Ctrl+`')
+        self.ui_navigateToSearchAction.triggered.connect(self.searchNavigateAction)
+
+        self.ui_navigateToPlaylistAction = QAction('Navigate to playlist', self)
+        self.ui_navigateToPlaylistAction.setShortcut('Ctrl+1')
+        self.ui_navigateToPlaylistAction.triggered.connect(self.playlistNavigateAction)
+
         # Songs and playlists
         self.ui_addSongAction = QAction('Add new Song', self)
         self.ui_addSongAction.triggered.connect(self.addSongAction)
@@ -212,6 +216,9 @@ class Grail(QMainWindow):
         self.ui_menu_view.addSeparator()
         self.ui_menu_view.addAction(self.ui_toggleLibraryAction)
         self.ui_menu_view.addAction(self.ui_togglePreviewAction)
+        self.ui_menu_view.addSeparator()
+        self.ui_menu_view.addAction(self.ui_navigateToSearchAction)
+        self.ui_menu_view.addAction(self.ui_navigateToPlaylistAction)
 
         # output menu
         self.ui_menu_output = self.ui_menubar.addMenu('&Output')
@@ -447,7 +454,7 @@ class Grail(QMainWindow):
             if not rule['port'] in ports:
                 ports.append(rule['port'])
 
-    def updateOSCConnections(self, list):
+    def updateOSCConnections(self, items):
 
         self.subscribers = []
 
@@ -490,6 +497,15 @@ class Grail(QMainWindow):
     def showMediaPanel(self):
 
         self.ui_left_sidebar.setCurrentIndex(1)
+
+    def searchNavigateAction(self):
+
+        self.ui_songs_search.setText("")
+        self.ui_songs_search.setFocus(Qt.OtherFocusReason)
+
+    def playlistNavigateAction(self):
+
+        self.ui_playlist_tree.setFocus(Qt.OtherFocusReason)
 
     def center(self):
         qr = self.frameGeometry()
@@ -601,8 +617,6 @@ class Grail(QMainWindow):
     def updatePlaylist(self):
 
         self.ui_playlist_tree.clear()
-
-        playlists = Playlist.getPlaylists()
 
         if self.playlist:
             songs = Playlist.getSongs(self.playlist['id'])

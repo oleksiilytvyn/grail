@@ -474,44 +474,49 @@ DisplayPreferencesDialog {
 
 #playlistList {
 	border: none;
-	border-top: 1px solid #ddd;
-	background: #f9f9f9;
+	background-color: #2f2f2f;
+	alternate-background-color: #393939;
 	show-decoration-selected: 1;
 	outline: 0;
 	} 
 
+	#playlistList QScrollBar::handle:vertical {
+		background: #ddd;
+		min-height: 20px;
+		border-radius: 3px;
+		}
+
 	#playlistList::item { 
-		color: #212121;
+		color: #e6e6e6;
 		padding: 4px 12px;
-		border-bottom: 1px solid #eee;
+		margin: 0;
+		border-bottom: 1px solid transparent;
 		qproperty-wordWrap: true;
 		} 
 
 	#playlistList::item:selected {
-		background: #0069d9;
-		border-bottom: 1px solid #0069d9;
-		color: #fff;
+		background: #8a9fbb;
+		border-bottom: 1px solid #8a9fbb;
+		color: #e6e6e6;
 		}
 
 #playlistDialogToolbar {
-	background: #f9f9f9;
-	border-top: 1px solid #e6e6e6;
+	background: #4b5056;
+	border-top: 1px solid #4b5056;
 	padding: 3px 5px;
 	}
 
 	#playlistDialogToolbar QToolButton {
 		border: 1px solid transparent;
 		background: none;
-		border-radius: 3px;
 		padding: 2px;
-		font-weight: bold;
 		}
 
 	#playlistDialogToolbar QToolButton:hover,
+	#playlistDialogToolbar QToolButton:checked,
 	#playlistDialogToolbar QToolButton:pressed {
-		background: #d1e3f7;
-		border: 1px solid #d1e3f7;
-		font-weight: bold;
+		border: 1px solid transparent;
+		background: none;
 		}
 
 	

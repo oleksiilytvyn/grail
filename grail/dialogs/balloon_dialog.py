@@ -26,17 +26,17 @@ from grail.utils import *
 
 
 class BalloonDialog(QDialog):
+    """Simple balloon dialog with pointer at bottom"""
 
     def __init__(self, parent=None):
 
         super(BalloonDialog, self).__init__(parent)
 
-        self._backgorund_color = QColor(255, 255, 255)
+        self._background_color = QColor(255, 255, 255)
 
         self.setWindowFlags(Qt.Widget | Qt.FramelessWindowHint | Qt.X11BypassWindowManagerHint)
         self.setAttribute(Qt.WA_NoSystemBackground, True)
         self.setAttribute(Qt.WA_TranslucentBackground, True)
-
         self.installEventFilter(self)
 
         if not PLATFORM_MAC:
@@ -72,18 +72,20 @@ class BalloonDialog(QDialog):
         rounded_rect.addPolygon(triangle)
 
         painter.setOpacity(1)
-        painter.fillPath(rounded_rect, QBrush(self._backgorund_color))
+        painter.fillPath(rounded_rect, QBrush(self._background_color))
 
         painter.restore()
         painter.end()
 
     def eventFilter(self, target, event):
+
         if event.type() == QEvent.WindowDeactivate:
             self.hide()
 
         return QObject.eventFilter(self, target, event)
 
     def sizeHint(self):
+
         return QSize(300, 300)
 
     def showAt(self, point):
@@ -94,4 +96,4 @@ class BalloonDialog(QDialog):
 
     def setBackgroundColor(self, color):
 
-        self._backgorund_color = color
+        self._background_color = color

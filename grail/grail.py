@@ -47,18 +47,20 @@ class Grail(QMainWindow):
 
         self.subscribers = []
 
-        self.initUI()
-        self.initOSC()
+        self._init_ui()
+        self._init_osc()
 
-    def initUI(self):
+    def _init_ui(self):
         """
         Initialize UI
         """
 
+        self._init_menubar()
+
         # dialogs
         self.dialog_about = AboutDialog()
         self.dialog_preferences = PreferencesDialog()
-        self.dialog_preferences.osc_out_changed.connect(self.updateOSCConnections)
+        self.dialog_preferences.osc_out_changed.connect(self.update_osc)
 
         self.dialog_song = SongDialog()
         self.dialog_song.updateComplete.connect(self.updateSearch)
@@ -75,310 +77,14 @@ class Grail(QMainWindow):
         self.display.modeChanged.connect(self.updateOutputMenu)
         self.display.testCardChanged.connect(self.updateOutputMenu)
 
-        self.ui_media_panel = MediaWidget()
-        self.ui_media_panel.itemSelected.connect(self.imageSelected)
-        self.ui_media_panel.switchMode.connect(self.showLibraryPanel)
-        self.ui_media_panel.blackoutImage.connect(self.setBlackoutImage)
-        self.ui_media_panel.textImage.connect(self.setTextImage)
-
-        # menubar
-        self.ui_menubar = QMenuBar(self)
-
-        # Help
-        self.ui_aboutAction = QAction('About Grail', self)
-        self.ui_aboutAction.triggered.connect(self.aboutAction)
-
-        # Import Playlist
-        self.ui_importPlaylistAction = QAction('Import playlist', self)
-        self.ui_importPlaylistAction.triggered.connect(self.importPlaylistAction)
-
-        # Export Playlist
-        self.ui_exportPlaylistAction = QAction('Export playlist', self)
-        self.ui_exportPlaylistAction.triggered.connect(self.exportPlaylistAction)
-
-        # Clear history
-        self.ui_clearHistoryAction = QAction('Clear history', self)
-        self.ui_clearHistoryAction.triggered.connect(self.clearHistoryAction)
-
-        # Display
-        self.ui_showAction = QAction('Show', self)
-        self.ui_showAction.triggered.connect(self.showAction)
-
-        self.ui_blackoutAction = QAction('Blackout', self)
-        self.ui_blackoutAction.setShortcut('Ctrl+Z')
-        self.ui_blackoutAction.setShortcutContext(Qt.ApplicationShortcut)
-        self.ui_blackoutAction.triggered.connect(self.blackoutAction)
-
-        self.ui_blackoutMediaAction = QAction('Blackout Media', self)
-        self.ui_blackoutMediaAction.setShortcut('Ctrl+Shift+Z')
-        self.ui_blackoutMediaAction.setShortcutContext(Qt.ApplicationShortcut)
-        self.ui_blackoutMediaAction.triggered.connect(self.blackoutMediaAction)
-
-        self.ui_blackoutTextAction = QAction('Blackout Text', self)
-        self.ui_blackoutTextAction.setShortcut('Ctrl+Alt+Z')
-        self.ui_blackoutTextAction.setShortcutContext(Qt.ApplicationShortcut)
-        self.ui_blackoutTextAction.triggered.connect(self.blackoutTextAction)
-
-        self.ui_nextPageAction = QAction('Next page', self)
-        self.ui_nextPageAction.setShortcut('Ctrl+N')
-        self.ui_nextPageAction.setShortcutContext(Qt.ApplicationShortcut)
-        self.ui_nextPageAction.triggered.connect(self.nextPageAction)
-
-        self.ui_previousPageAction = QAction('Previus page', self)
-        self.ui_previousPageAction.setShortcut('Ctrl+Shift+N')
-        self.ui_previousPageAction.setShortcutContext(Qt.ApplicationShortcut)
-        self.ui_previousPageAction.triggered.connect(self.previousPageAction)
-
-        self.ui_newDisplayAction = QAction('Open new display', self)
-        self.ui_newDisplayAction.setShortcut('Ctrl+D')
-        self.ui_newDisplayAction.setShortcutContext(Qt.ApplicationShortcut)
-        self.ui_newDisplayAction.triggered.connect(self.newDisplayAction)
-
-        self.ui_preferencesAction = QAction('Preferences', self)
-        self.ui_preferencesAction.setShortcut('Ctrl+P')
-        self.ui_preferencesAction.setShortcutContext(Qt.ApplicationShortcut)
-        self.ui_preferencesAction.triggered.connect(self.preferencesAction)
-
-        self.ui_showLibraryAction = QAction('Show Library', self)
-        self.ui_showLibraryAction.setShortcut('Ctrl+L')
-        self.ui_showLibraryAction.triggered.connect(self.showLibraryPanel)
-
-        self.ui_showMediaAction = QAction('Show Media', self)
-        self.ui_showMediaAction.setShortcut('Ctrl+M')
-        self.ui_showMediaAction.triggered.connect(self.showMediaPanel)
-
-        self.ui_toggleLibraryAction = QAction('Toggle Library sidebar', self)
-        self.ui_toggleLibraryAction.triggered.connect(self.toggleLibrary)
-
-        self.ui_togglePreviewAction = QAction('Toggle Preview sidebar', self)
-        self.ui_togglePreviewAction.triggered.connect(self.togglePreview)
-
-        self.ui_navigateToSearchAction = QAction('Search library', self)
-        self.ui_navigateToSearchAction.setShortcut('Ctrl+`')
-        self.ui_navigateToSearchAction.triggered.connect(self.searchNavigateAction)
-
-        self.ui_navigateToPlaylistAction = QAction('Navigate to playlist', self)
-        self.ui_navigateToPlaylistAction.setShortcut('Ctrl+1')
-        self.ui_navigateToPlaylistAction.triggered.connect(self.playlistNavigateAction)
-
-        # Songs and playlists
-        self.ui_addSongAction = QAction('Add new Song', self)
-        self.ui_addSongAction.triggered.connect(self.addSongAction)
-
-        self.outputDisabledAction = QAction('Disabled', self)
-        self.outputDisabledAction.setShortcut('Ctrl+Shift+D')
-        self.outputDisabledAction.setShortcutContext(Qt.ApplicationShortcut)
-        self.outputDisabledAction.triggered.connect(self.displayOutputDisabledAction)
-        self.outputDisabledAction.setCheckable(True)
-
-        self.showTestCardAction = QAction('Show Test Card', self)
-        self.showTestCardAction.setShortcut('Ctrl+T')
-        self.showTestCardAction.setShortcutContext(Qt.ApplicationShortcut)
-        self.showTestCardAction.triggered.connect(self.displayShowTestCardAction)
-        self.showTestCardAction.setCheckable(True)
-
-        self.outputPreferencesAction = QAction('Advanced Preferences', self)
-        self.outputPreferencesAction.setShortcut('Ctrl+Shift+P')
-        self.outputPreferencesAction.setShortcutContext(Qt.ApplicationShortcut)
-        self.outputPreferencesAction.triggered.connect(self.displayOutputPreferencesAction)
-
-        # edit menu
-        self.ui_menu_edit = self.ui_menubar.addMenu('&Edit')
-        self.ui_menu_edit.addAction(self.ui_addSongAction)
-        self.ui_menu_edit.addSeparator()
-        self.ui_menu_edit.addAction(self.ui_importPlaylistAction)
-        self.ui_menu_edit.addAction(self.ui_exportPlaylistAction)
-
-        self.ui_menu_edit.addSeparator()
-        self.ui_menu_edit.addAction(self.ui_clearHistoryAction)
-
-        if not PLATFORM_MAC:
-            self.ui_menu_edit.addSeparator()
-
-        self.ui_menu_edit.addAction(self.ui_preferencesAction)
-
-        # display menu
-        self.ui_menu_display = self.ui_menubar.addMenu('&Display')
-        self.ui_menu_display.addAction(self.ui_newDisplayAction)
-        self.ui_menu_display.addSeparator()
-        self.ui_menu_display.addAction(self.ui_showAction)
-        self.ui_menu_display.addAction(self.ui_blackoutAction)
-        self.ui_menu_display.addAction(self.ui_blackoutTextAction)
-        self.ui_menu_display.addAction(self.ui_blackoutMediaAction)
-        self.ui_menu_display.addSeparator()
-        self.ui_menu_display.addAction(self.ui_previousPageAction)
-        self.ui_menu_display.addAction(self.ui_nextPageAction)
-
-        # view menu
-        self.ui_menu_view = self.ui_menubar.addMenu('&View')
-        self.ui_menu_view.addAction(self.ui_showLibraryAction)
-        self.ui_menu_view.addAction(self.ui_showMediaAction)
-        self.ui_menu_view.addSeparator()
-        self.ui_menu_view.addAction(self.ui_toggleLibraryAction)
-        self.ui_menu_view.addAction(self.ui_togglePreviewAction)
-        self.ui_menu_view.addSeparator()
-        self.ui_menu_view.addAction(self.ui_navigateToSearchAction)
-        self.ui_menu_view.addAction(self.ui_navigateToPlaylistAction)
-
-        # output menu
-        self.ui_menu_output = self.ui_menubar.addMenu('&Output')
-
-        # help menu
-        self.ui_menu_help = self.ui_menubar.addMenu('&Help')
-        self.ui_menu_help.addAction(self.ui_aboutAction)
-
-        if not PLATFORM_MAC:
-            self.setMenuBar(self.ui_menubar)
-
         # left
-        self.ui_songs_bar = QVBoxLayout()
-        self.ui_songs_bar.setObjectName("library_bar")
-        self.ui_songs_bar.setSpacing(0)
-        self.ui_songs_bar.setContentsMargins(0, 0, 0, 0)
-
-        self.ui_songs_search = QSearchEdit()
-        self.ui_songs_search.setObjectName("library_search")
-        self.ui_songs_search.setAttribute(Qt.WA_MacShowFocusRect, False)
-        self.ui_songs_search.textChanged.connect(self.searchAction)
-        self.ui_songs_search.keyPressed.connect(self.searchKeyEvent)
-
-        self.ui_songs_list = SearchListWidget()
-        self.ui_songs_list.setObjectName("library_list")
-        self.ui_songs_list.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.ui_songs_list.setAlternatingRowColors(True)
-
-        self.ui_songs_list.itemClicked.connect(self.songClicked)
-        self.ui_songs_list.itemDoubleClicked.connect(self.songDoubleClicked)
-        self.ui_songs_list.currentItemChanged.connect(self.songClicked)
-        self.ui_songs_list.keyPressed.connect(self.songKeyEvent)
-
-        self.ui_songs_list.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.ui_songs_list.customContextMenuRequested.connect(self.songContextMenu)
-
-        addSongAction = QAction(QIcon(':/icons/add.png'), 'Add', self)
-        addSongAction.setIconVisibleInMenu(True)
-        addSongAction.triggered.connect(self.addSongAction)
-
-        switchViewAction = QAction(QIcon(':/icons/media.png'), 'Media', self)
-        switchViewAction.setIconVisibleInMenu(True)
-        switchViewAction.triggered.connect(self.toggleLeftView)
-
-        spacer = QWidget()
-        spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-
-        self.ui_songs_toolbar = QToolBar()
-        self.ui_songs_toolbar.setObjectName("library_toolbar")
-        self.ui_songs_toolbar.setIconSize(QSize(16, 16))
-        self.ui_songs_toolbar.addAction(addSongAction)
-        self.ui_songs_toolbar.addWidget(spacer)
-        self.ui_songs_toolbar.addAction(switchViewAction)
-
-        self.ui_songs_bar.addWidget(self.ui_songs_search)
-        self.ui_songs_bar.addWidget(self.ui_songs_list)
-        self.ui_songs_bar.addWidget(self.ui_songs_toolbar)
-
-        self.ui_songs_panel = QWidget()
-        self.ui_songs_panel.setObjectName("library_panel")
-        self.ui_songs_panel.setLayout(self.ui_songs_bar)
-        self.ui_songs_panel.setMinimumSize(100, 100)
-
-        self.ui_songs_bar_label = QLabel("There are no results", self.ui_songs_list)
-        self.ui_songs_bar_label.setAlignment(Qt.AlignCenter)
-        self.ui_songs_bar_label.setFont(QFont('Decorative', 12))
+        self._init_ui_library()
 
         # center
-        self.ui_playlist_bar = QVBoxLayout()
-        self.ui_playlist_bar.setSpacing(0)
-        self.ui_playlist_bar.setContentsMargins(0, 0, 0, 0)
-
-        self.ui_playlist_toolbar = QToolBar()
-        self.ui_playlist_toolbar.setObjectName("playlist_toolbar")
-
-        spacer = QWidget()
-        spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-
-        self.ui_playlist_label = PlaylistLabel()
-        self.ui_playlist_label.setObjectName("playlist_label")
-        self.ui_playlist_label.setText("Playlist (0 Songs)")
-        self.ui_playlist_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.ui_playlist_label.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.ui_playlist_label.clicked.connect(self.playlistLabelClicked)
-
-        self.ui_playlist_toolbar.addWidget(self.ui_playlist_label)
-
-        self.ui_playlist_tree = PlaylistTreeWidget()
-
-        self.ui_playlist_tree.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.ui_playlist_tree.itemClicked.connect(self.pageClicked)
-        self.ui_playlist_tree.itemDoubleClicked.connect(self.pageDoubleClicked)
-        self.ui_playlist_tree.customContextMenuRequested.connect(self.playlistContextMenu)
-        self.ui_playlist_tree.keyPressed.connect(self.playlistKeyEvent)
-        self.ui_playlist_tree.orderChanged.connect(self.playlistReordered)
-
-        self.ui_playlist_tree.itemCollapsed.connect(self.playlistItemCollapsed)
-        self.ui_playlist_tree.itemExpanded.connect(self.playlistItemCollapsed)
-
-        self.ui_playlist_bar.addWidget(self.ui_playlist_tree)
-        self.ui_playlist_bar.addWidget(self.ui_playlist_toolbar)
-
-        self.ui_playlist_panel = QWidget()
-        self.ui_playlist_panel.setObjectName("playlist_panel")
-        self.ui_playlist_panel.setLayout(self.ui_playlist_bar)
-        self.ui_playlist_panel.setMinimumSize(100, 100)
-
-        self.ui_playlist_panel_label = QLabel("Nothing in playlist", self.ui_playlist_panel)
-        self.ui_playlist_panel_label.setAlignment(Qt.AlignCenter)
-        self.ui_playlist_panel_label.setFont(QFont('Decorative', 12))
+        self._init_ui_playlist()
 
         # right
-        self.ui_preview_bar = QVBoxLayout()
-        self.ui_preview_bar.setSpacing(0)
-        self.ui_preview_bar.setContentsMargins(0, 0, 0, 0)
-
-        self.ui_preview_label = QLabel()
-        self.ui_preview_label.setObjectName("preview_label")
-        self.ui_preview_label.setAlignment(Qt.AlignCenter | Qt.AlignCenter)
-
-        self.ui_preview_edit = QuickTextEdit()
-        self.ui_preview_edit.setObjectName("preview_edit")
-        self.ui_preview_edit.textChanged.connect(self.quickEditChanged)
-
-        self.ui_preview_toolbar = QToolBar()
-        self.ui_preview_toolbar.setObjectName("preview_toolbar")
-        self.ui_preview_toolbar.setIconSize(QSize(16, 16))
-
-        blackoutAction = QAction(QIcon(':/icons/stop.png'), 'Blackout', self)
-        blackoutAction.triggered.connect(self.blackoutAction)
-
-        showQuickAction = QAction(QIcon(':/icons/play.png'), 'Show', self)
-        showQuickAction.triggered.connect(self.showQuickAction)
-        showQuickAction.setIconVisibleInMenu(True)
-
-        saveQuickAction = QAction(QIcon(':/icons/save.png'), 'Save', self)
-        saveQuickAction.triggered.connect(self.saveAction)
-        saveQuickAction.setIconVisibleInMenu(True)
-
-        self.ui_preview_liveAction = QAction(QIcon(':/icons/live.png'), 'Live', self)
-        self.ui_preview_liveAction.setCheckable(True)
-        self.ui_preview_liveAction.setChecked(False)
-        self.ui_preview_liveAction.setIconVisibleInMenu(True)
-
-        self.ui_preview_toolbar.addAction(showQuickAction)
-        self.ui_preview_toolbar.addAction(saveQuickAction)
-        self.ui_preview_toolbar.addAction(blackoutAction)
-
-        spacer = QWidget()
-        spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-
-        self.ui_preview_toolbar.addWidget(spacer)
-        self.ui_preview_toolbar.addAction(self.ui_preview_liveAction)
-
-        self.ui_preview_bar.addWidget(self.ui_preview_edit)
-        self.ui_preview_bar.addWidget(self.ui_preview_toolbar)
-
-        self.ui_preview_panel = QWidget()
-        self.ui_preview_panel.setLayout(self.ui_preview_bar)
-        self.ui_preview_panel.setMinimumSize(200, 100)
+        self._init_ui_preview()
 
         # vertical spliter
         self.ui_vertical_spliter = QSplitter(Qt.Vertical)
@@ -437,9 +143,317 @@ class Grail(QMainWindow):
 
         History.changed.connect(self.updateSearch)
 
-    # OSC
+    def _init_menubar(self):
 
-    def initOSC(self):
+        # menubar
+        self.ui_menubar = QMenuBar(self)
+
+        # Help
+        self.ui_aboutAction = QAction('About Grail', self)
+        self.ui_aboutAction.triggered.connect(self.aboutAction)
+
+        # Import Playlist
+        self.ui_importPlaylistAction = QAction('Import playlist', self)
+        self.ui_importPlaylistAction.triggered.connect(self.importPlaylistAction)
+
+        # Export Playlist
+        self.ui_exportPlaylistAction = QAction('Export playlist', self)
+        self.ui_exportPlaylistAction.triggered.connect(self.exportPlaylistAction)
+
+        # Clear history
+        self.ui_clearHistoryAction = QAction('Clear history', self)
+        self.ui_clearHistoryAction.triggered.connect(self.clearHistoryAction)
+
+        # Display
+        self.ui_showAction = QAction('Show', self)
+        self.ui_showAction.triggered.connect(self.showAction)
+
+        self.ui_blackoutAction = QAction('Blackout', self)
+        self.ui_blackoutAction.setShortcut('Ctrl+Z')
+        self.ui_blackoutAction.setShortcutContext(Qt.ApplicationShortcut)
+        self.ui_blackoutAction.triggered.connect(self.blackoutAction)
+
+        self.ui_blackoutMediaAction = QAction('Blackout Media', self)
+        self.ui_blackoutMediaAction.setShortcut('Ctrl+Shift+Z')
+        self.ui_blackoutMediaAction.setShortcutContext(Qt.ApplicationShortcut)
+        self.ui_blackoutMediaAction.triggered.connect(self.blackoutMediaAction)
+
+        self.ui_blackoutTextAction = QAction('Blackout Text', self)
+        self.ui_blackoutTextAction.setShortcut('Ctrl+Alt+Z')
+        self.ui_blackoutTextAction.setShortcutContext(Qt.ApplicationShortcut)
+        self.ui_blackoutTextAction.triggered.connect(self.blackoutTextAction)
+
+        self.ui_nextPageAction = QAction('Next page', self)
+        self.ui_nextPageAction.setShortcut('Ctrl+N')
+        self.ui_nextPageAction.setShortcutContext(Qt.ApplicationShortcut)
+        self.ui_nextPageAction.triggered.connect(self.nextPageAction)
+
+        self.ui_previousPageAction = QAction('Previous page', self)
+        self.ui_previousPageAction.setShortcut('Ctrl+Shift+N')
+        self.ui_previousPageAction.setShortcutContext(Qt.ApplicationShortcut)
+        self.ui_previousPageAction.triggered.connect(self.previousPageAction)
+
+        self.ui_newDisplayAction = QAction('Open new display', self)
+        self.ui_newDisplayAction.setShortcut('Ctrl+D')
+        self.ui_newDisplayAction.setShortcutContext(Qt.ApplicationShortcut)
+        self.ui_newDisplayAction.triggered.connect(self.newDisplayAction)
+
+        self.ui_preferencesAction = QAction('Preferences', self)
+        self.ui_preferencesAction.setShortcut('Ctrl+P')
+        self.ui_preferencesAction.setShortcutContext(Qt.ApplicationShortcut)
+        self.ui_preferencesAction.triggered.connect(self.preferencesAction)
+
+        self.ui_showLibraryAction = QAction('Show Library', self)
+        self.ui_showLibraryAction.setShortcut('Ctrl+L')
+        self.ui_showLibraryAction.triggered.connect(self.showLibraryPanel)
+
+        self.ui_showMediaAction = QAction('Show Media', self)
+        self.ui_showMediaAction.setShortcut('Ctrl+M')
+        self.ui_showMediaAction.triggered.connect(self.showMediaPanel)
+
+        self.ui_toggleLibraryAction = QAction('Toggle Library sidebar', self)
+        self.ui_toggleLibraryAction.triggered.connect(self.toggleLibrary)
+
+        self.ui_togglePreviewAction = QAction('Toggle Preview sidebar', self)
+        self.ui_togglePreviewAction.triggered.connect(self.togglePreview)
+
+        self.ui_navigateToSearchAction = QAction('Search library', self)
+        self.ui_navigateToSearchAction.setShortcut('Ctrl+`')
+        self.ui_navigateToSearchAction.triggered.connect(self.searchNavigateAction)
+
+        self.ui_navigateToPlaylistAction = QAction('Navigate to playlist', self)
+        self.ui_navigateToPlaylistAction.setShortcut('Ctrl+1')
+        self.ui_navigateToPlaylistAction.triggered.connect(self.playlistNavigateAction)
+
+        # Songs and playlists
+        self.ui_addSongAction = QAction('Add new Song', self)
+        self.ui_addSongAction.triggered.connect(self.addSongAction)
+
+        self.ui_outputDisabledAction = QAction('Disabled', self)
+        self.ui_outputDisabledAction.setShortcut('Ctrl+Shift+D')
+        self.ui_outputDisabledAction.setShortcutContext(Qt.ApplicationShortcut)
+        self.ui_outputDisabledAction.triggered.connect(self.displayOutputDisabledAction)
+        self.ui_outputDisabledAction.setCheckable(True)
+
+        self.ui_showTestCardAction = QAction('Show Test Card', self)
+        self.ui_showTestCardAction.setShortcut('Ctrl+T')
+        self.ui_showTestCardAction.setShortcutContext(Qt.ApplicationShortcut)
+        self.ui_showTestCardAction.triggered.connect(self.displayShowTestCardAction)
+        self.ui_showTestCardAction.setCheckable(True)
+
+        self.ui_outputPreferencesAction = QAction('Advanced Preferences', self)
+        self.ui_outputPreferencesAction.setShortcut('Ctrl+Shift+P')
+        self.ui_outputPreferencesAction.setShortcutContext(Qt.ApplicationShortcut)
+        self.ui_outputPreferencesAction.triggered.connect(self.displayOutputPreferencesAction)
+
+        # edit menu
+        self.ui_menu_edit = self.ui_menubar.addMenu('&Edit')
+        self.ui_menu_edit.addAction(self.ui_addSongAction)
+        self.ui_menu_edit.addSeparator()
+        self.ui_menu_edit.addAction(self.ui_importPlaylistAction)
+        self.ui_menu_edit.addAction(self.ui_exportPlaylistAction)
+
+        self.ui_menu_edit.addSeparator()
+        self.ui_menu_edit.addAction(self.ui_clearHistoryAction)
+
+        if not PLATFORM_MAC:
+            self.ui_menu_edit.addSeparator()
+
+        self.ui_menu_edit.addAction(self.ui_preferencesAction)
+
+        # display menu
+        self.ui_menu_display = self.ui_menubar.addMenu('&Display')
+        self.ui_menu_display.addAction(self.ui_newDisplayAction)
+        self.ui_menu_display.addSeparator()
+        self.ui_menu_display.addAction(self.ui_showAction)
+        self.ui_menu_display.addAction(self.ui_blackoutAction)
+        self.ui_menu_display.addAction(self.ui_blackoutTextAction)
+        self.ui_menu_display.addAction(self.ui_blackoutMediaAction)
+        self.ui_menu_display.addSeparator()
+        self.ui_menu_display.addAction(self.ui_previousPageAction)
+        self.ui_menu_display.addAction(self.ui_nextPageAction)
+
+        # view menu
+        self.ui_menu_view = self.ui_menubar.addMenu('&View')
+        self.ui_menu_view.addAction(self.ui_showLibraryAction)
+        self.ui_menu_view.addAction(self.ui_showMediaAction)
+        self.ui_menu_view.addSeparator()
+        self.ui_menu_view.addAction(self.ui_toggleLibraryAction)
+        self.ui_menu_view.addAction(self.ui_togglePreviewAction)
+        self.ui_menu_view.addSeparator()
+        self.ui_menu_view.addAction(self.ui_navigateToSearchAction)
+        self.ui_menu_view.addAction(self.ui_navigateToPlaylistAction)
+
+        # output menu
+        self.ui_menu_output = self.ui_menubar.addMenu('&Output')
+
+        # help menu
+        self.ui_menu_help = self.ui_menubar.addMenu('&Help')
+        self.ui_menu_help.addAction(self.ui_aboutAction)
+
+        if not PLATFORM_MAC:
+            self.setMenuBar(self.ui_menubar)
+
+    def _init_ui_library(self):
+        """Initialize UI of Library/Media panel"""
+
+        self.ui_media_panel = MediaWidget()
+        self.ui_media_panel.itemSelected.connect(self.imageSelected)
+        self.ui_media_panel.switchMode.connect(self.showLibraryPanel)
+        self.ui_media_panel.blackoutImage.connect(self.setBlackoutImage)
+        self.ui_media_panel.textImage.connect(self.setTextImage)
+
+        self.ui_songs_bar = QVBoxLayout()
+        self.ui_songs_bar.setObjectName("library_bar")
+        self.ui_songs_bar.setSpacing(0)
+        self.ui_songs_bar.setContentsMargins(0, 0, 0, 0)
+
+        self.ui_songs_search = QSearchEdit()
+        self.ui_songs_search.setObjectName("library_search")
+        self.ui_songs_search.setAttribute(Qt.WA_MacShowFocusRect, False)
+        self.ui_songs_search.textChanged.connect(self.searchAction)
+        self.ui_songs_search.keyPressed.connect(self.searchKeyEvent)
+
+        self.ui_songs_list = SearchListWidget()
+        self.ui_songs_list.setObjectName("library_list")
+        self.ui_songs_list.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.ui_songs_list.setAlternatingRowColors(True)
+
+        self.ui_songs_list.itemClicked.connect(self.songClicked)
+        self.ui_songs_list.itemDoubleClicked.connect(self.songDoubleClicked)
+        self.ui_songs_list.currentItemChanged.connect(self.songClicked)
+        self.ui_songs_list.keyPressed.connect(self.songKeyEvent)
+        self.ui_songs_list.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.ui_songs_list.customContextMenuRequested.connect(self.songContextMenu)
+
+        addSongAction = QAction(QIcon(':/icons/add.png'), 'Add', self)
+        addSongAction.setIconVisibleInMenu(True)
+        addSongAction.triggered.connect(self.addSongAction)
+
+        switchViewAction = QAction(QIcon(':/icons/media.png'), 'Media', self)
+        switchViewAction.setIconVisibleInMenu(True)
+        switchViewAction.triggered.connect(self.toggleLeftView)
+
+        spacer = QWidget()
+        spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+
+        self.ui_songs_toolbar = QToolBar()
+        self.ui_songs_toolbar.setObjectName("library_toolbar")
+        self.ui_songs_toolbar.setIconSize(QSize(16, 16))
+        self.ui_songs_toolbar.addAction(addSongAction)
+        self.ui_songs_toolbar.addWidget(spacer)
+        self.ui_songs_toolbar.addAction(switchViewAction)
+
+        self.ui_songs_bar.addWidget(self.ui_songs_search)
+        self.ui_songs_bar.addWidget(self.ui_songs_list)
+        self.ui_songs_bar.addWidget(self.ui_songs_toolbar)
+
+        self.ui_songs_panel = QWidget()
+        self.ui_songs_panel.setObjectName("library_panel")
+        self.ui_songs_panel.setLayout(self.ui_songs_bar)
+        self.ui_songs_panel.setMinimumSize(100, 100)
+
+        self.ui_songs_bar_label = QLabel("There are no results", self.ui_songs_list)
+        self.ui_songs_bar_label.setAlignment(Qt.AlignCenter)
+        self.ui_songs_bar_label.setFont(QFont('Decorative', 12))
+
+    def _init_ui_playlist(self):
+        """Initialize UI of playlist panel"""
+
+        self.ui_playlist_bar = QVBoxLayout()
+        self.ui_playlist_bar.setSpacing(0)
+        self.ui_playlist_bar.setContentsMargins(0, 0, 0, 0)
+
+        self.ui_playlist_toolbar = QToolBar()
+        self.ui_playlist_toolbar.setObjectName("playlist_toolbar")
+
+        spacer = QWidget()
+        spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+
+        self.ui_playlist_label = PlaylistLabel()
+        self.ui_playlist_label.setObjectName("playlist_label")
+        self.ui_playlist_label.setText("Playlist (0 Songs)")
+        self.ui_playlist_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.ui_playlist_label.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.ui_playlist_label.clicked.connect(self.playlistLabelClicked)
+
+        self.ui_playlist_toolbar.addWidget(self.ui_playlist_label)
+
+        self.ui_playlist_tree = PlaylistTreeWidget()
+        self.ui_playlist_tree.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.ui_playlist_tree.itemClicked.connect(self.pageClicked)
+        self.ui_playlist_tree.itemDoubleClicked.connect(self.pageDoubleClicked)
+        self.ui_playlist_tree.customContextMenuRequested.connect(self.playlistContextMenu)
+        self.ui_playlist_tree.keyPressed.connect(self.playlistKeyEvent)
+        self.ui_playlist_tree.orderChanged.connect(self.playlistReordered)
+        self.ui_playlist_tree.itemCollapsed.connect(self.playlistItemCollapsed)
+        self.ui_playlist_tree.itemExpanded.connect(self.playlistItemCollapsed)
+
+        self.ui_playlist_bar.addWidget(self.ui_playlist_tree)
+        self.ui_playlist_bar.addWidget(self.ui_playlist_toolbar)
+
+        self.ui_playlist_panel = QWidget()
+        self.ui_playlist_panel.setObjectName("playlist_panel")
+        self.ui_playlist_panel.setLayout(self.ui_playlist_bar)
+        self.ui_playlist_panel.setMinimumSize(100, 100)
+
+        self.ui_playlist_panel_label = QLabel("Nothing in playlist", self.ui_playlist_panel)
+        self.ui_playlist_panel_label.setAlignment(Qt.AlignCenter)
+        self.ui_playlist_panel_label.setFont(QFont('Decorative', 12))
+
+    def _init_ui_preview(self):
+        """Initialize preview panel"""
+
+        self.ui_preview_bar = QVBoxLayout()
+        self.ui_preview_bar.setSpacing(0)
+        self.ui_preview_bar.setContentsMargins(0, 0, 0, 0)
+
+        self.ui_preview_label = QLabel()
+        self.ui_preview_label.setObjectName("preview_label")
+        self.ui_preview_label.setAlignment(Qt.AlignCenter | Qt.AlignCenter)
+
+        self.ui_preview_edit = QuickTextEdit()
+        self.ui_preview_edit.setObjectName("preview_edit")
+        self.ui_preview_edit.textChanged.connect(self.quickEditChanged)
+
+        self.ui_preview_toolbar = QToolBar()
+        self.ui_preview_toolbar.setObjectName("preview_toolbar")
+        self.ui_preview_toolbar.setIconSize(QSize(16, 16))
+
+        blackoutAction = QAction(QIcon(':/icons/stop.png'), 'Blackout', self)
+        blackoutAction.triggered.connect(self.blackoutAction)
+
+        showQuickAction = QAction(QIcon(':/icons/play.png'), 'Show', self)
+        showQuickAction.triggered.connect(self.showQuickAction)
+        showQuickAction.setIconVisibleInMenu(True)
+
+        saveQuickAction = QAction(QIcon(':/icons/save.png'), 'Save', self)
+        saveQuickAction.triggered.connect(self.saveAction)
+        saveQuickAction.setIconVisibleInMenu(True)
+
+        self.ui_preview_liveAction = QAction(QIcon(':/icons/live.png'), 'Live', self)
+        self.ui_preview_liveAction.setCheckable(True)
+        self.ui_preview_liveAction.setChecked(False)
+        self.ui_preview_liveAction.setIconVisibleInMenu(True)
+
+        self.ui_preview_toolbar.addAction(showQuickAction)
+        self.ui_preview_toolbar.addAction(saveQuickAction)
+        self.ui_preview_toolbar.addAction(blackoutAction)
+
+        spacer = QWidget()
+        spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+
+        self.ui_preview_toolbar.addWidget(spacer)
+        self.ui_preview_toolbar.addAction(self.ui_preview_liveAction)
+
+        self.ui_preview_bar.addWidget(self.ui_preview_edit)
+        self.ui_preview_bar.addWidget(self.ui_preview_toolbar)
+
+        self.ui_preview_panel = QWidget()
+        self.ui_preview_panel.setLayout(self.ui_preview_bar)
+        self.ui_preview_panel.setMinimumSize(200, 100)
+
+    def _init_osc(self):
 
         self.subscribers = []
         self.listeners = []
@@ -454,7 +468,7 @@ class Grail(QMainWindow):
             if not rule['port'] in ports:
                 ports.append(rule['port'])
 
-    def updateOSCConnections(self, items):
+    def update_osc(self, items):
 
         self.subscribers = []
 
@@ -485,6 +499,36 @@ class Grail(QMainWindow):
 
     # UI
 
+    def resizeEvent(self, event):
+
+        self.updateLabels()
+
+    def closeEvent(self, event):
+
+        self.prefs.save()
+        self.dialog_about.close()
+        self.dialog_preferences.close()
+        self.dialog_song.close()
+        self.display.setAttribute(Qt.WA_DeleteOnClose, True)
+        self.display.close(True)
+
+        self.dialog_playlist.close()
+
+        for display in self.displays:
+            display.setAttribute(Qt.WA_DeleteOnClose, True)
+            display.close(True)
+
+        ConnectionManager.close()
+
+    def center(self):
+        """Center a main window"""
+
+        qr = self.frameGeometry()
+        cp = QDesktopWidget().availableGeometry().center()
+        qr.moveCenter(cp)
+
+        self.move(qr.topLeft())
+
     def toggleLeftView(self):
 
         index = self.ui_left_sidebar.currentIndex()
@@ -507,17 +551,7 @@ class Grail(QMainWindow):
 
         self.ui_playlist_tree.setFocus(Qt.OtherFocusReason)
 
-    def center(self):
-        qr = self.frameGeometry()
-        cp = QDesktopWidget().availableGeometry().center()
-        qr.moveCenter(cp)
-        self.move(qr.topLeft())
-
     def splitterMoved(self, pos, index):
-
-        self.updateLabels()
-
-    def resizeEvent(self, event):
 
         self.updateLabels()
 
@@ -557,10 +591,10 @@ class Grail(QMainWindow):
 
         self.ui_menu_output.clear()
 
-        self.showTestCardAction.setChecked(self.display.isTestCard())
-        self.outputDisabledAction.setChecked(self.display.isEnabled())
+        self.ui_showTestCardAction.setChecked(self.display.isTestCard())
+        self.ui_outputDisabledAction.setChecked(self.display.isEnabled())
 
-        self.ui_menu_output.addAction(self.outputDisabledAction)
+        self.ui_menu_output.addAction(self.ui_outputDisabledAction)
         self.ui_menu_output.addSeparator()
 
         def triggered(action):
@@ -568,7 +602,7 @@ class Grail(QMainWindow):
             def fn(item=action):
                 a = self.updateOutputMenu()
                 b = self.display.setMode(action.property("mode"))
-                c = self.outputDisabledAction.setChecked(False)
+                c = self.ui_outputDisabledAction.setChecked(False)
 
                 return a or b or c
 
@@ -590,8 +624,8 @@ class Grail(QMainWindow):
             self.ui_menu_output.addAction(action)
 
         self.ui_menu_output.addSeparator()
-        self.ui_menu_output.addAction(self.showTestCardAction)
-        self.ui_menu_output.addAction(self.outputPreferencesAction)
+        self.ui_menu_output.addAction(self.ui_showTestCardAction)
+        self.ui_menu_output.addAction(self.ui_outputPreferencesAction)
 
     def updateSearch(self, items=None):
 
@@ -781,16 +815,17 @@ class Grail(QMainWindow):
         connection.close()
 
     def clearHistoryAction(self):
+
         History.clear()
 
     def displayShowTestCardAction(self):
 
-        self.display.setTestCard(self.showTestCardAction.isChecked())
+        self.display.setTestCard(self.ui_showTestCardAction.isChecked())
 
     def displayOutputDisabledAction(self):
 
         self.display.setDisabled(True)
-        self.outputDisabledAction.setChecked(True)
+        self.ui_outputDisabledAction.setChecked(True)
 
     def displayOutputPreferencesAction(self):
 
@@ -798,6 +833,7 @@ class Grail(QMainWindow):
         dialog.show()
 
     def addSongAction(self):
+
         self.dialog_song.addSong()
         self.dialog_song.showOnTop()
 
@@ -868,6 +904,7 @@ class Grail(QMainWindow):
         self.dialog_preferences.activateWindow()
 
     def searchAction(self, text):
+
         keyword = str(self.ui_songs_search.text())
 
         if keyword:
@@ -966,6 +1003,7 @@ class Grail(QMainWindow):
                 if len(pages) > 0:
                     song = item.id
                     page = pages[0]['id']
+
             elif type(item) == PageTreeWidgetItem:
                 song = item.song
                 page = item.id
@@ -996,10 +1034,12 @@ class Grail(QMainWindow):
 
         if item.type == SearchListItem.TYPE_SONG:
             text = '\n\n'.join(page['page'] for page in Song.getPages(item.data["id"]))
+
             self.ui_preview_label.setText(text)
 
         if item.type == SearchListItem.TYPE_HISTORY:
             text = item.data["message"]
+
             self.ui_preview_label.setText(text)
 
         if item.type == SearchListItem.TYPE_REFERENCE:
@@ -1171,22 +1211,6 @@ class Grail(QMainWindow):
 
             ret = menu.exec_(self.ui_playlist_tree.mapToGlobal(pos))
 
-    def playlistKeyEvent(self, event):
-        item = self.ui_playlist_tree.currentItem()
-
-        if event.key() == Qt.Key_Return and item:
-            self.pageDoubleClicked(item)
-        elif event.key() == Qt.Key_Delete and item:
-            self.deletePlaylistSongAction()
-        elif event.key() == Qt.Key_Up and item:
-            QTreeWidget.keyPressEvent(self.ui_playlist_tree, event)
-            self.pageClicked(self.ui_playlist_tree.currentItem())
-        elif event.key() == Qt.Key_Down and item:
-            QTreeWidget.keyPressEvent(self.ui_playlist_tree, event)
-            self.pageClicked(self.ui_playlist_tree.currentItem())
-        else:
-            QTreeWidget.keyPressEvent(self.ui_playlist_tree, event)
-
     def playlistReordered(self):
 
         for index in range(self.ui_playlist_tree.topLevelItemCount()):
@@ -1265,24 +1289,21 @@ class Grail(QMainWindow):
             self.ui_playlist_tree.setCurrentItem(item)
             self.showAction()
 
-    # Events
+    def playlistKeyEvent(self, event):
+        item = self.ui_playlist_tree.currentItem()
 
-    def closeEvent(self, event):
-
-        self.prefs.save()
-        self.dialog_about.close()
-        self.dialog_preferences.close()
-        self.dialog_song.close()
-        self.display.setAttribute(Qt.WA_DeleteOnClose, True)
-        self.display.close(True)
-
-        self.dialog_playlist.close()
-
-        for display in self.displays:
-            display.setAttribute(Qt.WA_DeleteOnClose, True)
-            display.close(True)
-
-        ConnectionManager.close()
+        if event.key() == Qt.Key_Return and item:
+            self.pageDoubleClicked(item)
+        elif event.key() == Qt.Key_Delete and item:
+            self.deletePlaylistSongAction()
+        elif event.key() == Qt.Key_Up and item:
+            QTreeWidget.keyPressEvent(self.ui_playlist_tree, event)
+            self.pageClicked(self.ui_playlist_tree.currentItem())
+        elif event.key() == Qt.Key_Down and item:
+            QTreeWidget.keyPressEvent(self.ui_playlist_tree, event)
+            self.pageClicked(self.ui_playlist_tree.currentItem())
+        else:
+            QTreeWidget.keyPressEvent(self.ui_playlist_tree, event)
 
     def searchKeyEvent(self, event):
 
@@ -1334,6 +1355,7 @@ class Grail(QMainWindow):
             display.setBlackoutImage(path)
 
     def setTextImage(self, path):
+
         self.display.setTextImage(path)
 
         for display in self.displays:

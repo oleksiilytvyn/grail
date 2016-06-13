@@ -27,51 +27,50 @@ from .page_tree_widget_item import PageTreeWidgetItem
 
 
 class PlaylistTreeWidget(QTreeWidget):
-
     keyPressed = pyqtSignal('QKeyEvent')
     orderChanged = pyqtSignal()
 
-    def __init__( self, parent=None ):
+    def __init__(self, parent=None):
         super(PlaylistTreeWidget, self).__init__(parent)
 
         self.setObjectName("playlist_tree")
         self.setAlternatingRowColors(True)
-        self.setAttribute( Qt.WA_MacShowFocusRect, False )
+        self.setAttribute(Qt.WA_MacShowFocusRect, False)
         self.header().close()
 
-        self.setSelectionMode( QAbstractItemView.SingleSelection )
-        self.setDragEnabled( True )
-        self.viewport().setAcceptDrops( True )
-        self.setDropIndicatorShown( True )
-        self.setDragDropMode( QAbstractItemView.InternalMove )
-        self.setWordWrap( True )
+        self.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.setDragEnabled(True)
+        self.viewport().setAcceptDrops(True)
+        self.setDropIndicatorShown(True)
+        self.setDragDropMode(QAbstractItemView.InternalMove)
+        self.setWordWrap(True)
 
-        self.setAnimated( True )
-        self.setSortingEnabled( False )
+        self.setAnimated(True)
+        self.setSortingEnabled(False)
 
-        self.keyPressed.connect( self.keyPressedEvent )
-        self.setVerticalScrollMode( QAbstractItemView.ScrollPerPixel )
-        self.setVerticalScrollBarPolicy( Qt.ScrollBarAlwaysOff )
+        self.keyPressed.connect(self.keyPressedEvent)
+        self.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
         original = self.verticalScrollBar()
 
-        self.scrollbar = QScrollBar( Qt.Vertical, self )
-        self.scrollbar.valueChanged.connect( original.setValue )
+        self.scrollbar = QScrollBar(Qt.Vertical, self)
+        self.scrollbar.valueChanged.connect(original.setValue)
 
-        original.valueChanged.connect( self.scrollbar.setValue )
+        original.valueChanged.connect(self.scrollbar.setValue)
 
         self.updateScrollbar()
 
-    def keyPressEvent( self, event ):
-        self.keyPressed.emit( event )
+    def keyPressEvent(self, event):
+        self.keyPressed.emit(event)
 
-    def keyPressedEvent( self, event ):
+    def keyPressedEvent(self, event):
         pass
 
-    def dropEvent( self, event ):
+    def dropEvent(self, event):
 
-        dropingOn = self.itemAt( event.pos() )
-        dropingIndex = self.indexOfTopLevelItem( dropingOn )
+        dropingOn = self.itemAt(event.pos())
+        dropingIndex = self.indexOfTopLevelItem(dropingOn)
         draggingItem = self.currentItem()
 
         # count items in list
@@ -79,16 +78,16 @@ class PlaylistTreeWidget(QTreeWidget):
         items_count = 0
 
         while iterator.value():
-            if type( iterator.value() ) == SongTreeWidgetItem:
+            if type(iterator.value()) == SongTreeWidgetItem:
                 items_count += 1
 
             iterator += 1
 
-        if type( dropingOn ) == SongTreeWidgetItem:
+        if type(dropingOn) == SongTreeWidgetItem:
             expanded = draggingItem.isExpanded()
-            self.takeTopLevelItem( self.indexOfTopLevelItem( draggingItem ) )
+            self.takeTopLevelItem(self.indexOfTopLevelItem(draggingItem))
 
-            index = self.indexOfTopLevelItem( dropingOn )
+            index = self.indexOfTopLevelItem(dropingOn)
 
             dp = self.dropIndicatorPosition()
 
@@ -99,12 +98,12 @@ class PlaylistTreeWidget(QTreeWidget):
                 index = index - 1
 
             self.insertTopLevelItem(index, draggingItem)
-            self.setCurrentItem( draggingItem )
-            draggingItem.setExpanded( expanded )
+            self.setCurrentItem(draggingItem)
+            draggingItem.setExpanded(expanded)
 
         self.orderChanged.emit()
 
-    def updateScrollbar( self ):
+    def updateScrollbar(self):
 
         original = self.verticalScrollBar()
 
@@ -113,12 +112,12 @@ class PlaylistTreeWidget(QTreeWidget):
         else:
             self.scrollbar.show()
 
-        self.scrollbar.setPageStep( original.pageStep() )
-        self.scrollbar.setRange( original.minimum(), original.maximum() )
-        self.scrollbar.resize( 8, self.rect().height() )
-        self.scrollbar.move( self.rect().width() - 8, 0 )
+        self.scrollbar.setPageStep(original.pageStep())
+        self.scrollbar.setRange(original.minimum(), original.maximum())
+        self.scrollbar.resize(8, self.rect().height())
+        self.scrollbar.move(self.rect().width() - 8, 0)
 
-    def paintEvent( self, event ):
+    def paintEvent(self, event):
 
-        QTreeWidget.paintEvent( self, event )
+        QTreeWidget.paintEvent(self, event)
         self.updateScrollbar()

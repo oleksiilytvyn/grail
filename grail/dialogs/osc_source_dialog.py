@@ -38,9 +38,9 @@ class OSCSourceWidget(QWidget):
         self.initHost = 1
         self.itemId = 1
 
-        self.initUI()
+        self._init_ui()
 
-    def initUI(self):
+    def _init_ui(self):
 
         self.ui_layout = QVBoxLayout()
         self.ui_layout.setObjectName("songsBar")
@@ -126,9 +126,9 @@ class OSCSourceWidget(QWidget):
 
     def addAction(self):
 
-        self.initHost = self.initHost + 1
-        self.initPort = self.initPort + 1
-        self.itemId = self.itemId + 1
+        self.initHost += 1
+        self.initPort += 1
+        self.itemId += 1
 
         self.addItem("127.0.0." + str(self.initHost), str(self.initPort))
 

@@ -30,18 +30,18 @@ from .balloon_dialog import BalloonDialog
 
 
 class PlaylistDialog(BalloonDialog):
+    """List of playlist's dialog"""
+
     selected = pyqtSignal(int)
     renamed = pyqtSignal(int)
 
     def __init__(self, parent=None):
         super(PlaylistDialog, self).__init__(parent)
 
-        self.selected.connect(self.selectedEvent)
         self.setBackgroundColor(QColor(75, 80, 86))
+        self._init_ui()
 
-        self.initUI()
-
-    def initUI(self):
+    def _init_ui(self):
 
         self.ui_layout = QVBoxLayout()
         self.ui_layout.setSpacing(0)
@@ -60,20 +60,18 @@ class PlaylistDialog(BalloonDialog):
         header.setSectionResizeMode(1, QHeaderView.Fixed)
 
         self.ui_list.setColumnWidth(1, 42)
+        self.ui_list.setAlternatingRowColors(True)
         self.ui_list.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.ui_list.setSelectionMode(QAbstractItemView.SingleSelection)
-        self.ui_list.cellChanged.connect(self.listCellChanged)
-        self.ui_list.itemClicked.connect(self.listItemClicked)
-        self.ui_list.itemClicked.connect(self.listItemClicked)
-        self.ui_list.itemSelectionChanged.connect(self.listItemSelected)
-        self.ui_list.setAlternatingRowColors(True)
+        self.ui_list.cellChanged.connect(self._list_cell_changed)
+        self.ui_list.itemSelectionChanged.connect(self._list_item_selected)
 
-        editAction = QAction(QIcon(':/icons/edit.png'), 'Edit', self)
-        editAction.triggered.connect(self.editAction)
+        self.ui_edit_action = QAction(QIcon(':/icons/edit.png'), 'Edit', self)
+        self.ui_edit_action.triggered.connect(self.edit_action)
 
-        addAction = QAction(QIcon(':/icons/add.png'), 'Add', self)
-        addAction.setIconVisibleInMenu(True)
-        addAction.triggered.connect(self.addAction)
+        self.ui_add_action = QAction(QIcon(':/icons/add.png'), 'Add', self)
+        self.ui_add_action.setIconVisibleInMenu(True)
+        self.ui_add_action.triggered.connect(self.add_action)
 
         spacer = QWidget()
         spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -81,51 +79,49 @@ class PlaylistDialog(BalloonDialog):
         self.ui_toolbar = QToolBar()
         self.ui_toolbar.setIconSize(QSize(16, 16))
         self.ui_toolbar.setObjectName("playlistDialogToolbar")
-        self.ui_toolbar.addAction(editAction)
+        self.ui_toolbar.addAction(self.ui_edit_action)
         self.ui_toolbar.addWidget(spacer)
-        self.ui_toolbar.addAction(addAction)
+        self.ui_toolbar.addAction(self.ui_add_action)
 
         self.ui_layout.addWidget(self.ui_list)
         self.ui_layout.addWidget(self.ui_toolbar)
 
         self.setLayout(self.ui_layout)
-
         self.setWindowTitle('Playlist')
         self.setGeometry(100, 300, 240, 300)
         self.setMinimumSize(240, 300)
 
-        self.updateList()
+        self.update_list()
 
-    def addAction(self):
+    def add_action(self):
+        """Add new playlist"""
 
         playlist = Playlist.get(Playlist.add("Untitled"))
-
         x = self.ui_list.rowCount()
         item = PlaylistDialogItem(playlist)
+        button = PlaylistRemoveButton(self, playlist)
+        button.triggered.connect(self._list_remove_clicked)
 
         self.ui_list.insertRow(x)
-
         self.ui_list.setItem(x, 0, item)
-
-        button = PlaylistRemoveButton(self, playlist)
-        button.triggered.connect(self.listRemoveClicked)
         self.ui_list.setCellWidget(x, 1, button)
         self.ui_list.setCurrentCell(x, 0)
-
         self.ui_list.editItem(self.ui_list.item(x, 0))
 
-    def editAction(self):
+    def edit_action(self):
+        """Edit selected playlist"""
 
         x = self.ui_list.rowCount()
         id = Settings.get('playlist')
 
         for i in range(0, x):
             item = self.ui_list.item(i, 0)
+
             if int(item.getPlaylist()['id']) == int(id):
-                self.listItemClicked(item)
+                self._list_item_clicked(item)
                 self.ui_list.editItem(item)
 
-    def updateList(self):
+    def update_list(self):
 
         playlists = Playlist.getPlaylists()
 
@@ -140,17 +136,17 @@ class PlaylistDialog(BalloonDialog):
 
             if int(playlist['id']) == id:
                 self.ui_list.setCurrentItem(item)
-                self.listItemClicked(item)
+                self._list_item_clicked(item)
                 self.ui_list.scrollToItem(self.ui_list.item(x, 0))
 
             button = PlaylistRemoveButton(self, playlist)
-            button.triggered.connect(self.listRemoveClicked)
+            button.triggered.connect(self._list_remove_clicked)
 
             self.ui_list.setCellWidget(x, 1, button)
 
-            x = x + 1
+            x += 1
 
-    def listCellChanged(self, row, column):
+    def _list_cell_changed(self, row, column):
 
         item = self.ui_list.item(row, column)
         playlist = item.getPlaylist()
@@ -158,14 +154,16 @@ class PlaylistDialog(BalloonDialog):
 
         self.renamed.emit(playlist['id'])
 
-    def listRemoveClicked(self, action):
+    def _list_remove_clicked(self, action):
 
-        id = action.getPlaylist()['id']
-        Playlist.delete(id)
+        current = action.getPlaylist()['id']
+        Playlist.delete(current)
+        playlists = Playlist.getPlaylists()
 
-        self.updateList()
+        self.selected.emit(playlists[0]['id'])
+        self.update_list()
 
-    def listItemClicked(self, item):
+    def _list_item_clicked(self, item):
 
         x = self.ui_list.rowCount()
         y = self.ui_list.selectedIndexes()[0].row()
@@ -180,14 +178,11 @@ class PlaylistDialog(BalloonDialog):
 
         self.selected.emit(item.getPlaylist()['id'])
 
-    def listItemSelected(self):
+    def _list_item_selected(self):
 
         item = self.ui_list.item(self.ui_list.currentRow(), 0)
 
-        self.listItemClicked(item)
-
-    def selectedEvent(self, id):
-        pass
+        self._list_item_clicked(item)
 
     def showAt(self, point):
 
@@ -197,18 +192,20 @@ class PlaylistDialog(BalloonDialog):
 
 
 class PlaylistDialogItem(QTableWidgetItem):
+    """Playlist item inside playlist dialog"""
+
     def __init__(self, item):
         super(PlaylistDialogItem, self).__init__(item['title'])
 
         self.playlist = item
-
-        self.setFlags(self.flags() | Qt.ItemIsEditable)
+        self.setFlags(Qt.ItemIsEditable | Qt.ItemIsSelectable | Qt.ItemIsEnabled)
 
     def getPlaylist(self):
         return self.playlist
 
 
 class PlaylistRemoveButton(QToolButton):
+
     triggered = pyqtSignal("QToolButton")
 
     def __init__(self, parent, item):
@@ -221,29 +218,35 @@ class PlaylistRemoveButton(QToolButton):
 
         self.setStyleSheet("QToolButton {background: transparent;border: none;padding: 0;margin: 0;}")
 
-        self.clicked.connect(self.clickedEvent)
-        self.triggered.connect(self.triggeredEvent)
+        self.clicked.connect(self._clicked)
+        self.triggered.connect(self._triggered)
 
-    def getPlaylist(self):
-        return self.playlist
-
-    def clickedEvent(self, checked):
+    def _clicked(self, checked):
 
         self.triggered.emit(self)
 
-    def triggeredEvent(self, button):
+    def _triggered(self, button):
         pass
 
-    def setIconState(self, b):
+    def getPlaylist(self):
+        """Get a playlist assigned to component"""
 
-        if b:
+        return self.playlist
+
+    def setIconState(self, flag):
+        """Set icon state"""
+
+        if flag:
             self.setIcon(QIcon(':/icons/remove.png'))
         else:
             self.setIcon(QIcon(':/icons/remove-white.png'))
 
 
 class PlaylistTableWidget(QTableWidget):
+
     def __init__(self, parent=None):
+        """Initialize PlaylistTableWidget"""
+
         super(PlaylistTableWidget, self).__init__(parent)
 
         self.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
@@ -254,17 +257,18 @@ class PlaylistTableWidget(QTableWidget):
 
         self.scrollbar = QScrollBar(Qt.Vertical, self)
         self.scrollbar.valueChanged.connect(original.setValue)
-        self.scrollbar.rangeChanged.connect(self.scrollToSelected)
+        self.scrollbar.rangeChanged.connect(self.scroll_to_selected)
 
         original.valueChanged.connect(self.scrollbar.setValue)
 
-        self.updateScrollbar()
+        self.update_scrollbar()
 
     def paintEvent(self, event):
+        """Draw widget"""
 
         QTableWidget.paintEvent(self, event)
 
-        self.updateScrollbar()
+        self.update_scrollbar()
 
         x = self.rowCount()
         y = self.selectedIndexes()[0].row()
@@ -278,11 +282,14 @@ class PlaylistTableWidget(QTableWidget):
                 b.setIconState(True)
 
     def update(self):
+        """Update ui components"""
 
         super(PlaylistTableWidget, self).update()
-        self.updateScrollbar()
 
-    def updateScrollbar(self):
+        self.update_scrollbar()
+
+    def update_scrollbar(self):
+        """Update scrollbar to draw properly"""
 
         original = self.verticalScrollBar()
 
@@ -299,7 +306,8 @@ class PlaylistTableWidget(QTableWidget):
         self.scrollbar.resize(8, self.rect().height())
         self.scrollbar.move(self.rect().width() - 8, 0)
 
-    def scrollToSelected(self):
+    def scroll_to_selected(self):
+        """Scroll to selected item"""
 
         selected = self.selectedIndexes()
 

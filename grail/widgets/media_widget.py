@@ -40,9 +40,9 @@ class MediaWidget(QWidget):
 
         self.files_list = []
 
-        self.initUI()
+        self._init_ui()
 
-    def initUI(self):
+    def _init_ui(self):
 
         self.ui_layout = QVBoxLayout()
         self.ui_layout.setObjectName("media_dialog")

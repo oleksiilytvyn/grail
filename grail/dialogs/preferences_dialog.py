@@ -460,20 +460,20 @@ class BiblePanel(QWidget):
 
     def update_list(self):
 
-        items = BibleManager.getAll()
+        bibles = BibleManager.getAll()
         selected_path = Settings.get('bible.path')
 
         self.ui_list.clear()
-        self.ui_toolbar_label.setText("%d installed" % len(items))
+        self.ui_toolbar_label.setText("%d installed" % len(bibles))
 
-        for item in items:
+        for bible in bibles:
 
-            listitem = SearchListItem()
-            listitem.setItemData(item)
+            item = SearchListItem()
+            item.setItemData(bible)
 
-            if item['path'] == selected_path:
-                listitem.setText("%s - selected" % (item['name'],))
+            if bible['path'] == selected_path:
+                item.setText("%s - selected" % (bible['name'],))
             else:
-                listitem.setText(item['name'])
+                item.setText(bible['name'])
 
-            self.ui_list.addItem(listitem)
+            self.ui_list.addItem(item)

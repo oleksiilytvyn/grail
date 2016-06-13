@@ -28,18 +28,17 @@ class PlaylistsModel:
     Playlist managment
     '''
 
-    def __init__( self ):
+    def __init__(self):
 
         path = get_data_path() + '/songs.db'
         first_run = False
 
-        if not os.path.isfile( path ):
+        if not os.path.isfile(path):
             first_run = True
 
-        self.connection = ConnectionManager.get( path, get_path() + '/default/songs.db' )
+        self.connection = ConnectionManager.get(path, get_path() + '/default/songs.db')
 
         if first_run:
-
             cur = self.connection.cursor()
 
             cur.execute("""CREATE TABLE IF NOT EXISTS songs(
@@ -49,7 +48,8 @@ class PlaylistsModel:
                         album TEXT,
                         year INT)""")
 
-            cur.execute("CREATE TABLE IF NOT EXISTS pages(id INTEGER PRIMARY KEY AUTOINCREMENT, song INT, sort INT, page TEXT)")
+            cur.execute(
+                "CREATE TABLE IF NOT EXISTS pages(id INTEGER PRIMARY KEY AUTOINCREMENT, song INT, sort INT, page TEXT)")
 
             cur.execute("CREATE TABLE IF NOT EXISTS playlists(id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT)")
 
@@ -60,43 +60,43 @@ class PlaylistsModel:
                         song INT,
                         collapsed INTEGER)""")
 
-            cur.execute("INSERT INTO playlists VALUES(NULL, ?)", ("Default", ))
+            cur.execute("INSERT INTO playlists VALUES(NULL, ?)", ("Default",))
 
-    def get( self, id ):
+    def get(self, id):
         cursor = self.connection.cursor()
         cursor.execute("SELECT * FROM playlists WHERE id = ?", (id,))
 
         return cursor.fetchone()
 
-    def update( self, id, title ):
+    def update(self, id, title):
 
         cur = self.connection.cursor()
 
         cur.execute("UPDATE playlists SET title=? WHERE id=?", (title, id))
         self.connection.commit()
 
-    def add( self, title ):
+    def add(self, title):
 
         cur = self.connection.cursor()
-        cur.execute("INSERT INTO playlists VALUES(NULL, ?)", (title, ))
+        cur.execute("INSERT INTO playlists VALUES(NULL, ?)", (title,))
         self.connection.commit()
 
         return cur.lastrowid
 
-    def delete( self, id ):
+    def delete(self, id):
 
         cursor = self.connection.cursor()
         cursor.execute("DELETE FROM playlist WHERE playlist = ?", (id,))
         cursor.execute("DELETE FROM playlists WHERE id = ?", (id,))
         self.connection.commit()
 
-    def getPlaylists( self ):
+    def getPlaylists(self):
         cursor = self.connection.cursor()
         cursor.execute("SELECT * FROM playlists")
 
         return cursor.fetchall()
 
-    def getSongs( self, id ):
+    def getSongs(self, id):
         cursor = self.connection.cursor()
         cursor.execute(
             """
@@ -117,20 +117,20 @@ class PlaylistsModel:
 
         return cursor.fetchall()
 
-    def getSongsLink( self, id ):
+    def getSongsLink(self, id):
         cursor = self.connection.cursor()
         cursor.execute("SELECT * FROM playlist WHERE playlist = ?", (id,))
 
         return cursor.fetchall()
 
-    def addSong( self, playlist, song ):
+    def addSong(self, playlist, song):
         cur = self.connection.cursor()
         cur.execute("""INSERT INTO playlist
                     VALUES(NULL, ?, (SELECT max(sort) FROM playlist WHERE playlist = ?) + 1, ?, 0)""",
                     (playlist, playlist, song))
         self.connection.commit()
 
-    def deleteSong( self, playlist, song, pid = None ):
+    def deleteSong(self, playlist, song, pid=None):
         cursor = self.connection.cursor()
 
         if pid is None:
@@ -140,18 +140,19 @@ class PlaylistsModel:
 
         self.connection.commit()
 
-    def collapseSong( self, playlist, song, collapsed ):
+    def collapseSong(self, playlist, song, collapsed):
         cur = self.connection.cursor()
         cur.execute("UPDATE playlist SET collapsed=? WHERE playlist = ? AND id = ?", (int(collapsed), playlist, song))
         self.connection.commit()
 
-    def sortSongs( self, playlist, item, index ):
+    def sortSongs(self, playlist, item, index):
         cur = self.connection.cursor()
         cur.execute("UPDATE playlist SET sort=? WHERE id = ?", (index, item))
         self.connection.commit()
 
-    def close( self ):
+    def close(self):
         self.connection.commit()
         self.connection.close()
+
 
 Playlist = PlaylistsModel()

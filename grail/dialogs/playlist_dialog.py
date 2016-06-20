@@ -157,11 +157,18 @@ class PlaylistDialog(BalloonDialog):
     def _list_remove_clicked(self, action):
 
         current = action.getPlaylist()['id']
-        Playlist.delete(current)
-        playlists = Playlist.getPlaylists()
+        selected = self.ui_list.item(self.ui_list.currentRow(), 0)
+        selected_id = selected.getPlaylist()['id']
+        playlist_id = selected_id
 
-        self.selected.emit(playlists[0]['id'])
+        if current == selected_id:
+            playlists = Playlist.getPlaylists()
+            playlist_id = playlists[0]['id']
+
+        Playlist.delete(current)
+
         self.update_list()
+        self.selected.emit(playlist_id)
 
     def _list_item_clicked(self, item):
 

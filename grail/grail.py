@@ -556,6 +556,7 @@ class Grail(QMainWindow):
         self.updateLabels()
 
     def updateLabels(self):
+
         qr = self.ui_songs_bar_label.geometry()
         sr = self.ui_songs_panel.rect()
         cp = sr.center()
@@ -627,11 +628,19 @@ class Grail(QMainWindow):
         self.ui_menu_output.addAction(self.ui_showTestCardAction)
         self.ui_menu_output.addAction(self.ui_outputPreferencesAction)
 
-    def updateSearch(self, items=None):
+    def updateSearch(self, items=None, keyword=""):
 
         self.ui_songs_list.clear()
 
-        if not items:
+        if not items and keyword:
+            songs = Song.getList()
+
+            for item in songs:
+                listitem = SearchListItem()
+                listitem.setSong(item)
+
+                self.ui_songs_list.addItem(listitem)
+        elif not items:
             items = History.getLast(35)
 
             for item in items:
@@ -939,7 +948,7 @@ class Grail(QMainWindow):
                 except:
                     pass
 
-            self.updateSearch(items)
+            self.updateSearch(items, keyword)
         else:
             self.updateSearch()
 
@@ -1260,12 +1269,10 @@ class Grail(QMainWindow):
 
     def playlistSelectedAction(self, id):
 
-        self.playlist = Playlist.get(id)
-        self.updatePlaylist()
-
         Settings.set('playlist', id)
 
-        self.updateLabels()
+        self.playlist = Playlist.get(id)
+        self.updatePlaylist()
 
     def previousPageAction(self):
 

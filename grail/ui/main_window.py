@@ -6,11 +6,14 @@
     Main window of Grail application
 """
 
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QIcon
+from PyQt5.QtCore import Qt, QUrl
+from PyQt5.QtGui import QIcon, QDesktopServices
 from PyQt5.QtWidgets import QMainWindow, QMenuBar, QAction, QDesktopWidget
 
 from grailkit.util import *
+from grailkit.ui import GAboutDialog
+
+import grail
 
 
 class MainWindow(QMainWindow):
@@ -21,14 +24,37 @@ class MainWindow(QMainWindow):
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
 
-        self._ui()
+        self.project = None
 
-    def _ui(self):
+        self.__ui__()
+
+    def __ui__(self):
         """
         Initialize UI
         """
 
-        # setup menu
+        # about dialog
+        self.about_dialog = GAboutDialog(None, "Grail %s" % (grail.__version__,),
+                                         "Copyright © 2014-2016 Grail Team.\nAll rights reserved.",
+                                         QIcon(':/icons/256.png'))
+        self.about_dialog.url_report = "http://grailapp.com/"
+        self.about_dialog.url_help = "http://grailapp.com/help"
+
+        # setup window
+        self._ui_menubar()
+
+        self.setWindowIcon(QIcon(':/icons/256.png'))
+        self.setGeometry(300, 300, 800, 480)
+        self.setMinimumSize(320, 240)
+        self.setWindowTitle("Grail")
+        self.center()
+        self.show()
+
+    def _ui_menubar(self):
+        """
+        Setup menu
+        """
+
         self.ui_menubar = QMenuBar(self)
 
         # File
@@ -41,6 +67,7 @@ class MainWindow(QMainWindow):
         self.ui_save_as_action = QAction('Save project as', self)
 
         self.ui_quit_action = QAction('Quit', self)
+        self.ui_quit_action.triggered.connect(self.close)
 
         # Edit
         self.ui_cut_action = QAction('Cut', self)
@@ -53,6 +80,7 @@ class MainWindow(QMainWindow):
 
         # Controls
         self.ui_go_action = QAction('Go', self)
+        self.ui_go_to_action = QAction('Go to Cue', self)
         self.ui_blackout_action = QAction('Blackout', self)
         self.ui_next_cue_action = QAction('Next cue', self)
         self.ui_previous_cue_action = QAction('Previous cue', self)
@@ -67,9 +95,16 @@ class MainWindow(QMainWindow):
 
         # Help
         self.ui_about_action = QAction('About Grail', self)
+        self.ui_about_action.triggered.connect(self.about_action)
+
         self.ui_updates_action = QAction('Check for updates', self)
+        self.ui_updates_action.triggered.connect(self.update_action)
+
         self.ui_open_web_action = QAction('Visit grailapp.com', self)
+        self.ui_open_web_action.triggered.connect(self.open_web_action)
+
         self.ui_open_manual_action = QAction('View manual', self)
+        self.ui_open_manual_action.triggered.connect(self.open_manual_action)
 
         # Output
         self.ui_disable_output_action = QAction('Disabled', self)
@@ -102,6 +137,7 @@ class MainWindow(QMainWindow):
         # Controls menu
         self.ui_menu_controls = self.ui_menubar.addMenu('&Controls')
         self.ui_menu_controls.addAction(self.ui_go_action)
+        self.ui_menu_controls.addAction(self.ui_go_to_action)
         self.ui_menu_controls.addAction(self.ui_blackout_action)
         self.ui_menu_controls.addSeparator()
         self.ui_menu_controls.addAction(self.ui_previous_cue_action)
@@ -137,20 +173,14 @@ class MainWindow(QMainWindow):
         self.ui_menu_help.addAction(self.ui_open_web_action)
         self.ui_menu_help.addSeparator()
         self.ui_menu_help.addAction(self.ui_updates_action)
-        self.ui_menu_help.addSeparator()
+
+        if not OS_MAC:
+            self.ui_menu_help.addSeparator()
+
         self.ui_menu_help.addAction(self.ui_about_action)
 
         if not OS_MAC:
             self.setMenuBar(self.ui_menubar)
-
-        # setup window
-        self.setWindowIcon(QIcon(':/icons/256.png'))
-
-        self.setGeometry(300, 300, 800, 480)
-        self.setMinimumSize(320, 240)
-        self.setWindowTitle("Grail")
-        self.center()
-        self.show()
 
     def center(self):
         """Move window to the center of current screen"""
@@ -160,3 +190,44 @@ class MainWindow(QMainWindow):
         qr.moveCenter(cp)
 
         self.move(qr.topLeft())
+
+    def new_project(self):
+        pass
+
+    def open_project(self):
+        pass
+
+    def save_project(self):
+        pass
+
+    def save_project_as(self):
+        pass
+
+    def about_action(self):
+        """About dialog action"""
+
+        self.about_dialog.show()
+        self.about_dialog.raise_()
+        self.about_dialog.setWindowState(self.about_dialog.windowState() & ~Qt.WindowMinimized | Qt.WindowActive)
+        self.about_dialog.activateWindow()
+
+    def update_action(self):
+        """Check for updates action"""
+
+        # to-do: add a dialog to check for updates
+        pass
+
+    def open_web_action(self):
+        """Open a grailapp.com in a browser"""
+
+        url = QUrl("http://grailapp.com/")
+        QDesktopServices.openUrl(url)
+
+    def open_manual_action(self):
+        """Open a manual in new window"""
+
+        url = QUrl("http://grailapp.com/help")
+        QDesktopServices.openUrl(url)
+
+    def closeEvent(self, event):
+        pass

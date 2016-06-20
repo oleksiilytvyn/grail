@@ -33,7 +33,7 @@ try:
     import hgapi
 
     repo = hgapi.Repo(os.path.abspath(os.curdir))
-    version = "%s.dev%d" % (version, repo['tip'].rev)
+    version = "%sb%d" % (version, repo['tip'].rev)
 except ImportError:
     print("Failed to get revision number. Install hgapi python library")
 
@@ -114,8 +114,7 @@ setup(
         "build_exe": {
             "includes": includes,
             "include_files": includefiles,
-            # To-Do: test msvcr dll
-            # "include_msvcr": True,
+            "include_msvcr": True,
             "excludes": excludes,
             "silent": True
             },
@@ -123,7 +122,7 @@ setup(
             "upgrade_code": "{1f82a4c1-681d-43c3-b1b6-d63788c147a0}"
             },
         "bdist_mac": {
-            "bundle_name": application_title,
+            "bundle_name": "%s-%s" % (application_title, version),
             "custom_info_plist": "resources/bdist/Info.plist",
             "iconfile": "icon/grail.icns"
             },

@@ -140,7 +140,7 @@ setup(
             "upgrade_code": "{1f82a4c1-681d-43c3-b1b6-d63788c147a0}"
             },
         "bdist_mac": {
-            "bundle_name": application_title,
+            "bundle_name": "%s-%s" % (application_title, version),
             "custom_info_plist": "resources/bdist/Info.plist",
             "iconfile": "icon/grail.icns"
             },

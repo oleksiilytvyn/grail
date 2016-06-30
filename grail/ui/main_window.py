@@ -6,9 +6,11 @@
     Main window of Grail application
 """
 
-from PyQt5.QtCore import Qt, QUrl
-from PyQt5.QtGui import QIcon, QDesktopServices
-from PyQt5.QtWidgets import QMainWindow, QMenuBar, QAction, QDesktopWidget
+import os
+
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
 
 from grailkit.util import *
 from grailkit.ui import GAboutDialog
@@ -21,10 +23,10 @@ class MainWindow(QMainWindow):
     Grail application class
     """
 
-    def __init__(self, parent=None):
-        super(MainWindow, self).__init__(parent)
+    def __init__(self, app=None):
+        super(MainWindow, self).__init__()
 
-        self.project = None
+        self.app = app
 
         self.__ui__()
 
@@ -40,9 +42,25 @@ class MainWindow(QMainWindow):
         self.about_dialog.url_report = "http://grailapp.com/"
         self.about_dialog.url_help = "http://grailapp.com/help"
 
-        # setup window
         self._ui_menubar()
 
+        self.ui_library = QWidget()
+        self.ui_cuelist = QWidget()
+        self.ui_properties = QWidget()
+
+        # splitter
+        self.ui_spliter = QSplitter()
+        self.ui_spliter.setObjectName("spliter")
+
+        self.ui_spliter.addWidget(self.ui_library)
+        self.ui_spliter.addWidget(self.ui_cuelist)
+        self.ui_spliter.addWidget(self.ui_properties)
+
+        self.ui_spliter.setCollapsible(0, False)
+        self.ui_spliter.setCollapsible(2, False)
+        self.ui_spliter.setHandleWidth(1)
+
+        self.setCentralWidget(self.ui_spliter)
         self.setWindowIcon(QIcon(':/icons/256.png'))
         self.setGeometry(300, 300, 800, 480)
         self.setMinimumSize(320, 240)
@@ -59,12 +77,18 @@ class MainWindow(QMainWindow):
 
         # File
         self.ui_import_action = QAction('Import...', self)
+        self.ui_import_action.triggered.connect(self.import_action)
         self.ui_export_action = QAction('Export...', self)
+        self.ui_export_action.triggered.connect(self.export_action)
 
         self.ui_new_action = QAction('New project', self)
+        self.ui_new_action.triggered.connect(self.new_project)
         self.ui_open_action = QAction('Open project', self)
+        self.ui_open_action.triggered.connect(self.open_project)
         self.ui_save_action = QAction('Save project', self)
+        self.ui_save_action.triggered.connect(self.save_project)
         self.ui_save_as_action = QAction('Save project as', self)
+        self.ui_save_as_action.triggered.connect(self.save_project_as)
 
         self.ui_quit_action = QAction('Quit', self)
         self.ui_quit_action.triggered.connect(self.close)
@@ -192,16 +216,44 @@ class MainWindow(QMainWindow):
         self.move(qr.topLeft())
 
     def new_project(self):
-        pass
+        """Create a new project"""
+
+        project_name = "untitled"
+        path, ext = QFileDialog.getSaveFileName(self, "New project", project_name, "*.grail")
 
     def open_project(self):
-        pass
+        """Open an existing file"""
+
+        path, ext = QFileDialog.getOpenFileName(self, "Open File...", "", "*.grail")
+
+        if not os.path.isfile(path):
+            return
 
     def save_project(self):
-        pass
+        """Save current project"""
+
+        project_name = "untitled"
+        path, ext = QFileDialog.getSaveFileName(self, "Save project", project_name, "*.grail")
 
     def save_project_as(self):
-        pass
+        """Save current project as another project"""
+
+        project_name = "untitled"
+        path, ext = QFileDialog.getSaveFileName(self, "Save project as", project_name, "*.grail")
+
+    def import_action(self):
+        """Import data into Grail library or current project"""
+
+        path, ext = QFileDialog.getOpenFileName(self, "Import...", "", "*")
+
+        if not os.path.isfile(path):
+            return
+
+    def export_action(self):
+        """Export library or project"""
+
+        project_name = "untitled"
+        path, ext = QFileDialog.getSaveFileName(self, "Export...", project_name, "*.grail")
 
     def about_action(self):
         """About dialog action"""

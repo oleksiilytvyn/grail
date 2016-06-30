@@ -330,6 +330,10 @@ class Grail(QMainWindow):
         addSongAction.setIconVisibleInMenu(True)
         addSongAction.triggered.connect(self.addSongAction)
 
+        showAllSongsAction = QAction(QIcon(':/icons/songs.png'), 'All songs', self)
+        showAllSongsAction.setIconVisibleInMenu(True)
+        showAllSongsAction.triggered.connect(self.showAllSongsAction)
+
         switchViewAction = QAction(QIcon(':/icons/media.png'), 'Media', self)
         switchViewAction.setIconVisibleInMenu(True)
         switchViewAction.triggered.connect(self.toggleLeftView)
@@ -342,6 +346,7 @@ class Grail(QMainWindow):
         self.ui_songs_toolbar.setIconSize(QSize(16, 16))
         self.ui_songs_toolbar.addAction(addSongAction)
         self.ui_songs_toolbar.addWidget(spacer)
+        self.ui_songs_toolbar.addAction(showAllSongsAction)
         self.ui_songs_toolbar.addAction(switchViewAction)
 
         self.ui_songs_bar.addWidget(self.ui_songs_search)
@@ -529,6 +534,10 @@ class Grail(QMainWindow):
 
         self.move(qr.topLeft())
 
+    def showAllSongsAction(self):
+
+        self.updateSearch(None, "`")
+
     def toggleLeftView(self):
 
         index = self.ui_left_sidebar.currentIndex()
@@ -678,8 +687,8 @@ class Grail(QMainWindow):
                     songItem.addChild(pageItem)
 
                 self.ui_playlist_tree.addTopLevelItem(songItem)
-
         self.updateLabels()
+        self.ui_playlist_bar.update()
 
     # Actions
 

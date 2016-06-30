@@ -29,6 +29,7 @@
 		<file alias="icons/edit.png">icons/edit.png</file>
 		<file alias="icons/media.png">icons/media.png</file>
 		<file alias="icons/library.png">icons/library.png</file>
+		<file alias="icons/songs.png">icons/songs.png</file>
 		<file alias="icons/stop.png">icons/stop.png</file>
 		<file alias="icons/save.png">icons/save.png</file>
 		<file alias="icons/play.png">icons/play.png</file>

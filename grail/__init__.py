@@ -38,10 +38,7 @@ class Application(QApplication):
         super(Application, self).__init__(argv)
 
         self.shared_memory = None
-
-        # prevent from running more than one instance
-        if self.isAlreadyRunning():
-            self.quit()
+        self.lastWindowClosed.connect(self.quit)
 
         try:
             self.setAttribute(Qt.AA_UseHighDpiPixmaps)
@@ -54,6 +51,10 @@ class Application(QApplication):
                 self.setStyle(QStyleFactory.create("gtk"))
 
         self.setStyleSheet(get_stylesheet())
+
+        # prevent from running more than one instance
+        if self.isAlreadyRunning():
+            self.quit()
 
     def isAlreadyRunning(self):
         """Check for another instances of Grail
@@ -90,6 +91,7 @@ class Application(QApplication):
 
         self.shared_memory.detach()
         super(Application, self).quit()
+        sys.exit()
 
 old_excepthook = sys.excepthook
 

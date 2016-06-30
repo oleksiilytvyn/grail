@@ -21,7 +21,7 @@
 import math
 
 from grail.utils import *
-from grail.data import Settings, DisplayPreferences, DisplayMode
+from grail.data import DisplayPreferences, DisplayMode
 from grail.dialogs.display_preferences_dialog import DisplayPreferencesDialog
 
 from PyQt5.QtCore import *
@@ -62,9 +62,9 @@ class DisplayDialog(QDialog):
         desktop.screenCountChanged.connect(self.screensChanged)
         desktop.workAreaResized.connect(self.screensChanged)
 
-        self.initUI()
+        self.__ui__()
 
-    def initUI(self):
+    def __ui__(self):
 
         self.ui_preferences_action = QAction("Preferences", self)
         self.ui_preferences_action.triggered.connect(self.preferencesAction)
@@ -95,12 +95,13 @@ class DisplayDialog(QDialog):
 
     def preferencesUpdatedEvent(self):
 
-        if not self.oldTestCard is self.preferences.test:
+        if self.oldTestCard is not self.preferences.test:
             self.testCardChanged.emit(self.preferences.test)
 
         self.update()
 
     def paintEvent(self, event):
+        """Paint a display"""
 
         prefs = self.preferences
         comp = prefs.composition
@@ -239,7 +240,6 @@ class DisplayDialog(QDialog):
         delta = QPoint(event.globalPos() - self.mousePosition)
 
         self.move(self.x() + delta.x(), self.y() + delta.y())
-
         self.mousePosition = event.globalPos()
 
     def closeEvent(self, event):
@@ -258,6 +258,7 @@ class DisplayDialog(QDialog):
             self.preferences_dialog.close()
 
     def updateTestCard(self):
+        """Update test card image"""
 
         comp = self.preferences.composition
         image = QPixmap(comp.width(), comp.height())
@@ -294,7 +295,7 @@ class DisplayDialog(QDialog):
         radius = min(comp.height(), comp.width()) / 2
         circles = math.ceil((comp.width() / radius) / 2) + 1
 
-        for index in range(-circles, circles):
+        for index in range(-circles, circles + 1):
             ox = index * (radius * 1.25)
 
             painter.drawEllipse(QPoint(comp.width() / 2 + ox, comp.height() / 2), radius, radius)
@@ -423,8 +424,7 @@ class DisplayDialog(QDialog):
         return self.preferences_dialog
 
     def setMode(self, mode):
-
-        """ Set mode """
+        """Set mode """
 
         if mode.fullscreen:
             self.setOutput(mode.display)
@@ -434,14 +434,12 @@ class DisplayDialog(QDialog):
         self.preferences_dialog.updateOutputMenu()
 
     def getMode(self):
-
-        """ Returns current mode """
+        """Returns current mode """
 
         return self.preferences.getMode()
 
     def getGeometryModes(self):
-
-        """ Returns list of available display modes """
+        """Returns list of available display modes """
 
         modes = []
         disabled = DisplayMode("Disabled", QRect(0, 0, 800, 600), disabled=True)

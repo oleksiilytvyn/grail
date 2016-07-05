@@ -16,6 +16,7 @@ from grailkit.util import *
 from grailkit.ui import GAboutDialog
 
 import grail
+from grail.ui import NodeEditor, PropertyEditor, LibraryEditor, PreferencesDialog
 
 
 class MainWindow(QMainWindow):
@@ -27,6 +28,7 @@ class MainWindow(QMainWindow):
         super(MainWindow, self).__init__()
 
         self.app = app
+        self.project = self.app.project
 
         self.__ui__()
 
@@ -42,29 +44,32 @@ class MainWindow(QMainWindow):
         self.about_dialog.url_report = "http://grailapp.com/"
         self.about_dialog.url_help = "http://grailapp.com/help"
 
+        self.preferences_dialog = PreferencesDialog()
+
         self._ui_menubar()
 
-        self.ui_library = QWidget()
-        self.ui_cuelist = QWidget()
-        self.ui_properties = QWidget()
+        self.ui_library = LibraryEditor(self.app)
+        self.ui_cuelist = NodeEditor(self.app)
+        self.ui_properties = PropertyEditor(self.app)
+
+        self.ui_cuelist.nodeSelected.connect(self.ui_properties.node)
 
         # splitter
-        self.ui_spliter = QSplitter()
-        self.ui_spliter.setObjectName("spliter")
+        self._ui_splitter = QSplitter()
+        self._ui_splitter.setObjectName("main_splitter")
+        self._ui_splitter.addWidget(self.ui_library)
+        self._ui_splitter.addWidget(self.ui_cuelist)
+        self._ui_splitter.addWidget(self.ui_properties)
 
-        self.ui_spliter.addWidget(self.ui_library)
-        self.ui_spliter.addWidget(self.ui_cuelist)
-        self.ui_spliter.addWidget(self.ui_properties)
+        self._ui_splitter.setCollapsible(0, False)
+        self._ui_splitter.setCollapsible(2, False)
+        self._ui_splitter.setHandleWidth(1)
 
-        self.ui_spliter.setCollapsible(0, False)
-        self.ui_spliter.setCollapsible(2, False)
-        self.ui_spliter.setHandleWidth(1)
-
-        self.setCentralWidget(self.ui_spliter)
-        self.setWindowIcon(QIcon(':/icons/256.png'))
+        self.setCentralWidget(self._ui_splitter)
+        self.setWindowIcon(QIcon(':/icon/256.png'))
         self.setGeometry(300, 300, 800, 480)
         self.setMinimumSize(320, 240)
-        self.setWindowTitle("Grail")
+        self.setWindowTitle("%s - Grail" % (self.app.project.name,))
         self.center()
         self.show()
 
@@ -116,6 +121,7 @@ class MainWindow(QMainWindow):
         self.ui_edit_key_action = QAction('Edit Key map', self)
         self.ui_lock_action = QAction('Lock', self)
         self.ui_preferences_action = QAction('Preferences', self)
+        self.ui_preferences_action.triggered.connect(self.preferences_action)
 
         # Help
         self.ui_about_action = QAction('About Grail', self)
@@ -221,39 +227,44 @@ class MainWindow(QMainWindow):
         project_name = "untitled"
         path, ext = QFileDialog.getSaveFileName(self, "New project", project_name, "*.grail")
 
+        if path:
+            self.app.open(path, create=True)
+
     def open_project(self):
         """Open an existing file"""
 
         path, ext = QFileDialog.getOpenFileName(self, "Open File...", "", "*.grail")
 
-        if not os.path.isfile(path):
-            return
+        if path:
+            self.app.open(path, create=False)
 
     def save_project(self):
         """Save current project"""
 
-        project_name = "untitled"
-        path, ext = QFileDialog.getSaveFileName(self, "Save project", project_name, "*.grail")
+        self.project.save()
 
     def save_project_as(self):
         """Save current project as another project"""
 
-        project_name = "untitled"
+        project_name = "%s copy" % (self.project.name, )
         path, ext = QFileDialog.getSaveFileName(self, "Save project as", project_name, "*.grail")
+
+        self.project.save_copy(path)
 
     def import_action(self):
         """Import data into Grail library or current project"""
 
         path, ext = QFileDialog.getOpenFileName(self, "Import...", "", "*")
 
-        if not os.path.isfile(path):
-            return
+        # to-do: implement this
 
     def export_action(self):
         """Export library or project"""
 
         project_name = "untitled"
         path, ext = QFileDialog.getSaveFileName(self, "Export...", project_name, "*.grail")
+
+        # to-do: implement this
 
     def about_action(self):
         """About dialog action"""
@@ -280,6 +291,14 @@ class MainWindow(QMainWindow):
 
         url = QUrl("http://grailapp.com/help")
         QDesktopServices.openUrl(url)
+
+    def preferences_action(self):
+        """Open a preferences dialog"""
+
+        self.preferences_dialog.show()
+        self.preferences_dialog.raise_()
+        self.preferences_dialog.setWindowState(self.preferences_dialog.windowState() & ~Qt.WindowMinimized | Qt.WindowActive)
+        self.preferences_dialog.activateWindow()
 
     def closeEvent(self, event):
         pass

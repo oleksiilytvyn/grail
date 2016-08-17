@@ -21,9 +21,6 @@
 # Setup Script
 # Run the build process by running the command 'python setup.py build'
 
-application_title = "Grail"
-main_python_file = "grail.py"
-
 import os
 import sys
 import grail
@@ -32,6 +29,9 @@ import platform
 from cx_Freeze import setup, Executable
 
 # constants
+application_title = "Grail"
+main_python_file = "grail.py"
+
 PLATFORM_WIN = platform.system() == "Windows"
 PLATFORM_MAC = platform.system() == "Darwin"
 PLATFORM_UNIX = platform.system() == "Linux"
@@ -44,7 +44,7 @@ try:
     import hgapi
 
     repo = hgapi.Repo(os.path.abspath(os.curdir))
-    version = "%s.dev%d" % (version, repo['tip'].rev)
+    version = "%sb%d" % (version, repo['tip'].rev)
 except ImportError:
     print("Failed to get revision number. Install hgapi python library")
 
@@ -102,6 +102,8 @@ setup(
     long_description="",
     keywords='open source osc church lyrics projection song bible display',
     license='GNU General Public License v3',
+
+    requires=['cx_Freeze', 'PyQt5', 'hgapi'],
 
     classifiers=[
         'Development Status :: 4 - Beta',

@@ -11,7 +11,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
 from grailkit.ui import GDialog, GWidget, GListWidget, GListItem
-from grailkit.bible import BibleHost
+from grailkit.bible import BibleHost, BibleHostError
 
 
 class PreferencesDialog(GDialog):
@@ -164,6 +164,7 @@ class BiblePanel(Panel):
         self._ui_primary_action.triggered.connect(self.primary_action)
 
         self._ui_toolbar = QToolBar()
+        self._ui_toolbar.setObjectName("bible_toolbar")
         self._ui_toolbar.setIconSize(QSize(16, 16))
         self._ui_toolbar.addAction(self._ui_install_action)
         self._ui_toolbar.addWidget(self._ui_toolbar_label)
@@ -175,10 +176,21 @@ class BiblePanel(Panel):
         self.setLayout(self._ui_layout)
 
     def install_action(self):
-        pass
+        """Install new bible"""
+
+        path, ext = QFileDialog.getOpenFileName(self, "Open File...", "", "*.grail-bible")
+
+        try:
+            BibleHost.install(path)
+        except BibleHostError as msg:
+            print(msg)
+
+        self._update_list()
 
     def primary_action(self):
-        pass
+        """Make installed bible primary in grail"""
+
+        self._update_list()
 
     def _update_list(self):
         """Update list of installed bibles"""
@@ -191,7 +203,7 @@ class BiblePanel(Panel):
         for bible in bibles:
 
             item = GListItem()
-            item.setText(bible['name'])
+            item.setText(bible)
 
             self._ui_list.addItem(item)
 
@@ -243,6 +255,7 @@ class OSCOutPanel(Panel):
         self._ui_add_action.triggered.connect(self.add_action)
 
         self._ui_toolbar = QToolBar()
+        self._ui_toolbar.setObjectName("bible_toolbar")
         self._ui_toolbar.setIconSize(QSize(16, 16))
         self._ui_toolbar.addWidget(self._ui_toolbar_label)
         self._ui_toolbar.addAction(self._ui_add_action)

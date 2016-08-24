@@ -33,8 +33,12 @@ class WelcomeDialog(GDialog):
         open_action = GWelcomeAction("Open", "Open project", std_icon(QStyle.SP_DirIcon))
         open_action.clicked.connect(self._open)
 
-        continue_action = GWelcomeAction("Continue", "Open last project", QIcon(':/icon/256.png'))
-        continue_action.clicked.connect(self._continue)
+        last_project = self.app.settings.get('last-project', default="")
+        last_project_continue = last_project and os.path.isfile(last_project)
+
+        if last_project_continue:
+            continue_action = GWelcomeAction("Continue", os.path.split(last_project)[1], QIcon(':/icon/256.png'))
+            continue_action.clicked.connect(self._continue)
 
         widget = GWelcomeWidget()
         widget.setTitle("Welcome to Grail")
@@ -44,7 +48,9 @@ class WelcomeDialog(GDialog):
 
         widget.addWidget(create_action)
         widget.addWidget(open_action)
-        widget.addWidget(continue_action)
+
+        if last_project_continue:
+            widget.addWidget(continue_action)
 
         layout = QHBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
@@ -78,5 +84,7 @@ class WelcomeDialog(GDialog):
     def _continue(self):
         """Open a last project"""
 
-        # To-do: implement this functionality
-        pass
+        path = self.app.settings.get('last-project')
+
+        if os.path.isfile(path):
+            self.app.open(path, create=False)

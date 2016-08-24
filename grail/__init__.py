@@ -15,6 +15,11 @@ from grail.application import Grail
 
 __version__ = '1.0.0'
 
+APPLICATION_NAME = "Grail"
+APPLICATION_WEB = "http://grailapp.com/"
+ORGANISATION_NAME = "Grail"
+ORGANISATION_DOMAIN = "grailapp.com"
+
 
 def main():
     os.chdir(util.path_app())

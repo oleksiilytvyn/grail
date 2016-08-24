@@ -28,11 +28,16 @@ class NodeEditor(GWidget):
     def __ui__(self):
 
         self._ui_list = GListWidget()
-        self._ui_list.itemClicked.connect(self._node_selected_event)
+        self._ui_list.itemClicked.connect(self._node_clicked_event)
+        self._ui_list.itemSelectionChanged.connect(self._node_selected_event)
 
-        self._ui_add_action = QAction(QIcon(':/icon/32.png'), 'Add', self)
+        self._ui_add_action = QAction(QIcon(':/icons/add.png'), 'Add node', self)
         self._ui_add_action.setIconVisibleInMenu(True)
         self._ui_add_action.triggered.connect(self.add_action)
+
+        self._ui_remove_action = QAction(QIcon(':/icons/remove-white.png'), 'Remove node', self)
+        self._ui_remove_action.setIconVisibleInMenu(True)
+        self._ui_remove_action.triggered.connect(self.remove_action)
 
         spacer = QWidget()
         spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -42,6 +47,7 @@ class NodeEditor(GWidget):
         self._ui_toolbar.setIconSize(QSize(16, 16))
         self._ui_toolbar.addAction(self._ui_add_action)
         self._ui_toolbar.addWidget(spacer)
+        self._ui_toolbar.addAction(self._ui_remove_action)
 
         self._ui_layout = QVBoxLayout()
         self._ui_layout.setContentsMargins(0, 0, 0, 0)
@@ -62,9 +68,35 @@ class NodeEditor(GWidget):
 
             self._ui_list.addItem(item)
 
-    def _node_selected_event(self, item):
+    def _node_clicked_event(self, item):
 
         self.nodeSelected.emit(item.id)
 
+    def _node_selected_event(self):
+
+        items = self._ui_list.selectedItems()
+
+        if len(items) > 0:
+            self.nodeSelected.emit(items[0].id)
+
+    def update_list(self):
+
+        self._update()
+
     def add_action(self):
-        pass
+
+        self.app.project.create("Untitled item")
+        self.update_list()
+        self._ui_list.setCurrentRow(self._ui_list.count() - 1)
+        self.nodeSelected.emit(self._ui_list.item(self._ui_list.count() - 1).id)
+
+    def remove_action(self):
+
+        item = self._ui_list.currentItem()
+
+        if item:
+            self.app.project.remove(item.id)
+
+        self.update_list()
+        self._ui_list.setCurrentRow(0)
+        self.nodeSelected.emit(self._ui_list.item(0).id)

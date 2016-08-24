@@ -51,6 +51,7 @@ class MainWindow(QMainWindow):
         self.ui_library = LibraryEditor(self.app)
         self.ui_cuelist = NodeEditor(self.app)
         self.ui_properties = PropertyEditor(self.app)
+        self.ui_properties.changed.connect(self.ui_cuelist.update_list)
 
         self.ui_cuelist.nodeSelected.connect(self.ui_properties.node)
 
@@ -301,4 +302,6 @@ class MainWindow(QMainWindow):
         self.preferences_dialog.activateWindow()
 
     def closeEvent(self, event):
-        pass
+        """Save project"""
+
+        self.app.project.close()

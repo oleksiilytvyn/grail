@@ -6,6 +6,10 @@
         <file alias="icon/128.png">../icon/128.png</file>
         <file alias="icon/256.png">../icon/256.png</file>
 
+        <file alias="icons/add.png">icons/add.png</file>
+        <file alias="icons/save.png">icons/save.png</file>
+        <file alias="icons/remove-white.png">icons/remove-white.png</file>
+
         <file alias="stylesheet/grail.css">stylesheet/grail.css</file>
     </qresource>
 </RCC>

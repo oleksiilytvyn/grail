@@ -16,10 +16,15 @@ from grailkit.ui import GWidget, GListWidget, GListItem
 class PropertyEditor(GWidget):
     """Simple property editor"""
 
+    changed = pyqtSignal()
+
     def __init__(self, app):
         super(PropertyEditor, self).__init__()
 
         self.app = app
+        self.current_entity = None
+        self.current_property = None
+        self._updating_list = True
 
         self.__ui__()
 
@@ -29,13 +34,15 @@ class PropertyEditor(GWidget):
         self._ui_properties = QTableWidget()
         self._ui_properties.setShowGrid(False)
         self._ui_properties.setColumnCount(2)
-        self._ui_properties.horizontalHeader().setVisible(False)
+        self._ui_properties.horizontalHeader().setVisible(True)
         self._ui_properties.horizontalHeader().setStretchLastSection(True)
         self._ui_properties.setAlternatingRowColors(True)
         self._ui_properties.verticalHeader().setVisible(False)
         self._ui_properties.setHorizontalHeaderLabels(["Key", "Value"])
         self._ui_properties.setSelectionBehavior(QAbstractItemView.SelectRows)
         self._ui_properties.setSelectionMode(QAbstractItemView.SingleSelection)
+        self._ui_properties.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)
+        self._ui_properties.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
         self._ui_properties.setStyleSheet("""
             QTableWidget {
                 border: none;
@@ -64,15 +71,22 @@ class PropertyEditor(GWidget):
                     border-bottom: 1px solid #8a9fbb;
                     color: #e6e6e6;
                     }""")
+        self._ui_properties.itemChanged.connect(self._item_changed)
+        self._ui_properties.itemClicked.connect(self._item_clicked)
 
-        self._ui_add_action = QAction(QIcon(':/icon/32.png'), 'Add', self)
+        self._ui_add_action = QAction(QIcon(':/icons/add.png'), 'Add property', self)
         self._ui_add_action.setIconVisibleInMenu(True)
         self._ui_add_action.triggered.connect(self.add_action)
+
+        self._ui_remove_action = QAction(QIcon(':/icons/remove-white.png'), 'Remove property', self)
+        self._ui_remove_action.setIconVisibleInMenu(True)
+        self._ui_remove_action.triggered.connect(self.remove_action)
 
         self._ui_toolbar = QToolBar()
         self._ui_toolbar.setObjectName("library_toolbar")
         self._ui_toolbar.setIconSize(QSize(16, 16))
         self._ui_toolbar.addAction(self._ui_add_action)
+        self._ui_toolbar.addAction(self._ui_remove_action)
 
         self._ui_layout = QVBoxLayout()
         self._ui_layout.setContentsMargins(0, 0, 0, 0)
@@ -85,6 +99,9 @@ class PropertyEditor(GWidget):
 
     def node(self, entity_id):
         """Show a node properties"""
+
+        self._updating_list = True
+        self.current_entity = entity_id
 
         props = self.app.project.properties(entity_id)
 
@@ -100,20 +117,85 @@ class PropertyEditor(GWidget):
                         '@index': entity.index
                         }
 
+        for key in props:
+            entity_props[key] = props[key]
+
         self._ui_properties.clearContents()
-        self._ui_properties.setRowCount(len(props) + len(entity_props))
+        self._ui_properties.setRowCount(len(entity_props))
 
         index = 0
 
         for key in entity_props:
-            self._ui_properties.setItem(index, 0, QTableWidgetItem(key))
-            self._ui_properties.setItem(index, 1, QTableWidgetItem(str(entity_props[key])))
+            item_key = QTableWidgetItem(key)
+            item_key.entity_id = entity_id
+            item_key.entity_key = key
+
+            item_value = QTableWidgetItem(str(entity_props[key]))
+            item_value.entity_id = entity_id
+            item_value.entity_key = key
+
+            self._ui_properties.setItem(index, 0, item_key)
+            self._ui_properties.setItem(index, 1, item_value)
+
             index += 1
 
-        for key in props:
-            self._ui_properties.setItem(index, 0, QTableWidgetItem(key))
-            self._ui_properties.setItem(index, 1, QTableWidgetItem(str(props[key])))
-            index += 1
+        self._updating_list = False
 
     def add_action(self):
-        pass
+        """Add a new property"""
+
+        self.app.project.set(self.current_entity, str(self.current_property) + '%', "")
+
+    def remove_action(self):
+        """Remove a selected property"""
+
+        self.app.project.unset(self.current_entity, self.current_property)
+        self.node(self.current_entity)
+
+    def _item_clicked(self, item):
+
+        self.current_property = item.entity_key
+
+    def _item_changed(self, item):
+
+        if self._updating_list:
+            return
+
+        dna = self.app.project
+        std_props = ['@id',
+                     '@name',
+                     '@type',
+                     '@parent',
+                     '@content',
+                     '@created',
+                     '@modified',
+                     '@search',
+                     '@index']
+
+        if item.column() == 0:
+            if item.entity_key not in std_props:
+                dna.rename(item.entity_id, item.entity_key, str(item.text()))
+
+        if item.column() == 1:
+            key = item.entity_key
+            value = str(item.text())
+            entity = dna.entity(item.entity_id)
+
+            if key in std_props:
+                if key == '@name':
+                    entity.name = value
+                if key == '@parent':
+                    entity.parent_id = int(value)
+                if key == '@index':
+                    entity.index = int(value)
+                if key == '@search':
+                    entity.search = value
+                if key == '@content':
+                    entity.content = value
+
+                entity.update()
+            else:
+                dna.set(item.entity_id, key, value)
+
+        self.node(item.entity_id)
+        self.changed.emit()

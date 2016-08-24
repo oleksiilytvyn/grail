@@ -57,7 +57,7 @@ class LibraryEditor(GWidget):
         self._ui_list.itemDoubleClicked.connect(self._item_doubleclicked)
         self._ui_list.customContextMenuRequested.connect(self._context_menu)
 
-        self._ui_add_action = QAction(QIcon(':/icon/32.png'), 'Add', self)
+        self._ui_add_action = QAction(QIcon(':/icons/add.png'), 'Add', self)
         self._ui_add_action.setIconVisibleInMenu(True)
         self._ui_add_action.triggered.connect(self.add_action)
 

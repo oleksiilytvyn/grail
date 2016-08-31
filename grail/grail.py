@@ -19,6 +19,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 # generic imports
+import json
 import sqlite3 as lite
 
 # OSC library
@@ -153,6 +154,10 @@ class Grail(QMainWindow):
         self.ui_aboutAction.triggered.connect(self.aboutAction)
 
         # Import Playlist
+        self.ui_importSongsAction = QAction('Import songs...', self)
+        self.ui_importSongsAction.triggered.connect(self.importSongsAction)
+
+        # Import Playlist
         self.ui_importPlaylistAction = QAction('Import playlist', self)
         self.ui_importPlaylistAction.triggered.connect(self.importPlaylistAction)
 
@@ -225,7 +230,7 @@ class Grail(QMainWindow):
         self.ui_navigateToPlaylistAction.setShortcut('Ctrl+1')
         self.ui_navigateToPlaylistAction.triggered.connect(self.playlistNavigateAction)
 
-        # Songs and playlists
+        # Songs and playlist's
         self.ui_addSongAction = QAction('Add new Song', self)
         self.ui_addSongAction.triggered.connect(self.addSongAction)
 
@@ -252,6 +257,8 @@ class Grail(QMainWindow):
         self.ui_menu_edit.addSeparator()
         self.ui_menu_edit.addAction(self.ui_importPlaylistAction)
         self.ui_menu_edit.addAction(self.ui_exportPlaylistAction)
+        self.ui_menu_edit.addSeparator()
+        self.ui_menu_edit.addAction(self.ui_importSongsAction)
 
         self.ui_menu_edit.addSeparator()
         self.ui_menu_edit.addAction(self.ui_clearHistoryAction)
@@ -691,6 +698,39 @@ class Grail(QMainWindow):
         self.ui_playlist_bar.update()
 
     # Actions
+
+    def importSongsAction(self):
+
+        path, ext = QFileDialog.getOpenFileName(self, "Open File...", "", "*.json")
+
+        if not os.path.isfile(path):
+            return
+
+        data_file = open(path)
+        data = json.load(data_file)
+
+        if len(data) < 1:
+            return
+
+        for song in data:
+            available = False
+
+            try:
+                for search_item in Song.search(song['name']):
+                    if (search_item['title'] == song['name'] and search_item['artist'] == song['artist']
+                        and search_item['album'] == song['album'] and search_item['year'] == song['year']):
+                        available = True
+
+                if not available:
+                    sid = Song.add(song['name'], song['artist'], song['album'], song['year'])
+
+                    for page in song['lyrics'].split('\n\n'):
+                        Song.addPage(sid, page)
+            except:
+                pass
+
+        self.updateSearch()
+        self.updatePlaylist()
 
     def importPlaylistAction(self):
 

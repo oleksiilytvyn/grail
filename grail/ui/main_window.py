@@ -13,7 +13,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
 from grailkit.util import *
-from grailkit.ui import GAboutDialog
+from grailkit.ui import GAboutDialog, GMessageDialog
 
 import grail
 from grail.ui import NodeEditor, PropertyEditor, LibraryEditor, PreferencesDialog
@@ -279,19 +279,20 @@ class MainWindow(QMainWindow):
         """Check for updates action"""
 
         # to-do: add a dialog to check for updates
-        pass
+        message = GMessageDialog(title="No updates",
+                                 text="Updates not available.",
+                                 icon=GMessageDialog.Warning)
+        message.exec_()
 
     def open_web_action(self):
         """Open a grailapp.com in a browser"""
 
-        url = QUrl("http://grailapp.com/")
-        QDesktopServices.openUrl(url)
+        QDesktopServices.openUrl( QUrl("http://grailapp.com/") )
 
     def open_manual_action(self):
-        """Open a manual in new window"""
+        """Open a manual in browser"""
 
-        url = QUrl("http://grailapp.com/help")
-        QDesktopServices.openUrl(url)
+        QDesktopServices.openUrl( QUrl("http://grailapp.com/help") )
 
     def preferences_action(self):
         """Open a preferences dialog"""

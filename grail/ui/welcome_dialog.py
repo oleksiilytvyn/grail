@@ -3,7 +3,7 @@
     grail.ui.welcome_dialog
     ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    Welcome dialog that provides option to choose action
+    Welcome dialog that provides option to choose action when Grail is launched
 """
 
 import os
@@ -27,7 +27,7 @@ class WelcomeDialog(GDialog):
 
         std_icon = QApplication.style().standardIcon
 
-        create_action = GWelcomeAction("Create", "Make new project", std_icon(QStyle.SP_FileIcon))
+        create_action = GWelcomeAction("Create", "New project", std_icon(QStyle.SP_FileIcon))
         create_action.clicked.connect(self._create)
 
         open_action = GWelcomeAction("Open", "Open project", std_icon(QStyle.SP_DirIcon))

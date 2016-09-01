@@ -11,6 +11,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
 from grailkit.ui import GDialog, GWidget, GListWidget, GListItem
+from grailkit.util import OS_MAC
 from grailkit.bible import BibleHost, BibleHostError
 
 
@@ -123,10 +124,50 @@ class GeneralPanel(Panel):
         super(GeneralPanel, self).__init__(parent)
 
     def __ui__(self):
-        pass
+
+        self.ui_reset_btn = QPushButton("Restore")
+        self.ui_reset_btn.clicked.connect(self.restore_action)
+        self.ui_reset_label = QLabel("Restore Grail to it's original state")
+
+        self.ui_import_btn = QPushButton("Import library")
+        self.ui_import_btn.clicked.connect(self.import_action)
+        self.ui_import_label = QLabel("Add songs from a library file.")
+
+        self.ui_export_btn = QPushButton("Export library")
+        self.ui_export_btn.clicked.connect(self.export_action)
+        self.ui_export_label = QLabel("Save my library of songs to file.")
+
+        self.ui_layout = QVBoxLayout()
+        self.ui_layout.setContentsMargins(12, 12, 12, 12)
+
+        self.ui_layout.setSpacing(8 if OS_MAC else 0)
+
+        self.ui_layout.addWidget(self.ui_reset_btn, 0, Qt.AlignLeft)
+        self.ui_layout.addWidget(self.ui_reset_label)
+        self.ui_layout.addSpacing(12)
+
+        self.ui_layout.addWidget(self.ui_import_btn, 0, Qt.AlignLeft)
+        self.ui_layout.addWidget(self.ui_import_label)
+        self.ui_layout.addSpacing(12)
+
+        self.ui_layout.addWidget(self.ui_export_btn, 0, Qt.AlignLeft)
+        self.ui_layout.addWidget(self.ui_export_label)
+
+        self.ui_layout.addStretch()
+
+        self.setLayout(self.ui_layout)
 
     def name(self):
         return "General"
+
+    def restore_action(self):
+        pass
+
+    def import_action(self):
+        pass
+
+    def export_action(self):
+        pass
 
 
 class BiblePanel(Panel):

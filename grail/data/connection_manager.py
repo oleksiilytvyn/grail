@@ -89,7 +89,11 @@ class ConnectionManager:
         for key in self.__list__:
             connection = self.__list__[key]
 
-            connection.commit()
+            try:
+                connection.commit()
+            except lite.ProgrammingError:
+                pass
+
             connection.close()
 
 

@@ -255,10 +255,9 @@ class Grail(QMainWindow):
         self.ui_menu_edit = self.ui_menubar.addMenu('&Edit')
         self.ui_menu_edit.addAction(self.ui_addSongAction)
         self.ui_menu_edit.addSeparator()
+        self.ui_menu_edit.addAction(self.ui_importSongsAction)
         self.ui_menu_edit.addAction(self.ui_importPlaylistAction)
         self.ui_menu_edit.addAction(self.ui_exportPlaylistAction)
-        self.ui_menu_edit.addSeparator()
-        self.ui_menu_edit.addAction(self.ui_importSongsAction)
 
         self.ui_menu_edit.addSeparator()
         self.ui_menu_edit.addAction(self.ui_clearHistoryAction)

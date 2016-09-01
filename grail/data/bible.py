@@ -59,34 +59,33 @@ class BibleModel:
 
     def __init__(self):
 
+        self.connection = None
+
         bible_path = Settings.get('bible.path')
+        default_bible_path = get_data_path() + '/bibles/default-ru-rst.db'
 
-        if bible_path is not None:
+        # use bible that already selected as primary
+        if bible_path is not None and os.path.isfile(bible_path) and os.path.getsize(bible_path) > 100:
             self.change_bible(bible_path)
-            return None
 
-        path = get_data_path() + '/bible.db'
-        first_run = False
+            return
 
-        if not os.path.isfile(path):
-            first_run = True
-
-        self.connection = ConnectionManager.get(path, get_path() + '/default/bible.db')
-
-        if first_run and not ConnectionManager.iscopied(path):
-            cur = self.connection.cursor()
-
-            cur.execute(
-                """CREATE TABLE IF NOT EXISTS
-                   books(id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, full TEXT, short TEXT )""")
-
-            cur.execute(
-                """CREATE TABLE IF NOT EXISTS
-                   verses(id INTEGER PRIMARY KEY AUTOINCREMENT, book INT, chapter INT, verse INT )""")
+        # install default bible
+        copy_file(get_path() + '/default/bible.db', default_bible_path)
+        self.change_bible(default_bible_path)
 
     def change_bible(self, path):
 
         new_connection = ConnectionManager.get(path)
+        cursor = new_connection.cursor()
+
+        cursor.execute(
+            """CREATE TABLE IF NOT EXISTS
+               books(id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, full TEXT, short TEXT )""")
+
+        cursor.execute(
+            """CREATE TABLE IF NOT EXISTS
+               verses(id INTEGER PRIMARY KEY AUTOINCREMENT, book INT, chapter INT, verse INT )""")
 
         if new_connection:
             self.connection = new_connection

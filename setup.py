@@ -76,7 +76,7 @@ excludes = ["nt",
             "numpy.core._dotblas"]
 
 includefiles = [('resources/bdist/bible.db-default', 'default/bible.db'),
-                ('resources/bdist//songs.db-default', 'default/songs.db'),
+                ('resources/bdist/songs.db-default', 'default/songs.db'),
                 ('LICENSE', 'LICENSE'),
                 ('build/.version', '.version')]
 

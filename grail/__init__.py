@@ -27,6 +27,7 @@ from PyQt5.QtWidgets import *
 
 from grail.utils import *
 from grail.grail import Grail
+from grail.data import ConnectionManager
 
 __version__ = '0.9.7'
 
@@ -88,6 +89,8 @@ class Application(QApplication):
 
     def quit(self):
         """Quit application and close all connections"""
+
+        ConnectionManager.close()
 
         self.shared_memory.detach()
         super(Application, self).quit()

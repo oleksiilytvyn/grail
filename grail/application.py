@@ -39,8 +39,12 @@ class Grail(GApplication):
         self.setStyleSheetFile(":/stylesheet/grail.css")
 
         self.settings = SettingsFile(SETTINGS_PATH, create=True)
+        self.osc_host = None
         self.project = None
         self.library = None
+        # to-do: this is not save
+        self.bible = None
+        self.change_bible(self.settings.get('bible-default', ""))
 
         self.main_window = None
 
@@ -71,7 +75,7 @@ class Grail(GApplication):
         self.project = Project(path, create=create)
         self.library = Library(LIBRARY_PATH, create=True)
 
-        self.settings.set('last-project', path)
+        self.settings.set('project-last', path)
 
         self.main_window = MainWindow(self)
         self.main_window.show()
@@ -83,3 +87,21 @@ class Grail(GApplication):
 
         self.library.close()
         self.settings.close()
+
+    def change_bible(self, bible_id):
+        """Change bible on the fly"""
+
+        bibles = BibleHost.list()
+
+        # if bible already selected
+        if bible_id in bibles:
+            self.bible = BibleHost.get(bible_id)
+        # if bible not selected but available
+        elif len(bibles) > 0:
+            bible_id = bibles.keys()[0]
+            self.bible = BibleHost.get(bible_id)
+            self.settings.set('bible-default', bibles.keys()[0])
+        # if there is no bibles available
+        else:
+            # to-do: make it work
+            pass

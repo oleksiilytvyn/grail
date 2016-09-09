@@ -13,6 +13,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
 from grailkit.ui import GWidget, GSearchEdit, GListWidget, GListItem
+from grailkit.ui.gapplication import AppInstance
 
 
 class LibraryEditor(GWidget):
@@ -76,11 +77,26 @@ class LibraryEditor(GWidget):
 
         self.setLayout(self._ui_layout)
 
-    def _search_event(self, text):
+    def _search_event(self, keyword):
+        """Triggered when user types something in search field"""
 
-        print(text)
+        self._ui_list.clear()
+
+        if not keyword:
+            return
+
+        # show bible references (limit to 3)
+        for verse in AppInstance().bible.match_reference(keyword):
+            item = GListItem()
+            item.setText(verse.reference)
+
+            self._ui_list.addItem(item)
+
+        # show songs from library (limit to 9)
+        # show media items from library (limit to 6)
 
     def _search_key_event(self, event):
+        """Process key evens before search action begins"""
 
         event_key = event.key()
 
@@ -108,13 +124,21 @@ class LibraryEditor(GWidget):
             self._ui_search.setText("")
 
     def _context_menu(self, event):
+        """Context menu action"""
+
         pass
 
     def _item_clicked(self, item):
+        """List item clicked"""
+
         pass
 
     def _item_doubleclicked(self, item):
+        """List item double-clicked"""
+
         pass
 
     def add_action(self):
+        """Add action"""
+
         pass

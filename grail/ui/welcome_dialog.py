@@ -33,7 +33,7 @@ class WelcomeDialog(GDialog):
         open_action = GWelcomeAction("Open", "Open project", std_icon(QStyle.SP_DirIcon))
         open_action.clicked.connect(self._open)
 
-        last_project = self.app.settings.get('last-project', default="")
+        last_project = self.app.settings.get('project-last', default="")
         last_project_continue = last_project and os.path.isfile(last_project)
 
         if last_project_continue:

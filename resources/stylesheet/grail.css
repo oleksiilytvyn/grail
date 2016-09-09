@@ -102,10 +102,10 @@ PreferencesDialog {
 
     #bible_list {
         border: none;
+        outline: 0;
         background: #2f2f2f;
         show-decoration-selected: 1;
         alternate-background-color: #393939;
-        outline: 0;
         }
 
         #bible_list::item {
@@ -134,3 +134,26 @@ PreferencesDialog {
             padding: 2px;
             margin: 0;
             }
+
+#osc_out_list {
+    border: none;
+    padding: 0;
+    outline: 0;
+    background: #2f2f2f;
+    show-decoration-selected: 1;
+    alternate-background-color: #393939;
+    }
+
+    #osc_out_list::item {
+        color: #e6e6e6;
+        padding: 4px 12px;
+        margin: 0;
+        outline: none;
+        border: none;
+        qproperty-wordWrap: true;
+        }
+
+    #osc_out_list::item:selected {
+        background: #8a9fbb;
+        color: #e6e6e6;
+        }

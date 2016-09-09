@@ -12,10 +12,16 @@ Thumbs.db
 *.db-journal
 
 bin/*
-dist/*
-build/*
+dist/*.exe
+dist/*.msi
+dist/*.dmg
+dist/*.app
+dist/*/*
+
+build/*.exe
+build/*.msi
+build/*.dmg
+build/*.app
+build/*/*
 .idea/*
 __pycache__/*
-
-osc/*
-grailkit/*

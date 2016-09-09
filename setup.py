@@ -22,11 +22,11 @@ PLATFORM_WIN = platform.system() == "Windows"
 PLATFORM_MAC = platform.system() == "Darwin"
 PLATFORM_UNIX = platform.system() == "Linux"
 
+# Constants
 version = grail.__version__
 version_path = "build/.version"
-
 application_title = "Grail"
-main_python_file = "grail.py"
+application_file = "grail.py"
 
 # try to add revision number to version
 try:
@@ -36,6 +36,8 @@ try:
     version = "%sb%d" % (version, repo['tip'].rev)
 except ImportError:
     print("Failed to get revision number. Install hgapi python library")
+except:
+    print("Unable to get revision number")
 
 directory = os.path.dirname(os.path.realpath(version_path))
 
@@ -130,7 +132,7 @@ setup(
             "volume_label": application_title
             }
         },
-    executables=[Executable(main_python_file,
+    executables=[Executable(application_file,
                             base="Win32GUI" if sys.platform == "win32" else None,
                             icon="icon/grail.ico",
                             compress=True,

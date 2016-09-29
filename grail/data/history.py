@@ -19,32 +19,31 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
 
 from grail.utils import *
-from datetime import date, datetime
+from datetime import datetime
 
 from .connection_manager import ConnectionManager
 
 
 class HistoryModel(QObject):
+    """Manage message history"""
 
     changed = pyqtSignal()
 
-    def __init__( self ):
+    def __init__(self):
 
         super(HistoryModel, self).__init__()
 
-        self.changed.connect( self.changedEvent )
+        self.changed.connect(self.changedEvent)
 
         path = get_data_path() + '/history.db'
         first_run = False
 
-        if not os.path.isfile( path ):
+        if not os.path.isfile(path):
             first_run = True
 
-        self.connection = ConnectionManager.get( path )
+        self.connection = ConnectionManager.get(path)
 
         if first_run:
             cur = self.connection.cursor()
@@ -56,28 +55,32 @@ class HistoryModel(QObject):
                         message TEXT,
                         added timestamp )""")
 
-    def get( self, id ):
+    def get(self, id):
+        """Get message by id"""
 
         cursor = self.connection.cursor()
         cursor.execute("SELECT * FROM history WHERE id = ?", (id,))
 
         return cursor.fetchone()
 
-    def getAll( self ):
+    def getAll(self):
+        """Get all messages"""
 
         cursor = self.connection.cursor()
         cursor.execute("SELECT * FROM history ORDER BY added DESC")
 
         return cursor.fetchall()
 
-    def getLast( self, size = 10 ):
+    def getLast(self, size=10):
+        """Get last messages"""
 
         cursor = self.connection.cursor()
         cursor.execute("SELECT * FROM history ORDER BY added DESC LIMIT ?", (size,))
 
         return cursor.fetchall()
 
-    def search( self, keyword ):
+    def search(self, keyword):
+        """Search for message by given keyword"""
 
         keyword = "%" + keyword + "%"
 
@@ -92,7 +95,8 @@ class HistoryModel(QObject):
 
         return cur.fetchall()
 
-    def clear( self ):
+    def clear(self):
+        """Remove all messages from history"""
 
         cursor = self.connection.cursor()
         cursor.execute("DELETE FROM history")
@@ -100,21 +104,25 @@ class HistoryModel(QObject):
 
         self.changed.emit()
 
-    def add( self, item_type, title, message ):
+    def add(self, item_type, title, message):
+        """Add message to history"""
 
         cur = self.connection.cursor()
-        cur.execute("INSERT INTO history VALUES(NULL, ?, ?, ?, ?)", ( item_type, title, message, datetime.now() ))
+        cur.execute("INSERT INTO history VALUES(NULL, ?, ?, ?, ?)", (item_type, title, message, datetime.now()))
         self.connection.commit()
 
         self.changed.emit()
 
         return cur.lastrowid
 
-    def changedEvent( self ):
+    def changedEvent(self):
         pass
 
-    def close( self ):
+    def close(self):
+        """Close connection"""
+
         self.connection.commit()
         self.connection.close()
+
 
 History = HistoryModel()

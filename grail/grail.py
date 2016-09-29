@@ -716,8 +716,10 @@ class Grail(QMainWindow):
 
             try:
                 for search_item in Song.search(song['name']):
-                    if (search_item['title'] == song['name'] and search_item['artist'] == song['artist']
-                        and search_item['album'] == song['album'] and search_item['year'] == song['year']):
+                    if (search_item['title'] == song['name'] and
+                            search_item['artist'] == song['artist'] and
+                            search_item['album'] == song['album'] and
+                            search_item['year'] == song['year']):
                         available = True
 
                 if not available:

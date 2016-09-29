@@ -24,9 +24,7 @@ from .connection_manager import ConnectionManager
 
 
 class PlaylistsModel:
-    '''
-    Playlist managment
-    '''
+    """Playlist management"""
 
     def __init__(self):
 
@@ -63,12 +61,15 @@ class PlaylistsModel:
             cur.execute("INSERT INTO playlists VALUES(NULL, ?)", ("Default",))
 
     def get(self, id):
+        """Get playlist by id"""
+
         cursor = self.connection.cursor()
         cursor.execute("SELECT * FROM playlists WHERE id = ?", (id,))
 
         return cursor.fetchone()
 
     def update(self, id, title):
+        """Update playlist title"""
 
         cur = self.connection.cursor()
 
@@ -76,6 +77,7 @@ class PlaylistsModel:
         self.connection.commit()
 
     def add(self, title):
+        """Create new playlist with given title"""
 
         cur = self.connection.cursor()
         cur.execute("INSERT INTO playlists VALUES(NULL, ?)", (title,))
@@ -84,6 +86,7 @@ class PlaylistsModel:
         return cur.lastrowid
 
     def delete(self, id):
+        """Delete playlist by id"""
 
         cursor = self.connection.cursor()
         cursor.execute("DELETE FROM playlist WHERE playlist = ?", (id,))
@@ -91,12 +94,16 @@ class PlaylistsModel:
         self.connection.commit()
 
     def getPlaylists(self):
+        """Get list of playlist's"""
+
         cursor = self.connection.cursor()
         cursor.execute("SELECT * FROM playlists")
 
         return cursor.fetchall()
 
     def getSongs(self, id):
+        """Get lit of songs in playlist with given id"""
+
         cursor = self.connection.cursor()
         cursor.execute(
             """
@@ -118,12 +125,16 @@ class PlaylistsModel:
         return cursor.fetchall()
 
     def getSongsLink(self, id):
+        """Get all songs in playlist"""
+
         cursor = self.connection.cursor()
         cursor.execute("SELECT * FROM playlist WHERE playlist = ?", (id,))
 
         return cursor.fetchall()
 
     def addSong(self, playlist, song):
+        """Add song to playlist"""
+
         cur = self.connection.cursor()
         cur.execute("""INSERT INTO playlist
                     VALUES(NULL, ?, (SELECT max(sort) FROM playlist WHERE playlist = ?) + 1, ?, 0)""",
@@ -131,6 +142,8 @@ class PlaylistsModel:
         self.connection.commit()
 
     def deleteSong(self, playlist, song, pid=None):
+        """Delete song from playlist"""
+
         cursor = self.connection.cursor()
 
         if pid is None:
@@ -141,16 +154,22 @@ class PlaylistsModel:
         self.connection.commit()
 
     def collapseSong(self, playlist, song, collapsed):
+        """Set song collapse"""
+
         cur = self.connection.cursor()
         cur.execute("UPDATE playlist SET collapsed=? WHERE playlist = ? AND id = ?", (int(collapsed), playlist, song))
         self.connection.commit()
 
     def sortSongs(self, playlist, item, index):
+        """Sort songs"""
+
         cur = self.connection.cursor()
         cur.execute("UPDATE playlist SET sort=? WHERE id = ?", (index, item))
         self.connection.commit()
 
     def close(self):
+        """Close connection"""
+
         self.connection.commit()
         self.connection.close()
 

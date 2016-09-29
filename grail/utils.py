@@ -99,6 +99,8 @@ def remove_file(path):
 
 
 def get_version():
+    """Returns grail version"""
+
     path = '.version'
 
     if os.path.isfile(path):

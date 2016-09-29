@@ -61,19 +61,27 @@ class SongModel:
             cur.execute("INSERT INTO playlists VALUES(NULL, ?)", ("Default",))
 
     def close(self):
+        """Close connection"""
+
         self.connection.commit()
         self.connection.close()
 
     def getConnection(self):
+        """Get connection"""
+
         return self.connection
 
     def get(self, id):
+        """Get song by id"""
+
         cur = self.connection.cursor()
         cur.execute("SELECT * FROM songs WHERE id = ?", (id,))
 
         return cur.fetchone()
 
     def search(self, keyword):
+        """Search songs by keyword"""
+
         keyword = "%" + keyword + "%"
 
         cur = self.connection.cursor()
@@ -91,6 +99,8 @@ class SongModel:
         return cur.fetchall()
 
     def add(self, title, artist="unknown", album="unknown", year=0):
+        """Add new song"""
+
         record = (title, artist, album, year)
 
         cur = self.connection.cursor()
@@ -100,13 +110,17 @@ class SongModel:
         return cur.lastrowid
 
     def update(self, id, title, artist, album, year):
+        """Update song info"""
+
         cur = self.connection.cursor()
 
         cur.execute("UPDATE songs SET title=?, artist=?, album=?, year=? WHERE id=?", (title, artist, album, year, id))
         self.connection.commit()
 
     def delete(self, id):
-        # if song in any playlist don't delete it
+        """Delete song by id"""
+
+        # if song already in any playlist do not delete it
         cursor = self.connection.cursor()
 
         cursor.execute("SELECT * FROM playlist WHERE song = ?", (id,))
@@ -116,37 +130,51 @@ class SongModel:
             cursor.execute("DELETE FROM pages WHERE song = ?", (id,))
 
     def getList(self):
+        """Get list of all songs"""
+
         cursor = self.connection.cursor()
         cursor.execute("SELECT * FROM songs ORDER BY title")
 
         return cursor.fetchall()
 
     def getPage(self, page_id, index):
+        """Get page of song"""
+
         cursor = self.connection.cursor()
         cursor.execute("SELECT * FROM pages WHERE song = ? AND sort = ?", (page_id, index))
 
         return cursor.fetchone()
 
     def getPages(self, page_id):
+        """Get all pages of song"""
+
         cursor = self.connection.cursor()
         cursor.execute("SELECT * FROM pages WHERE song = ? ORDER BY sort ASC", (page_id,))
 
         return cursor.fetchall()
 
     def addPage(self, page_id, text):
+        """Add page to song"""
+
         cur = self.connection.cursor()
         cur.execute("INSERT INTO pages VALUES(NULL, ?, (SELECT max(sort) FROM pages WHERE song = ?) + 1, ?)",
                     (page_id, page_id, text))
 
     def deletePage(self, page_id, index):
+        """Delete song page"""
+
         cursor = self.connection.cursor()
         cursor.execute("DELETE FROM pages WHERE song = ? AND sort = ?", (page_id, index))
 
     def deletePages(self, page_id):
+        """Delete all pages of song"""
+
         cursor = self.connection.cursor()
         cursor.execute("DELETE FROM pages WHERE song = ?", (page_id,))
 
     def updatePage(self, page_id, index, page):
+        """Update song page"""
+
         cur = self.connection.cursor()
 
         cur.execute("UPDATE pages SET page=? WHERE song=? AND id=?", (page, page_id, index))

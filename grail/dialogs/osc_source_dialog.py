@@ -242,10 +242,14 @@ class SourcesTableWidget(QTableWidget):
 
 
 class SourcesRemoveButton(QToolButton):
+
     triggered = pyqtSignal("QToolButton")
 
     def __init__(self, parent, itemid):
         super(SourcesRemoveButton, self).__init__(parent)
+
+        self._icon_regular = QIcon(':/icons/remove.png')
+        self._icon_white = QIcon(':/icons/remove-white.png')
 
         self.setIconState(True)
         self.setMinimumSize(16, 16)
@@ -253,19 +257,19 @@ class SourcesRemoveButton(QToolButton):
 
         self.setStyleSheet("QToolButton {background: transparent;border: none;padding: 0;margin: 0;}")
 
-        self.clicked.connect(self.clickedEvent)
-        self.triggered.connect(self.triggeredEvent)
+        self.clicked.connect(self._clicked)
+        self.triggered.connect(self._triggered)
 
-    def clickedEvent(self, checked):
+    def _clicked(self, checked):
 
         self.triggered.emit(self)
 
-    def triggeredEvent(self, button):
+    def _triggered(self, button):
         pass
 
-    def setIconState(self, b):
+    def setIconState(self, flag):
 
-        if b:
-            self.setIcon(QIcon(':/icons/remove.png'))
+        if flag:
+            self.setIcon(self._icon_regular)
         else:
-            self.setIcon(QIcon(':/icons/remove-white.png'))
+            self.setIcon(self._icon_white)

@@ -79,7 +79,7 @@ class MediaWidget(QWidget):
         self.ui_list.setIconSize(QSize(size, size))
         self.ui_list.setSpacing(1)
         self.ui_list.setAcceptDrops(True)
-        self.ui_list.setDropIndicatorShown(False)
+        self.ui_list.setDropIndicatorShown(True)
         self.ui_list.setWrapping(True)
         self.ui_list.setLayoutMode(QListView.Batched)
         self.ui_list.setMovement(QListView.Snap)
@@ -155,6 +155,8 @@ class MediaWidget(QWidget):
 
         ret = menu.exec_(self.mapToGlobal(pos))
 
+        return ret
+
     def addFilesAction(self):
 
         location = QStandardPaths.locate(QStandardPaths.PicturesLocation, "",
@@ -192,13 +194,21 @@ class MediaWidget(QWidget):
     def addListItem(self, path):
 
         if path not in self.files_list:
-            pieceItem = QListWidgetItem()
-            pieceItem.setIcon(QIcon(path))
-            pieceItem.setData(Qt.UserRole, path)
-            pieceItem.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDragEnabled)
+
+            item_pixmap = QPixmap(path)
+            item_icon = QIcon(item_pixmap)
+
+            # if size is 0x0 don't load image it can broke view
+            if item_pixmap.size().width() is 0 and item_pixmap.size().width() is 0:
+                return False
+
+            item = QListWidgetItem()
+            item.setIcon(item_icon)
+            item.setData(Qt.UserRole, path)
+            item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDragEnabled)
 
             self.files_list.append(path)
-            self.ui_list.addItem(pieceItem)
+            self.ui_list.addItem(item)
 
     def itemDoubleClicked(self, item):
 

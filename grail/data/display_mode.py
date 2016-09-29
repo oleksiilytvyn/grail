@@ -22,9 +22,11 @@ from PyQt5.QtCore import *
 
 
 class DisplayMode:
+    """Display geometry mode"""
 
     def __init__(self, name="Untitled", geometry=QRect(0, 0, 800, 600),
                  fullscreen=True, display="none", disabled=False):
+
         self.name = name
         self.geometry = geometry
         self.fullscreen = fullscreen
@@ -32,24 +34,38 @@ class DisplayMode:
         self.disabled = disabled
 
     def isEqual(self, mode):
+        """Compare current display modes with other"""
+
         return self.geometry == mode.geometry and self.fullscreen == mode.fullscreen
 
     def setName(self, name):
+        """Set mode name"""
+
         self.name = name
 
     def setDisabled(self, flag):
+        """Set as disabled"""
+
         self.disabled = bool(flag)
 
     def setGeometry(self, geometry):
+        """Set mode geometry"""
+
         self.geometry = geometry
 
     def setFullscreen(self, flag):
+        """Set as fullscreen"""
+
         self.fullscreen = bool(flag)
 
     def setDisplay(self, name):
+        """Set a display name"""
+
         self.display = name
 
     def getName(self):
+        """Get a name of mode"""
+
         data = ("Windowed" if not self.fullscreen else self.display, self.geometry.width(), self.geometry.height())
 
         return "Disabled" if self.disabled else "%s (%dx%d)" % data

@@ -29,7 +29,7 @@ from grail.utils import *
 from grail.grail import Grail
 from grail.data import ConnectionManager
 
-__version__ = '0.9.7'
+__version__ = '0.9.8'
 
 
 class Application(QApplication):
@@ -40,6 +40,9 @@ class Application(QApplication):
 
         self.shared_memory = None
         self.lastWindowClosed.connect(self.quit)
+
+        self._exception_hook = sys.excepthook
+        sys.excepthook = self._exception
 
         try:
             self.setAttribute(Qt.AA_UseHighDpiPixmaps)
@@ -96,23 +99,17 @@ class Application(QApplication):
         super(Application, self).quit()
         sys.exit()
 
-old_excepthook = sys.excepthook
+    def _exception(self, _type, value, traceback_object):
+        """Hook exception to be written to file"""
 
+        self._exception_hook(_type, value, traceback_object)
 
-def hook_exception(exctype, value, traceback_object):
-    """Hook exception to be written to file"""
-
-    old_excepthook(exctype, value, traceback_object)
-
-    out = open('error.log', 'a+')
-    out.write("=== Exception ===\n" +
-              "Platform: %s\n" % (platform.platform(),) +
-              "Version: %s\n" % (get_version(),) +
-              "Traceback: %s\n" % (''.join(traceback.format_exception(exctype, value, traceback_object)),))
-    out.close()
-
-
-sys.excepthook = hook_exception
+        out = open('error.log', 'a+')
+        out.write("=== Exception ===\n" +
+                  "Platform: %s\n" % (platform.platform(),) +
+                  "Version: %s\n" % (get_version(),) +
+                  "Traceback: %s\n" % (''.join(traceback.format_exception(_type, value, traceback_object)),))
+        out.close()
 
 
 def main():

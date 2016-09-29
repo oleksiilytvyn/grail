@@ -24,8 +24,9 @@ import os
 
 
 class ConnectionManager:
-    """Manage SQLite connections"""
+    """Manage all SQLite connections"""
 
+    # dict of all files
     __list__ = {}
 
     def __init__(self):
@@ -33,7 +34,7 @@ class ConnectionManager:
         self.copied = []
         self.first_run = True
 
-    def get(self, path, copypath=None):
+    def get(self, path, copy_path=None):
 
         # copy files from data to default
         if self.first_run:
@@ -57,8 +58,8 @@ class ConnectionManager:
                 os.makedirs(directory)
 
             if not os.path.isfile(path):
-                if copypath is not None:
-                    copy_file(copypath, path)
+                if copy_path is not None:
+                    copy_file(copy_path, path)
                     self.copied.append(path)
                 else:
                     open(path, 'w+')
@@ -82,9 +83,12 @@ class ConnectionManager:
         return connection
 
     def iscopied(self, path):
+        """Check if file is in copied list"""
+
         return path in self.copied
 
     def close(self):
+        """Close connection"""
 
         for key in self.__list__:
             connection = self.__list__[key]

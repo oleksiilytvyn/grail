@@ -219,6 +219,8 @@ class PlaylistRemoveButton(QToolButton):
         super(PlaylistRemoveButton, self).__init__(parent)
 
         self.playlist = item
+        self._icon_regular = QIcon(':/icons/remove.png')
+        self._icon_white = QIcon(':/icons/remove-white.png')
 
         self.setIconState(True)
         self.setMinimumSize(16, 16)
@@ -244,12 +246,13 @@ class PlaylistRemoveButton(QToolButton):
         """Set icon state"""
 
         if flag:
-            self.setIcon(QIcon(':/icons/remove.png'))
+            self.setIcon(self._icon_regular)
         else:
-            self.setIcon(QIcon(':/icons/remove-white.png'))
+            self.setIcon(self._icon_white)
 
 
 class PlaylistTableWidget(QTableWidget):
+    """List widget with remove button"""
 
     def __init__(self, parent=None):
         """Initialize PlaylistTableWidget"""

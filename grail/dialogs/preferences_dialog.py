@@ -460,7 +460,7 @@ class BiblePanel(QWidget):
 
     def update_list(self):
 
-        bibles = BibleManager.getAll()
+        bibles = BibleManager.list()
         selected_path = Settings.get('bible.path')
 
         self.ui_list.clear()

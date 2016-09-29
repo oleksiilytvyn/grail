@@ -18,7 +18,6 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import os
 import glob
 import sqlite3 as lite
 
@@ -188,9 +187,11 @@ Bible = BibleModel()
 
 
 class BibleManager:
+    """Manage installed bibles"""
 
     @staticmethod
-    def getAll():
+    def list():
+        """Get list of all installed bibles"""
 
         files = glob.glob(get_data_path() + "/bibles/*.db")
         items = []
@@ -207,16 +208,20 @@ class BibleManager:
 
     @staticmethod
     def set(path):
+        """Set a path to default bible"""
+
         Bible.change_bible(path)
 
     @staticmethod
     def install(path):
+        """Install new bible from file"""
 
         if BibleManager.verify(path):
             copy_file(os.path.normpath(path), os.path.normpath(get_data_path() + '/bibles/' + os.path.basename(path)))
 
     @staticmethod
     def verify(path):
+        """Verify bible file consistency"""
 
         if not (os.path.exists(path) and os.path.isfile(path)):
             return False

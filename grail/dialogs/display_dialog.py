@@ -128,9 +128,7 @@ class DisplayDialog(QDialog):
                        QPointF(0, output.height())])
 
         QTransform.quadToQuad(QPolygonF(q), QPolygonF(p), t)
-
         world_transform = t * prefs.transform
-
         painter.setTransform(world_transform)
 
         if not prefs.test:
@@ -145,7 +143,7 @@ class DisplayDialog(QDialog):
             if self.image:
                 background_image = self.image
 
-            if (self.text != " " and self.text != "") and self.image_text and not self.image:
+            if len(self.text.strip()) > 0 and not self.image:
                 background_image = self.image_text
 
             if background_image:

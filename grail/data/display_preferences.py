@@ -26,6 +26,8 @@ from .settings import Settings
 
 
 class DisplayPreferences:
+    """Display preferences object"""
+
     color = QColor("#ffffff")
     font = QFont('decorative', 28)
     background = QColor("#000000")

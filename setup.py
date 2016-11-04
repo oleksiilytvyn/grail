@@ -18,39 +18,66 @@ from cx_Freeze import setup, Executable
 
 
 # constants
-PLATFORM_WIN = platform.system() == "Windows"
-PLATFORM_MAC = platform.system() == "Darwin"
-PLATFORM_UNIX = platform.system() == "Linux"
+OS_WIN = platform.system() == "Windows"
+OS_MAC = platform.system() == "Darwin"
+OS_UNIX = platform.system() == "Linux"
+
+
+def get_revision():
+    """try to add revision number to version"""
+
+    rev = grail.__version__
+
+    try:
+        import hgapi
+
+        repo = hgapi.Repo(os.path.abspath(os.curdir))
+        rev = "%sb%d" % (grail.__version__, repo['tip'].rev)
+    except ImportError:
+        print("Failed to get revision number. Install 'hgapi' python module")
+    except Exception as e:
+        print("Unable to get revision number")
+        print(e)
+
+    return rev
+
+
+def compile_resources():
+    """try to build resources file"""
+
+    try:
+        os.system("pyrcc5 -o grail/resources.py resources/resources.qrc")
+        print("Building resource file")
+    except:
+        print("Failed to build resource file")
+
+
+def create_version_file(path, version):
+    """Create .version file inside app directory"""
+
+    directory = os.path.dirname(os.path.realpath(path))
+
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
+    # add version file to build
+    try:
+        f = open(path, "w+")
+        f.write(version)
+        f.close()
+    except:
+        print("Failed to create a version file")
+
 
 # Constants
-version = grail.__version__
+version = get_revision()
 version_path = "build/.version"
 application_title = "Grail"
 application_file = "grail.py"
-
-# try to add revision number to version
-try:
-    import hgapi
-
-    repo = hgapi.Repo(os.path.abspath(os.curdir))
-    version = "%sb%d" % (version, repo['tip'].rev)
-except ImportError:
-    print("Failed to get revision number. Install hgapi python library")
-except:
-    print("Unable to get revision number")
-
-directory = os.path.dirname(os.path.realpath(version_path))
-
-if not os.path.exists(directory):
-    os.makedirs(directory)
-
-# add version file to build
-try:
-    f = open(version_path, "w+")
-    f.write(version)
-    f.close()
-except:
-    print("Failed to create a version file")
+bundle_name = "%s-%s" % (application_title, version)
+app_bundle = "%s.app" % (bundle_name,)
+app_contents = "build/%s/Contents" % app_bundle
+app_resources = "%s/Resources" % app_contents
 
 includes = ["atexit"]
 excludes = ["nt",
@@ -66,15 +93,11 @@ excludes = ["nt",
             "scipy.special",
             "numpy.core._dotblas"]
 
-includefiles = [('LICENSE', 'LICENSE'),
-                ('build/.version', '.version')]
+files = [('LICENSE', 'LICENSE'),
+         ('build/.version', '.version')]
 
-# try to build resources file
-try:
-    print("Building resource file")
-    os.system("pyrcc5 -o grail/resources.py resources/resources.qrc")
-except:
-    print("Failed to build resource file")
+compile_resources()
+create_version_file(version_path, version)
 
 setup(
     name=application_title,
@@ -100,7 +123,6 @@ setup(
         'Natural Language :: English',
         'Operating System :: MacOS :: MacOS X',
         'Operating System :: Microsoft :: Windows',
-        'Operating System :: POSIX :: BSD :: FreeBSD',
         'Operating System :: POSIX :: Linux',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
@@ -115,21 +137,24 @@ setup(
     options={
         "build_exe": {
             "includes": includes,
-            "include_files": includefiles,
+            "include_files": files,
             "include_msvcr": True,
             "excludes": excludes,
             "silent": True
             },
         "bdist_msi": {
+            "add_to_path": True,
             "upgrade_code": "{1f82a4c1-681d-43c3-b1b6-d63788c147a0}"
             },
         "bdist_mac": {
-            "bundle_name": "%s-%s" % (application_title, version),
+            "bundle_name": bundle_name,
+            # "qt_menu_nib": None
             "custom_info_plist": "resources/bdist/Info.plist",
             "iconfile": "icon/grail.icns"
             },
         "bdist_dmg": {
-            "volume_label": application_title
+            "volume_label": application_title,
+            "applications_shortcut": True
             }
         },
     executables=[Executable(application_file,
@@ -140,9 +165,7 @@ setup(
                             shortcutDir="ProgramMenuFolder")])
 
 # fix Mac OS app file
-if PLATFORM_MAC:
-    app_resources = "build/%s-%s.app/Contents/Resources" % (application_title, version)
-    app_contents = "build/%s-%s.app/Contents" % (application_title, version)
+if OS_MAC:
 
     if os.path.exists(app_resources):
         shutil.copyfile("resources/bdist/qt.conf", app_resources + '/qt.conf')

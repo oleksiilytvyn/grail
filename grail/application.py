@@ -8,7 +8,8 @@
 
 import os
 
-from grailkit.project import Project, SettingsFile
+from grailkit.dna import SettingsFile
+from grailkit.project import Project
 from grailkit.library import Library
 from grailkit.bible import BibleHost
 from grailkit.ui import GApplication, GMessageDialog

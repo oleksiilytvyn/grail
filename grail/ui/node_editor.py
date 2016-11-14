@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 """
     grail.ui.node_editor
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ~~~~~~~~~~~~~~~~~~~~
 
     Simple grail file node editor
 """

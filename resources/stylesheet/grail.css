@@ -157,3 +157,48 @@ PreferencesDialog {
         background: #8a9fbb;
         color: #e6e6e6;
         }
+
+/**
+ * @section welcome dialog
+ */
+
+WelcomeDialog {
+    background: #2f2f2f url(:/i/welcome_bg.png) scroll no-repeat 0 0;
+    }
+
+/**
+ * @section song dialog
+ */
+
+SongDialog {
+    background: #262626;
+    }
+
+    SongDialog QLabel {
+        color: #959595;
+        margin: 0;
+        }
+
+    SongDialog QLineEdit,
+    SongDialog QTextEdit {
+        border: 1px solid #1a1a1a;
+        border-radius: 2px;
+        padding: 2px;
+        margin: 0;
+        background: #212121;
+        min-height: 20px;
+        color: #b3b3b3;
+        }
+
+    SongDialog QScrollBar:vertical {
+        background: transparent;
+        border: none;
+        width: 8px;
+        margin: 2px 2px 2px 0;
+        }
+
+    SongDialog QScrollBar::handle:vertical {
+        background: #ddd;
+        min-height: 20px;
+        border-radius: 3px;
+        }

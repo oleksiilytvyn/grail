@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 """
     grail.ui.welcome_dialog
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ~~~~~~~~~~~~~~~~~~~~~~~
 
     Welcome dialog that provides option to choose action when Grail is launched
 """
@@ -57,7 +57,6 @@ class WelcomeDialog(GDialog):
         layout.addWidget(widget)
 
         self.setLayout(layout)
-        self.setStyleSheet("background: #2f2f2f;")
 
         self.setGeometry(100, 100, 380, 460)
         self.setFixedSize(380, 460)

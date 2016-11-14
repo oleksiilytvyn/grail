@@ -6,22 +6,15 @@
     Extended GApplication class and add some grail specific methods
 """
 
-import os
-
 from grailkit.dna import SettingsFile
 from grailkit.project import Project
 from grailkit.library import Library
 from grailkit.bible import BibleHost
 from grailkit.ui import GApplication, GMessageDialog
-from grailkit.util import path_appdata
 
 import grail
 import grail.resources
-
 from grail.ui import MainWindow, WelcomeDialog
-
-LIBRARY_PATH = os.path.join(path_appdata("grail"), "library.grail-library")
-SETTINGS_PATH = os.path.join(path_appdata("grail"), "app.grail")
 
 
 class Grail(GApplication):
@@ -39,7 +32,7 @@ class Grail(GApplication):
         self.setOrganizationDomain(grail.ORGANISATION_DOMAIN)
         self.setStyleSheetFile(":/stylesheet/grail.css")
 
-        self.settings = SettingsFile(SETTINGS_PATH, create=True)
+        self.settings = SettingsFile(grail.SETTINGS_PATH, create=True)
         self.osc_host = None
         self.project = None
         self.library = None
@@ -74,7 +67,7 @@ class Grail(GApplication):
             self.main_window.close()
 
         self.project = Project(path, create=create)
-        self.library = Library(LIBRARY_PATH, create=True)
+        self.library = Library(grail.LIBRARY_PATH, create=True)
 
         self.settings.set('project-last', path)
 

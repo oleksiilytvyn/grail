@@ -7,11 +7,13 @@
 """
 
 import os
+import json
 
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
+from grailkit.dna import DNA
 from grailkit.util import *
 from grailkit.ui import GAboutDialog, GMessageDialog
 
@@ -40,7 +42,7 @@ class MainWindow(QMainWindow):
         # about dialog
         self.about_dialog = GAboutDialog(None, "Grail %s" % (grail.__version__,),
                                          "Copyright © 2014-2016 Grail Team.\nAll rights reserved.",
-                                         QIcon(':/icons/256.png'))
+                                         QIcon(':/icon/256.png'))
         self.about_dialog.url_report = "http://grailapp.com/"
         self.about_dialog.url_help = "http://grailapp.com/help"
 
@@ -256,8 +258,48 @@ class MainWindow(QMainWindow):
         """Import data into Grail library or current project"""
 
         path, ext = QFileDialog.getOpenFileName(self, "Import...", "", "*")
+        ext = path.split('.')[-1]
 
-        # to-do: implement this
+        if ext == 'grail':
+            print("Import of grail files not supported")
+        elif ext == 'grail-library':
+            print("Import of grail library files not supported")
+        elif ext == 'grail-bible':
+            print("Import of grail bible files not supported")
+        else:
+            self._import_json(path)
+
+    def _import_json(self, path):
+        """Import json file"""
+
+        lib = self.app.library
+
+        def json_key(obj, key, default=""):
+            if obj:
+                return obj[key] if key in obj else default
+            else:
+                return default
+
+        try:
+            with open(path) as data_file:
+                data = json.load(data_file)
+
+                for item in data:
+                    if not 'name' in item:
+                        continue
+
+                    song = lib.create(json_key(item, 'name', 'Untitled'), entity_type=DNA.TYPE_SONG)
+                    song.year = json_key(item, 'year', 2000)
+                    song.album = json_key(item, 'album', 'Unknown')
+                    song.artist = json_key(item, 'artist', 'Unknown')
+                    song.lyrics = json_key(item, 'lyrics', '')
+                    song.update()
+
+            return True
+        except ValueError:
+            pass
+
+        return False
 
     def export_action(self):
         """Export library or project"""
@@ -287,12 +329,12 @@ class MainWindow(QMainWindow):
     def open_web_action(self):
         """Open a grailapp.com in a browser"""
 
-        QDesktopServices.openUrl( QUrl("http://grailapp.com/") )
+        QDesktopServices.openUrl(QUrl("http://grailapp.com/"))
 
     def open_manual_action(self):
         """Open a manual in browser"""
 
-        QDesktopServices.openUrl( QUrl("http://grailapp.com/help") )
+        QDesktopServices.openUrl(QUrl("http://grailapp.com/help"))
 
     def preferences_action(self):
         """Open a preferences dialog"""

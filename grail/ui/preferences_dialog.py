@@ -10,7 +10,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
-from grailkit.ui import GDialog, GWidget, GListWidget, GListItem
+from grailkit.ui import GDialog, GWidget, GListWidget, GListItem, GSwitch
 from grailkit.ui.gapplication import AppInstance
 from grailkit.util import OS_MAC
 from grailkit.bible import BibleHost, BibleHostError
@@ -45,6 +45,7 @@ class PreferencesDialog(GDialog):
             GeneralPanel,
             OSCInPanel,
             OSCOutPanel,
+            MIDIPanel,
             BiblePanel
         ]
 
@@ -153,6 +154,10 @@ class GeneralPanel(Panel):
 
         self.ui_layout.addWidget(self.ui_export_btn, 0, Qt.AlignLeft)
         self.ui_layout.addWidget(self.ui_export_label)
+        self.ui_layout.addSpacing(12)
+
+        self.ui_layout.addWidget(GSwitch())
+        self.ui_layout.addWidget(QLabel("Continue last project on startup"))
 
         self.ui_layout.addStretch()
 
@@ -499,3 +504,45 @@ class OSCTableRemoveButton(QToolButton):
         """Set a hovered icon state by passign True"""
 
         self.setIcon(QIcon(':/icons/remove-white.png'))
+
+
+class MIDIPanel(Panel):
+
+    changed = pyqtSignal()
+
+    def __init__(self, parent=None):
+        super(MIDIPanel, self).__init__(parent)
+
+    def name(self):
+        return "MIDI in"
+
+    def __ui__(self):
+
+        self._ui_layout = QVBoxLayout()
+        self._ui_layout.setSpacing(0)
+        self._ui_layout.setContentsMargins(0, 0, 0, 0)
+
+        self._ui_list = OSCOutTableWidget()
+
+        self._ui_toolbar_label = QLabel("0 destinations")
+        self._ui_toolbar_label.setAlignment(Qt.AlignCenter)
+        self._ui_toolbar_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+
+        self._ui_clear_action = QAction(QIcon(':/icons/remove-white.png'), 'Remove all', self)
+        self._ui_clear_action.setIconVisibleInMenu(True)
+
+        self._ui_add_action = QAction(QIcon(':/icons/add.png'), 'Add destination', self)
+        self._ui_add_action.setIconVisibleInMenu(True)
+
+        self._ui_toolbar = QToolBar()
+        # to-do: rename object
+        self._ui_toolbar.setObjectName("bible_toolbar")
+        self._ui_toolbar.setIconSize(QSize(16, 16))
+        self._ui_toolbar.addAction(self._ui_clear_action)
+        self._ui_toolbar.addWidget(self._ui_toolbar_label)
+        self._ui_toolbar.addAction(self._ui_add_action)
+
+        self._ui_layout.addWidget(self._ui_list)
+        self._ui_layout.addWidget(self._ui_toolbar)
+
+        self.setLayout(self._ui_layout)

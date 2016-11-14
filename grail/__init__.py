@@ -10,7 +10,10 @@
 import os
 import sys
 
+import grailkit
 from grailkit import util
+from grailkit.util import path_appdata
+
 from grail.application import Grail
 
 __version__ = '1.0.0'
@@ -19,6 +22,9 @@ APPLICATION_NAME = "Grail"
 APPLICATION_WEB = "http://grailapp.com/"
 ORGANISATION_NAME = "Grail"
 ORGANISATION_DOMAIN = "grailapp.com"
+
+LIBRARY_PATH = grailkit.PATH_LIBRARY
+SETTINGS_PATH = os.path.join(path_appdata("grail"), "app.grail")
 
 
 def main():

@@ -107,7 +107,7 @@ setup(
     author='Oleksii Lytvyn',
     author_email='grailapplication@gmail.com',
     description="Simple and fast lyrics application.",
-    long_description="",
+    long_description="Simple and powerful media software for churches",
     keywords='open source osc church lyrics projection song bible display',
     license='GNU General Public License v3',
 

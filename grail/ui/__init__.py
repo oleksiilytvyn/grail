@@ -6,6 +6,7 @@
     Expose classes to public
 """
 
+from grail.ui.song_dialog import SongDialog
 from grail.ui.node_editor import NodeEditor
 from grail.ui.property_editor import PropertyEditor
 from grail.ui.library_editor import LibraryEditor

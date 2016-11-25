@@ -29,7 +29,7 @@ from grail.utils import *
 from grail.grail import Grail
 from grail.data import ConnectionManager
 
-__version__ = '0.9.8'
+__version__ = '0.9.9'
 
 
 class Application(QApplication):

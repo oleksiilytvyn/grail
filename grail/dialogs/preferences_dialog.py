@@ -146,7 +146,7 @@ class GeneralPanel(QWidget):
 
         self.ui_reset_btn = QPushButton("Reset")
         self.ui_reset_btn.clicked.connect(self.reset_action)
-        self.ui_reset_label = QLabel("Restore all settings to original state and clear library.")
+        self.ui_reset_label = QLabel("Restore all settings to it's original state.\nBackup library before reset.")
 
         self.ui_import_btn = QPushButton("Import library")
         self.ui_import_btn.clicked.connect(self.import_action)
@@ -159,20 +159,21 @@ class GeneralPanel(QWidget):
         self.ui_layout = QVBoxLayout()
         self.ui_layout.setContentsMargins(12, 12, 12, 12)
 
-        if PLATFORM_MAC:
-            self.ui_layout.setSpacing(8)
-        else:
-            self.ui_layout.setSpacing(0)
+        self.ui_layout.setSpacing(8 if PLATFORM_MAC else 0)
 
+        self.ui_layout.addSpacing(16)
         self.ui_layout.addWidget(self.ui_reset_btn, 0, Qt.AlignLeft)
+        self.ui_layout.addSpacing(6)
         self.ui_layout.addWidget(self.ui_reset_label)
-        self.ui_layout.addSpacing(24)
+        self.ui_layout.addSpacing(16)
 
         self.ui_layout.addWidget(self.ui_import_btn, 0, Qt.AlignLeft)
+        self.ui_layout.addSpacing(6)
         self.ui_layout.addWidget(self.ui_import_label)
-        self.ui_layout.addSpacing(24)
+        self.ui_layout.addSpacing(16)
 
         self.ui_layout.addWidget(self.ui_export_btn, 0, Qt.AlignLeft)
+        self.ui_layout.addSpacing(6)
         self.ui_layout.addWidget(self.ui_export_label)
 
         self.ui_layout.addStretch()

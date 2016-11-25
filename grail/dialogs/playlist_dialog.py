@@ -210,6 +210,10 @@ class PlaylistDialogItem(QTableWidgetItem):
     def getPlaylist(self):
         return self.playlist
 
+# optimization to prevent loading of same icons multiple times
+PlaylistRemoveButtonICON = None
+PlaylistRemoveButtonICON_HOVER = None
+
 
 class PlaylistRemoveButton(QToolButton):
 
@@ -219,8 +223,16 @@ class PlaylistRemoveButton(QToolButton):
         super(PlaylistRemoveButton, self).__init__(parent)
 
         self.playlist = item
-        self._icon_regular = QIcon(':/icons/remove.png')
-        self._icon_white = QIcon(':/icons/remove-white.png')
+
+        global PlaylistRemoveButtonICON
+        global PlaylistRemoveButtonICON_HOVER
+
+        if not PlaylistRemoveButtonICON:
+            PlaylistRemoveButtonICON = QIcon(':/icons/remove.png')
+            PlaylistRemoveButtonICON_HOVER = QIcon(':/icons/remove-white.png')
+
+        self._icon_regular = PlaylistRemoveButtonICON
+        self._icon_white = PlaylistRemoveButtonICON_HOVER
 
         self.setIconState(True)
         self.setMinimumSize(16, 16)
@@ -235,6 +247,7 @@ class PlaylistRemoveButton(QToolButton):
         self.triggered.emit(self)
 
     def _triggered(self, button):
+
         pass
 
     def getPlaylist(self):

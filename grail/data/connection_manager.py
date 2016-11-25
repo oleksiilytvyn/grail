@@ -71,7 +71,7 @@ class ConnectionManager:
                 return char.lower()
 
             def searchprep(char):
-                char = re.sub(r'[\[\_\]\.\-\,\!\(\)\"\'\:\;]', '', char)
+                char = re.sub(r'[\[_\].\-,!()\"\':;]', '', char)
 
                 return char.lower()
 

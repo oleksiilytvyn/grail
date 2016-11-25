@@ -33,11 +33,7 @@ PLATFORM_UNIX = platform.system() == "Linux"
 
 
 def get_path():
-    """
-    Get the path to this script no matter how it's run.
-
-    :returns: path
-    """
+    """Get the path to this script no matter how it's run."""
 
     if hasattr(sys, 'frozen'):
         path = os.path.dirname(sys.executable)
@@ -50,11 +46,7 @@ def get_path():
 
 
 def get_stylesheet():
-    """
-    Get the application stylesheet
-
-    :returns: string
-    """
+    """Get application stylesheet"""
 
     data = ""
     stream = QFile(":/stylesheet/app.qss")
@@ -70,17 +62,25 @@ def get_stylesheet():
 
 
 def get_data_path():
-    APPNAME = 'grail1'
+    """Returns path to grail settings folder"""
+
+    name = 'grail1'
 
     if sys.platform == 'win32':
-        appdata = os.path.join(os.environ['APPDATA'], APPNAME)
+        appdata = os.path.join(os.environ['APPDATA'], name)
     else:
-        appdata = os.path.expanduser(os.path.join("~", "." + APPNAME))
+        appdata = os.path.expanduser(os.path.join("~", "." + name))
 
     return appdata
 
 
 def copy_file(a, b):
+    """Copy file from source 'a' to destination 'b'
+
+    Args:
+        a (str): source path
+        b (str): destination path
+    """
     directory = os.path.dirname(os.path.realpath(b))
 
     if not os.path.exists(directory):
@@ -91,11 +91,16 @@ def copy_file(a, b):
 
 
 def remove_file(path):
+    """Remove file without throwing exception
+
+    Args:
+        path (str): path to file to be removed
+    """
 
     try:
         os.remove(path)
     except OSError as e:
-        print(e)
+        pass
 
 
 def get_version():
@@ -107,13 +112,3 @@ def get_version():
         return open(path).read()
     else:
         return grail.__version__
-
-
-def tr(word):
-    """
-    translate string
-
-    :returns: string
-    """
-
-    return word

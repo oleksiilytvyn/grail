@@ -297,6 +297,10 @@ class OSCInPanel(Panel):
         self._ui_label = QLabel("OSC Input not supported", self)
         self._ui_label.move(20, 20)
 
+    def resizeEvent(self, event):
+
+        self.update()
+
     def update(self):
 
         size = self._ui_label.size()

@@ -14,13 +14,13 @@ from PyQt5.QtWidgets import *
 
 from grailkit.bible import Verse
 from grailkit.dna import DNA, SongEntity
-from grailkit.ui import GWidget, GSearchEdit, GListWidget, GListItem, GSpacer
+from grailkit.ui import GSearchEdit, GListWidget, GListItem, GSpacer
 from grailkit.ui.gapplication import AppInstance
 
-from grail.ui import SongDialog
+from grail.ui import SongDialog, Panel
 
 
-class LibraryEditor(GWidget):
+class LibraryEditor(Panel):
     """Simple library browser"""
 
     def __init__(self, app):
@@ -28,6 +28,8 @@ class LibraryEditor(GWidget):
 
         self.app = app
         self.song_dialog = SongDialog()
+
+        self.connect('/app/close', self._close)
 
         self.__ui__()
 
@@ -152,8 +154,9 @@ class LibraryEditor(GWidget):
     def _search_focus_out(self, event):
         """Focus on first item in list after Tab pressed"""
 
-        self._ui_list.setCurrentRow(0)
-        self._ui_list.setFocus()
+        if event.reason() == Qt.TabFocusReason and event.lostFocus():
+            self._ui_list.setCurrentRow(0)
+            self._ui_list.setFocus()
 
     def _context_menu(self, pos):
         """Context menu action"""
@@ -196,13 +199,14 @@ class LibraryEditor(GWidget):
         entity = item.object()
 
         if isinstance(entity, Verse):
-            pass
+            self.emit('/message/preview', "%s\n%s" % (entity.text, entity.reference))
         elif isinstance(entity, SongEntity):
-            pass
+            self.emit('/message/preview', entity.lyrics)
 
     def _item_doubleclicked(self, item):
         """List item double-clicked"""
 
+        # to-do add item to cuelist
         pass
 
     def add_action(self):
@@ -224,3 +228,7 @@ class LibraryEditor(GWidget):
 
         self.song_dialog.set_entity(item)
         self.song_dialog.show()
+
+    def _close(self):
+
+        self.song_dialog.close()

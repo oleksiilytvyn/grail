@@ -12,13 +12,15 @@ from PyQt5.QtWidgets import *
 
 from grailkit.ui import GWidget, GListWidget, GListItem
 
+from grail.ui import Panel
 
-class NodeEditor(GWidget):
 
-    nodeSelected = pyqtSignal(int)
+class NodeEditor(Panel):
 
     def __init__(self, app):
         super(NodeEditor, self).__init__()
+
+        self.connect('/property/changed', self._update)
 
         self.app = app
 
@@ -28,7 +30,6 @@ class NodeEditor(GWidget):
     def __ui__(self):
 
         self._ui_list = GListWidget()
-        self._ui_list.itemClicked.connect(self._node_clicked_event)
         self._ui_list.itemSelectionChanged.connect(self._node_selected_event)
 
         self._ui_add_action = QAction(QIcon(':/icons/add.png'), 'Add node', self)
@@ -68,27 +69,19 @@ class NodeEditor(GWidget):
 
             self._ui_list.addItem(item)
 
-    def _node_clicked_event(self, item):
-
-        self.nodeSelected.emit(item.id)
-
     def _node_selected_event(self):
 
         items = self._ui_list.selectedItems()
 
         if len(items) > 0:
-            self.nodeSelected.emit(items[0].id)
-
-    def update_list(self):
-
-        self._update()
+            self.emit('/node/selected', items[0].id)
 
     def add_action(self):
 
         self.app.project.create("Untitled item")
         self.update_list()
         self._ui_list.setCurrentRow(self._ui_list.count() - 1)
-        self.nodeSelected.emit(self._ui_list.item(self._ui_list.count() - 1).id)
+        self.emit('/node/selected', self._ui_list.item(self._ui_list.count() - 1).id)
 
     def remove_action(self):
 
@@ -99,4 +92,4 @@ class NodeEditor(GWidget):
 
         self.update_list()
         self._ui_list.setCurrentRow(0)
-        self.nodeSelected.emit(self._ui_list.item(0).id)
+        self.emit('/node/selected', self._ui_list.item(0).id)

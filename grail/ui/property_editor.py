@@ -10,13 +10,11 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
-from grailkit.ui import GWidget, GListWidget, GListItem
+from grail.ui import Panel
 
 
-class PropertyEditor(GWidget):
+class PropertyEditor(Panel):
     """Simple property editor"""
-
-    changed = pyqtSignal()
 
     def __init__(self, app):
         super(PropertyEditor, self).__init__()
@@ -25,6 +23,9 @@ class PropertyEditor(GWidget):
         self.current_entity = None
         self.current_property = None
         self._updating_list = True
+
+        # connect signals
+        self.connect('/node/selected', self.node)
 
         self.__ui__()
 
@@ -198,4 +199,4 @@ class PropertyEditor(GWidget):
                 dna.set(item.entity_id, key, value)
 
         self.node(item.entity_id)
-        self.changed.emit()
+        self.emit('/property/changed')

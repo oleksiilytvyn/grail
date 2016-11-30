@@ -46,6 +46,101 @@
             }
 
 /**
+ * @section cuelist panel
+ */
+
+#cuelist {
+    background-color: #626364;
+    padding: 0;
+    margin: 0;
+    }
+
+    #cuelist_toolbar {
+        background: #4b5056;
+        border-top: 1px solid #4b5056;
+        padding: 5px;
+        min-height: 24px;
+        }
+
+        #cuelist_toolbar QToolButton {
+            border: 1px solid transparent;
+            background: none;
+            border-radius: 3px;
+            padding: 2px;
+            }
+
+/**
+ * @section cuelist panel
+ */
+
+#cuelist_dialog {
+    background-color: #626364;
+    }
+
+    #cuelist_dialog_toolbar {
+        background: #4b5056;
+        border-top: 1px solid #4b5056;
+        padding: 5px 5px 5px 5px;
+        min-height: 24px;
+        }
+
+        #cuelist_dialog_toolbar QToolButton {
+            border: 1px solid transparent;
+            background: none;
+            border-radius: 3px;
+            padding: 2px;
+            }
+
+/**
+ * @section preview editor
+ */
+
+    #preview_label {
+        background: #000;
+        color: #fff;
+        padding: 8px;
+        qproperty-alignment: AlignCenter AlignCenter;
+        qproperty-wordWrap: true;
+        }
+
+    #preview_edit {
+        border: none;
+        background: #2f2f2f;
+        color: #ffffff;
+        padding: 3px 6px;
+        }
+
+        #preview_edit QScrollBar::handle:vertical {
+            background: #ddd;
+            min-height: 20px;
+            border-radius: 3px;
+            }
+
+    #preview_toolbar {
+        background: #4b5056;
+        border-top: 1px solid #4b5056;
+        padding: 3px 5px;
+        }
+
+        #preview_toolbar QToolButton {
+            border: 1px solid transparent;
+            background: none;
+            border-radius: 3px;
+            padding: 2px;
+            }
+
+        #preview_toolbar QToolButton:hover,
+        #preview_toolbar QToolButton:checked,
+        #preview_toolbar QToolButton:pressed {
+            background: #151515;
+            border: 1px solid #151515;
+            }
+
+    #preview_splitter::handle {
+        background-color: #333;
+        }
+
+/**
  * @section node editor
  */
 

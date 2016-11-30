@@ -1,0 +1,27 @@
+syntax: glob
+
+*~
+.db
+*.db
+.pyc
+*.pyc
+*.pyo
+*.log
+Thumbs.db
+.db-journal
+*.db-journal
+
+bin/*
+dist/*.exe
+dist/*.msi
+dist/*.dmg
+dist/*.app
+dist/*/*
+
+build/*.exe
+build/*.msi
+build/*.dmg
+build/*.app
+build/*/*
+.idea/*
+__pycache__/*

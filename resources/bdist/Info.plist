@@ -4,11 +4,13 @@
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
+
 	<key>CFBundleExecutable</key>
 	<string>grail</string>
+
 	<key>CFBundleIconFile</key>
 	<string>icon.icns</string>
-	
+
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
 

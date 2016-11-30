@@ -1,47 +1,28 @@
 <!DOCTYPE RCC>
 <RCC version="1.0">
-	<qresource>
-		<file alias="icons/branch-closed.png">icons/branch-closed.png</file>
-		<file alias="icons/branch-open.png">icons/branch-open.png</file>
-		<file alias="icons/branch-closed-white.png">icons/branch-closed-white.png</file>
-		<file alias="icons/branch-open-white.png">icons/branch-open-white.png</file>
-		<file alias="icons/search-clear.png">icons/search-clear.png</file>
+    <qresource>
+        <!-- Grail icons -->
+        <file alias="icon/32.png">../icon/32.png</file>
+        <file alias="icon/64.png">../icon/64.png</file>
+        <file alias="icon/128.png">../icon/128.png</file>
+        <file alias="icon/256.png">../icon/256.png</file>
 
-		<file alias="icons/color.png">icons/color.png</file>
-		<file alias="icons/background.png">icons/background.png</file>
-		<file alias="icons/shadow.png">icons/shadow.png</file>
-		<file alias="icons/font.png">icons/font.png</file>
-		<file alias="icons/font-white.png">icons/font-white.png</file>
-		<file alias="icons/selection-select.png">icons/selection-select.png</file>
-		<file alias="icons/selection-select-white.png">icons/selection-select-white.png</file>
-		<file alias="icons/zone-select.png">icons/zone-select.png</file>
-		<file alias="icons/align.png">icons/align.png</file>
-		<file alias="icons/align-white.png">icons/align-white.png</file>
-		<file alias="icons/case.png">icons/case.png</file>
-		<file alias="icons/case-white.png">icons/case-white.png</file>
+        <!-- Icons used in app -->
+        <file alias="icons/add.png">icons/add.png</file>
+        <file alias="icons/play.png">icons/play.png</file>
+        <file alias="icons/stop.png">icons/stop.png</file>
+        <file alias="icons/live.png">icons/live.png</file>
+        <file alias="icons/save.png">icons/save.png</file>
+        <file alias="icons/edit.png">icons/edit.png</file>
+        <file alias="icons/menu.png">icons/menu.png</file>
+        <file alias="icons/lock.png">icons/lock.png</file>
+        <file alias="icons/unlock.png">icons/unlock.png</file>
+        <file alias="icons/remove-white.png">icons/remove-white.png</file>
 
-		<file alias="icons/testcard.png">icons/testcard.png</file>
-		<file alias="icons/testcard-selected.png">icons/testcard-selected.png</file>
-		<file alias="icons/text-padding-box.png">icons/text-padding-box.png</file>
-		<file alias="icons/text-padding-box-selected.png">icons/text-padding-box-selected.png</file>
+        <!-- Images -->
+        <file alias="i/welcome_bg.png">i/welcome_bg.png</file>
 
-		<file alias="icons/add.png">icons/add.png</file>
-		<file alias="icons/edit.png">icons/edit.png</file>
-		<file alias="icons/media.png">icons/media.png</file>
-		<file alias="icons/library.png">icons/library.png</file>
-		<file alias="icons/songs.png">icons/songs.png</file>
-		<file alias="icons/stop.png">icons/stop.png</file>
-		<file alias="icons/save.png">icons/save.png</file>
-		<file alias="icons/play.png">icons/play.png</file>
-		<file alias="icons/live.png">icons/live.png</file>
-		<file alias="icons/remove.png">icons/remove.png</file>
-		<file alias="icons/remove-white.png">icons/remove-white.png</file>
-
-		<file alias="icons/32.png">../icon/32.png</file>
-		<file alias="icons/64.png">../icon/64.png</file>
-		<file alias="icons/128.png">../icon/128.png</file>
-		<file alias="icons/256.png">../icon/256.png</file>
-
-		<file alias="stylesheet/app.qss">stylesheet/app.qss</file>
-	</qresource>
+        <!-- Stylesheet -->
+        <file alias="stylesheet/grail.css">stylesheet/grail.css</file>
+    </qresource>
 </RCC>

@@ -1,5 +1,0 @@
-recursive-include grail *.py
-recursive-include resources *
-include LICENSE
-include README.md
-include AUTHORS

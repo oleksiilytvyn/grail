@@ -1,14 +1,27 @@
 syntax: glob
 
-bin/*
-dist/*
-build/*
-__pycache__/*
-.idea/*
-
+*~
+.db
+*.db
+.pyc
 *.pyc
 *.pyo
-*~
-*.db
-*.db-journal
 *.log
+Thumbs.db
+.db-journal
+*.db-journal
+
+bin/*
+dist/*.exe
+dist/*.msi
+dist/*.dmg
+dist/*.app
+dist/*/*
+
+build/*.exe
+build/*.msi
+build/*.dmg
+build/*.app
+build/*/*
+.idea/*
+__pycache__/*

@@ -16,9 +16,10 @@ from PyQt5.QtWidgets import *
 from grailkit.dna import DNA
 from grailkit.util import *
 from grailkit.ui import GAboutDialog, GMessageDialog
+from grailkit.ui.gapplication import AppInstance
 
 import grail
-from grail.ui import NodeEditor, PropertyEditor, LibraryEditor, PreferencesDialog
+from grail.ui import PreviewEditor, LibraryEditor, PreferencesDialog, CuelistEditor
 
 
 class MainWindow(QMainWindow):
@@ -51,22 +52,20 @@ class MainWindow(QMainWindow):
         self._ui_menubar()
 
         self.ui_library = LibraryEditor(self.app)
-        self.ui_cuelist = NodeEditor(self.app)
-        self.ui_properties = PropertyEditor(self.app)
-        self.ui_properties.changed.connect(self.ui_cuelist.update_list)
-
-        self.ui_cuelist.nodeSelected.connect(self.ui_properties.node)
+        self.ui_cuelist = CuelistEditor(self.app)
+        self.ui_preview = PreviewEditor(self.app)
 
         # splitter
         self._ui_splitter = QSplitter()
         self._ui_splitter.setObjectName("main_splitter")
         self._ui_splitter.addWidget(self.ui_library)
         self._ui_splitter.addWidget(self.ui_cuelist)
-        self._ui_splitter.addWidget(self.ui_properties)
+        self._ui_splitter.addWidget(self.ui_preview)
 
         self._ui_splitter.setCollapsible(0, False)
         self._ui_splitter.setCollapsible(2, False)
         self._ui_splitter.setHandleWidth(1)
+        self._ui_splitter.setSizes([self._ui_splitter.rect().width() / 3] * 3)
 
         self.setCentralWidget(self._ui_splitter)
         self.setWindowIcon(QIcon(':/icon/256.png'))
@@ -285,7 +284,7 @@ class MainWindow(QMainWindow):
                 data = json.load(data_file)
 
                 for item in data:
-                    if not 'name' in item:
+                    if 'name' not in item:
                         continue
 
                     song = lib.create(json_key(item, 'name', 'Untitled'), entity_type=DNA.TYPE_SONG)
@@ -347,4 +346,5 @@ class MainWindow(QMainWindow):
     def closeEvent(self, event):
         """Save project"""
 
+        AppInstance().emit('/app/close')
         self.app.project.close()

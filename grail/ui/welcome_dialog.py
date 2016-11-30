@@ -83,7 +83,7 @@ class WelcomeDialog(GDialog):
     def _continue(self):
         """Open a last project"""
 
-        path = self.app.settings.get('last-project')
+        path = self.app.settings.get('project-last')
 
         if os.path.isfile(path):
             self.app.open(path, create=False)

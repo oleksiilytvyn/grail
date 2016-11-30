@@ -111,6 +111,9 @@ setup(
     keywords='open source osc church lyrics projection song bible display',
     license='GNU General Public License v3',
 
+    requires=['grailkit', 'PyQt5'],
+    install_requires=['grailkit', 'PyQt5'],
+
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: MacOS X',

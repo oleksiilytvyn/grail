@@ -16,7 +16,6 @@ from PyQt5.QtWidgets import *
 from grailkit.dna import DNA
 from grailkit.util import *
 from grailkit.ui import GAboutDialog, GMessageDialog
-from grailkit.ui.gapplication import AppInstance
 
 import grail
 from grail.ui import PreviewEditor, LibraryEditor, PreferencesDialog, CuelistEditor
@@ -32,6 +31,10 @@ class MainWindow(QMainWindow):
 
         self.app = app
         self.project = self.app.project
+
+        self.project.property_changed.connect(print)
+
+        self._test_card = True
 
         self.__ui__()
 
@@ -71,7 +74,7 @@ class MainWindow(QMainWindow):
         self.setWindowIcon(QIcon(':/icon/256.png'))
         self.setGeometry(300, 300, 800, 480)
         self.setMinimumSize(320, 240)
-        self.setWindowTitle("%s - Grail" % (self.app.project.name,))
+        self.setWindowTitle("%s - Grail" % (self.app.project.location,))
         self.center()
         self.show()
 
@@ -140,8 +143,15 @@ class MainWindow(QMainWindow):
 
         # Output
         self.ui_disable_output_action = QAction('Disabled', self)
+        self.ui_disable_output_action.setCheckable(True)
+        self.ui_disable_output_action.triggered.connect(self.disable_output_action)
+
         self.ui_show_test_card_action = QAction('Show Test Card', self)
+        self.ui_show_test_card_action.setCheckable(True)
+        self.ui_show_test_card_action.triggered.connect(self.test_card_action)
+
         self.ui_output_preferences_action = QAction('Advanced Preferences', self)
+        self.ui_output_preferences_action.triggered.connect(self.output_preferences_action)
 
         # File menu
         self.ui_menu_file = self.ui_menubar.addMenu('&File')
@@ -152,45 +162,30 @@ class MainWindow(QMainWindow):
         self.ui_menu_file.addAction(self.ui_save_as_action)
         self.ui_menu_file.addSeparator()
         self.ui_menu_file.addAction(self.ui_import_action)
-        self.ui_menu_file.addAction(self.ui_export_action)
+        # self.ui_menu_file.addAction(self.ui_export_action)
         self.ui_menu_file.addSeparator()
         self.ui_menu_file.addAction(self.ui_quit_action)
 
         # Edit menu
-        self.ui_menu_edit = self.ui_menubar.addMenu('&Edit')
-        self.ui_menu_edit.addAction(self.ui_cut_action)
-        self.ui_menu_edit.addAction(self.ui_copy_action)
-        self.ui_menu_edit.addAction(self.ui_paste_action)
-        self.ui_menu_edit.addAction(self.ui_duplicate_action)
-        self.ui_menu_edit.addAction(self.ui_delete_action)
-        self.ui_menu_edit.addSeparator()
-        self.ui_menu_edit.addAction(self.ui_add_song_action)
+        # self.ui_menu_edit = self.ui_menubar.addMenu('&Edit')
+        # self.ui_menu_edit.addAction(self.ui_cut_action)
+        # self.ui_menu_edit.addAction(self.ui_copy_action)
+        # self.ui_menu_edit.addAction(self.ui_paste_action)
+        # self.ui_menu_edit.addAction(self.ui_duplicate_action)
+        # self.ui_menu_edit.addAction(self.ui_delete_action)
+        # self.ui_menu_edit.addSeparator()
+        # self.ui_menu_edit.addAction(self.ui_add_song_action)
 
         # Controls menu
         self.ui_menu_controls = self.ui_menubar.addMenu('&Controls')
         self.ui_menu_controls.addAction(self.ui_go_action)
-        self.ui_menu_controls.addAction(self.ui_go_to_action)
+        # self.ui_menu_controls.addAction(self.ui_go_to_action)
         self.ui_menu_controls.addAction(self.ui_blackout_action)
         self.ui_menu_controls.addSeparator()
         self.ui_menu_controls.addAction(self.ui_previous_cue_action)
         self.ui_menu_controls.addAction(self.ui_next_cue_action)
         self.ui_menu_controls.addAction(self.ui_first_cue_action)
         self.ui_menu_controls.addAction(self.ui_last_cue_action)
-
-        # View menu
-        self.ui_menu_view = self.ui_menubar.addMenu('&View')
-
-        # Options menu
-        self.ui_menu_options = self.ui_menubar.addMenu('&Options')
-        self.ui_menu_options.addAction(self.ui_edit_osc_action)
-        self.ui_menu_options.addAction(self.ui_edit_key_action)
-        self.ui_menu_options.addSeparator()
-        self.ui_menu_options.addAction(self.ui_lock_action)
-
-        if not OS_MAC:
-            self.ui_menu_options.addSeparator()
-
-        self.ui_menu_options.addAction(self.ui_preferences_action)
 
         # Output menu
         self.ui_menu_output = self.ui_menubar.addMenu('&Output')
@@ -258,15 +253,24 @@ class MainWindow(QMainWindow):
 
         path, ext = QFileDialog.getOpenFileName(self, "Import...", "", "*")
         ext = path.split('.')[-1]
+        message = ""
 
         if ext == 'grail':
-            print("Import of grail files not supported")
+            message = "Import of grail files not supported"
         elif ext == 'grail-library':
-            print("Import of grail library files not supported")
+            message = "Import of grail library files not supported"
         elif ext == 'grail-bible':
-            print("Import of grail bible files not supported")
-        else:
+            message = "Import of grail bible files not supported"
+        elif ext == 'json':
             self._import_json(path)
+        else:
+            message = "File format not supported."
+
+        if message:
+            dialog = GMessageDialog(title="Import",
+                                    text=message,
+                                    icon=GMessageDialog.Warning)
+            dialog.exec_()
 
     def _import_json(self, path):
         """Import json file"""
@@ -343,8 +347,25 @@ class MainWindow(QMainWindow):
         self.preferences_dialog.setWindowState(self.preferences_dialog.windowState() & ~Qt.WindowMinimized | Qt.WindowActive)
         self.preferences_dialog.activateWindow()
 
+    def output_preferences_action(self):
+        """Open output preferences dialog"""
+
+        pass
+
+    def test_card_action(self):
+        """Show test card or hide it"""
+
+        self._test_card = not self._test_card
+
+        self.app.emit('/display/testcard', self._test_card)
+
+    def disable_output_action(self):
+        """Disable display output"""
+
+        self.app.emit('/display/disable')
+
     def closeEvent(self, event):
         """Save project"""
 
-        AppInstance().emit('/app/close')
+        self.app.emit('/app/close')
         self.app.project.close()

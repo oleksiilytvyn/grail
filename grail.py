@@ -3,7 +3,7 @@
     grail
     ~~~~~
 
-    Just run a grail
+    Just run a grail app
 """
 
 from grail import main

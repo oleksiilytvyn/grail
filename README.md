@@ -9,8 +9,7 @@ The goal of project to provide beautiful, simple and fast application for christ
 
 * Python 3.3 or higher
 * PyQt 5 or higher
-* osc library (https://bitbucket.org/grailapp/osc)
-* grailkit library (https://bitbucket.org/grailapp/grailkit)
+* grailkit (https://bitbucket.org/grailapp/grailkit or pip install grailkit)
 
 If you want to build, you also need:
 

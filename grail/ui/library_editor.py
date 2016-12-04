@@ -94,7 +94,7 @@ class LibraryEditor(Panel):
             # show songs from library
             for song in AppInstance().library.items(filter_type=DNA.TYPE_SONG):
                 item = GListItem()
-                item.setText("[S] %s" % (song.name,))
+                item.setText("%s" % (song.name,))
                 item.setObject(song)
 
                 self._ui_list.addItem(item)
@@ -104,7 +104,7 @@ class LibraryEditor(Panel):
         # show bible references (limit to 3)
         for verse in AppInstance().bible.match_reference(keyword):
             item = GListItem()
-            item.setText("[V] %s" % (verse.reference,))
+            item.setText("%s" % (verse.reference,))
             item.setObject(verse)
 
             self._ui_list.addItem(item)
@@ -113,7 +113,7 @@ class LibraryEditor(Panel):
         for song in AppInstance().library.items(filter_keyword=keyword, filter_type=DNA.TYPE_SONG,
                                                 sort="name", reverse=True, limit=9):
             item = GListItem()
-            item.setText("[S] %s" % (song.name,))
+            item.setText("%s" % (song.name,))
             item.setObject(song)
 
             self._ui_list.addItem(item)

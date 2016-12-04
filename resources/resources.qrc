@@ -17,6 +17,7 @@
         <file alias="icons/menu.png">icons/menu.png</file>
         <file alias="icons/lock.png">icons/lock.png</file>
         <file alias="icons/unlock.png">icons/unlock.png</file>
+        <file alias="icons/remove.png">icons/remove.png</file>
         <file alias="icons/remove-white.png">icons/remove-white.png</file>
 
         <!-- Images -->

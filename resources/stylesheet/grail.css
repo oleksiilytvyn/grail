@@ -55,6 +55,68 @@
     margin: 0;
     }
 
+    #cuelist_list {
+        border: none;
+        show-decoration-selected: 1;
+        padding: 0;
+        background-color: #626364;
+        alternate-background-color: #676869;
+        outline: 0;
+        }
+
+        #cuelist_list::item {
+            color: #e6e6e6;
+            padding: 4px 0;
+            margin: 0;
+            outline: none;
+            border: none;
+            border-bottom: 1px solid #626364;
+            qproperty-wordWrap: true;
+            }
+
+        #cuelist_list::item:selected {
+            background: #8a9fbb;
+            border-bottom: 1px solid #8a9fbb;
+            color: #e6e6e6;
+            }
+
+        #cuelist_list::branch {
+            margin: 0;
+            padding: 0;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid #626364;
+            }
+
+        #cuelist_list::branch:selected {
+            background: #8a9fbb;
+            border-bottom: 1px solid #8a9fbb;
+            }
+
+        #cuelist_list::branch:has-children:!has-siblings:closed,
+        #cuelist_list::branch:closed:has-children:has-siblings {
+            border-image: none;
+            image: url(:/icons/branch-closed.png);
+            }
+
+        #cuelist_list::branch:open:has-children:!has-siblings,
+        #cuelist_list::branch:open:has-children:has-siblings  {
+            border-image: none;
+            image: url(:/icons/branch-open.png);
+            }
+
+        #cuelist_list::branch:has-children:!has-siblings:closed:selected,
+        #cuelist_list::branch:closed:has-children:has-siblings:selected {
+            border-image: none;
+            image: url(:/icons/branch-closed-white.png);
+            }
+
+        #cuelist_list::branch:open:has-children:!has-siblings:selected,
+        #cuelist_list::branch:open:has-children:has-siblings:selected  {
+            border-image: none;
+            image: url(:/icons/branch-open-white.png);
+            }
+
     #cuelist_toolbar {
         background: #4b5056;
         border-top: 1px solid #4b5056;
@@ -69,18 +131,54 @@
             padding: 2px;
             }
 
+    #cuelist_label {
+        qproperty-alignment: AlignCenter AlignCenter;
+        color: #e0e0e1;
+        margin: 3px;
+        }
+
 /**
  * @section cuelist panel
  */
 
 #cuelist_dialog {
-    background-color: #626364;
+    background-color: #2f2f2f;
     }
 
+    #cuelist_dialog_list {
+        border: none;
+        background-color: #2f2f2f;
+        alternate-background-color: #393939;
+        show-decoration-selected: 1;
+        outline: 0;
+        }
+
+        #cuelist_dialog_list QScrollBar::handle:vertical {
+            background: #ddd;
+            min-height: 20px;
+            border-radius: 3px;
+            }
+
+        #cuelist_dialog_list::item {
+            color: #e6e6e6;
+            padding: 4px 12px;
+            margin: 0;
+            border-bottom: 1px solid transparent;
+            qproperty-wordWrap: true;
+            }
+
+        #cuelist_dialog_list::item:selected {
+            background: #8a9fbb;
+            border-bottom: 1px solid #8a9fbb;
+            color: #e6e6e6;
+            }
+
     #cuelist_dialog_toolbar {
-        background: #4b5056;
-        border-top: 1px solid #4b5056;
-        padding: 5px 5px 5px 5px;
+        background: #222;
+        border-top: 1px solid #8a9fbb;
+        border: none;
+        padding: 0;
+        margin: 0;
         min-height: 24px;
         }
 
@@ -88,7 +186,7 @@
             border: 1px solid transparent;
             background: none;
             border-radius: 3px;
-            padding: 2px;
+            padding: 4px 4px;
             }
 
 /**
@@ -105,8 +203,8 @@
 
     #preview_edit {
         border: none;
-        background: #2f2f2f;
-        color: #ffffff;
+        background: #131313;
+        color: #f1f1f1;
         padding: 3px 6px;
         }
 
@@ -117,8 +215,8 @@
             }
 
     #preview_toolbar {
-        background: #4b5056;
-        border-top: 1px solid #4b5056;
+        background: #1e1e1e;
+        border-top: 1px solid #1e1e1e;
         padding: 3px 5px;
         }
 
@@ -127,13 +225,6 @@
             background: none;
             border-radius: 3px;
             padding: 2px;
-            }
-
-        #preview_toolbar QToolButton:hover,
-        #preview_toolbar QToolButton:checked,
-        #preview_toolbar QToolButton:pressed {
-            background: #151515;
-            border: 1px solid #151515;
             }
 
     #preview_splitter::handle {

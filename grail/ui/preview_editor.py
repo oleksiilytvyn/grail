@@ -27,7 +27,7 @@ class PreviewEditor(Panel):
 
     def __ui__(self):
 
-        self._ui_label = QLabel("Hello world!")
+        self._ui_label = QLabel("")
         self._ui_label.setObjectName("preview_label")
         self._ui_label.setWordWrap(True)
         self._ui_label.setAlignment(Qt.AlignCenter | Qt.AlignCenter)

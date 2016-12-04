@@ -10,7 +10,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
-from grailkit.ui import GBalloonDialog, GSpacer, GListWidget, GListItem
+from grailkit.ui import GBalloonDialog, GSpacer
 from grailkit.ui.gapplication import AppInstance
 
 
@@ -19,12 +19,14 @@ class CuelistDialog(GBalloonDialog):
     def __init__(self):
         super(CuelistDialog, self).__init__()
 
+        self._updating_list = False
+
         self.__ui__()
         self.update_list()
 
     def __ui__(self):
 
-        self.setBackgroundColor(QColor(75, 80, 86))
+        self.setBackgroundColor(QColor("#222"))
         self.setObjectName('cuelist_dialog')
 
         self._ui_layout = QVBoxLayout()
@@ -32,6 +34,9 @@ class CuelistDialog(GBalloonDialog):
         self._ui_layout.setContentsMargins(0, 0, 0, 0)
 
         self._ui_list = CuelistsListWidget()
+        self._ui_list.setObjectName("cuelist_dialog_list")
+        self._ui_list.cellChanged.connect(self._list_cell_changed)
+        self._ui_list.itemSelectionChanged.connect(self._list_item_selected)
 
         self._ui_edit_action = QAction(QIcon(':/icons/edit.png'), 'Edit', self)
         self._ui_edit_action.triggered.connect(self.edit_action)
@@ -57,6 +62,8 @@ class CuelistDialog(GBalloonDialog):
 
     def update_list(self):
 
+        self._updating_list = True
+
         app = AppInstance()
         cuelists = app.project.cuelists()
         x = 0
@@ -64,26 +71,61 @@ class CuelistDialog(GBalloonDialog):
         self._ui_list.setRowCount(len(cuelists))
 
         for cuelist in cuelists:
-            item = CuelistsListItem(cuelist.name)
-            self._ui_list.setItem(x, 0, item)
 
-            #if int(playlist['id']) == id:
-            #    self.ui_list.setCurrentItem(item)
-            #    self._list_item_clicked(item)
-            #    self.ui_list.scrollToItem(self.ui_list.item(x, 0))
+            item = CuelistsListItem(cuelist.name)
+            item.cuelist_id = cuelist.id
 
             button = CuelistsListButton(self)
-            #button.triggered.connect(self._list_remove_clicked)
+            button.cuelist_id = cuelist.id
+            button.clicked.connect(self._remove_clicked)
 
+            self._ui_list.setItem(x, 0, item)
             self._ui_list.setCellWidget(x, 1, button)
 
             x += 1
 
+        self._updating_list = False
+
+    def _remove_clicked(self, item):
+
+        AppInstance().project.remove(item.cuelist_id)
+
+        self.update_list()
+
+    def _list_item_selected(self):
+
+        item = self._ui_list.item(self._ui_list.currentRow(), 0)
+
+        AppInstance().emit('/cuelist/selected', item.cuelist_id)
+
+    def _list_cell_changed(self, row, column):
+
+        # don't do anything if list refreshing
+        if self._updating_list:
+            return False
+
+        item = self._ui_list.item(row, column)
+        cuelist = AppInstance().project.cuelist(item.cuelist_id)
+        cuelist.name = item.text()
+        cuelist.update()
+
     def edit_action(self):
-        pass
+        """Edit button clicked"""
+
+        items = self._ui_list.selectedItems()
+
+        if len(items) < 1:
+            return False
+
+        self._ui_list.editItem(items[0])
 
     def add_action(self):
-        pass
+        """Add button clicked"""
+
+        AppInstance().project.append(name="Untitled")
+
+        self.update_list()
+        self._ui_list.editItem(self._ui_list.item(self._ui_list.rowCount() - 1, 0))
 
 
 class CuelistsListItem(QTableWidgetItem):
@@ -95,19 +137,35 @@ class CuelistsListItem(QTableWidgetItem):
         self.setFlags(Qt.ItemIsEditable | Qt.ItemIsSelectable | Qt.ItemIsEnabled)
 
 
-class CuelistsListButton(QToolButton):
+class CuelistsListButton(QWidget):
+
+    clicked = pyqtSignal("QWidget")
 
     def __init__(self, parent):
         super(CuelistsListButton, self).__init__(parent)
 
-        self.setMinimumSize(16, 16)
-        self.setStyleSheet("QToolButton {background: transparent;border: none;padding: 0;margin: 0;}")
+        self._icon = QPixmap(':/icons/remove-white.png')
+
+    def paintEvent(self, event):
+
+        size = 18
+
+        p = QPainter()
+        p.begin(self)
+
+        p.drawPixmap(self.width() / 2 - size / 2, self.height() / 2 - size / 2, size, size, self._icon)
+
+        p.end()
+
+    def mousePressEvent(self, event):
+
+        self.clicked.emit(self)
 
 
 class CuelistsListWidget(QTableWidget):
 
     def __init__(self, parent=None):
-        """Initialize PlaylistTableWidget"""
+        """Initialize"""
 
         super(CuelistsListWidget, self).__init__(parent)
 
@@ -145,12 +203,8 @@ class CuelistsListWidget(QTableWidget):
 
         QTableWidget.paintEvent(self, event)
 
-        self._update_scrollbar()
-
     def update(self, **kwargs):
-        """Update ui components
-        :param **kwargs:
-        """
+        """Update ui components"""
 
         super(CuelistsListWidget, self).update()
 
@@ -161,7 +215,7 @@ class CuelistsListWidget(QTableWidget):
 
         original = self.verticalScrollBar()
 
-        if not hasattr(self, 'scrollbar'):
+        if not hasattr(self, '_scrollbar'):
             return
 
         if original.value() == original.maximum() and original.value() == 0:

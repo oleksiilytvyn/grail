@@ -118,6 +118,14 @@ class Grail(GApplication):
             pass
 
     def connect(self, message, fn):
+        """Connect message listener
+
+        Args:
+            message (str): message name
+            fn (callable): function to call
+        Raises:
+            Exception when message or fn arguments is incorrect
+        """
 
         if not message or not isinstance(message, str):
             raise Exception("Message argument is wrong")
@@ -131,6 +139,11 @@ class Grail(GApplication):
             self._slots[message] = [fn]
 
     def emit(self, message, *args):
+        """Emit a message
+
+        Args:
+            message (str): message name
+        """
 
         if message in self._slots:
             for fn in self._slots[message]:

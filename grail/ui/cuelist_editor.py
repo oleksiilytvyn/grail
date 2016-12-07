@@ -10,8 +10,6 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
-from grailkit.ui import GSpacer, GListWidget, GListItem
-
 from grail.ui import CuelistDialog, Panel
 
 
@@ -22,6 +20,7 @@ class CuelistEditor(Panel):
 
         self.app = app
         self._locked = False
+        self._cuelist_id = 0
 
         self.dialog = CuelistDialog()
         self.dialog.showAt(QPoint(500, 500))
@@ -44,13 +43,13 @@ class CuelistEditor(Panel):
         self._ui_list.setObjectName("cuelist_list")
         self._ui_list.setContextMenuPolicy(Qt.CustomContextMenu)
 
-        # self._ui_list.itemClicked.connect(self.page_clicked)
-        # self._ui_list.itemDoubleClicked.connect(self.page_double_clicked)
-        # self._ui_list.customContextMenuRequested.connect(self.playlist_context_menu)
-        # self._ui_list.keyPressed.connect(self.playlist_key_event)
-        # self._ui_list.orderChanged.connect(self.playlist_reordered)
-        # self._ui_list.itemCollapsed.connect(self.playlist_item_collapsed)
-        # self._ui_list.itemExpanded.connect(self.playlist_item_collapsed)
+        self._ui_list.itemClicked.connect(self._item_clicked)
+        self._ui_list.itemDoubleClicked.connect(self._item_double_clicked)
+        self._ui_list.customContextMenuRequested.connect(self._context_menu)
+        self._ui_list.keyPressed.connect(self._key_event)
+        self._ui_list.orderChanged.connect(self._list_reordered)
+        self._ui_list.itemCollapsed.connect(self._item_collapsed)
+        self._ui_list.itemExpanded.connect(self._item_collapsed)
 
         self._ui_label = QLabel("...")
         self._ui_label.setObjectName("cuelist_label")
@@ -91,18 +90,42 @@ class CuelistEditor(Panel):
         self.dialog.update_list()
         self.dialog.showAt(self.mapToGlobal(point))
 
-    def cuelist_selected(self, cuelist_id):
+    def cuelist_selected(self, cuelist_id=0):
 
+        self._cuelist_id = cuelist_id
         cuelist = self.app.project.cuelist(cuelist_id)
+
+        self._ui_list.clear()
+
+        if cuelist is None:
+            self._ui_label.setText("...")
+            return False
 
         self._ui_label.setText("%s <small>(%d cues)</small>" % (cuelist.name, len(cuelist)))
         self._ui_list.clear()
 
         for cue in cuelist.cues():
-            item = QTreeWidgetItem(self._ui_list, ["%s" % (cue.name, ), '2s', 'E'])
-            item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+            item = CuelistItem(self._ui_list, "%s" % (cue.name, ))
 
             self._ui_list.addTopLevelItem(item)
+
+    def _item_clicked(self):
+        pass
+
+    def _item_double_clicked(self):
+        pass
+
+    def _context_menu(self):
+        pass
+
+    def _key_event(self):
+        pass
+
+    def _list_reordered(self):
+        pass
+
+    def _item_collapsed(self):
+        pass
 
     def _close(self):
         """Close child dialogs"""
@@ -195,3 +218,11 @@ class CuelistWidget(QTreeWidget):
         self._scrollbar.setRange(original.minimum(), original.maximum())
         self._scrollbar.resize(8, self.rect().height())
         self._scrollbar.move(self.rect().width() - 8, 0)
+
+
+class CuelistItem(QTreeWidgetItem):
+
+    def __init__(self, parent, text=""):
+        super(CuelistItem, self).__init__(parent, [text])
+
+        self.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)

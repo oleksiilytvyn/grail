@@ -240,36 +240,49 @@ class SourcesTableWidget(QTableWidget):
         self.scrollbar.resize(8, self.rect().height())
         self.scrollbar.move(self.rect().width() - 8, 0)
 
+# optimization to prevent loading of same icons multiple times
+SourcesRemoveButtonICON = None
+SourcesRemoveButtonICON_HOVER = None
 
-class SourcesRemoveButton(QToolButton):
 
-    triggered = pyqtSignal("QToolButton")
+class SourcesRemoveButton(QWidget):
 
-    def __init__(self, parent, itemid):
+    triggered = pyqtSignal("QWidget")
+
+    def __init__(self, parent, playlist):
         super(SourcesRemoveButton, self).__init__(parent)
 
-        self._icon_regular = QIcon(':/icons/remove.png')
-        self._icon_white = QIcon(':/icons/remove-white.png')
+        self.playlist = playlist
+        self._icon = QPixmap(':/icons/remove-white.png')
 
-        self.setIconState(True)
-        self.setMinimumSize(16, 16)
-        self.id = itemid
+    def paintEvent(self, event):
 
-        self.setStyleSheet("QToolButton {background: transparent;border: none;padding: 0;margin: 0;}")
+        size = 18
 
-        self.clicked.connect(self._clicked)
-        self.triggered.connect(self._triggered)
+        p = QPainter()
+        p.begin(self)
 
-    def _clicked(self, checked):
+        p.drawPixmap(self.width() / 2 - size / 2, self.height() / 2 - size / 2, size, size, self._icon)
+
+        p.end()
+
+    def mousePressEvent(self, event):
 
         self.triggered.emit(self)
 
-    def _triggered(self, button):
-        pass
+    def getPlaylist(self):
+        """Get a playlist assigned to component"""
+
+        return self.playlist
 
     def setIconState(self, flag):
+        """Set icon state"""
 
-        if flag:
-            self.setIcon(self._icon_regular)
-        else:
-            self.setIcon(self._icon_white)
+        global SourcesRemoveButtonICON
+        global SourcesRemoveButtonICON_HOVER
+
+        if not SourcesRemoveButtonICON:
+            SourcesRemoveButtonICON = QPixmap(':/icons/remove.png')
+            SourcesRemoveButtonICON_HOVER = QPixmap(':/icons/remove-white.png')
+
+        self._icon = SourcesRemoveButtonICON if flag else SourcesRemoveButtonICON_HOVER

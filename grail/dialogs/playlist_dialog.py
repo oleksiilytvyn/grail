@@ -99,7 +99,7 @@ class PlaylistDialog(BalloonDialog):
         playlist = Playlist.get(Playlist.add("Untitled"))
         x = self.ui_list.rowCount()
         item = PlaylistDialogItem(playlist)
-        button = PlaylistRemoveButton(self, playlist)
+        button = PlaylistButton(self, playlist)
         button.triggered.connect(self._list_remove_clicked)
 
         self.ui_list.insertRow(x)
@@ -139,7 +139,7 @@ class PlaylistDialog(BalloonDialog):
                 self._list_item_clicked(item)
                 self.ui_list.scrollToItem(self.ui_list.item(x, 0))
 
-            button = PlaylistRemoveButton(self, playlist)
+            button = PlaylistButton(self, playlist)
             button.triggered.connect(self._list_remove_clicked)
 
             self.ui_list.setCellWidget(x, 1, button)
@@ -210,45 +210,36 @@ class PlaylistDialogItem(QTableWidgetItem):
     def getPlaylist(self):
         return self.playlist
 
+
 # optimization to prevent loading of same icons multiple times
 PlaylistRemoveButtonICON = None
 PlaylistRemoveButtonICON_HOVER = None
 
 
-class PlaylistRemoveButton(QToolButton):
+class PlaylistButton(QWidget):
 
-    triggered = pyqtSignal("QToolButton")
+    triggered = pyqtSignal("QWidget")
 
-    def __init__(self, parent, item):
-        super(PlaylistRemoveButton, self).__init__(parent)
+    def __init__(self, parent, playlist):
+        super(PlaylistButton, self).__init__(parent)
 
-        self.playlist = item
+        self.playlist = playlist
+        self._icon = QPixmap(':/icons/remove-white.png')
 
-        global PlaylistRemoveButtonICON
-        global PlaylistRemoveButtonICON_HOVER
+    def paintEvent(self, event):
 
-        if not PlaylistRemoveButtonICON:
-            PlaylistRemoveButtonICON = QIcon(':/icons/remove.png')
-            PlaylistRemoveButtonICON_HOVER = QIcon(':/icons/remove-white.png')
+        size = 18
 
-        self._icon_regular = PlaylistRemoveButtonICON
-        self._icon_white = PlaylistRemoveButtonICON_HOVER
+        p = QPainter()
+        p.begin(self)
 
-        self.setIconState(True)
-        self.setMinimumSize(16, 16)
+        p.drawPixmap(self.width() / 2 - size / 2, self.height() / 2 - size / 2, size, size, self._icon)
 
-        self.setStyleSheet("QToolButton {background: transparent;border: none;padding: 0;margin: 0;}")
+        p.end()
 
-        self.clicked.connect(self._clicked)
-        self.triggered.connect(self._triggered)
-
-    def _clicked(self, checked):
+    def mousePressEvent(self, event):
 
         self.triggered.emit(self)
-
-    def _triggered(self, button):
-
-        pass
 
     def getPlaylist(self):
         """Get a playlist assigned to component"""
@@ -258,10 +249,15 @@ class PlaylistRemoveButton(QToolButton):
     def setIconState(self, flag):
         """Set icon state"""
 
-        if flag:
-            self.setIcon(self._icon_regular)
-        else:
-            self.setIcon(self._icon_white)
+        global PlaylistRemoveButtonICON
+        global PlaylistRemoveButtonICON_HOVER
+
+        if not PlaylistRemoveButtonICON:
+            PlaylistRemoveButtonICON = QPixmap(':/icons/remove.png')
+            PlaylistRemoveButtonICON_HOVER = QPixmap(':/icons/remove-white.png')
+
+        self._icon = PlaylistRemoveButtonICON if flag else PlaylistRemoveButtonICON_HOVER
+
 
 
 class PlaylistTableWidget(QTableWidget):

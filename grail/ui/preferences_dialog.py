@@ -10,8 +10,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
-from grailkit.ui import GDialog, GWidget, GListWidget, GListItem, GSwitch
-from grailkit.ui.gapplication import AppInstance
+from grailkit.qt import GDialog, GWidget, GListWidget, GListItem, GSwitch, AppInstance
 from grailkit.util import OS_MAC
 from grailkit.bible import BibleHost, BibleHostError
 

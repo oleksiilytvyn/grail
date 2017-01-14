@@ -10,7 +10,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
-from grailkit.ui import GSpacer
+from grailkit.qt import GSpacer
 
 from grail.ui import Panel
 

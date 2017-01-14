@@ -10,15 +10,22 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
-from grailkit.ui import GDialog
+from grailkit.qt import GDialog, AppInstance
+from grailkit.dna import DNA
 
 
 class SongDialog(GDialog):
     """Song edit dialog"""
 
-    def __init__(self, parent=None, song=None, library=None):
+    MODE_CREATE = 0
+    MODE_UPDATE = 1
+
+    changed = pyqtSignal()
+
+    def __init__(self, parent=None, song=None):
         super(SongDialog, self).__init__(parent)
 
+        self._mode = SongDialog.MODE_CREATE
         self._entity = song
 
         self.__ui__()
@@ -82,6 +89,7 @@ class SongDialog(GDialog):
     def reject_action(self):
         """Close window"""
 
+        self.changed.emit()
         self.reject()
 
     def accept_action(self):
@@ -93,21 +101,38 @@ class SongDialog(GDialog):
         lyrics = str(self.ui_lyrics_edit.toPlainText()).strip()
         year = int(''.join(x for x in self.ui_year_edit.text() if x.isdigit()))
 
-        print('--- song ---')
-        print(title)
-        print(album)
-        print(artist)
-        print(lyrics)
-        print(year)
+        if self._mode == SongDialog.MODE_CREATE:
+            entity = AppInstance().library.create(name=title, entity_type=DNA.TYPE_SONG)
+        else:
+            entity = self._entity
 
+        entity.name = title
+        entity.album = album
+        entity.artist = artist
+        entity.lyrics = lyrics
+        entity.year = year
+        entity.update()
+
+        self.changed.emit()
         self.accept()
 
     def set_entity(self, entity):
 
         self._entity = entity
 
-        self.ui_title_edit.setText(entity.name)
-        self.ui_album_edit.setText(entity.album)
-        self.ui_artist_edit.setText(entity.artist)
-        self.ui_lyrics_edit.setText(entity.lyrics)
-        self.ui_year_edit.setText(str(entity.year))
+        if entity:
+            self.ui_title_edit.setText(entity.name)
+            self.ui_album_edit.setText(entity.album)
+            self.ui_artist_edit.setText(entity.artist)
+            self.ui_lyrics_edit.setText(entity.lyrics)
+            self.ui_year_edit.setText(str(entity.year))
+
+            self._mode = SongDialog.MODE_UPDATE
+        else:
+            self.ui_title_edit.setText('Untitled')
+            self.ui_album_edit.setText('')
+            self.ui_artist_edit.setText('Unknown')
+            self.ui_lyrics_edit.setText('')
+            self.ui_year_edit.setText('2000')
+
+            self._mode = SongDialog.MODE_CREATE

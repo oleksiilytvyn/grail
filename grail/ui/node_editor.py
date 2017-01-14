@@ -10,7 +10,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
-from grailkit.ui import GWidget, GListWidget, GListItem
+from grailkit.qt import GWidget, GListWidget, GListItem
 
 from grail.ui import Panel
 

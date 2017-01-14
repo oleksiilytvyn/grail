@@ -27,6 +27,7 @@ class CuelistEditor(Panel):
 
         self.connect('/app/close', self._close)
         self.connect('/cuelist/selected', self.cuelist_selected)
+        self.connect('/cuelist/add', self._add_entity)
 
         self.__ui__()
 
@@ -108,6 +109,18 @@ class CuelistEditor(Panel):
             item = CuelistItem(self._ui_list, "%s" % (cue.name, ))
 
             self._ui_list.addTopLevelItem(item)
+
+    def _add_entity(self, id):
+        """Add entity to cuelist"""
+
+        cuelist_id = self._cuelist_id
+        entity = self.app.library.item(id)
+        cuelist = self.app.project.cuelist(cuelist_id)
+
+        if entity and cuelist:
+            cuelist.append(entity)
+
+            self.cuelist_selected(cuelist_id)
 
     def _item_clicked(self):
         pass

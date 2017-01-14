@@ -6,8 +6,8 @@
     Panels and panel manager
 """
 
-from grailkit.ui import GWidget
-from grailkit.ui.gapplication import AppInstance
+from grailkit.qt import GWidget
+from grailkit.qt.gapplication import AppInstance
 
 
 class Panel(GWidget):
@@ -22,8 +22,6 @@ class Panel(GWidget):
 
     def emit(self, message, *args):
         """Emit signal globally"""
-
-        print(self, message, *args)
 
         self.__app.emit(message, *args)
 

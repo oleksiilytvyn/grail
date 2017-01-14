@@ -14,8 +14,7 @@ from PyQt5.QtWidgets import *
 
 from grailkit.bible import Verse
 from grailkit.dna import DNA, SongEntity
-from grailkit.ui import GSearchEdit, GListWidget, GListItem, GSpacer
-from grailkit.ui.gapplication import AppInstance
+from grailkit.qt import GSearchEdit, GListWidget, GListItem, GSpacer, AppInstance
 
 from grail.ui import SongDialog, Panel
 
@@ -28,8 +27,11 @@ class LibraryEditor(Panel):
 
         self.app = app
         self.song_dialog = SongDialog()
+        self.song_dialog.changed.connect(self._update)
 
         self.connect('/app/close', self._close)
+        self.app.library.entity_changed.connect(self._update)
+        self.app.library.entity_removed.connect(self._update)
 
         self.__ui__()
 
@@ -84,6 +86,11 @@ class LibraryEditor(Panel):
         # simulate search event
         self._search_event("")
 
+    def _update(self, entity_id=None):
+        """Update panel"""
+
+        self._search_event(str(self._ui_search.text()))
+
     def _search_event(self, keyword):
         """Triggered when user types something in search field"""
 
@@ -92,7 +99,7 @@ class LibraryEditor(Panel):
         if not keyword:
 
             # show songs from library
-            for song in AppInstance().library.items(filter_type=DNA.TYPE_SONG):
+            for song in self.app.library.items(filter_type=DNA.TYPE_SONG):
                 item = GListItem()
                 item.setText("%s" % (song.name,))
                 item.setObject(song)
@@ -102,7 +109,7 @@ class LibraryEditor(Panel):
             return
 
         # show bible references (limit to 3)
-        for verse in AppInstance().bible.match_reference(keyword):
+        for verse in self.app.bible.match_reference(keyword):
             item = GListItem()
             item.setText("%s" % (verse.reference,))
             item.setObject(verse)
@@ -110,15 +117,15 @@ class LibraryEditor(Panel):
             self._ui_list.addItem(item)
 
         # show songs from library (limit to 9)
-        for song in AppInstance().library.items(filter_keyword=keyword, filter_type=DNA.TYPE_SONG,
-                                                sort="name", reverse=True, limit=9):
+        for song in self.app.library.items(filter_keyword=keyword, filter_type=DNA.TYPE_SONG,
+                                      sort="name", reverse=True, limit=9):
             item = GListItem()
             item.setText("%s" % (song.name,))
             item.setObject(song)
 
             self._ui_list.addItem(item)
 
-        # To-do: show media items from library (limit to 6)
+        # todo: show media items from library (limit to 6)
 
     def _search_key_event(self, event):
         """Process key evens before search action begins"""
@@ -206,29 +213,34 @@ class LibraryEditor(Panel):
     def _item_doubleclicked(self, item):
         """List item double-clicked"""
 
-        # to-do add item to cuelist
-        pass
+        if not item:
+            return
+
+        self.add_item_action(item.object())
 
     def add_action(self):
         """Add action"""
 
+        self.song_dialog.set_entity(None)
         self.song_dialog.show()
 
-    def add_item_action(self, item):
+    def add_item_action(self, entity):
+        """Add item to cuelist"""
 
-        pass
+        self.emit('/cuelist/add', entity.id)
 
-    def delete_item_action(self, item):
+    def delete_item_action(self, entity):
         """Delete item from library"""
 
-        AppInstance().library.remove(item.id)
+        self.app.library.remove(entity.id)
 
-    def edit_item_action(self, item):
+    def edit_item_action(self, entity):
         """Edit library item"""
 
-        self.song_dialog.set_entity(item)
+        self.song_dialog.set_entity(entity)
         self.song_dialog.show()
 
     def _close(self):
+        """Close this panel and child components"""
 
         self.song_dialog.close()

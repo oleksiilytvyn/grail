@@ -15,7 +15,7 @@ from PyQt5.QtWidgets import *
 
 from grailkit.dna import DNA
 from grailkit.util import *
-from grailkit.ui import GAboutDialog, GMessageDialog
+from grailkit.qt import GAboutDialog, GMessageDialog
 
 import grail
 from grail.ui import PreviewEditor, LibraryEditor, PreferencesDialog, CuelistEditor
@@ -164,6 +164,7 @@ class MainWindow(QMainWindow):
         self.ui_menu_file.addAction(self.ui_import_action)
         # self.ui_menu_file.addAction(self.ui_export_action)
         self.ui_menu_file.addSeparator()
+        self.ui_menu_file.addAction(self.ui_preferences_action)
         self.ui_menu_file.addAction(self.ui_quit_action)
 
         # Edit menu

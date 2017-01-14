@@ -10,8 +10,8 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
-from grailkit.ui import GBalloonDialog, GSpacer
-from grailkit.ui.gapplication import AppInstance
+from grailkit.qt import GBalloonDialog, GSpacer
+from grailkit.qt.gapplication import AppInstance
 
 
 class CuelistDialog(GBalloonDialog):
@@ -122,7 +122,7 @@ class CuelistDialog(GBalloonDialog):
     def add_action(self):
         """Add button clicked"""
 
-        AppInstance().project.append(name="Untitled")
+        AppInstance().project.create(name="Untitled")
 
         self.update_list()
         self._ui_list.editItem(self._ui_list.item(self._ui_list.rowCount() - 1, 0))

@@ -11,7 +11,7 @@ import sys
 
 from grailkit.dna import SettingsFile, Project, Library
 from grailkit.bible import BibleHost
-from grailkit.ui import GApplication, GMessageDialog
+from grailkit.qt import GApplication, GMessageDialog
 
 import grail
 import grail.resources
@@ -92,8 +92,10 @@ class Grail(GApplication):
     def _closed(self):
         """Called when all windows closed"""
 
-        self.library.close()
-        self.settings.close()
+        if self.library:
+            self.library.close()
+        if self.settings:
+            self.settings.close()
 
         if self._relaunch:
             python = sys.executable
@@ -114,7 +116,7 @@ class Grail(GApplication):
             self.settings.set('bible-default', bibles.keys()[0])
         # if there is no bibles available
         else:
-            # to-do: make it work
+            # todo: make it work
             pass
 
     def connect(self, message, fn):

@@ -20,7 +20,10 @@ class CuelistEditor(Panel):
 
         self.app = app
         self._locked = False
-        self._cuelist_id = 0
+        self._cuelist_id = self.app.project.settings().get('cuelist/current', default=0)
+
+        self.app.project.entity_changed.connect(self._update)
+        self.app.project.entity_removed.connect(self._update)
 
         self.dialog = CuelistDialog()
         self.dialog.showAt(QPoint(500, 500))
@@ -30,6 +33,7 @@ class CuelistEditor(Panel):
         self.connect('/cuelist/add', self._add_entity)
 
         self.__ui__()
+        self.cuelist_selected(self._cuelist_id)
 
     def __ui__(self):
 
@@ -91,6 +95,10 @@ class CuelistEditor(Panel):
         self.dialog.update_list()
         self.dialog.showAt(self.mapToGlobal(point))
 
+    def _update(self, *args):
+
+        self.cuelist_selected(self._cuelist_id)
+
     def cuelist_selected(self, cuelist_id=0):
 
         self._cuelist_id = cuelist_id
@@ -102,6 +110,8 @@ class CuelistEditor(Panel):
             self._ui_label.setText("...")
             return False
 
+        self.app.project.settings().set('cuelist/current', cuelist_id)
+
         self._ui_label.setText("%s <small>(%d cues)</small>" % (cuelist.name, len(cuelist)))
         self._ui_list.clear()
 
@@ -110,11 +120,11 @@ class CuelistEditor(Panel):
 
             self._ui_list.addTopLevelItem(item)
 
-    def _add_entity(self, id):
+    def _add_entity(self, entity_id):
         """Add entity to cuelist"""
 
         cuelist_id = self._cuelist_id
-        entity = self.app.library.item(id)
+        entity = self.app.library.item(entity_id)
         cuelist = self.app.project.cuelist(cuelist_id)
 
         if entity and cuelist:

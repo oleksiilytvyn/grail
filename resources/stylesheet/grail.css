@@ -388,3 +388,41 @@ SongDialog {
         min-height: 20px;
         border-radius: 3px;
         }
+
+QTreeWidget {
+    border: none;
+    show-decoration-selected: 1;
+    padding: 0;
+    background-color: #626364;
+    alternate-background-color: #676869;
+    outline: 0;
+    }
+
+    QTreeWidget::item {
+        color: #e6e6e6;
+        padding: 4px 0;
+        margin: 0;
+        outline: none;
+        border: none;
+        border-bottom: 1px solid #626364;
+        qproperty-wordWrap: true;
+        }
+
+    QTreeWidget::item:selected {
+        background: #8a9fbb;
+        border-bottom: 1px solid #8a9fbb;
+        color: #e6e6e6;
+        }
+
+    QTreeWidget::branch {
+        margin: 0;
+        padding: 0;
+        background: transparent;
+        border: none;
+        border-bottom: 1px solid #626364;
+        }
+
+    QTreeWidget::branch:selected {
+        background: #8a9fbb;
+        border-bottom: 1px solid #8a9fbb;
+        }

@@ -6,11 +6,13 @@
     Simple grail file node editor
 """
 
+from collections import defaultdict
+
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
-from grailkit.qt import GWidget, GListWidget, GListItem
+from grailkit.qt import GListWidget, GListItem, GSpacer
 
 from grail.ui import Panel
 
@@ -23,14 +25,23 @@ class NodeEditor(Panel):
         self.connect('/property/changed', self._update)
 
         self.app = app
+        self._folded = defaultdict(bool)
+
+        self.app.project.entity_changed.connect(self._update)
+        self.app.project.entity_removed.connect(self._update)
 
         self.__ui__()
         self._update()
 
     def __ui__(self):
 
-        self._ui_list = GListWidget()
-        self._ui_list.itemSelectionChanged.connect(self._node_selected_event)
+        self._ui_tree = TreeWidget()
+        self._ui_tree.setObjectName('playlist_tree')
+        self._ui_tree.setContextMenuPolicy(Qt.CustomContextMenu)
+        # self._ui_tree.customContextMenuRequested.connect(self.playlist_context_menu)
+        self._ui_tree.itemSelectionChanged.connect(self._selection_changed)
+        self._ui_tree.itemExpanded.connect(self._item_expanded)
+        self._ui_tree.itemCollapsed.connect(self._item_collapsed)
 
         self._ui_add_action = QAction(QIcon(':/icons/add.png'), 'Add node', self)
         self._ui_add_action.setIconVisibleInMenu(True)
@@ -40,56 +51,116 @@ class NodeEditor(Panel):
         self._ui_remove_action.setIconVisibleInMenu(True)
         self._ui_remove_action.triggered.connect(self.remove_action)
 
-        spacer = QWidget()
-        spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-
         self._ui_toolbar = QToolBar()
         self._ui_toolbar.setObjectName("node_toolbar")
         self._ui_toolbar.setIconSize(QSize(16, 16))
         self._ui_toolbar.addAction(self._ui_add_action)
-        self._ui_toolbar.addWidget(spacer)
+        self._ui_toolbar.addWidget(GSpacer())
         self._ui_toolbar.addAction(self._ui_remove_action)
 
         self._ui_layout = QVBoxLayout()
         self._ui_layout.setContentsMargins(0, 0, 0, 0)
         self._ui_layout.setSpacing(0)
 
-        self._ui_layout.addWidget(self._ui_list)
+        self._ui_layout.addWidget(self._ui_tree)
         self._ui_layout.addWidget(self._ui_toolbar)
 
         self.setLayout(self._ui_layout)
 
-    def _update(self):
+    def _update(self, *args):
 
-        self._ui_list.clear()
+        dna = self.app.project.dna
 
-        for entity in self.app.project.entities():
-            item = GListItem("%d - %s" % (entity.id, entity.name))
-            item.id = entity.id
+        # tree
+        self._ui_tree.clear()
 
-            self._ui_list.addItem(item)
+        def add_childs(tree_item, parent_id):
+            for child in dna.childs(parent_id):
+                child_item = TreeItemWidget(child)
+                child_item.setText(0, child.name)
+                # child_item.setExpanded(self._folded[child.id])
 
-    def _node_selected_event(self):
+                add_childs(child_item, child.id)
 
-        items = self._ui_list.selectedItems()
+                tree_item.addChild(child_item)
 
-        if len(items) > 0:
-            self.emit('/node/selected', items[0].id)
+        for entity in dna.childs(0):
+            item = TreeItemWidget(entity)
+            item.setText(0, entity.name)
+            # item.setExpanded(self._folded[entity.id])
+
+            add_childs(item, entity.id)
+
+            self._ui_tree.addTopLevelItem(item)
+
+        for item in self._ui_tree.findItems('', Qt.MatchContains | Qt.MatchRecursive):
+            item.setExpanded(self._folded[item.object().id])
+
+    def _selection_changed(self, *args):
+
+        current = self._ui_tree.currentItem()
+
+        if current:
+            self.emit('/node/selected', current.object().id)
+
+    def _item_expanded(self, item):
+
+        self._folded[item.object().id] = True
+
+    def _item_collapsed(self, item):
+
+        self._folded[item.object().id] = False
 
     def add_action(self):
 
-        self.app.project.create("Untitled item")
-        self.update_list()
-        self._ui_list.setCurrentRow(self._ui_list.count() - 1)
-        self.emit('/node/selected', self._ui_list.item(self._ui_list.count() - 1).id)
+        item = self._ui_tree.currentItem()
+        parent_id = item.object().id if item else 0
+
+        self.app.project.dna.create("Untitled item", parent=parent_id)
 
     def remove_action(self):
 
-        item = self._ui_list.currentItem()
+        item = self._ui_tree.currentItem()
 
         if item:
-            self.app.project.remove(item.id)
+            self.app.project.dna.remove(item.object().id)
 
-        self.update_list()
-        self._ui_list.setCurrentRow(0)
-        self.emit('/node/selected', self._ui_list.item(0).id)
+        self._ui_tree.setCurrentItem(self._ui_tree.itemAt(0, 0))
+
+        item = self._ui_tree.currentItem()
+
+        if item:
+            self.emit('/node/selected', item.object().id)
+
+
+class TreeWidget(QTreeWidget):
+
+    def __init__(self, parent=None):
+        super(TreeWidget, self).__init__(parent)
+
+        self.setAlternatingRowColors(True)
+        self.setAttribute(Qt.WA_MacShowFocusRect, False)
+        self.header().close()
+        self.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.setDragEnabled(True)
+        self.viewport().setAcceptDrops(True)
+        self.setDropIndicatorShown(True)
+        self.setDragDropMode(QAbstractItemView.InternalMove)
+        self.setWordWrap(True)
+        self.setAnimated(False)
+        self.setSortingEnabled(False)
+
+
+class TreeItemWidget(QTreeWidgetItem):
+    """Representation of node as QTreeWidgetItem"""
+
+    def __init__(self, data=None):
+        super(TreeItemWidget, self).__init__()
+
+        self._data = data
+
+    def object(self):
+        return self._data
+
+    def setObject(self, data):
+        self._data = data

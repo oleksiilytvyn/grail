@@ -18,13 +18,11 @@ from grailkit.util import *
 from grailkit.qt import GAboutDialog, GMessageDialog
 
 import grail
-from grail.ui import PreviewEditor, LibraryEditor, PreferencesDialog, CuelistEditor
+from grail.ui import PreviewEditor, LibraryEditor, PreferencesDialog, CuelistEditor, PropertyEditor, NodeEditor
 
 
 class MainWindow(QMainWindow):
-    """
-    Grail application class
-    """
+    """Grail application class"""
 
     def __init__(self, app=None):
         super(MainWindow, self).__init__()
@@ -32,16 +30,12 @@ class MainWindow(QMainWindow):
         self.app = app
         self.project = self.app.project
 
-        self.project.property_changed.connect(print)
-
         self._test_card = True
 
         self.__ui__()
 
     def __ui__(self):
-        """
-        Initialize UI
-        """
+        """Initialize UI"""
 
         # about dialog
         self.about_dialog = GAboutDialog(None, "Grail %s" % (grail.__version__,),
@@ -58,16 +52,21 @@ class MainWindow(QMainWindow):
         self.ui_cuelist = CuelistEditor(self.app)
         self.ui_preview = PreviewEditor(self.app)
 
+        self.ui_nodes = NodeEditor(self.app)
+        self.ui_properties = PropertyEditor(self.app)
+
         # splitter
         self._ui_splitter = QSplitter()
         self._ui_splitter.setObjectName("main_splitter")
         self._ui_splitter.addWidget(self.ui_library)
         self._ui_splitter.addWidget(self.ui_cuelist)
         self._ui_splitter.addWidget(self.ui_preview)
+        # self._ui_splitter.addWidget(self.ui_nodes)
+        # self._ui_splitter.addWidget(self.ui_properties)
 
+        self._ui_splitter.setHandleWidth(1)
         self._ui_splitter.setCollapsible(0, False)
         self._ui_splitter.setCollapsible(2, False)
-        self._ui_splitter.setHandleWidth(1)
         self._ui_splitter.setSizes([self._ui_splitter.rect().width() / 3] * 3)
 
         self.setCentralWidget(self._ui_splitter)
@@ -79,9 +78,7 @@ class MainWindow(QMainWindow):
         self.show()
 
     def _ui_menubar(self):
-        """
-        Setup menu
-        """
+        """Setup menu"""
 
         self.ui_menubar = QMenuBar(self)
 

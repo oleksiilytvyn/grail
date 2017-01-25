@@ -25,5 +25,8 @@
 
         <!-- Stylesheet -->
         <file alias="stylesheet/grail.css">stylesheet/grail.css</file>
+
+        <!-- Default App Resource -->
+        <file alias="default/bible-en-kjv.grail-bible">default/bible-en-kjv.grail-bible</file>
     </qresource>
 </RCC>

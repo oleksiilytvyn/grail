@@ -10,6 +10,8 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
+from grailkit.qt import GSpacer
+
 from grail.ui import Panel
 
 
@@ -87,6 +89,7 @@ class PropertyEditor(Panel):
         self._ui_toolbar.setObjectName("library_toolbar")
         self._ui_toolbar.setIconSize(QSize(16, 16))
         self._ui_toolbar.addAction(self._ui_add_action)
+        self._ui_toolbar.addWidget(GSpacer())
         self._ui_toolbar.addAction(self._ui_remove_action)
 
         self._ui_layout = QVBoxLayout()
@@ -104,9 +107,12 @@ class PropertyEditor(Panel):
         self._updating_list = True
         self.current_entity = entity_id
 
-        props = self.app.project.properties(entity_id)
+        props = self.app.project.dna.properties(entity_id)
+        entity = self.app.project.dna.entity(entity_id)
 
-        entity = self.app.project.entity(entity_id)
+        if not entity:
+            return False
+
         entity_props = {'@id': entity.id,
                         '@name': entity.name,
                         '@type': entity.type,
@@ -145,12 +151,12 @@ class PropertyEditor(Panel):
     def add_action(self):
         """Add a new property"""
 
-        self.app.project.set(self.current_entity, str(self.current_property) + '%', "")
+        self.app.project.dna.set(self.current_entity, str(self.current_property) + '%', "")
 
     def remove_action(self):
         """Remove a selected property"""
 
-        self.app.project.unset(self.current_entity, self.current_property)
+        self.app.project.dna.unset(self.current_entity, self.current_property)
         self.node(self.current_entity)
 
     def _item_clicked(self, item):
@@ -162,7 +168,7 @@ class PropertyEditor(Panel):
         if self._updating_list:
             return
 
-        dna = self.app.project
+        project = self.app.project
         std_props = ['@id',
                      '@name',
                      '@type',
@@ -175,12 +181,12 @@ class PropertyEditor(Panel):
 
         if item.column() == 0:
             if item.entity_key not in std_props:
-                dna.rename(item.entity_id, item.entity_key, str(item.text()))
+                project.dna.rename(item.entity_id, item.entity_key, str(item.text()))
 
         if item.column() == 1:
             key = item.entity_key
             value = str(item.text())
-            entity = dna.entity(item.entity_id)
+            entity = project.dna.entity(item.entity_id)
 
             if key in std_props:
                 if key == '@name':
@@ -196,7 +202,7 @@ class PropertyEditor(Panel):
 
                 entity.update()
             else:
-                dna.set(item.entity_id, key, value)
+                project.dna.set(item.entity_id, key, value)
 
         self.node(item.entity_id)
         self.emit('/property/changed')

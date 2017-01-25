@@ -96,7 +96,8 @@ class CuelistDialog(GBalloonDialog):
 
         item = self._ui_list.item(self._ui_list.currentRow(), 0)
 
-        AppInstance().emit('/cuelist/selected', item.cuelist_id)
+        if item:
+            AppInstance().emit('/cuelist/selected', item.cuelist_id)
 
     def _list_cell_changed(self, row, column):
 

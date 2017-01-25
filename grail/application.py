@@ -8,6 +8,9 @@
 
 import os
 import sys
+import tempfile
+
+from PyQt5.QtCore import QFile
 
 from grailkit.dna import SettingsFile, Project, Library
 from grailkit.bible import BibleHost
@@ -35,21 +38,28 @@ class Grail(GApplication):
         self.setStyleSheetFile(":/stylesheet/grail.css")
 
         self._slots = {}
+        self._relaunch = False
+        self._relaunch_args = []
         self.settings = SettingsFile(grail.SETTINGS_PATH, create=True)
         self.osc_host = None
         self.project = None
         self.library = None
-        # to-do: this is not save
         self.bible = None
-        self.change_bible(self.settings.get('bible-default', ""))
+        self.change_bible(self.settings.get('bible/default', ""))
 
         self.main_window = None
-        self._relaunch = False
-        self._relaunch_args = []
 
         self.welcome_dialog = WelcomeDialog(self)
         self.welcome_dialog.show()
 
+        # open last project instantly
+        if self.settings.get('project/continue', default=False):
+            path = self.settings.get('project/last', default='')
+
+            if os.path.isfile(path):
+                self.open(path, create=False)
+
+        # console args
         create = '-c' in argv
         path = argv[1] if len(argv) >= 2 else False
 
@@ -71,6 +81,9 @@ class Grail(GApplication):
                                  icon=GMessageDialog.Critical)
         message.exec_()
 
+        # close application
+        sys.exit()
+
     def open(self, path, create=False):
         """Open a file"""
 
@@ -82,7 +95,7 @@ class Grail(GApplication):
         self.project = Project(path, create=create)
         self.library = Library(grail.LIBRARY_PATH, create=True)
 
-        self.settings.set('project-last', path)
+        self.settings.set('project/last', path)
 
         self.main_window = MainWindow(self)
         self.main_window.show()
@@ -102,7 +115,11 @@ class Grail(GApplication):
             os.execl(python, python, sys.argv[0], *self._relaunch_args)
 
     def change_bible(self, bible_id):
-        """Change bible on the fly"""
+        """Change bible on the fly
+
+        Args:
+            bible_id: bible identifier
+        """
 
         bibles = BibleHost.list()
 
@@ -110,14 +127,32 @@ class Grail(GApplication):
         if bible_id in bibles:
             self.bible = BibleHost.get(bible_id)
         # if bible not selected but available
+        # pick first bible
         elif len(bibles) > 0:
-            bible_id = bibles.keys()[0]
-            self.bible = BibleHost.get(bible_id)
-            self.settings.set('bible-default', bibles.keys()[0])
+            for bible_id, bible in bibles.items():
+                self.bible = BibleHost.get(bible_id)
+                self.settings.set('bible/default', bible_id)
+                break
         # if there is no bibles available
+        # install default bible from resources
         else:
-            # todo: make it work
-            pass
+            _file, path = tempfile.mkstemp(prefix='bible-', suffix='.grail-bible')
+            # remove empty file for qt to create a file at same place
+            os.remove(path)
+
+            ref = QFile(':default/bible-en-kjv.grail-bible')
+            ref.copy(path)
+            ref.close()
+
+            BibleHost.install(path, replace=True)
+            # remove temporary file
+            os.remove(path)
+
+            bibles = BibleHost.list()
+            for bible_id, bible in bibles.items():
+                self.bible = BibleHost.get(bible_id)
+                self.settings.set('bible/default', bible_id)
+                break
 
     def connect(self, message, fn):
         """Connect message listener

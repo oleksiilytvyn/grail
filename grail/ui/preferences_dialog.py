@@ -258,7 +258,7 @@ class BiblePanel(Panel):
         if len(items) > 0:
             bible_id = items[0].bible_id
 
-            AppInstance().settings.set('bible-default', bible_id)
+            AppInstance().settings.set('bible/default', bible_id)
 
         self._update_list()
 
@@ -266,7 +266,7 @@ class BiblePanel(Panel):
         """Update list of installed bibles"""
 
         bibles = BibleHost.list()
-        bible_selected_id = AppInstance().settings.get('bible-default', None)
+        bible_selected_id = AppInstance().settings.get('bible/default', None)
 
         self._ui_list.clear()
         self._ui_toolbar_label.setText("%d installed" % len(bibles))

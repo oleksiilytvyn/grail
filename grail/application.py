@@ -12,7 +12,7 @@ import tempfile
 
 from PyQt5.QtCore import QFile
 
-from grailkit.dna import SettingsFile, Project, Library
+from grailkit.dna import SettingsFile, Project, Library, DNAError
 from grailkit.bible import BibleHost
 from grailkit.qt import GApplication, GMessageDialog
 
@@ -80,9 +80,6 @@ class Grail(GApplication):
                                  text="Close previously opened Grail and try again",
                                  icon=GMessageDialog.Critical)
         message.exec_()
-
-        # close application
-        sys.exit()
 
     def open(self, path, create=False):
         """Open a file"""

@@ -12,7 +12,8 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
-from grailkit.qt import GListWidget, GListItem, GSpacer
+from grailkit.qt import GSpacer, GMessageDialog
+from grailkit.dna import DNA
 
 from grail.ui import Panel
 
@@ -71,14 +72,12 @@ class NodeEditor(Panel):
 
         dna = self.app.project.dna
 
-        # tree
         self._ui_tree.clear()
 
         def add_childs(tree_item, parent_id):
             for child in dna.childs(parent_id):
                 child_item = TreeItemWidget(child)
                 child_item.setText(0, child.name)
-                # child_item.setExpanded(self._folded[child.id])
 
                 add_childs(child_item, child.id)
 
@@ -87,12 +86,12 @@ class NodeEditor(Panel):
         for entity in dna.childs(0):
             item = TreeItemWidget(entity)
             item.setText(0, entity.name)
-            # item.setExpanded(self._folded[entity.id])
 
             add_childs(item, entity.id)
 
             self._ui_tree.addTopLevelItem(item)
 
+        # expand items
         for item in self._ui_tree.findItems('', Qt.MatchContains | Qt.MatchRecursive):
             item.setExpanded(self._folded[item.object().id])
 
@@ -150,6 +149,39 @@ class TreeWidget(QTreeWidget):
         self.setAnimated(False)
         self.setSortingEnabled(False)
 
+    def dropEvent(self, event):
+
+        dropping = self.itemAt(event.pos())
+        dragging = self.currentItem()
+        dragging_object = dragging.object()
+        drop_indicator = self.dropIndicatorPosition()
+
+        # don't allow moving of project and project settings entities
+        if (dragging_object.type == DNA.TYPE_PROJECT and dragging_object.parent_id == 0) or \
+                (dragging_object.type == DNA.TYPE_SETTINGS and dragging_object.parent_id == 1):
+            message = GMessageDialog(title="Item can't be moved",
+                                     text="Item '%s' can't be moved" % dragging_object.name,
+                                     icon=GMessageDialog.Warning)
+            message.exec_()
+
+            return
+
+        # manage a boolean for the case when you are above an item
+        if drop_indicator == QAbstractItemView.AboveItem:
+            dragging.object().index = dropping.object().index - 1
+        # something when being below an item
+        elif drop_indicator == QAbstractItemView.BelowItem:
+            dragging.object().index = dropping.object().index + 1
+        # you're on an item, maybe add the current one as a child
+        elif drop_indicator == QAbstractItemView.OnItem:
+            dragging.object().parent_id = dropping.object().id
+            # dragging.object().index = dropping.object().id
+        # you are not on your tree
+        elif drop_indicator == QAbstractItemView.OnViewport:
+            pass
+
+        QTreeWidget.dropEvent(self, event)
+
 
 class TreeItemWidget(QTreeWidgetItem):
     """Representation of node as QTreeWidgetItem"""
@@ -160,7 +192,9 @@ class TreeItemWidget(QTreeWidgetItem):
         self._data = data
 
     def object(self):
+
         return self._data
 
     def setObject(self, data):
+
         self._data = data

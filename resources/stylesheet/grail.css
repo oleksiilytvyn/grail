@@ -426,3 +426,27 @@ QTreeWidget {
         background: #8a9fbb;
         border-bottom: 1px solid #8a9fbb;
         }
+
+    QTreeWidget::branch:has-children:!has-siblings:closed,
+    QTreeWidget::branch:closed:has-children:has-siblings {
+        border-image: none;
+        image: url(:/i/branch-closed-white.png);
+        }
+
+    QTreeWidget::branch:open:has-children:!has-siblings,
+    QTreeWidget::branch:open:has-children:has-siblings  {
+        border-image: none;
+        image: url(:/i/branch-open-white.png);
+        }
+
+    QTreeWidget::branch:has-children:!has-siblings:closed:selected,
+    QTreeWidget::branch:closed:has-children:has-siblings:selected {
+        border-image: none;
+        image: url(:/i/branch-closed-white.png);
+        }
+
+    QTreeWidget::branch:open:has-children:!has-siblings:selected,
+    QTreeWidget::branch:open:has-children:has-siblings:selected  {
+        border-image: none;
+        image: url(:/i/branch-open-white.png);
+        }

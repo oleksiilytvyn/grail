@@ -22,6 +22,8 @@
 
         <!-- Images -->
         <file alias="i/welcome_bg.png">i/welcome_bg.png</file>
+        <file alias="i/branch-closed-white.png">i/branch-closed-white.png</file>
+        <file alias="i/branch-open-white.png">i/branch-open-white.png</file>
 
         <!-- Stylesheet -->
         <file alias="stylesheet/grail.css">stylesheet/grail.css</file>

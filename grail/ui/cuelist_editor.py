@@ -5,12 +5,16 @@
 
     Manage cuelist in this view
 """
+import re
 
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
 from grail.ui import CuelistDialog, Panel
+from grailkit.dna import DNA
+
+from grail.ui.node_editor import TreeWidget, TreeItemWidget
 
 
 class CuelistEditor(Panel):
@@ -44,17 +48,13 @@ class CuelistEditor(Panel):
         self._ui_layout.setSpacing(0)
         self._ui_layout.setContentsMargins(0, 0, 0, 0)
 
-        self._ui_list = CuelistWidget()
-        self._ui_list.setObjectName("cuelist_list")
-        self._ui_list.setContextMenuPolicy(Qt.CustomContextMenu)
-
-        self._ui_list.itemClicked.connect(self._item_clicked)
-        self._ui_list.itemDoubleClicked.connect(self._item_double_clicked)
-        self._ui_list.customContextMenuRequested.connect(self._context_menu)
-        self._ui_list.keyPressed.connect(self._key_event)
-        self._ui_list.orderChanged.connect(self._list_reordered)
-        self._ui_list.itemCollapsed.connect(self._item_collapsed)
-        self._ui_list.itemExpanded.connect(self._item_collapsed)
+        self._ui_tree = TreeWidget()
+        self._ui_tree.setObjectName('playlist_tree')
+        self._ui_tree.setContextMenuPolicy(Qt.CustomContextMenu)
+        self._ui_tree.customContextMenuRequested.connect(self._context_menu)
+        self._ui_tree.itemSelectionChanged.connect(self._selection_changed)
+        self._ui_tree.itemExpanded.connect(self._item_expanded)
+        self._ui_tree.itemCollapsed.connect(self._item_collapsed)
 
         self._ui_label = QLabel("...")
         self._ui_label.setObjectName("cuelist_label")
@@ -78,7 +78,7 @@ class CuelistEditor(Panel):
         self._ui_toolbar.addWidget(self._ui_label)
         # self._ui_toolbar.addAction(self._ui_menu_action)
 
-        self._ui_layout.addWidget(self._ui_list)
+        self._ui_layout.addWidget(self._ui_tree)
         self._ui_layout.addWidget(self._ui_toolbar)
 
         self.setLayout(self._ui_layout)
@@ -103,8 +103,7 @@ class CuelistEditor(Panel):
 
         self._cuelist_id = cuelist_id
         cuelist = self.app.project.cuelist(cuelist_id)
-
-        self._ui_list.clear()
+        dna = self.app.project.dna
 
         if cuelist is None:
             self._ui_label.setText("...")
@@ -113,12 +112,27 @@ class CuelistEditor(Panel):
         self.app.project.settings().set('cuelist/current', cuelist_id)
 
         self._ui_label.setText("%s <small>(%d cues)</small>" % (cuelist.name, len(cuelist)))
-        self._ui_list.clear()
 
-        for cue in cuelist.cues():
-            item = CuelistItem(self._ui_list, "%s" % (cue.name, ))
+        self._ui_tree.clear()
 
-            self._ui_list.addTopLevelItem(item)
+        def add_childs(tree_item, parent_id):
+            for child in dna.childs(parent_id):
+                child_item = TreeItemWidget(child)
+                child_item.setText(0, child.name)
+
+                add_childs(child_item, child.id)
+
+                tree_item.addChild(child_item)
+                child_item.setExpanded(bool(child.get('expanded', default=False)))
+
+        for entity in cuelist.cues():
+            item = TreeItemWidget(entity)
+            item.setText(0, entity.name)
+
+            add_childs(item, entity.id)
+
+            self._ui_tree.addTopLevelItem(item)
+            item.setExpanded(bool(entity.get('expanded', default=False)))
 
     def _add_entity(self, entity_id):
         """Add entity to cuelist"""
@@ -128,7 +142,12 @@ class CuelistEditor(Panel):
         cuelist = self.app.project.cuelist(cuelist_id)
 
         if entity and cuelist:
-            cuelist.append(entity)
+            new_entity = cuelist.append(entity)
+
+            pages = re.sub(r'([\s]+?[\n]+)', '\n', new_entity.lyrics if new_entity.lyrics else '').split('\n\n')
+
+            for page in pages:
+                new_entity.create(name=page, entity_type=DNA.TYPE_CUE)
 
             self.cuelist_selected(cuelist_id)
 
@@ -147,105 +166,29 @@ class CuelistEditor(Panel):
     def _list_reordered(self):
         pass
 
-    def _item_collapsed(self):
+    def _selection_changed(self):
         pass
+
+    def _item_expanded(self, item):
+        """Tree item expanded
+
+        Args:
+            item (TreeItemWidget): tree item
+        """
+
+        item.object().set('expanded', True)
+
+    def _item_collapsed(self, item):
+        """Tree item collapsed
+
+        Args:
+            item (TreeItemWidget): tree item
+        """
+
+        item.object().set('expanded', False)
 
     def _close(self):
         """Close child dialogs"""
 
         self.dialog.close()
 
-
-class CuelistWidget(QTreeWidget):
-
-    keyPressed = pyqtSignal('QKeyEvent')
-    orderChanged = pyqtSignal()
-
-    def __init__(self, parent=None):
-        super(CuelistWidget, self).__init__(parent)
-
-        self.header().close()
-        self.setWordWrap(True)
-        self.setAnimated(True)
-        self.setDragEnabled(True)
-        self.setSortingEnabled(False)
-        self.setDropIndicatorShown(True)
-        self.setAlternatingRowColors(True)
-        self.viewport().setAcceptDrops(True)
-        self.setAttribute(Qt.WA_MacShowFocusRect, False)
-        self.setSelectionMode(QAbstractItemView.SingleSelection)
-        self.setDragDropMode(QAbstractItemView.InternalMove)
-
-        self.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
-        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-
-        original = self.verticalScrollBar()
-
-        self._scrollbar = QScrollBar(Qt.Vertical, self)
-        self._scrollbar.valueChanged.connect(original.setValue)
-
-        original.valueChanged.connect(self._scrollbar.setValue)
-
-        self._update_scrollbar()
-
-    def keyPressEvent(self, event):
-
-        self.keyPressed.emit(event)
-
-    def dropEvent(self, event):
-
-        dropping_on = self.itemAt(event.pos())
-        dropping_index = self.indexOfTopLevelItem(dropping_on)
-        dragging_item = self.currentItem()
-
-        # count items in list
-        iterator = QTreeWidgetItemIterator(self)
-        items_count = 0
-
-        while iterator.value():
-            if True: # type(iterator.value()) == SongTreeWidgetItem:
-                items_count += 1
-
-            iterator += 1
-
-        if True: # type(dropping_on) == SongTreeWidgetItem:
-            expanded = dragging_item.isExpanded()
-            self.takeTopLevelItem(self.indexOfTopLevelItem(dragging_item))
-
-            index = self.indexOfTopLevelItem(dropping_on)
-            dp = self.dropIndicatorPosition()
-
-            if dp == QAbstractItemView.BelowItem:
-                index += 1
-
-            if index == items_count:
-                index -= 1
-
-            self.insertTopLevelItem(index, dragging_item)
-            self.setCurrentItem(dragging_item)
-
-            dragging_item.setExpanded(expanded)
-
-        self.orderChanged.emit()
-
-    def _update_scrollbar(self):
-
-        original = self.verticalScrollBar()
-
-        if original.value() == original.maximum() and original.value() == 0:
-            self._scrollbar.hide()
-        else:
-            self._scrollbar.show()
-
-        self._scrollbar.setPageStep(original.pageStep())
-        self._scrollbar.setRange(original.minimum(), original.maximum())
-        self._scrollbar.resize(8, self.rect().height())
-        self._scrollbar.move(self.rect().width() - 8, 0)
-
-
-class CuelistItem(QTreeWidgetItem):
-
-    def __init__(self, parent, text=""):
-        super(CuelistItem, self).__init__(parent, [text])
-
-        self.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)

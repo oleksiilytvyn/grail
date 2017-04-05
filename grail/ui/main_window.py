@@ -52,8 +52,10 @@ class MainWindow(QMainWindow):
         self.ui_cuelist = CuelistEditor(self.app)
         self.ui_preview = PreviewEditor(self.app)
 
-        self.ui_nodes = NodeEditor(self.app)
-        self.ui_properties = PropertyEditor(self.app)
+        # self.ui_nodes = NodeEditor(self.app)
+        # self.ui_nodes.show()
+        # self.ui_properties = PropertyEditor(self.app)
+        # self.ui_properties.show()
 
         # splitter
         self._ui_splitter = QSplitter()
@@ -61,8 +63,6 @@ class MainWindow(QMainWindow):
         self._ui_splitter.addWidget(self.ui_library)
         self._ui_splitter.addWidget(self.ui_cuelist)
         self._ui_splitter.addWidget(self.ui_preview)
-        # self._ui_splitter.addWidget(self.ui_nodes)
-        # self._ui_splitter.addWidget(self.ui_properties)
 
         self._ui_splitter.setHandleWidth(1)
         self._ui_splitter.setCollapsible(0, False)
@@ -308,7 +308,7 @@ class MainWindow(QMainWindow):
         project_name = "untitled"
         path, ext = QFileDialog.getSaveFileName(self, "Export...", project_name, "*.grail")
 
-        # to-do: implement this
+        # todo: implement this
 
     def about_action(self):
         """About dialog action"""
@@ -321,7 +321,7 @@ class MainWindow(QMainWindow):
     def update_action(self):
         """Check for updates action"""
 
-        # to-do: add a dialog to check for updates
+        # todo: add a dialog to check for updates
         message = GMessageDialog(title="No updates",
                                  text="Updates not available.",
                                  icon=GMessageDialog.Warning)

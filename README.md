@@ -2,7 +2,7 @@
 
 # Grail #
 
-Grail is an application for managing and displaying lyrics and media.
+Grail is an application for creating and executing cues that can send data over OSC (lyrics, display commands).
 The goal of project to provide beautiful, simple and fast application for christian community.
 
 ## Dependencies ##
@@ -26,6 +26,6 @@ execute following command in terminal:
 
 ## How to build ##
 
-Just run in terminal following command
+Just run in terminal following command to build for your current platform
 
     python setup.py build

@@ -55,6 +55,8 @@ class CuelistEditor(Panel):
         self._ui_tree.itemSelectionChanged.connect(self._selection_changed)
         self._ui_tree.itemExpanded.connect(self._item_expanded)
         self._ui_tree.itemCollapsed.connect(self._item_collapsed)
+        self._ui_tree.itemClicked.connect(self._item_clicked)
+        self._ui_tree.itemDoubleClicked.connect(self._item_double_clicked)
 
         self._ui_label = QLabel("...")
         self._ui_label.setObjectName("cuelist_label")
@@ -95,6 +97,16 @@ class CuelistEditor(Panel):
         self.dialog.update_list()
         self.dialog.showAt(self.mapToGlobal(point))
 
+    def item_delete(self, item):
+        """Remove cue item action"""
+
+        item.object().delete()
+
+    def item_edit(self, item):
+        """Edit cue action"""
+
+        print('edit', item)
+
     def _update(self, *args):
 
         self.cuelist_selected(self._cuelist_id)
@@ -109,11 +121,11 @@ class CuelistEditor(Panel):
             self._ui_label.setText("...")
             return False
 
+        self._ui_tree.clear()
+
         self.app.project.settings().set('cuelist/current', cuelist_id)
 
         self._ui_label.setText("%s <small>(%d cues)</small>" % (cuelist.name, len(cuelist)))
-
-        self._ui_tree.clear()
 
         def add_childs(tree_item, parent_id):
             for child in dna.childs(parent_id):
@@ -151,14 +163,34 @@ class CuelistEditor(Panel):
 
             self.cuelist_selected(cuelist_id)
 
-    def _item_clicked(self):
-        pass
+    def _item_clicked(self, item):
+        """Preview cue text"""
 
-    def _item_double_clicked(self):
-        pass
+        self.app.emit('/message/preview', item.object().name)
 
-    def _context_menu(self):
-        pass
+    def _item_double_clicked(self, item):
+        """Send cue text"""
+
+        self.app.emit('/message/master', item.object().name)
+
+    def _context_menu(self, pos):
+        """Context menu on cue item"""
+
+        item = self._ui_tree.itemAt(pos)
+
+        if item:
+            menu = QMenu("Context Menu", self)
+
+            delete_action = QAction('Delete cue', menu)
+            delete_action.triggered.connect(lambda: self.item_delete(item))
+
+            edit_action = QAction('Edit cue', menu)
+            edit_action.triggered.connect(lambda: self.item_edit(item))
+
+            menu.addAction(edit_action)
+            menu.addAction(delete_action)
+
+            menu.exec_(self._ui_tree.mapToGlobal(pos))
 
     def _key_event(self):
         pass

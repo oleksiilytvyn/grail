@@ -11,10 +11,10 @@ import os
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
-from grailkit.qt import GDialog, GWelcomeWidget, GWelcomeAction
+from grailkit.qt import Dialog, Welcome, WelcomeAction
 
 
-class WelcomeDialog(GDialog):
+class WelcomeDialog(Dialog):
 
     def __init__(self, app):
         super(WelcomeDialog, self).__init__()
@@ -27,20 +27,20 @@ class WelcomeDialog(GDialog):
 
         std_icon = QApplication.style().standardIcon
 
-        create_action = GWelcomeAction("Create", "New project", std_icon(QStyle.SP_FileIcon))
+        create_action = WelcomeAction("Create", "New project", std_icon(QStyle.SP_FileIcon))
         create_action.clicked.connect(self._create)
 
-        open_action = GWelcomeAction("Open", "Open project", std_icon(QStyle.SP_DirIcon))
+        open_action = WelcomeAction("Open", "Open project", std_icon(QStyle.SP_DirIcon))
         open_action.clicked.connect(self._open)
 
         last_project = self.app.settings.get('project/last', default="")
         last_project_continue = last_project and os.path.isfile(last_project)
 
         if last_project_continue:
-            continue_action = GWelcomeAction("Continue", os.path.split(last_project)[1], QIcon(':/icon/256.png'))
+            continue_action = WelcomeAction("Continue", os.path.split(last_project)[1], QIcon(':/icon/256.png'))
             continue_action.clicked.connect(self._continue)
 
-        widget = GWelcomeWidget()
+        widget = Welcome()
         widget.setTitle("Welcome to Grail")
         widget.setDescription("Choose action below")
         widget.setIcon(QIcon(':/icon/256.png'))
@@ -61,7 +61,7 @@ class WelcomeDialog(GDialog):
         self.setGeometry(100, 100, 380, 460)
         self.setFixedSize(380, 460)
         self.setWindowTitle("Welcome to Grail")
-        self.moveToCenter()
+        self.moveCenter()
 
     def _open(self):
         """Open a existing project"""

@@ -6,16 +6,15 @@
     Panels and panel manager
 """
 
-from grailkit.qt import GWidget
-from grailkit.qt.gapplication import AppInstance
+from grailkit.qt import Component, Application
 
 
-class Panel(GWidget):
+class Panel(Component):
 
     def __init__(self):
         super(Panel, self).__init__()
 
-        self.__app = AppInstance()
+        self.__app = Application.instance()
 
     def __ui__(self):
         pass

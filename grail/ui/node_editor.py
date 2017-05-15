@@ -12,7 +12,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
-from grailkit.qt import GSpacer, GMessageDialog
+from grailkit.qt import Spacer, MessageDialog
 from grailkit.dna import DNA
 
 from grail.ui import Panel
@@ -56,7 +56,7 @@ class NodeEditor(Panel):
         self._ui_toolbar.setObjectName("node_toolbar")
         self._ui_toolbar.setIconSize(QSize(16, 16))
         self._ui_toolbar.addAction(self._ui_add_action)
-        self._ui_toolbar.addWidget(GSpacer())
+        self._ui_toolbar.addWidget(Spacer())
         self._ui_toolbar.addAction(self._ui_remove_action)
 
         self._ui_layout = QVBoxLayout()
@@ -159,9 +159,9 @@ class TreeWidget(QTreeWidget):
         # don't allow moving of project and project settings entities
         if (dragging_object.type == DNA.TYPE_PROJECT and dragging_object.parent_id == 0) or \
                 (dragging_object.type == DNA.TYPE_SETTINGS and dragging_object.parent_id == 1):
-            message = GMessageDialog(title="Item can't be moved",
-                                     text="Item '%s' can't be moved" % dragging_object.name,
-                                     icon=GMessageDialog.Warning)
+            message = MessageDialog(title="Item can't be moved",
+                                    text="Item '%s' can't be moved" % dragging_object.name,
+                                    icon=MessageDialog.Warning)
             message.exec_()
 
             return

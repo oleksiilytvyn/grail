@@ -10,7 +10,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
-from grailkit.qt import GSpacer
+from grailkit.qt import Spacer
 
 from grail.ui import Panel
 
@@ -89,7 +89,7 @@ class PropertyEditor(Panel):
         self._ui_toolbar.setObjectName("library_toolbar")
         self._ui_toolbar.setIconSize(QSize(16, 16))
         self._ui_toolbar.addAction(self._ui_add_action)
-        self._ui_toolbar.addWidget(GSpacer())
+        self._ui_toolbar.addWidget(Spacer())
         self._ui_toolbar.addAction(self._ui_remove_action)
 
         self._ui_layout = QVBoxLayout()

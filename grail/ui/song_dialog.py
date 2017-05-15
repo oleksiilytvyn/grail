@@ -10,11 +10,11 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
-from grailkit.qt import GDialog, AppInstance
+from grailkit.qt import Dialog, Application
 from grailkit.dna import DNA
 
 
-class SongDialog(GDialog):
+class SongDialog(Dialog):
     """Song edit dialog"""
 
     MODE_CREATE = 0
@@ -102,7 +102,7 @@ class SongDialog(GDialog):
         year = int(''.join(x for x in self.ui_year_edit.text() if x.isdigit()))
 
         if self._mode == SongDialog.MODE_CREATE:
-            entity = AppInstance().library.create(name=title, entity_type=DNA.TYPE_SONG)
+            entity = Application.instance().library.create(name=title, entity_type=DNA.TYPE_SONG)
         else:
             entity = self._entity
 

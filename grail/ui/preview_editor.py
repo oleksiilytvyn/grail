@@ -10,7 +10,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
-from grailkit.qt import GSpacer
+from grailkit.qt import Spacer
 
 from grail.ui import Panel
 
@@ -55,7 +55,7 @@ class PreviewEditor(Panel):
 
         self._ui_toolbar.addAction(self._ui_show_quick_action)
         self._ui_toolbar.addAction(self._ui_blackout_action)
-        self._ui_toolbar.addWidget(GSpacer())
+        self._ui_toolbar.addWidget(Spacer())
         self._ui_toolbar.addAction(self._ui_live_action)
 
         self._ui_edit_layout = QVBoxLayout()
@@ -90,13 +90,18 @@ class PreviewEditor(Panel):
         self._ui_edit.setPlainText(message)
 
     def _edit_changed(self):
+        """Edit changed"""
         pass
 
     def _blackout_action(self):
-        pass
+
+        self.app.emit('/message/master', ' ')
 
     def _show_action(self):
-        pass
+
+        self.app.emit('/message/master', str(self._ui_edit.toPlainText()))
 
     def _live_action(self):
-        pass
+
+        if self._ui_live_action.isChecked():
+            self.app.emit('/message/master', str(self._ui_edit.toPlainText()))

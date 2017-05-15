@@ -28,6 +28,8 @@ SETTINGS_PATH = os.path.join(path_appdata("grail"), "app.grail")
 
 
 def main():
+    """Run Grail application from location of installation"""
+
     os.chdir(util.path_app())
 
     app = Grail(sys.argv)

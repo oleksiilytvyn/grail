@@ -10,11 +10,10 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
-from grailkit.qt import GBalloonDialog, GSpacer
-from grailkit.qt.gapplication import AppInstance
+from grailkit.qt import Popup, Spacer, Application
 
 
-class CuelistDialog(GBalloonDialog):
+class CuelistDialog(Popup):
 
     def __init__(self):
         super(CuelistDialog, self).__init__()
@@ -49,7 +48,7 @@ class CuelistDialog(GBalloonDialog):
         self._ui_toolbar.setIconSize(QSize(16, 16))
         self._ui_toolbar.setObjectName("cuelist_dialog_toolbar")
         self._ui_toolbar.addAction(self._ui_edit_action)
-        self._ui_toolbar.addWidget(GSpacer())
+        self._ui_toolbar.addWidget(Spacer())
         self._ui_toolbar.addAction(self._ui_add_action)
 
         self._ui_layout.addWidget(self._ui_list)
@@ -64,7 +63,7 @@ class CuelistDialog(GBalloonDialog):
 
         self._updating_list = True
 
-        app = AppInstance()
+        app = Application.instance()
         cuelists = app.project.cuelists()
         x = 0
 
@@ -88,7 +87,7 @@ class CuelistDialog(GBalloonDialog):
 
     def _remove_clicked(self, item):
 
-        AppInstance().project.remove(item.cuelist_id)
+        Application.instance().project.remove(item.cuelist_id)
 
         self.update_list()
 
@@ -97,7 +96,7 @@ class CuelistDialog(GBalloonDialog):
         item = self._ui_list.item(self._ui_list.currentRow(), 0)
 
         if item:
-            AppInstance().emit('/cuelist/selected', item.cuelist_id)
+            Application.instance().emit('/cuelist/selected', item.cuelist_id)
 
     def _list_cell_changed(self, row, column):
 
@@ -106,7 +105,7 @@ class CuelistDialog(GBalloonDialog):
             return False
 
         item = self._ui_list.item(row, column)
-        cuelist = AppInstance().project.cuelist(item.cuelist_id)
+        cuelist = Application.instance().project.cuelist(item.cuelist_id)
         cuelist.name = item.text()
         cuelist.update()
 
@@ -123,7 +122,7 @@ class CuelistDialog(GBalloonDialog):
     def add_action(self):
         """Add button clicked"""
 
-        AppInstance().project.create(name="Untitled")
+        Application.instance().project.create(name="Untitled")
 
         self.update_list()
         self._ui_list.editItem(self._ui_list.item(self._ui_list.rowCount() - 1, 0))

@@ -15,10 +15,11 @@ from PyQt5.QtWidgets import *
 
 from grailkit.dna import DNA
 from grailkit.util import *
-from grailkit.qt import GAboutDialog, GMessageDialog
+from grailkit.qt import AboutDialog, MessageDialog
 
 import grail
-from grail.ui import PreviewEditor, LibraryEditor, PreferencesDialog, CuelistEditor, PropertyEditor, NodeEditor
+from grail.core import Viewer
+from grail.ui import PreferencesDialog
 
 
 class MainWindow(QMainWindow):
@@ -38,9 +39,9 @@ class MainWindow(QMainWindow):
         """Initialize UI"""
 
         # about dialog
-        self.about_dialog = GAboutDialog(None, "Grail %s" % (grail.__version__,),
-                                         "Copyright © 2014-2016 Grail Team.\nAll rights reserved.",
-                                         QIcon(':/icon/256.png'))
+        self.about_dialog = AboutDialog(None, "Grail %s" % (grail.__version__,),
+                                        "Copyright © 2014-2016 Grail Team.\nAll rights reserved.",
+                                        QIcon(':/icon/256.png'))
         self.about_dialog.url_report = "http://grailapp.com/"
         self.about_dialog.url_help = "http://grailapp.com/help"
 
@@ -48,26 +49,19 @@ class MainWindow(QMainWindow):
 
         self._ui_menubar()
 
-        self.ui_library = LibraryEditor(self.app)
-        self.ui_cuelist = CuelistEditor(self.app)
-        self.ui_preview = PreviewEditor(self.app)
-
-        # self.ui_nodes = NodeEditor(self.app)
-        # self.ui_nodes.show()
-        # self.ui_properties = PropertyEditor(self.app)
-        # self.ui_properties.show()
-
         # splitter
         self._ui_splitter = QSplitter()
         self._ui_splitter.setObjectName("main_splitter")
-        self._ui_splitter.addWidget(self.ui_library)
-        self._ui_splitter.addWidget(self.ui_cuelist)
-        self._ui_splitter.addWidget(self.ui_preview)
-
         self._ui_splitter.setHandleWidth(1)
-        self._ui_splitter.setCollapsible(0, False)
-        self._ui_splitter.setCollapsible(2, False)
-        self._ui_splitter.setSizes([self._ui_splitter.rect().width() / 3] * 3)
+
+        plugins = Viewer.plugins()
+
+        for plug in plugins:
+            viewer = plug(self._ui_splitter)
+
+            self._ui_splitter.addWidget(viewer)
+
+        self._ui_splitter.setSizes([self._ui_splitter.rect().width() / len(plugins)] * len(plugins))
 
         self.setCentralWidget(self._ui_splitter)
         self.setWindowIcon(QIcon(':/icon/256.png'))
@@ -265,9 +259,9 @@ class MainWindow(QMainWindow):
             message = "File format not supported."
 
         if message:
-            dialog = GMessageDialog(title="Import",
-                                    text=message,
-                                    icon=GMessageDialog.Warning)
+            dialog = MessageDialog(title="Import",
+                                   text=message,
+                                   icon=MessageDialog.Warning)
             dialog.exec_()
 
     def _import_json(self, path):
@@ -322,9 +316,9 @@ class MainWindow(QMainWindow):
         """Check for updates action"""
 
         # todo: add a dialog to check for updates
-        message = GMessageDialog(title="No updates",
-                                 text="Updates not available.",
-                                 icon=GMessageDialog.Warning)
+        message = MessageDialog(title="No updates",
+                                text="Updates not available.",
+                                icon=MessageDialog.Warning)
         message.exec_()
 
     def open_web_action(self):

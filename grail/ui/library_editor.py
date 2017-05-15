@@ -14,7 +14,7 @@ from PyQt5.QtWidgets import *
 
 from grailkit.bible import Verse
 from grailkit.dna import DNA, SongEntity
-from grailkit.qt import GSearchEdit, GListWidget, GListItem, GSpacer, AppInstance
+from grailkit.qt import SearchEdit, List, ListItem, Spacer, Application
 
 from grail.ui import SongDialog, Panel
 
@@ -44,7 +44,7 @@ class LibraryEditor(Panel):
         self._ui_layout.setSpacing(0)
         self._ui_layout.setContentsMargins(0, 0, 0, 0)
 
-        self._ui_search = GSearchEdit()
+        self._ui_search = SearchEdit()
         self._ui_search.setObjectName("library_search")
         self._ui_search.setPlaceholderText("Search library...")
         self._ui_search.textChanged.connect(self._search_event)
@@ -60,7 +60,7 @@ class LibraryEditor(Panel):
         self._ui_search_widget.setObjectName("library_search_widget")
         self._ui_search_widget.setLayout(self._ui_search_layout)
 
-        self._ui_list = GListWidget()
+        self._ui_list = List()
         self._ui_list.setObjectName("library_list")
         self._ui_list.setContextMenuPolicy(Qt.CustomContextMenu)
         self._ui_list.currentItemChanged.connect(self._item_clicked)
@@ -75,7 +75,7 @@ class LibraryEditor(Panel):
         self._ui_toolbar.setObjectName("library_toolbar")
         self._ui_toolbar.setIconSize(QSize(16, 16))
         self._ui_toolbar.addAction(self._ui_add_action)
-        self._ui_toolbar.addWidget(GSpacer())
+        self._ui_toolbar.addWidget(Spacer())
 
         self._ui_layout.addWidget(self._ui_search_widget)
         self._ui_layout.addWidget(self._ui_list)
@@ -100,7 +100,7 @@ class LibraryEditor(Panel):
 
             # show songs from library
             for song in self.app.library.items(filter_type=DNA.TYPE_SONG):
-                item = GListItem()
+                item = ListItem()
                 item.setText("%s" % (song.name,))
                 item.setObject(song)
 
@@ -110,7 +110,7 @@ class LibraryEditor(Panel):
 
         # show bible references (limit to 3)
         for verse in self.app.bible.match_reference(keyword):
-            item = GListItem()
+            item = ListItem()
             item.setText("%s" % (verse.reference,))
             item.setObject(verse)
 
@@ -119,7 +119,7 @@ class LibraryEditor(Panel):
         # show songs from library (limit to 9)
         for song in self.app.library.items(filter_keyword=keyword, filter_type=DNA.TYPE_SONG,
                                       sort="name", reverse=True, limit=9):
-            item = GListItem()
+            item = ListItem()
             item.setText("%s" % (song.name,))
             item.setObject(song)
 

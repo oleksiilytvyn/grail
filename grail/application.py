@@ -12,21 +12,28 @@ import tempfile
 
 from PyQt5.QtCore import QFile
 
-from grailkit.dna import SettingsFile, Project, Library, DNAError
+from grailkit.dna import SettingsFile, Project, Library
 from grailkit.bible import BibleHost
-from grailkit.qt import GApplication, GMessageDialog
+from grailkit.qt import Application, MessageDialog
 
 import grail
 import grail.resources
 from grail.ui import MainWindow, WelcomeDialog
+from grail.core import Plugin, Viewer
+
+# load internal plugins and viewers
+from grail.plugins import *
 
 
-class Grail(GApplication):
+class Grail(Application):
 
     def __init__(self, argv):
         super(Grail, self).__init__(argv)
 
         BibleHost.setup()
+
+        for plug in Plugin.plugins() + Viewer.plugins() + Configurator.plugins():
+            plug.loaded()
 
         self.setQuitOnLastWindowClosed(True)
         self.lastWindowClosed.connect(self._closed)
@@ -40,6 +47,7 @@ class Grail(GApplication):
         self._slots = {}
         self._relaunch = False
         self._relaunch_args = []
+
         self.settings = SettingsFile(grail.SETTINGS_PATH, create=True)
         self.osc_host = None
         self.project = None
@@ -76,9 +84,9 @@ class Grail(GApplication):
         launch multiple instances of Grail
         """
 
-        message = GMessageDialog(title="Grail already launched",
-                                 text="Close previously opened Grail and try again",
-                                 icon=GMessageDialog.Critical)
+        message = MessageDialog(title="Grail already launched",
+                                text="Close previously opened Grail and try again",
+                                icon=MessageDialog.Critical)
         message.exec_()
 
     def open(self, path, create=False):
@@ -102,8 +110,12 @@ class Grail(GApplication):
     def _closed(self):
         """Called when all windows closed"""
 
+        for plug in Plugin.plugins() + Viewer.plugins() + Configurator.plugins():
+            plug.unloaded()
+
         if self.library:
             self.library.close()
+
         if self.settings:
             self.settings.close()
 
@@ -146,13 +158,15 @@ class Grail(GApplication):
             os.remove(path)
 
             bibles = BibleHost.list()
+
             for bible_id, bible in bibles.items():
                 self.bible = BibleHost.get(bible_id)
                 self.settings.set('bible/default', bible_id)
+
                 break
 
     def connect(self, message, fn):
-        """Connect message listener
+        """Connect a message listener
 
         Args:
             message (str): message name
@@ -173,10 +187,11 @@ class Grail(GApplication):
             self._slots[message] = [fn]
 
     def emit(self, message, *args):
-        """Emit a message
+        """Emit a message with arguments
 
         Args:
             message (str): message name
+            *args (list): any arguments
         """
 
         if message in self._slots:

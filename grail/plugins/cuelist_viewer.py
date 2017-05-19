@@ -3,7 +3,9 @@
     grail.plugins.cuelist_viewer
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    :copyright: (c) 2017 by Oleksii Lytvyn.
+    View and edit cuelists
+
+    :copyright: (c) 2017 by Grail Team.
     :license: GNU, see LICENSE for more details.
 """
 import re
@@ -13,9 +15,8 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
 from grailkit.dna import DNA
-from grailkit.qt import Popup, Application, Spacer
+from grailkit.qt import Popup, Application, Spacer, MessageDialog
 
-from grail.ui.node_editor import TreeWidget, TreeItemWidget
 from grail.core import Viewer
 
 
@@ -251,6 +252,7 @@ class CuelistsListWidget(QTableWidget):
 class CuelistViewer(Viewer):
     """Library viewer"""
 
+    id = 'cuelist'
     # Unique plugin name string
     name = 'Cuelist'
     # Plugin author string
@@ -311,17 +313,27 @@ class CuelistViewer(Viewer):
         self._ui_menu_action.setIconVisibleInMenu(True)
         self._ui_menu_action.triggered.connect(self.menu_action)
 
+        self._ui_view_action = QToolButton()
+        self._ui_view_action.setText("View")
+        self._ui_view_action.setIcon(QIcon(':/icons/menu.png'))
+        self._ui_view_action.clicked.connect(self.view_action)
+
         self._ui_toolbar = QToolBar()
         self._ui_toolbar.setObjectName("cuelist_toolbar")
         self._ui_toolbar.setIconSize(QSize(16, 16))
-        # self._ui_toolbar.addAction(self._ui_lock_action)
+        self._ui_toolbar.addWidget(self._ui_view_action)
         self._ui_toolbar.addWidget(self._ui_label)
-        # self._ui_toolbar.addAction(self._ui_menu_action)
 
         self._ui_layout.addWidget(self._ui_tree)
         self._ui_layout.addWidget(self._ui_toolbar)
 
         self.setLayout(self._ui_layout)
+
+    def view_action(self):
+        """Replace current view with something other"""
+
+        menu = self.plugin_menu()
+        menu.exec_(self._ui_toolbar.mapToGlobal(self._ui_view_action.pos()))
 
     def lock_action(self):
 
@@ -336,12 +348,12 @@ class CuelistViewer(Viewer):
         self.dialog.showAt(self.mapToGlobal(point))
 
     def item_delete(self, item):
-        """Remove cue item action"""
+        """Remove cue item menu_action"""
 
         item.object().delete()
 
     def item_edit(self, item):
-        """Edit cue action"""
+        """Edit cue menu_action"""
 
         print('edit', item)
 
@@ -461,3 +473,71 @@ class CuelistViewer(Viewer):
         """Close child dialogs"""
 
         self.dialog.close()
+
+
+class TreeWidget(QTreeWidget):
+
+    def __init__(self, parent=None):
+        super(TreeWidget, self).__init__(parent)
+
+        self.setAlternatingRowColors(True)
+        self.setAttribute(Qt.WA_MacShowFocusRect, False)
+        self.header().close()
+        self.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.setDragEnabled(True)
+        self.viewport().setAcceptDrops(True)
+        self.setDropIndicatorShown(True)
+        self.setDragDropMode(QAbstractItemView.InternalMove)
+        self.setWordWrap(True)
+        self.setAnimated(False)
+        self.setSortingEnabled(False)
+
+    def dropEvent(self, event):
+
+        dropping = self.itemAt(event.pos())
+        dragging = self.currentItem()
+        dragging_object = dragging.object()
+        drop_indicator = self.dropIndicatorPosition()
+
+        # don't allow moving of project and project settings entities
+        if (dragging_object.type == DNA.TYPE_PROJECT and dragging_object.parent_id == 0) or \
+                (dragging_object.type == DNA.TYPE_SETTINGS and dragging_object.parent_id == 1):
+            message = MessageDialog(title="Item can't be moved",
+                                    text="Item '%s' can't be moved" % dragging_object.name,
+                                    icon=MessageDialog.Warning)
+            message.exec_()
+
+            return
+
+        # manage a boolean for the case when you are above an item
+        if drop_indicator == QAbstractItemView.AboveItem:
+            dragging.object().index = dropping.object().index - 1
+        # something when being below an item
+        elif drop_indicator == QAbstractItemView.BelowItem:
+            dragging.object().index = dropping.object().index + 1
+        # you're on an item, maybe add the current one as a child
+        elif drop_indicator == QAbstractItemView.OnItem:
+            dragging.object().parent_id = dropping.object().id
+            # dragging.object().index = dropping.object().id
+        # you are not on your tree
+        elif drop_indicator == QAbstractItemView.OnViewport:
+            pass
+
+        QTreeWidget.dropEvent(self, event)
+
+
+class TreeItemWidget(QTreeWidgetItem):
+    """Representation of node as QTreeWidgetItem"""
+
+    def __init__(self, data=None):
+        super(TreeItemWidget, self).__init__()
+
+        self._data = data
+
+    def object(self):
+
+        return self._data
+
+    def setObject(self, data):
+
+        self._data = data

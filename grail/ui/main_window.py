@@ -4,6 +4,9 @@
     ~~~~~~~~~~~~~~~~~~~~
 
     Main window of Grail application
+
+    :copyright: (c) 2017 by Grail Team.
+    :license: GNU, see LICENSE for more details.
 """
 
 import os
@@ -18,8 +21,8 @@ from grailkit.util import *
 from grailkit.qt import AboutDialog, MessageDialog
 
 import grail
-from grail.core import Viewer
-from grail.ui import PreferencesDialog
+from grail.core import Viewer, Plugin
+from grail.ui import PreferencesDialog, ViewArranger
 
 
 class MainWindow(QMainWindow):
@@ -49,21 +52,9 @@ class MainWindow(QMainWindow):
 
         self._ui_menubar()
 
-        # splitter
-        self._ui_splitter = QSplitter()
-        self._ui_splitter.setObjectName("main_splitter")
-        self._ui_splitter.setHandleWidth(1)
+        self.view_arranger = ViewArranger()
 
-        plugins = Viewer.plugins()
-
-        for plug in plugins:
-            viewer = plug(self._ui_splitter)
-
-            self._ui_splitter.addWidget(viewer)
-
-        self._ui_splitter.setSizes([self._ui_splitter.rect().width() / len(plugins)] * len(plugins))
-
-        self.setCentralWidget(self._ui_splitter)
+        self.setCentralWidget(self.view_arranger)
         self.setWindowIcon(QIcon(':/icon/256.png'))
         self.setGeometry(300, 300, 800, 480)
         self.setMinimumSize(320, 240)
@@ -74,7 +65,7 @@ class MainWindow(QMainWindow):
     def _ui_menubar(self):
         """Setup menu"""
 
-        self.ui_menubar = QMenuBar(self)
+        self.ui_menubar = QMenuBar(None)
 
         # File
         self.ui_import_action = QAction('Import...', self)
@@ -179,13 +170,6 @@ class MainWindow(QMainWindow):
         self.ui_menu_controls.addAction(self.ui_first_cue_action)
         self.ui_menu_controls.addAction(self.ui_last_cue_action)
 
-        # Output menu
-        self.ui_menu_output = self.ui_menubar.addMenu('&Output')
-        self.ui_menu_output.addAction(self.ui_disable_output_action)
-        self.ui_menu_output.addSeparator()
-        self.ui_menu_output.addAction(self.ui_show_test_card_action)
-        self.ui_menu_output.addAction(self.ui_output_preferences_action)
-
         # Help menu
         self.ui_menu_help = self.ui_menubar.addMenu('&Help')
         self.ui_menu_help.addAction(self.ui_open_manual_action)
@@ -209,6 +193,12 @@ class MainWindow(QMainWindow):
         qr.moveCenter(cp)
 
         self.move(qr.topLeft())
+
+    def register_menu(self, location, fn):
+
+        tokens = location.split('->')
+        items = tokens[0:len(tokens)-1]
+        name = tokens[-1]
 
     def new_project(self):
         """Create a new project"""
@@ -305,7 +295,7 @@ class MainWindow(QMainWindow):
         # todo: implement this
 
     def about_action(self):
-        """About dialog action"""
+        """About dialog menu_action"""
 
         self.about_dialog.show()
         self.about_dialog.raise_()
@@ -313,7 +303,7 @@ class MainWindow(QMainWindow):
         self.about_dialog.activateWindow()
 
     def update_action(self):
-        """Check for updates action"""
+        """Check for updates menu_action"""
 
         # todo: add a dialog to check for updates
         message = MessageDialog(title="No updates",

@@ -3,7 +3,10 @@
     grail.ui.welcome_dialog
     ~~~~~~~~~~~~~~~~~~~~~~~
 
-    Welcome dialog that provides option to choose action when Grail is launched
+    Welcome dialog that provides options to choose from when Grail is launched
+
+    :copyright: (c) 2017 by Grail Team.
+    :license: GNU, see LICENSE for more details.
 """
 
 import os
@@ -36,13 +39,9 @@ class WelcomeDialog(Dialog):
         last_project = self.app.settings.get('project/last', default="")
         last_project_continue = last_project and os.path.isfile(last_project)
 
-        if last_project_continue:
-            continue_action = WelcomeAction("Continue", os.path.split(last_project)[1], QIcon(':/icon/256.png'))
-            continue_action.clicked.connect(self._continue)
-
         widget = Welcome()
         widget.setTitle("Welcome to Grail")
-        widget.setDescription("Choose action below")
+        widget.setDescription("Choose menu_action below")
         widget.setIcon(QIcon(':/icon/256.png'))
         widget.setIconVisible(True)
 
@@ -50,6 +49,9 @@ class WelcomeDialog(Dialog):
         widget.addWidget(open_action)
 
         if last_project_continue:
+            continue_action = WelcomeAction("Continue", os.path.split(last_project)[1], QIcon(':/icon/256.png'))
+            continue_action.clicked.connect(self._continue)
+
             widget.addWidget(continue_action)
 
         layout = QHBoxLayout()

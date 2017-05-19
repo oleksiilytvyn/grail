@@ -1,9 +1,12 @@
 # -*- coding: UTF-8 -*-
 """
-    Grail
-    ~~~~~
+    grail.__main__
+    ~~~~~~~~~~~~~~
 
     Run Grail as python package
+
+    :copyright: (c) 2017 by Grail Team.
+    :license: GNU, see LICENSE for more details.
 """
 
 import os

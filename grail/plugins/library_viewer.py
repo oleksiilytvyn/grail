@@ -3,7 +3,9 @@
     grail.plugins.library_viewer
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    :copyright: (c) 2017 by Oleksii Lytvyn.
+    Manage built-in library
+
+    :copyright: (c) 2017 by Grail Team.
     :license: GNU, see LICENSE for more details.
 """
 import re
@@ -146,6 +148,7 @@ class SongDialog(Dialog):
 class LibraryViewer(Viewer):
     """Library viewer"""
 
+    id = 'library'
     # Unique plugin name string
     name = 'Library'
     # Plugin author string
@@ -201,11 +204,17 @@ class LibraryViewer(Viewer):
         self._ui_add_action.setIconVisibleInMenu(True)
         self._ui_add_action.triggered.connect(self.add_action)
 
+        self._ui_view_action = QToolButton()
+        self._ui_view_action.setText("View")
+        self._ui_view_action.setIcon(QIcon(':/icons/menu.png'))
+        self._ui_view_action.clicked.connect(self.view_action)
+
         self._ui_toolbar = QToolBar()
         self._ui_toolbar.setObjectName("library_toolbar")
         self._ui_toolbar.setIconSize(QSize(16, 16))
-        self._ui_toolbar.addAction(self._ui_add_action)
+        self._ui_toolbar.addWidget(self._ui_view_action)
         self._ui_toolbar.addWidget(Spacer())
+        self._ui_toolbar.addAction(self._ui_add_action)
 
         self._ui_layout.addWidget(self._ui_search_widget)
         self._ui_layout.addWidget(self._ui_list)
@@ -258,7 +267,7 @@ class LibraryViewer(Viewer):
         # todo: show media items from library (limit to 6)
 
     def _search_key_event(self, event):
-        """Process key evens before search action begins"""
+        """Process key evens before search menu_action begins"""
 
         event_key = event.key()
 
@@ -296,7 +305,7 @@ class LibraryViewer(Viewer):
             self._ui_list.setFocus()
 
     def _context_menu(self, pos):
-        """Context menu action"""
+        """Context menu menu_action"""
 
         item = self._ui_list.itemAt(pos)
 
@@ -348,8 +357,14 @@ class LibraryViewer(Viewer):
 
         self.add_item_action(item.object())
 
+    def view_action(self):
+        """Replace current view with something other"""
+
+        menu = self.plugin_menu()
+        menu.exec_(self._ui_toolbar.mapToGlobal(self._ui_view_action.pos()))
+
     def add_action(self):
-        """Add action"""
+        """Add menu_action"""
 
         self.song_dialog.set_entity(None)
         self.song_dialog.show()
@@ -374,11 +389,3 @@ class LibraryViewer(Viewer):
         """Close this panel and child components"""
 
         self.song_dialog.close()
-
-    @classmethod
-    def loaded(cls):
-        print('Plugin %s loaded' % cls.name)
-
-    @classmethod
-    def unloaded(cls):
-        print('Plugin %s unloaded' % cls.name)

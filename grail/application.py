@@ -4,13 +4,17 @@
     ~~~~~~~~~~~~~~~~~
 
     Extended GApplication class and add some grail specific methods
+
+    :copyright: (c) 2017 by Grail Team.
+    :license: GNU, see LICENSE for more details.
 """
 
 import os
 import sys
+import weakref
 import tempfile
 
-from PyQt5.QtCore import QFile
+from PyQt5.QtCore import QFile, pyqtSignal
 
 from grailkit.dna import SettingsFile, Project, Library
 from grailkit.bible import BibleHost
@@ -20,6 +24,7 @@ import grail
 import grail.resources
 from grail.ui import MainWindow, WelcomeDialog
 from grail.core import Plugin, Viewer
+from grail.core.executor import Executor
 
 # load internal plugins and viewers
 from grail.plugins import *
@@ -45,6 +50,7 @@ class Grail(Application):
         self.setStyleSheetFile(":/stylesheet/grail.css")
 
         self._slots = {}
+        self._plugins = []
         self._relaunch = False
         self._relaunch_args = []
 
@@ -53,6 +59,7 @@ class Grail(Application):
         self.project = None
         self.library = None
         self.bible = None
+        self.executor = Executor()
         self.change_bible(self.settings.get('bible/default', ""))
 
         self.main_window = None
@@ -106,6 +113,15 @@ class Grail(Application):
         self.main_window.show()
 
         self.welcome_dialog.close()
+
+        self._plugins = []
+
+        # launch plugins and store them in list
+        # this code prevents from GC on qt widgets
+        for plug in Plugin.plugins():
+            instance = plug()
+
+            self._plugins.append(instance)
 
     def _closed(self):
         """Called when all windows closed"""
@@ -181,17 +197,23 @@ class Grail(Application):
         if not callable(fn):
             raise Exception("Given function is not callable.")
 
+        if message not in self._slots:
+            self._slots[message] = []
+
+        self._slots[message].append(fn)
+
+    def disconnect_signal(self, message, fn):
+        """Disconnect given function from signal"""
+
         if message in self._slots:
-            self._slots[message].append(fn)
-        else:
-            self._slots[message] = [fn]
+            self._slots[message].remove(fn)
 
     def emit(self, message, *args):
         """Emit a message with arguments
 
         Args:
             message (str): message name
-            *args (list): any arguments
+            *args: any arguments
         """
 
         if message in self._slots:

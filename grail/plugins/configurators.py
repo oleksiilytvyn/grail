@@ -1,9 +1,12 @@
 # -*- coding: UTF-8 -*-
 """
-    
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    grail.plugins.configurators
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    
+    Core configurators
+
+    :copyright: (c) 2017 by Grail Team.
+    :license: GNU, see LICENSE for more details.
 """
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
@@ -15,10 +18,12 @@ from grailkit.bible import BibleHost, BibleHostError
 
 
 class GeneralConfigurator(Configurator):
+    """Configure general preferences"""
 
     id = 'general-configurator'
     name = 'General'
     author = 'Grail Team'
+    description = 'General configuration page'
 
     def __init__(self, parent=None):
         super(GeneralConfigurator, self).__init__(parent)
@@ -61,7 +66,7 @@ class GeneralConfigurator(Configurator):
 
     def restore_action(self):
         """Restore Grail to it's factory settings.
-        This action will remove all songs and clear all preferences
+        This menu_action will remove all songs and clear all preferences
         """
 
         # Todo: implement this
@@ -86,10 +91,12 @@ class GeneralConfigurator(Configurator):
 
 
 class BibleConfigurator(Configurator):
+    """Configure bible preferences"""
 
     id = 'bible-configurator'
     name = 'Bible'
     author = 'Grail Team'
+    description = 'Configuration page for bibles'
 
     def __init__(self, parent=None):
         super(BibleConfigurator, self).__init__(parent)

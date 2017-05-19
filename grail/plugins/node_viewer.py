@@ -3,7 +3,9 @@
     grail.plugins.node_viewer
     ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    :copyright: (c) 2017 by Oleksii Lytvyn.
+    This plugin for developers who want to see whats going on with nodes
+
+    :copyright: (c) 2017 by Grail Team.
     :license: GNU, see LICENSE for more details.
 """
 from collections import defaultdict
@@ -20,6 +22,7 @@ from grail.core import Viewer
 
 class NodeViewer(Viewer):
 
+    id = 'node'
     # Unique plugin name string
     name = 'Nodes'
     # Plugin author string
@@ -58,11 +61,17 @@ class NodeViewer(Viewer):
         self._ui_remove_action.setIconVisibleInMenu(True)
         self._ui_remove_action.triggered.connect(self.remove_action)
 
+        self._ui_view_action = QToolButton()
+        self._ui_view_action.setText("View")
+        self._ui_view_action.setIcon(QIcon(':/icons/menu.png'))
+        self._ui_view_action.clicked.connect(self.view_action)
+
         self._ui_toolbar = QToolBar()
         self._ui_toolbar.setObjectName("node_toolbar")
         self._ui_toolbar.setIconSize(QSize(16, 16))
-        self._ui_toolbar.addAction(self._ui_add_action)
+        self._ui_toolbar.addWidget(self._ui_view_action)
         self._ui_toolbar.addWidget(Spacer())
+        self._ui_toolbar.addAction(self._ui_add_action)
         self._ui_toolbar.addAction(self._ui_remove_action)
 
         self._ui_layout = QVBoxLayout()
@@ -115,6 +124,12 @@ class NodeViewer(Viewer):
     def _item_collapsed(self, item):
 
         self._folded[item.object().id] = False
+
+    def view_action(self):
+        """Replace current view with something other"""
+
+        menu = self.plugin_menu()
+        menu.exec_(self._ui_toolbar.mapToGlobal(self._ui_view_action.pos()))
 
     def add_action(self):
 

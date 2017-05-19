@@ -4,6 +4,9 @@
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     Global preferences dialog window and all panels displayed inside
+
+    :copyright: (c) 2017 by Grail Team.
+    :license: GNU, see LICENSE for more details.
 """
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QStackedWidget
@@ -73,7 +76,7 @@ class PreferencesDialog(Dialog):
         self.setWindowFlags(Qt.WindowCloseButtonHint)
 
     def page_clicked(self, item):
-        """Page clicked action"""
+        """Page clicked menu_action"""
 
         index = item.index
         panel = self._ui_panel.widget(index)

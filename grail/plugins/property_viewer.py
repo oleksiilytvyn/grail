@@ -3,7 +3,9 @@
     grail.plugins.property_viewer
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    :copyright: (c) 2017 by Oleksii Lytvyn.
+    Node properties viewer
+
+    :copyright: (c) 2017 by Grail Team.
     :license: GNU, see LICENSE for more details.
 """
 from PyQt5.QtCore import *
@@ -18,6 +20,7 @@ from grail.core import Viewer
 class PropertyViewer(Viewer):
     """Simple property editor"""
 
+    id = 'property'
     # Unique plugin name string
     name = 'Properties'
     # Plugin author string
@@ -40,7 +43,7 @@ class PropertyViewer(Viewer):
     def __ui__(self):
         """Create UI layout and widgets"""
 
-        self._ui_properties = QTableWidget()
+        self._ui_properties = QTableWidget(self)
         self._ui_properties.setShowGrid(False)
         self._ui_properties.setColumnCount(2)
         self._ui_properties.horizontalHeader().setVisible(True)
@@ -91,11 +94,17 @@ class PropertyViewer(Viewer):
         self._ui_remove_action.setIconVisibleInMenu(True)
         self._ui_remove_action.triggered.connect(self.remove_action)
 
+        self._ui_view_action = QToolButton()
+        self._ui_view_action.setText("View")
+        self._ui_view_action.setIcon(QIcon(':/icons/menu.png'))
+        self._ui_view_action.clicked.connect(self.view_action)
+
         self._ui_toolbar = QToolBar()
         self._ui_toolbar.setObjectName("library_toolbar")
         self._ui_toolbar.setIconSize(QSize(16, 16))
-        self._ui_toolbar.addAction(self._ui_add_action)
+        self._ui_toolbar.addWidget(self._ui_view_action)
         self._ui_toolbar.addWidget(Spacer())
+        self._ui_toolbar.addAction(self._ui_add_action)
         self._ui_toolbar.addAction(self._ui_remove_action)
 
         self._ui_layout = QVBoxLayout()
@@ -153,6 +162,12 @@ class PropertyViewer(Viewer):
             index += 1
 
         self._updating_list = False
+
+    def view_action(self):
+        """Replace current view with something other"""
+
+        menu = self.plugin_menu()
+        menu.exec_(self._ui_toolbar.mapToGlobal(self._ui_view_action.pos()))
 
     def add_action(self):
         """Add a new property"""

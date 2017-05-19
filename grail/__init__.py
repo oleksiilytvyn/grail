@@ -4,6 +4,9 @@
     ~~~~~~~~~~~~~~
 
     Bootstrap and run Grail
+
+    :copyright: (c) 2017 by Grail Team.
+    :license: GNU, see LICENSE for more details.
 """
 
 
@@ -25,6 +28,8 @@ ORGANISATION_DOMAIN = "grailapp.com"
 
 LIBRARY_PATH = grailkit.PATH_LIBRARY
 SETTINGS_PATH = os.path.join(path_appdata("grail"), "app.grail")
+
+DEBUG = False
 
 
 def main():

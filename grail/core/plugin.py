@@ -12,7 +12,8 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
-from grailkit.qt import Component, Application, Splitter
+from grailkit.util import default_key
+from grailkit.qt import Component, Application
 from grailkit.plug import PluginRegistry
 
 
@@ -22,12 +23,16 @@ class _PluginMeta(object):
 
     # unique plugin identifier
     id = 'dummy-plugin'
+
     # Plugin display name
     name = 'Default plugin'
+
     # Plugin author string
     author = 'Grail Team'
+
     # Plugin description string
     description = 'Dummy plugin that doesn\'t make anything useful'
+
     # Do not list this plugin if True
     private = False
 
@@ -36,9 +41,10 @@ class _PluginMeta(object):
 
         super(_PluginMeta, self).__init__()
 
-        # keep track of slot to delete them
+        # keep track of slots to delete them
         self.__slots = []
         self.__destroyed = False
+        self.__app = Application.instance()
 
     def emit(self, message, *args):
         """Emit a message with arguments
@@ -48,7 +54,7 @@ class _PluginMeta(object):
             *args: any arguments
         """
 
-        self.app.emit(message, *args)
+        self.__app.emit(message, *args)
 
     def connect(self, message, fn):
         """Connect a message listener
@@ -58,37 +64,8 @@ class _PluginMeta(object):
             fn (callable): function to call
         """
 
-        self.app.connect(message, fn)
+        self.__app.connect(message, fn)
         self.__slots.append([message, fn])
-
-    def register_action(self, name, fn):
-        """Register a global menu_action
-
-        Actions added by this method can be accessed from menu_action list in application
-        """
-
-        pass
-
-    def register_menu(self, location, fn=None, remove=False, index=-1, hotkey=None):
-        """Register a menu item in global application menu
-
-        Args:
-            location (str): path to menu item and item name divided by '->'
-            fn (callable): callback function
-
-        Example:
-
-            def callback():
-                self._inspector_dialog.show()
-                self._inspector_dialog.raise_()
-
-            self.register_menu("View->Developer->Show inspector", callback)
-        """
-
-        main = self.app.main_window
-
-        if main:
-            main.register_menu(location, fn)
 
     def destroy(self):
         """Gracefully destroy widget and disconnect any signals
@@ -102,7 +79,7 @@ class _PluginMeta(object):
         # clear slots as they keeping this object alive
         # and preventing from gc collection
         for slot in self.__slots:
-            self.app.disconnect_signal(*slot)
+            self.__app.disconnect_signal(*slot)
 
         self.__slots = []
 
@@ -110,7 +87,19 @@ class _PluginMeta(object):
     def app(self):
         """Returns application instance"""
 
-        return Application.instance()
+        return self.__app
+
+    @property
+    def library(self):
+        return self.__app.library
+
+    @property
+    def project(self):
+        return self.__app.project
+
+    @property
+    def bible(self):
+        return self.__app.bible
 
     @classmethod
     def loaded(cls):
@@ -128,20 +117,127 @@ class _PluginMeta(object):
     def plugins(cls):
         """Returns list of classes extended from Plugin in alphabetical order"""
 
-        plugins = sorted(cls.__registry__, key=lambda x: str(x), reverse=True)
-
-        return plugins
+        return sorted(cls.__registry__, key=lambda x: str(x), reverse=True)
 
 
 class Plugin(_PluginMeta, metaclass=PluginRegistry):
-    """Abstract plugin"""
+    """Non-visual plugin.
+    Subclasses of `Plugin` created when project opened and
+    closed when user closes application or another project opened
+
+    Plugins can:
+     - register actions
+     - register items in global menu
+    """
 
     def __init__(self):
         super(Plugin, self).__init__()
 
+    def register_action(self, name, fn):
+        """Register a global menu_action
+        Actions added by this method can be accessed from menu_action list in application
+
+        Args:
+            name (str): name of action
+            fn (callable): callback function
+        """
+
+        self.app.register_action(self, name, fn)
+
+    def register_menu(self, location, fn=None, shortcut=None, checkable=False, checked=False, before='Help'):
+        """Register a menu item in global application menu
+
+        Args:
+            location (str): path to menu item and item name divided by '->'
+            fn (callable): callback function
+            shortcut (str): Qt shortcut string
+            checkable (bool): weather this is action with checkbox
+            checked (bool): action checked or not if `checkable`
+            before (str): where to place item
+
+        Example:
+
+            def callback():
+                self._inspector_dialog.show()
+                self._inspector_dialog.raise_()
+
+            self.register_menu("View->Developer->Show inspector", callback)
+        """
+
+        main = self.app.main_window
+        menubar = main.ui_menubar
+        tokens = location.split('->')
+        before = before.split('->')
+        items = tokens[0:len(tokens) - 1]
+        name = tokens[-1]
+
+        def create_action(menu, location_tokens, new_action, before_tokens):
+            action_name = location_tokens[0]
+            action_target = None
+            before_name = before_tokens[0] if len(before_tokens) else None
+            before_action = None
+
+            # search for existing items
+            for action in menu.actions():
+                if action.text() == action_name:
+                    action_target = action
+
+                if action.text() == before_name:
+                    before_action = action
+
+            if action_target:
+                action_target = action_target.menu()
+            elif not action_target and before_action:
+                action_target = menu.insertMenu(before_action, QMenu(action_name, menu)).menu()
+            else:
+                action_target = menu.addMenu(action_name)
+
+            before_action = None
+            before_name = before_tokens[1] if len(before_tokens) > 1 else None
+
+            for item in action_target.actions():
+                if item.text() == before_name:
+                    before_action = item
+                    break
+
+            if len(location_tokens) == 1 and before_action:
+                if new_action:
+                    action_target.insertAction(before_action, new_action)
+                else:
+                    action_target.insertSeparator(before_action)
+            elif len(location_tokens) == 1:
+                if new_action:
+                    action_target.addAction(new_action)
+                else:
+                    action_target.addSeparator()
+            else:
+                create_action(action_target, location_tokens[1:], new_action, before_tokens[1:])
+
+        # add separator
+        if name == '---':
+            create_action(menubar, items, None, before)
+        # add action
+        else:
+            def trigger(_fn, _action):
+                return lambda: _fn(_action)
+
+            action = QAction(name, menubar)
+            action.triggered.connect(trigger(fn, action))
+
+            if checkable:
+                action.setCheckable(True)
+                action.setChecked(checked)
+
+            if shortcut:
+                action.setShortcut(shortcut)
+                action.setShortcutContext(Qt.ApplicationShortcut)
+
+            create_action(menubar, items, action, before)
+
 
 class _ComponentPluginRegistry(type(Component), PluginRegistry):
-    """Meta class for visual plugins"""
+    """Meta class for visual plugins
+    Combines properties of grailkit.qt.Component and grailkit.plug.PluginRegistry"""
 
     def __init__(cls, name, bases, attrs):
         type(Component).__init__(cls, name, bases, attrs)
@@ -149,13 +245,17 @@ class _ComponentPluginRegistry(type(Component), PluginRegistry):
 
 
 class Viewer(Component, _PluginMeta, metaclass=_ComponentPluginRegistry):
-    """Visual component plugin"""
+    """Visual component plugin that will be available in view arranger
+
+    Viewer class can only create self and listen/emit global events
+    """
 
     def __init__(self, parent=None):
         Component.__init__(self, parent)
 
+        # viewer properties
         self.__properties = {}
-        # destroy all signals
+        # destroy all signals when qt object destroyed
         self.destroyed.connect(lambda: _PluginMeta.destroy(self))
 
     def __ui__(self):
@@ -164,13 +264,12 @@ class Viewer(Component, _PluginMeta, metaclass=_ComponentPluginRegistry):
         pass
 
     @property
-    def arranger(self):
-        """Access global arranger"""
-
-        return self.app.main_window.view_arranger
+    def __arranger(self):
+        return Application.instance().main_window.view_arranger
 
     def paintEvent(self, event):
         """Fix issue with css component styles"""
+
         super(Viewer, self).paintEvent(event)
 
         option = QStyleOption()
@@ -181,12 +280,12 @@ class Viewer(Component, _PluginMeta, metaclass=_ComponentPluginRegistry):
         self.style().drawPrimitive(QStyle.PE_Widget, option, painter, self)
 
     def plugin_menu(self):
-        """Returns qt menu that will replace this view with chosen from list"""
+        """Returns QMenu with list of viewers, split options and action to remove current viewer"""
 
-        menu = QMenu("Available views", self)
+        menu = QMenu("Viewers", self)
 
-        def triggered(action):
-            return lambda x, item=action: self.arranger.replace(self, item.plugin)
+        def triggered(plugin_id):
+            return lambda item: self.__arranger.replace(self, plugin_id)
 
         for plug in self.plugins():
 
@@ -194,19 +293,18 @@ class Viewer(Component, _PluginMeta, metaclass=_ComponentPluginRegistry):
                 continue
 
             action = QAction(plug.name, menu)
-            action.plugin = plug.id
-            action.triggered.connect(triggered(action))
+            action.triggered.connect(triggered(plug.id))
 
             menu.addAction(action)
 
         remove_action = QAction('Remove', menu)
-        remove_action.triggered.connect(lambda: self.arranger.remove(self))
+        remove_action.triggered.connect(lambda: self.__arranger.remove(self))
 
         split_v_action = QAction('Split vertically', menu)
-        split_v_action.triggered.connect(lambda: self.arranger.split(self, 'v'))
+        split_v_action.triggered.connect(lambda: self.__arranger.split(self, 'v'))
 
         split_h_action = QAction('Split horizontally', menu)
-        split_h_action.triggered.connect(lambda: self.arranger.split(self, 'h'))
+        split_h_action.triggered.connect(lambda: self.__arranger.split(self, 'h'))
 
         menu.addSeparator()
         menu.addAction(split_h_action)
@@ -218,10 +316,16 @@ class Viewer(Component, _PluginMeta, metaclass=_ComponentPluginRegistry):
 
     def set(self, key, value):
         """Store viewer state using key-value storage"""
-        pass
+
+        if not isinstance(key, str):
+            raise ValueError('Unable to set property %s of object %s' % (str(key), str(self)))
+
+        self.__properties[key] = value
 
     def get(self, key, default=None):
-        pass
+        """Returns stored property"""
+
+        return default_key(self.__properties, key, default)
 
 
 class Configurator(Component, _PluginMeta, metaclass=_ComponentPluginRegistry):
@@ -236,6 +340,8 @@ class Configurator(Component, _PluginMeta, metaclass=_ComponentPluginRegistry):
         pass
 
     def clicked(self):
-        """Called by host when configuration page is selected"""
+        """Called by host when configuration page is selected.
+        You can refresh data at this moment.
+        """
 
         pass

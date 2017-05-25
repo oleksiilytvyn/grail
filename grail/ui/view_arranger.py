@@ -3,18 +3,14 @@
     grail.ui.view_arranger
     ~~~~~~~~~~~~~~~~~~~~~~
 
-    Arrange views in any order you want
+    Arrange viewers in any order you want
 
     :copyright: (c) 2017 by Grail Team.
     :license: GNU, see LICENSE for more details.
 """
-import sip
-
 from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
 
-from grailkit.qt import Component, HLayout, Button, Splitter
+from grailkit.qt import Component, HLayout, Splitter
 from grail.core import Viewer
 from grail.plugins import EmptyViewer
 
@@ -29,7 +25,8 @@ class ViewArranger(Component):
         self.setLayout(self._layout)
 
         # create test widgets
-        widget = self.build(['h', 'library', 'cuelist', ['v', 'node', 'property'], 'empty'])
+        widget = self.build(['h', 'library', 'cuelist', 'node', 'property'])
+
         self._layout.addWidget(widget)
 
     def build(self, data):
@@ -52,6 +49,7 @@ class ViewArranger(Component):
             viewer (grail.core.Viewer): viewer to replace
             other (string): new viewer
         """
+
         splitter = viewer.parentWidget()
         index = splitter.indexOf(viewer)
         sizes = splitter.sizes()
@@ -117,7 +115,6 @@ class ViewArranger(Component):
     def _destroy(self, viewer):
         """Destroy viewer and remove from list"""
 
-        # remove current viewer
         viewer.setParent(None)
         viewer.deleteLater()
 

@@ -18,6 +18,7 @@ from grailkit.qt import Dialog, Welcome, WelcomeAction
 
 
 class WelcomeDialog(Dialog):
+    """Welcome dialog that shown on Grail startup"""
 
     def __init__(self, app):
         super(WelcomeDialog, self).__init__()
@@ -27,8 +28,10 @@ class WelcomeDialog(Dialog):
         self.__ui__()
 
     def __ui__(self):
+        """Build UI"""
 
         std_icon = QApplication.style().standardIcon
+        grail_icon = QIcon(':/icon/256.png')
 
         create_action = WelcomeAction("Create", "New project", std_icon(QStyle.SP_FileIcon))
         create_action.clicked.connect(self._create)
@@ -42,14 +45,14 @@ class WelcomeDialog(Dialog):
         widget = Welcome()
         widget.setTitle("Welcome to Grail")
         widget.setDescription("Choose menu_action below")
-        widget.setIcon(QIcon(':/icon/256.png'))
+        widget.setIcon(grail_icon)
         widget.setIconVisible(True)
 
         widget.addWidget(create_action)
         widget.addWidget(open_action)
 
         if last_project_continue:
-            continue_action = WelcomeAction("Continue", os.path.split(last_project)[1], QIcon(':/icon/256.png'))
+            continue_action = WelcomeAction("Continue", os.path.split(last_project)[1], grail_icon)
             continue_action.clicked.connect(self._continue)
 
             widget.addWidget(continue_action)
@@ -59,10 +62,10 @@ class WelcomeDialog(Dialog):
         layout.addWidget(widget)
 
         self.setLayout(layout)
-
+        self.setWindowTitle("Welcome to Grail")
+        self.setWindowIcon(grail_icon)
         self.setGeometry(100, 100, 380, 460)
         self.setFixedSize(380, 460)
-        self.setWindowTitle("Welcome to Grail")
         self.moveCenter()
 
     def _open(self):

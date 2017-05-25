@@ -43,14 +43,23 @@ class SongDialog(Dialog):
         self.ui_lyrics_label = QLabel('Lyrics')
 
         self.ui_title_edit = QLineEdit()
+        self.ui_title_edit.setPlaceholderText("Song title")
         self.ui_title_edit.setAttribute(Qt.WA_MacShowFocusRect, 0)
+
         self.ui_artist_edit = QLineEdit()
+        self.ui_artist_edit.setPlaceholderText("Artist name")
         self.ui_artist_edit.setAttribute(Qt.WA_MacShowFocusRect, 0)
+
         self.ui_album_edit = QLineEdit()
+        self.ui_album_edit.setPlaceholderText("Album")
         self.ui_album_edit.setAttribute(Qt.WA_MacShowFocusRect, 0)
+
         self.ui_year_edit = QLineEdit()
+        self.ui_year_edit.setPlaceholderText("Year")
         self.ui_year_edit.setAttribute(Qt.WA_MacShowFocusRect, 0)
+
         self.ui_lyrics_edit = QTextEdit()
+        self.ui_lyrics_edit.setPlaceholderText("Lyrics")
         self.ui_lyrics_edit.setAttribute(Qt.WA_MacShowFocusRect, 0)
         self.ui_lyrics_edit.setAcceptRichText(False)
 

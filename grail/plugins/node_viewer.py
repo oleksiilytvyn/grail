@@ -23,15 +23,12 @@ from grail.core import Viewer
 class NodeViewer(Viewer):
 
     id = 'node'
-    # Unique plugin name string
     name = 'Nodes'
-    # Plugin author string
     author = 'Grail Team'
-    # Plugin description string
     description = 'View all nodes in grail file'
 
-    def __init__(self, *args):
-        super(NodeViewer, self).__init__(*args)
+    def __init__(self, parent=None):
+        super(NodeViewer, self).__init__(parent)
 
         self.connect('/property/changed', self._update)
 

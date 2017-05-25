@@ -85,28 +85,6 @@ class MainWindow(QMainWindow):
         self.ui_quit_action = QAction('Quit', self)
         self.ui_quit_action.triggered.connect(self.close)
 
-        # Edit
-        self.ui_cut_action = QAction('Cut', self)
-        self.ui_copy_action = QAction('Copy', self)
-        self.ui_paste_action = QAction('Paste', self)
-        self.ui_duplicate_action = QAction('Duplicate', self)
-        self.ui_delete_action = QAction('Delete', self)
-
-        self.ui_add_song_action = QAction('Add new Song', self)
-
-        # Controls
-        self.ui_go_action = QAction('Go', self)
-        self.ui_go_to_action = QAction('Go to Cue', self)
-        self.ui_blackout_action = QAction('Blackout', self)
-        self.ui_next_cue_action = QAction('Next cue', self)
-        self.ui_previous_cue_action = QAction('Previous cue', self)
-        self.ui_last_cue_action = QAction('Go to last cue', self)
-        self.ui_first_cue_action = QAction('Go to first cue', self)
-
-        # Options
-        self.ui_edit_osc_action = QAction('Edit OSC map', self)
-        self.ui_edit_key_action = QAction('Edit Key map', self)
-        self.ui_lock_action = QAction('Lock', self)
         self.ui_preferences_action = QAction('Preferences', self)
         self.ui_preferences_action.triggered.connect(self.preferences_action)
 
@@ -123,20 +101,8 @@ class MainWindow(QMainWindow):
         self.ui_open_manual_action = QAction('View manual', self)
         self.ui_open_manual_action.triggered.connect(self.open_manual_action)
 
-        # Output
-        self.ui_disable_output_action = QAction('Disabled', self)
-        self.ui_disable_output_action.setCheckable(True)
-        self.ui_disable_output_action.triggered.connect(self.disable_output_action)
-
-        self.ui_show_test_card_action = QAction('Show Test Card', self)
-        self.ui_show_test_card_action.setCheckable(True)
-        self.ui_show_test_card_action.triggered.connect(self.test_card_action)
-
-        self.ui_output_preferences_action = QAction('Advanced Preferences', self)
-        self.ui_output_preferences_action.triggered.connect(self.output_preferences_action)
-
         # File menu
-        self.ui_menu_file = self.ui_menubar.addMenu('&File')
+        self.ui_menu_file = self.ui_menubar.addMenu('File')
         self.ui_menu_file.addAction(self.ui_new_action)
         self.ui_menu_file.addAction(self.ui_open_action)
         self.ui_menu_file.addSeparator()
@@ -144,34 +110,13 @@ class MainWindow(QMainWindow):
         self.ui_menu_file.addAction(self.ui_save_as_action)
         self.ui_menu_file.addSeparator()
         self.ui_menu_file.addAction(self.ui_import_action)
-        # self.ui_menu_file.addAction(self.ui_export_action)
+        self.ui_menu_file.addAction(self.ui_export_action)
         self.ui_menu_file.addSeparator()
         self.ui_menu_file.addAction(self.ui_preferences_action)
         self.ui_menu_file.addAction(self.ui_quit_action)
 
-        # Edit menu
-        # self.ui_menu_edit = self.ui_menubar.addMenu('&Edit')
-        # self.ui_menu_edit.addAction(self.ui_cut_action)
-        # self.ui_menu_edit.addAction(self.ui_copy_action)
-        # self.ui_menu_edit.addAction(self.ui_paste_action)
-        # self.ui_menu_edit.addAction(self.ui_duplicate_action)
-        # self.ui_menu_edit.addAction(self.ui_delete_action)
-        # self.ui_menu_edit.addSeparator()
-        # self.ui_menu_edit.addAction(self.ui_add_song_action)
-
-        # Controls menu
-        self.ui_menu_controls = self.ui_menubar.addMenu('&Controls')
-        self.ui_menu_controls.addAction(self.ui_go_action)
-        # self.ui_menu_controls.addAction(self.ui_go_to_action)
-        self.ui_menu_controls.addAction(self.ui_blackout_action)
-        self.ui_menu_controls.addSeparator()
-        self.ui_menu_controls.addAction(self.ui_previous_cue_action)
-        self.ui_menu_controls.addAction(self.ui_next_cue_action)
-        self.ui_menu_controls.addAction(self.ui_first_cue_action)
-        self.ui_menu_controls.addAction(self.ui_last_cue_action)
-
         # Help menu
-        self.ui_menu_help = self.ui_menubar.addMenu('&Help')
+        self.ui_menu_help = self.ui_menubar.addMenu('Help')
         self.ui_menu_help.addAction(self.ui_open_manual_action)
         self.ui_menu_help.addAction(self.ui_open_web_action)
         self.ui_menu_help.addSeparator()
@@ -193,12 +138,6 @@ class MainWindow(QMainWindow):
         qr.moveCenter(cp)
 
         self.move(qr.topLeft())
-
-    def register_menu(self, location, fn):
-
-        tokens = location.split('->')
-        items = tokens[0:len(tokens)-1]
-        name = tokens[-1]
 
     def new_project(self):
         """Create a new project"""
@@ -328,23 +267,6 @@ class MainWindow(QMainWindow):
         self.preferences_dialog.raise_()
         self.preferences_dialog.setWindowState(self.preferences_dialog.windowState() & ~Qt.WindowMinimized | Qt.WindowActive)
         self.preferences_dialog.activateWindow()
-
-    def output_preferences_action(self):
-        """Open output preferences dialog"""
-
-        pass
-
-    def test_card_action(self):
-        """Show test card or hide it"""
-
-        self._test_card = not self._test_card
-
-        self.app.emit('/display/testcard', self._test_card)
-
-    def disable_output_action(self):
-        """Disable display output"""
-
-        self.app.emit('/display/disable')
 
     def closeEvent(self, event):
         """Save project"""

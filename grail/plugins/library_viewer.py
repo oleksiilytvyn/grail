@@ -19,152 +19,26 @@ from grailkit.dna import DNA, SongEntity
 from grailkit.qt import SearchEdit, List, ListItem, Spacer, Dialog, Application
 
 from grail.core import Viewer
-
-
-class SongDialog(Dialog):
-    """Song edit dialog"""
-
-    MODE_CREATE = 0
-    MODE_UPDATE = 1
-
-    changed = pyqtSignal()
-
-    def __init__(self, parent=None, song=None):
-        super(SongDialog, self).__init__(parent)
-
-        self._mode = SongDialog.MODE_CREATE
-        self._entity = song
-
-        self.__ui__()
-
-    def __ui__(self):
-        """Create UI of this dialog"""
-
-        self.ui_title_label = QLabel('Title')
-        self.ui_artist_label = QLabel('Artist')
-        self.ui_album_label = QLabel('Album')
-        self.ui_year_label = QLabel('Year')
-        self.ui_lyrics_label = QLabel('Lyrics')
-
-        self.ui_title_edit = QLineEdit()
-        self.ui_title_edit.setAttribute(Qt.WA_MacShowFocusRect, 0)
-        self.ui_artist_edit = QLineEdit()
-        self.ui_artist_edit.setAttribute(Qt.WA_MacShowFocusRect, 0)
-        self.ui_album_edit = QLineEdit()
-        self.ui_album_edit.setAttribute(Qt.WA_MacShowFocusRect, 0)
-        self.ui_year_edit = QLineEdit()
-        self.ui_year_edit.setAttribute(Qt.WA_MacShowFocusRect, 0)
-        self.ui_lyrics_edit = QTextEdit()
-        self.ui_lyrics_edit.setAttribute(Qt.WA_MacShowFocusRect, 0)
-        self.ui_lyrics_edit.setAcceptRichText(False)
-
-        self.ui_buttons = QDialogButtonBox()
-        self.ui_buttons.setContentsMargins(0, 12, 0, 0)
-        self.ui_buttons.setStandardButtons(QDialogButtonBox.Cancel | QDialogButtonBox.Ok)
-        self.ui_buttons.accepted.connect(self.accept_action)
-        self.ui_buttons.rejected.connect(self.reject_action)
-
-        self.ui_grid = QGridLayout()
-        self.ui_grid.setSpacing(10)
-        self.ui_grid.setContentsMargins(12, 12, 12, 12)
-        self.ui_grid.setColumnMinimumWidth(0, 200)
-
-        self.ui_grid.addWidget(self.ui_title_label, 0, 0, 1, 2)
-        self.ui_grid.addWidget(self.ui_title_edit, 1, 0, 1, 2)
-
-        self.ui_grid.addWidget(self.ui_album_label, 2, 0, 1, 2)
-        self.ui_grid.addWidget(self.ui_album_edit, 3, 0, 1, 2)
-
-        self.ui_grid.addWidget(self.ui_artist_label, 4, 0)
-        self.ui_grid.addWidget(self.ui_artist_edit, 5, 0)
-
-        self.ui_grid.addWidget(self.ui_year_label, 4, 1)
-        self.ui_grid.addWidget(self.ui_year_edit, 5, 1)
-
-        self.ui_grid.addWidget(self.ui_lyrics_label, 6, 0, 1, 2)
-        self.ui_grid.addWidget(self.ui_lyrics_edit, 7, 0, 1, 2)
-
-        self.ui_grid.addWidget(self.ui_buttons, 8, 0, 1, 2)
-
-        self.setLayout(self.ui_grid)
-        self.setWindowIcon(QIcon(':/icons/32.png'))
-        self.setWindowTitle('Add song')
-        self.setGeometry(300, 300, 300, 400)
-        self.setMinimumSize(300, 400)
-        self.setWindowFlags(Qt.WindowCloseButtonHint)
-
-    def reject_action(self):
-        """Close window"""
-
-        self.changed.emit()
-        self.reject()
-
-    def accept_action(self):
-        """Save or create a song"""
-
-        title = str(self.ui_title_edit.text())
-        album = str(self.ui_album_edit.text())
-        artist = str(self.ui_artist_edit.text())
-        lyrics = str(self.ui_lyrics_edit.toPlainText()).strip()
-        year = int(''.join(x for x in self.ui_year_edit.text() if x.isdigit()))
-
-        if self._mode == SongDialog.MODE_CREATE:
-            entity = Application.instance().library.create(name=title, entity_type=DNA.TYPE_SONG)
-        else:
-            entity = self._entity
-
-        entity.name = title
-        entity.album = album
-        entity.artist = artist
-        entity.lyrics = lyrics
-        entity.year = year
-        entity.update()
-
-        self.changed.emit()
-        self.accept()
-
-    def set_entity(self, entity):
-
-        self._entity = entity
-
-        if entity:
-            self.ui_title_edit.setText(entity.name)
-            self.ui_album_edit.setText(entity.album)
-            self.ui_artist_edit.setText(entity.artist)
-            self.ui_lyrics_edit.setText(entity.lyrics)
-            self.ui_year_edit.setText(str(entity.year))
-
-            self._mode = SongDialog.MODE_UPDATE
-        else:
-            self.ui_title_edit.setText('Untitled')
-            self.ui_album_edit.setText('')
-            self.ui_artist_edit.setText('Unknown')
-            self.ui_lyrics_edit.setText('')
-            self.ui_year_edit.setText('2000')
-
-            self._mode = SongDialog.MODE_CREATE
+from grail.ui import SongDialog
 
 
 class LibraryViewer(Viewer):
     """Library viewer"""
 
     id = 'library'
-    # Unique plugin name string
     name = 'Library'
-    # Plugin author string
     author = 'Grail Team'
-    # Plugin description string
     description = 'Manage grail library'
 
-    def __init__(self, *args):
-        super(LibraryViewer, self).__init__(*args)
+    def __init__(self, parent=None):
+        super(LibraryViewer, self).__init__(parent)
 
         self.song_dialog = SongDialog()
         self.song_dialog.changed.connect(self._update)
 
         self.connect('/app/close', self._close)
-        self.app.library.entity_changed.connect(self._update)
-        self.app.library.entity_removed.connect(self._update)
+        self.library.entity_changed.connect(self._update)
+        self.library.entity_removed.connect(self._update)
 
         self.__ui__()
 
@@ -238,7 +112,7 @@ class LibraryViewer(Viewer):
         if not keyword:
 
             # show songs from library
-            for song in self.app.library.items(filter_type=DNA.TYPE_SONG):
+            for song in self.library.items(filter_type=DNA.TYPE_SONG):
                 item = ListItem()
                 item.setText("%s" % (song.name,))
                 item.setObject(song)
@@ -248,7 +122,7 @@ class LibraryViewer(Viewer):
             return
 
         # show bible references (limit to 3)
-        for verse in self.app.bible.match_reference(keyword):
+        for verse in self.bible.match_reference(keyword):
             item = ListItem()
             item.setText("%s" % (verse.reference,))
             item.setObject(verse)
@@ -256,7 +130,7 @@ class LibraryViewer(Viewer):
             self._ui_list.addItem(item)
 
         # show songs from library (limit to 9)
-        for song in self.app.library.items(filter_keyword=keyword, filter_type=DNA.TYPE_SONG,
+        for song in self.library.items(filter_keyword=keyword, filter_type=DNA.TYPE_SONG,
                                       sort="name", reverse=True, limit=9):
             item = ListItem()
             item.setText("%s" % (song.name,))
@@ -377,7 +251,7 @@ class LibraryViewer(Viewer):
     def delete_item_action(self, entity):
         """Delete item from library"""
 
-        self.app.library.remove(entity.id)
+        self.library.remove(entity.id)
 
     def edit_item_action(self, entity):
         """Edit library item"""

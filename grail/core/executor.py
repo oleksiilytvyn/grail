@@ -24,12 +24,13 @@ class Executor:
 
         return self._current
 
+    @property
     def cuelist(self):
         """Returns cuelist of last executed cue"""
 
         return self._current
 
-    def exec(self, cue):
+    def go(self, cue):
         """Execute given cue
 
         Args:
@@ -41,7 +42,14 @@ class Executor:
         print('Executing cue:', cue.name)
 
         if cue.follow == dna.CueEntity.FOLLOW_CONTINUE:
-            self.next()
+            self.go(self.next())
+        elif cue.follow == dna.CueEntity.FOLLOW_ON:
+            self.select(self.next())
+
+    def select(self, cue):
+        """Select cue"""
+
+        pass
 
     def next(self):
         """Execute next cue in current cuelist"""

@@ -19,13 +19,9 @@ from grail.core import Viewer
 class EmptyViewer(Viewer):
 
     id = 'empty'
-    # Unique plugin name string
     name = 'Empty'
-    # Plugin author string
     author = 'Grail Team'
-    # Plugin description string
     description = 'This viewer created after split or if viewer not found'
-    # do not list empty view in list of available viewers
     private = True
 
     def __init__(self, parent=None):

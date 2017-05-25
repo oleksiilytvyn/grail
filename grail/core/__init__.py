@@ -8,3 +8,4 @@
 """
 
 from .plugin import Plugin, Viewer, Configurator
+from .executor import Executor

@@ -8,10 +8,8 @@
     :copyright: (c) 2017 by Grail Team.
     :license: GNU, see LICENSE for more details.
 """
-
 import os
 import sys
-import weakref
 import tempfile
 
 from PyQt5.QtCore import QFile, pyqtSignal
@@ -23,8 +21,7 @@ from grailkit.qt import Application, MessageDialog
 import grail
 import grail.resources
 from grail.ui import MainWindow, WelcomeDialog
-from grail.core import Plugin, Viewer
-from grail.core.executor import Executor
+from grail.core import Plugin, Viewer, Executor
 
 # load internal plugins and viewers
 from grail.plugins import *
@@ -51,6 +48,7 @@ class Grail(Application):
 
         self._slots = {}
         self._plugins = []
+        self._actions = []
         self._relaunch = False
         self._relaunch_args = []
 
@@ -203,7 +201,12 @@ class Grail(Application):
         self._slots[message].append(fn)
 
     def disconnect_signal(self, message, fn):
-        """Disconnect given function from signal"""
+        """Disconnect given function from signal
+
+        Args:
+            message (str): signal message
+            fn (callable): original function
+        """
 
         if message in self._slots:
             self._slots[message].remove(fn)
@@ -219,3 +222,14 @@ class Grail(Application):
         if message in self._slots:
             for fn in self._slots[message]:
                 fn(*args)
+
+    def register_action(self, plugin, name, fn):
+        """Register global action
+
+        Args:
+            plugin: plugin instance
+            name: name of action
+            fn: callback
+        """
+
+        pass

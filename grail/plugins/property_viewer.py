@@ -21,15 +21,12 @@ class PropertyViewer(Viewer):
     """Simple property editor"""
 
     id = 'property'
-    # Unique plugin name string
     name = 'Properties'
-    # Plugin author string
     author = 'Grail Team'
-    # Plugin description string
     description = 'View all properties of selected entities'
 
-    def __init__(self, app):
-        super(PropertyViewer, self).__init__()
+    def __init__(self, parent=None):
+        super(PropertyViewer, self).__init__(parent)
 
         self.current_entity = None
         self.current_property = None

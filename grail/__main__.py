@@ -15,6 +15,7 @@ import sys
 from grailkit import util
 from grail.application import Grail
 
+
 if __name__ == "__main__":
 
     os.chdir(util.path_app())

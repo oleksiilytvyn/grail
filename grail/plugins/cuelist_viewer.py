@@ -253,25 +253,22 @@ class CuelistViewer(Viewer):
     """Library viewer"""
 
     id = 'cuelist'
-    # Unique plugin name string
     name = 'Cuelist'
-    # Plugin author string
     author = 'Grail Team'
-    # Plugin description string
     description = 'Manage cuelists'
 
-    def __init__(self, *args):
-        super(CuelistViewer, self).__init__(*args)
+    def __init__(self, parent=None):
+        super(CuelistViewer, self).__init__(parent)
 
         self._locked = False
-        self._cuelist_id = self.app.project.settings().get('cuelist/current', default=0)
+        self._cuelist_id = self.project.settings().get('cuelist/current', default=0)
+        self._dialog = CuelistDialog()
 
-        self.app.project.entity_changed.connect(self._update)
-        self.app.project.entity_removed.connect(self._update)
+        # Track project changes
+        self.project.entity_changed.connect(self._update)
+        self.project.entity_removed.connect(self._update)
 
-        self.dialog = CuelistDialog()
-        self.dialog.showAt(QPoint(500, 500))
-
+        # Application signals
         self.connect('/app/close', self._close)
         self.connect('/cuelist/selected', self.cuelist_selected)
         self.connect('/cuelist/add', self._add_entity)
@@ -305,14 +302,6 @@ class CuelistViewer(Viewer):
         self._ui_label.setContextMenuPolicy(Qt.CustomContextMenu)
         self._ui_label.mousePressEvent = lambda event: self.menu_action()
 
-        self._ui_lock_action = QAction(QIcon(':/icons/lock.png'), 'Lock', self)
-        self._ui_lock_action.setIconVisibleInMenu(True)
-        self._ui_lock_action.triggered.connect(self.lock_action)
-
-        self._ui_menu_action = QAction(QIcon(':/icons/menu.png'), 'Cuelists', self)
-        self._ui_menu_action.setIconVisibleInMenu(True)
-        self._ui_menu_action.triggered.connect(self.menu_action)
-
         self._ui_view_action = QToolButton()
         self._ui_view_action.setText("View")
         self._ui_view_action.setIcon(QIcon(':/icons/menu.png'))
@@ -338,14 +327,14 @@ class CuelistViewer(Viewer):
     def lock_action(self):
 
         self._locked = not self._locked
-        self.app.emit("app/lock", self._locked)
+        self.emit("app/lock", self._locked)
 
     def menu_action(self):
 
         point = QPoint(self.rect().width() / 2, self.rect().height() - 16)
 
-        self.dialog.update_list()
-        self.dialog.showAt(self.mapToGlobal(point))
+        self._dialog.update_list()
+        self._dialog.showAt(self.mapToGlobal(point))
 
     def item_delete(self, item):
         """Remove cue item menu_action"""
@@ -364,8 +353,8 @@ class CuelistViewer(Viewer):
     def cuelist_selected(self, cuelist_id=0):
 
         self._cuelist_id = cuelist_id
-        cuelist = self.app.project.cuelist(cuelist_id)
-        dna = self.app.project.dna
+        cuelist = self.project.cuelist(cuelist_id)
+        dna = self.project.dna
 
         if cuelist is None:
             self._ui_label.setText("...")
@@ -373,7 +362,7 @@ class CuelistViewer(Viewer):
 
         self._ui_tree.clear()
 
-        self.app.project.settings().set('cuelist/current', cuelist_id)
+        self.project.settings().set('cuelist/current', cuelist_id)
 
         self._ui_label.setText("%s <small>(%d cues)</small>" % (cuelist.name, len(cuelist)))
 
@@ -400,8 +389,8 @@ class CuelistViewer(Viewer):
         """Add entity to cuelist"""
 
         cuelist_id = self._cuelist_id
-        entity = self.app.library.item(entity_id)
-        cuelist = self.app.project.cuelist(cuelist_id)
+        entity = self.library.item(entity_id)
+        cuelist = self.project.cuelist(cuelist_id)
 
         if entity and cuelist:
             new_entity = cuelist.append(entity)
@@ -416,12 +405,12 @@ class CuelistViewer(Viewer):
     def _item_clicked(self, item):
         """Preview cue text"""
 
-        self.app.emit('/message/preview', item.object().name)
+        self.emit('/message/preview', item.object().name)
 
     def _item_double_clicked(self, item):
         """Send cue text"""
 
-        self.app.emit('/message/master', item.object().name)
+        self.emit('/message/master', item.object().name)
 
     def _context_menu(self, pos):
         """Context menu on cue item"""
@@ -472,7 +461,7 @@ class CuelistViewer(Viewer):
     def _close(self):
         """Close child dialogs"""
 
-        self.dialog.close()
+        self._dialog.close()
 
 
 class TreeWidget(QTreeWidget):

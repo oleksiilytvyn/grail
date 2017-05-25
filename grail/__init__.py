@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 """
-    grail.__init__
-    ~~~~~~~~~~~~~~
+    grail
+    ~~~~~
 
     Bootstrap and run Grail
 

@@ -22,7 +22,7 @@ from grailkit.qt import AboutDialog, MessageDialog
 
 import grail
 from grail.core import Viewer, Plugin
-from grail.ui import PreferencesDialog, ViewArranger
+from grail.ui import PreferencesDialog, ViewArranger, ActionsDialog
 
 
 class MainWindow(QMainWindow):
@@ -43,16 +43,20 @@ class MainWindow(QMainWindow):
 
         # about dialog
         self.about_dialog = AboutDialog(None, "Grail %s" % (grail.__version__,),
-                                        "Copyright © 2014-2016 Grail Team.\nAll rights reserved.",
+                                        "Copyright © 2014-2017 Grail Team.\nAll rights reserved.",
                                         QIcon(':/icon/256.png'))
         self.about_dialog.url_report = "http://grailapp.com/"
         self.about_dialog.url_help = "http://grailapp.com/help"
 
         self.preferences_dialog = PreferencesDialog()
 
+        self.actions_dialog = ActionsDialog()
+
         self._ui_menubar()
 
         self.view_arranger = ViewArranger()
+        self.view_arranger.updated.connect(self._arranger_updated)
+        self.view_arranger.compose(self._compose())
 
         self.setCentralWidget(self.view_arranger)
         self.setWindowIcon(QIcon(':/icon/256.png'))
@@ -88,6 +92,9 @@ class MainWindow(QMainWindow):
         self.ui_preferences_action = QAction('Preferences', self)
         self.ui_preferences_action.triggered.connect(self.preferences_action)
 
+        self.ui_actions_action = QAction('Show actions...', self)
+        self.ui_actions_action.triggered.connect(self.open_actions_action)
+
         # Help
         self.ui_about_action = QAction('About Grail', self)
         self.ui_about_action.triggered.connect(self.about_action)
@@ -115,6 +122,10 @@ class MainWindow(QMainWindow):
         self.ui_menu_file.addAction(self.ui_preferences_action)
         self.ui_menu_file.addAction(self.ui_quit_action)
 
+        # Action menu
+        self.ui_menu_action = self.ui_menubar.addMenu('Action')
+        self.ui_menu_action.addAction(self.ui_actions_action)
+
         # Help menu
         self.ui_menu_help = self.ui_menubar.addMenu('Help')
         self.ui_menu_help.addAction(self.ui_open_manual_action)
@@ -129,6 +140,134 @@ class MainWindow(QMainWindow):
 
         if not OS_MAC:
             self.setMenuBar(self.ui_menubar)
+
+    def _compose(self, _root=None):
+        """Create structure from project nodes"""
+
+        # default structure
+        default = [
+                {
+                    "layout/orientation": "horizontal",
+                    "layout/type": "layout",
+                    "width": 1280,
+                    "height": 751,
+                    "x": 0,
+                    "y": 0
+                },
+                {
+                    "view/id": "library",
+                    "width": 311,
+                    "height": 751,
+                    "x": 0,
+                    "y": 0
+                },
+                {
+                    "view/id": "cuelist",
+                    "width": 370,
+                    "height": 751,
+                    "x": 0,
+                    "y": 0
+                },
+                {
+                    "view/id": "time",
+                    "width": 278,
+                    "height": 751,
+                    "x": 0,
+                    "y": 0
+                }
+            ]
+
+        structure = []
+
+        if not _root:
+            layout = self.project.dna.entities(filter_type=DNA.TYPE_LAYOUT,
+                                               filter_parent=0,
+                                               filter_keyword="Layout")
+            if len(layout) == 0:
+                return default
+            else:
+                layout = layout[0]
+        else:
+            layout = _root
+
+        structure.append({
+                "layout/orientation": layout.get("layout/orientation", default="horizontal"),
+                "layout/type": layout.get("layout/type", default="layout"),
+                "width": layout.get("width", default=100),
+                "height": layout.get("height", default=100),
+                "x": layout.get("x", default=0),
+                "y": layout.get("y", default=0)
+            })
+
+        for entity in layout.childs():
+            if entity.type == DNA.TYPE_LAYOUT:
+                structure.append(self._compose(entity))
+            elif entity.type == DNA.TYPE_VIEW:
+                structure.append({
+                    "view/id": entity.get("view/id", default="empty"),
+                    "width": entity.get("width", default=100),
+                    "height": entity.get("height", default=100),
+                    "x": entity.get("x", default=0),
+                    "y": entity.get("y", default=0)
+                    })
+
+        return structure if len(structure) > 0 else [default, []][1 if _root else 0]
+
+    def _arranger_updated(self, _structure=None, _root=None):
+        """Layout of arranger is changed"""
+
+        structure = _structure if _structure else self.view_arranger.decompose()
+        layout = structure[0]
+        views = structure[1:]
+        root = self.project.dna if not _root else _root
+
+        if not _root:
+            # remove old layout entity
+            entities = root.entities(filter_type=DNA.TYPE_LAYOUT,
+                                     filter_parent=0,
+                                     filter_keyword="Layout")
+
+            for entity in entities:
+                root.remove(entity.id)
+
+            # create new layout entity
+            entity = root.create(name="Layout",
+                                 entity_type=DNA.TYPE_LAYOUT,
+                                 parent=0,
+                                 properties={
+                                     'layout/type': layout['layout/type'],
+                                     'layout/orientation': layout['layout/orientation'],
+                                     'height': layout['height'],
+                                     'width': layout['width'],
+                                     'x': layout['x'],
+                                     'y': layout['y']
+                                 })
+        else:
+            # create child entity
+            entity = root.create(name="Layout",
+                                 entity_type=DNA.TYPE_LAYOUT,
+                                 properties={
+                                    'layout/type': layout['layout/type'],
+                                    'layout/orientation': layout['layout/orientation'],
+                                    'height': layout['height'],
+                                    'width': layout['width'],
+                                    'x': layout['x'],
+                                    'y': layout['y']
+                                 })
+
+        for view in views:
+            if isinstance(view, list):
+                self._arranger_updated(view, entity)
+            elif isinstance(view, dict):
+                entity.create(name="View",
+                              entity_type=DNA.TYPE_VIEW,
+                              properties={
+                                "view/id": view["view/id"],
+                                "width": view["width"],
+                                "height": view["height"],
+                                "x": view["x"],
+                                "y": view["y"]
+                              })
 
     def center(self):
         """Move window to the center of current screen"""
@@ -169,6 +308,12 @@ class MainWindow(QMainWindow):
 
         self.project.save_copy(path)
 
+    def open_actions_action(self):
+        """Open actions dialog"""
+
+        self.actions_dialog.show()
+        self.actions_dialog.raise_()
+
     def import_action(self):
         """Import data into Grail library or current project"""
 
@@ -198,12 +343,6 @@ class MainWindow(QMainWindow):
 
         lib = self.app.library
 
-        def json_key(obj, key, default=""):
-            if obj:
-                return obj[key] if key in obj else default
-            else:
-                return default
-
         try:
             with open(path) as data_file:
                 data = json.load(data_file)
@@ -212,11 +351,11 @@ class MainWindow(QMainWindow):
                     if 'name' not in item:
                         continue
 
-                    song = lib.create(json_key(item, 'name', 'Untitled'), entity_type=DNA.TYPE_SONG)
-                    song.year = json_key(item, 'year', 2000)
-                    song.album = json_key(item, 'album', 'Unknown')
-                    song.artist = json_key(item, 'artist', 'Unknown')
-                    song.lyrics = json_key(item, 'lyrics', '')
+                    song = lib.create(default_key(item, 'name', 'Untitled'), entity_type=DNA.TYPE_SONG)
+                    song.year = default_key(item, 'year', 2000)
+                    song.album = default_key(item, 'album', 'Unknown')
+                    song.artist = default_key(item, 'artist', 'Unknown')
+                    song.lyrics = default_key(item, 'lyrics', '')
                     song.update()
 
             return True
@@ -244,9 +383,8 @@ class MainWindow(QMainWindow):
     def update_action(self):
         """Check for updates menu_action"""
 
-        # todo: add a dialog to check for updates
-        message = MessageDialog(title="No updates",
-                                text="Updates not available.",
+        message = MessageDialog(title="Updates",
+                                text="Unable to check for updates...",
                                 icon=MessageDialog.Warning)
         message.exec_()
 

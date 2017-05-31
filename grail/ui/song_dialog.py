@@ -13,7 +13,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
-from grailkit.qt import Dialog, Application
+from grailkit.qt import Dialog, Application, HLayout, Button, Spacer
 from grailkit.dna import DNA
 
 
@@ -36,67 +36,69 @@ class SongDialog(Dialog):
     def __ui__(self):
         """Create UI of this dialog"""
 
-        self.ui_title_label = QLabel('Title')
-        self.ui_artist_label = QLabel('Artist')
-        self.ui_album_label = QLabel('Album')
-        self.ui_year_label = QLabel('Year')
-        self.ui_lyrics_label = QLabel('Lyrics')
+        self._ui_title = QLineEdit()
+        self._ui_title.setPlaceholderText("Song title")
+        self._ui_title.setAttribute(Qt.WA_MacShowFocusRect, 0)
 
-        self.ui_title_edit = QLineEdit()
-        self.ui_title_edit.setPlaceholderText("Song title")
-        self.ui_title_edit.setAttribute(Qt.WA_MacShowFocusRect, 0)
+        self._ui_artist = QLineEdit()
+        self._ui_artist.setPlaceholderText("Artist name")
+        self._ui_artist.setAttribute(Qt.WA_MacShowFocusRect, 0)
 
-        self.ui_artist_edit = QLineEdit()
-        self.ui_artist_edit.setPlaceholderText("Artist name")
-        self.ui_artist_edit.setAttribute(Qt.WA_MacShowFocusRect, 0)
+        self._ui_album = QLineEdit()
+        self._ui_album.setPlaceholderText("Album")
+        self._ui_album.setAttribute(Qt.WA_MacShowFocusRect, 0)
 
-        self.ui_album_edit = QLineEdit()
-        self.ui_album_edit.setPlaceholderText("Album")
-        self.ui_album_edit.setAttribute(Qt.WA_MacShowFocusRect, 0)
+        self._ui_year = QLineEdit()
+        self._ui_year.setPlaceholderText("Year")
+        self._ui_year.setAttribute(Qt.WA_MacShowFocusRect, 0)
 
-        self.ui_year_edit = QLineEdit()
-        self.ui_year_edit.setPlaceholderText("Year")
-        self.ui_year_edit.setAttribute(Qt.WA_MacShowFocusRect, 0)
+        self._ui_lyrics = QTextEdit()
+        self._ui_lyrics.setPlaceholderText("Lyrics")
+        self._ui_lyrics.setAttribute(Qt.WA_MacShowFocusRect, 0)
+        self._ui_lyrics.setAcceptRichText(False)
 
-        self.ui_lyrics_edit = QTextEdit()
-        self.ui_lyrics_edit.setPlaceholderText("Lyrics")
-        self.ui_lyrics_edit.setAttribute(Qt.WA_MacShowFocusRect, 0)
-        self.ui_lyrics_edit.setAcceptRichText(False)
+        policy = self._ui_lyrics.sizePolicy()
+        policy.setVerticalStretch(1)
 
-        self.ui_buttons = QDialogButtonBox()
-        self.ui_buttons.setContentsMargins(0, 12, 0, 0)
-        self.ui_buttons.setStandardButtons(QDialogButtonBox.Cancel | QDialogButtonBox.Ok)
-        self.ui_buttons.accepted.connect(self.accept_action)
-        self.ui_buttons.rejected.connect(self.reject_action)
+        self._ui_lyrics.setSizePolicy(policy)
 
-        self.ui_grid = QGridLayout()
-        self.ui_grid.setSpacing(10)
-        self.ui_grid.setContentsMargins(12, 12, 12, 12)
-        self.ui_grid.setColumnMinimumWidth(0, 200)
+        self._ui_button_ok = Button("Ok")
+        self._ui_button_ok.clicked.connect(self.accept_action)
 
-        self.ui_grid.addWidget(self.ui_title_label, 0, 0, 1, 2)
-        self.ui_grid.addWidget(self.ui_title_edit, 1, 0, 1, 2)
+        self._ui_button_cancel = Button("Cancel")
+        self._ui_button_cancel.clicked.connect(self.reject_action)
 
-        self.ui_grid.addWidget(self.ui_album_label, 2, 0, 1, 2)
-        self.ui_grid.addWidget(self.ui_album_edit, 3, 0, 1, 2)
+        self._ui_buttons = HLayout()
+        self._ui_buttons.setSpacing(10)
+        self._ui_buttons.setContentsMargins(0, 0, 0, 0)
+        self._ui_buttons.addWidget(Spacer())
+        self._ui_buttons.addWidget(self._ui_button_cancel)
+        self._ui_buttons.addWidget(self._ui_button_ok)
 
-        self.ui_grid.addWidget(self.ui_artist_label, 4, 0)
-        self.ui_grid.addWidget(self.ui_artist_edit, 5, 0)
+        self._ui_layout = QGridLayout()
+        self._ui_layout.setSpacing(8)
+        self._ui_layout.setContentsMargins(12, 12, 12, 10)
+        self._ui_layout.setColumnMinimumWidth(0, 200)
 
-        self.ui_grid.addWidget(self.ui_year_label, 4, 1)
-        self.ui_grid.addWidget(self.ui_year_edit, 5, 1)
+        self._ui_layout.addWidget(self._ui_title, 1, 0, 1, 2)
+        self._ui_layout.addWidget(self._ui_album, 3, 0, 1, 2)
+        self._ui_layout.addWidget(self._ui_artist, 5, 0)
+        self._ui_layout.addWidget(self._ui_year, 5, 1)
+        self._ui_layout.addWidget(self._ui_lyrics, 7, 0, 1, 2)
+        self._ui_layout.addLayout(self._ui_buttons, 8, 0, 1, 2)
 
-        self.ui_grid.addWidget(self.ui_lyrics_label, 6, 0, 1, 2)
-        self.ui_grid.addWidget(self.ui_lyrics_edit, 7, 0, 1, 2)
-
-        self.ui_grid.addWidget(self.ui_buttons, 8, 0, 1, 2)
-
-        self.setLayout(self.ui_grid)
+        self.setLayout(self._ui_layout)
         self.setWindowIcon(QIcon(':/icons/32.png'))
         self.setWindowTitle('Add song')
         self.setGeometry(300, 300, 300, 400)
         self.setMinimumSize(300, 400)
         self.setWindowFlags(Qt.WindowCloseButtonHint)
+
+    def closeEvent(self, event):
+        """Reject on close"""
+        super(SongDialog, self).closeEvent(event)
+
+        self.reject_action()
 
     def reject_action(self):
         """Close window"""
@@ -107,11 +109,11 @@ class SongDialog(Dialog):
     def accept_action(self):
         """Save or create a song"""
 
-        title = str(self.ui_title_edit.text())
-        album = str(self.ui_album_edit.text())
-        artist = str(self.ui_artist_edit.text())
-        lyrics = str(self.ui_lyrics_edit.toPlainText()).strip()
-        year = int(''.join(x for x in self.ui_year_edit.text() if x.isdigit()))
+        title = str(self._ui_title.text())
+        album = str(self._ui_album.text())
+        artist = str(self._ui_artist.text())
+        lyrics = str(self._ui_lyrics.toPlainText()).strip()
+        year = int(''.join(x for x in self._ui_year.text() if x.isdigit()))
 
         if self._mode == SongDialog.MODE_CREATE:
             entity = Application.instance().library.create(name=title, entity_type=DNA.TYPE_SONG)
@@ -129,22 +131,25 @@ class SongDialog(Dialog):
         self.accept()
 
     def set_entity(self, entity):
+        """Set entity to edit"""
 
         self._entity = entity
 
+        self.setWindowTitle("Edit song" if entity else "Add song")
+
         if entity:
-            self.ui_title_edit.setText(entity.name)
-            self.ui_album_edit.setText(entity.album)
-            self.ui_artist_edit.setText(entity.artist)
-            self.ui_lyrics_edit.setText(entity.lyrics)
-            self.ui_year_edit.setText(str(entity.year))
+            self._ui_title.setText(entity.name)
+            self._ui_album.setText(entity.album)
+            self._ui_artist.setText(entity.artist)
+            self._ui_lyrics.setText(entity.lyrics)
+            self._ui_year.setText(str(entity.year))
 
             self._mode = SongDialog.MODE_UPDATE
         else:
-            self.ui_title_edit.setText('Untitled')
-            self.ui_album_edit.setText('')
-            self.ui_artist_edit.setText('Unknown')
-            self.ui_lyrics_edit.setText('')
-            self.ui_year_edit.setText('2000')
+            self._ui_title.setText('')
+            self._ui_album.setText('')
+            self._ui_artist.setText('')
+            self._ui_lyrics.setText('')
+            self._ui_year.setText('')
 
             self._mode = SongDialog.MODE_CREATE

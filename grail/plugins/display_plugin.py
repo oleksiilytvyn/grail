@@ -31,17 +31,24 @@ class DisplayPlugin(Plugin):
     def __init__(self):
         super(DisplayPlugin, self).__init__()
 
-        self.register_menu("Display->Disable", self.disable_action,
-                           shortcut="Ctrl+D",
-                           checkable=True,
-                           checked=True)
+        # Register menu items
+        self.menu_disable = self.register_menu("Display->Disable", self.disable_action,
+                                               shortcut="Ctrl+D",
+                                               checkable=True,
+                                               checked=True)
         self.register_menu('Display->---')
-        self.register_menu("Display->Show Test Card", self.testcard_action,
-                           shortcut="Ctrl+Shift+T",
-                           checkable=True)
+        self.menu_testcard = self.register_menu("Display->Show Test Card", self.testcard_action,
+                                                shortcut="Ctrl+Shift+T",
+                                                checkable=True)
         self.register_menu("Display->Advanced...", self.preferences_action,
                            shortcut="Ctrl+Shift+A")
 
+        # Register actions
+        self.register_action("Disable output", self.disable_action)
+        self.register_action("Toggle test card", self.testcard_action)
+        self.register_action("Advanced preferences...", self.preferences_action)
+
+        # Connect signals
         self.connect('/app/close', self.close)
 
         self.window = DisplayWindow()
@@ -52,19 +59,29 @@ class DisplayPlugin(Plugin):
         desktop.screenCountChanged.connect(self._screens_changed)
         desktop.workAreaResized.connect(self._screens_changed)
 
-    def testcard_action(self, action):
+    def testcard_action(self, action=None):
         """Show or hide test card"""
+
+        # called from Actions
+        if not action:
+            action = self.menu_testcard
+            action.setChecked(not action.isChecked())
 
         self.window.setTestCard(action.isChecked())
 
-    def preferences_action(self, action):
+    def preferences_action(self, action=None):
         """Show display preferences dialog"""
 
         self.preferences_dialog.show()
         self.preferences_dialog.raise_()
 
-    def disable_action(self, action):
+    def disable_action(self, action=None):
         """Disable display output"""
+
+        # called from Actions
+        if not action:
+            action = self.menu_disable
+            action.setChecked(True)
 
         if action.isChecked():
             self.window.close()
@@ -72,14 +89,15 @@ class DisplayPlugin(Plugin):
             self.window.show()
 
     def close(self):
-        """Close display on application exit"""
+        """Close display and friends on application exit"""
 
         self.window.close()
+        self.preferences_dialog.close()
 
     def _screens_changed(self):
         """Display configuration changed"""
 
-        self.window.close()
+        self.disable_action()
 
 
 class DisplayWindow(Frameless):

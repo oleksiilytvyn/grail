@@ -27,6 +27,11 @@ class EmptyViewer(Viewer):
     def __init__(self, parent=None):
         super(EmptyViewer, self).__init__(parent)
 
+        self.__ui__()
+
+    def __ui__(self):
+        """Setup UI components"""
+
         self.setStyleSheet("""
             #EmptyViewer {
                 background-color: #2f2f2f;
@@ -49,12 +54,6 @@ class EmptyViewer(Viewer):
                 margin: 0 0 16px 0;
                 }
             """)
-
-        self.__ui__()
-
-    def __ui__(self):
-        """Setup UI components"""
-
         self.setObjectName("EmptyViewer")
 
         self._ui_title_label = Label("No view")

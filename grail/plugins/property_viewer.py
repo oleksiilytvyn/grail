@@ -12,7 +12,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
-from grailkit.qt import Spacer
+from grailkit.qt import Spacer, Toolbar
 
 from grail.core import Viewer
 
@@ -96,11 +96,9 @@ class PropertyViewer(Viewer):
         self._ui_view_action.setIcon(QIcon(':/icons/menu.png'))
         self._ui_view_action.clicked.connect(self.view_action)
 
-        self._ui_toolbar = QToolBar()
-        self._ui_toolbar.setObjectName("library_toolbar")
-        self._ui_toolbar.setIconSize(QSize(16, 16))
+        self._ui_toolbar = Toolbar()
         self._ui_toolbar.addWidget(self._ui_view_action)
-        self._ui_toolbar.addWidget(Spacer())
+        self._ui_toolbar.addStretch()
         self._ui_toolbar.addAction(self._ui_add_action)
         self._ui_toolbar.addAction(self._ui_remove_action)
 

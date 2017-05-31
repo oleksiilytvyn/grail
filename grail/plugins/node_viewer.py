@@ -14,7 +14,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
-from grailkit.qt import Spacer, MessageDialog
+from grailkit.qt import Spacer, MessageDialog, Toolbar, Tree, TreeItem
 from grailkit.dna import DNA
 
 from grail.core import Viewer
@@ -63,13 +63,11 @@ class NodeViewer(Viewer):
         self._ui_view_action.setIcon(QIcon(':/icons/menu.png'))
         self._ui_view_action.clicked.connect(self.view_action)
 
-        self._ui_toolbar = QToolBar()
-        self._ui_toolbar.setObjectName("node_toolbar")
-        self._ui_toolbar.setIconSize(QSize(16, 16))
+        self._ui_toolbar = Toolbar()
         self._ui_toolbar.addWidget(self._ui_view_action)
         self._ui_toolbar.addWidget(Spacer())
-        self._ui_toolbar.addAction(self._ui_add_action)
         self._ui_toolbar.addAction(self._ui_remove_action)
+        self._ui_toolbar.addAction(self._ui_add_action)
 
         self._ui_layout = QVBoxLayout()
         self._ui_layout.setContentsMargins(0, 0, 0, 0)
@@ -88,7 +86,7 @@ class NodeViewer(Viewer):
 
         def add_childs(tree_item, parent_id):
             for child in dna.childs(parent_id):
-                child_item = TreeItemWidget(child)
+                child_item = TreeItem(child)
                 child_item.setText(0, child.name)
 
                 add_childs(child_item, child.id)
@@ -96,7 +94,7 @@ class NodeViewer(Viewer):
                 tree_item.addChild(child_item)
 
         for entity in dna.childs(0):
-            item = TreeItemWidget(entity)
+            item = TreeItem(entity)
             item.setText(0, entity.name)
 
             add_childs(item, entity.id)
@@ -150,22 +148,10 @@ class NodeViewer(Viewer):
             self.emit('/node/selected', item.object().id)
 
 
-class TreeWidget(QTreeWidget):
+class TreeWidget(Tree):
 
-    def __init__(self, parent=None):
-        super(TreeWidget, self).__init__(parent)
-
-        self.setAlternatingRowColors(True)
-        self.setAttribute(Qt.WA_MacShowFocusRect, False)
-        self.header().close()
-        self.setSelectionMode(QAbstractItemView.SingleSelection)
-        self.setDragEnabled(True)
-        self.viewport().setAcceptDrops(True)
-        self.setDropIndicatorShown(True)
-        self.setDragDropMode(QAbstractItemView.InternalMove)
-        self.setWordWrap(True)
-        self.setAnimated(False)
-        self.setSortingEnabled(False)
+    def __init__(self, *args):
+        super(TreeWidget, self).__init__(*args)
 
     def dropEvent(self, event):
 
@@ -199,20 +185,3 @@ class TreeWidget(QTreeWidget):
             pass
 
         QTreeWidget.dropEvent(self, event)
-
-
-class TreeItemWidget(QTreeWidgetItem):
-    """Representation of node as QTreeWidgetItem"""
-
-    def __init__(self, data=None):
-        super(TreeItemWidget, self).__init__()
-
-        self._data = data
-
-    def object(self):
-
-        return self._data
-
-    def setObject(self, data):
-
-        self._data = data

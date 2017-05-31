@@ -13,7 +13,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
 from grail.core import Configurator
-from grailkit.qt import List, ListItem, Switch, Application, Button, VLayout, Label, Spacer
+from grailkit.qt import List, ListItem, Switch, Application, Button, VLayout, Label, Spacer, Toolbar
 from grailkit.bible import BibleHost, BibleHostError
 
 
@@ -123,9 +123,7 @@ class BibleConfigurator(Configurator):
         self._ui_primary_action.setIconVisibleInMenu(True)
         self._ui_primary_action.triggered.connect(self.primary_action)
 
-        self._ui_toolbar = QToolBar()
-        self._ui_toolbar.setObjectName("bible_toolbar")
-        self._ui_toolbar.setIconSize(QSize(16, 16))
+        self._ui_toolbar = Toolbar()
         self._ui_toolbar.addAction(self._ui_install_action)
         self._ui_toolbar.addWidget(self._ui_toolbar_label)
         self._ui_toolbar.addAction(self._ui_primary_action)

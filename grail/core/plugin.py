@@ -155,6 +155,9 @@ class Plugin(_PluginMeta, metaclass=PluginRegistry):
             checked (bool): action checked or not if `checkable`
             before (str): where to place item
 
+        Returns:
+            QAction menu item created
+
         Example:
 
             def callback():
@@ -171,51 +174,9 @@ class Plugin(_PluginMeta, metaclass=PluginRegistry):
         items = tokens[0:len(tokens) - 1]
         name = tokens[-1]
 
-        def create_action(menu, location_tokens, new_action, before_tokens):
-            action_name = location_tokens[0]
-            action_target = None
-            before_name = before_tokens[0] if len(before_tokens) else None
-            before_action = None
-
-            # search for existing items
-            for action in menu.actions():
-                if action.text() == action_name:
-                    action_target = action
-
-                if action.text() == before_name:
-                    before_action = action
-
-            if action_target:
-                action_target = action_target.menu()
-            elif not action_target and before_action:
-                action_target = menu.insertMenu(before_action, QMenu(action_name, menu)).menu()
-            else:
-                action_target = menu.addMenu(action_name)
-
-            before_action = None
-            before_name = before_tokens[1] if len(before_tokens) > 1 else None
-
-            for item in action_target.actions():
-                if item.text() == before_name:
-                    before_action = item
-                    break
-
-            if len(location_tokens) == 1 and before_action:
-                if new_action:
-                    action_target.insertAction(before_action, new_action)
-                else:
-                    action_target.insertSeparator(before_action)
-            elif len(location_tokens) == 1:
-                if new_action:
-                    action_target.addAction(new_action)
-                else:
-                    action_target.addSeparator()
-            else:
-                create_action(action_target, location_tokens[1:], new_action, before_tokens[1:])
-
         # add separator
         if name == '---':
-            create_action(menubar, items, None, before)
+            self.__create_action(menubar, items, None, before)
         # add action
         else:
             def trigger(_fn, _action):
@@ -232,7 +193,51 @@ class Plugin(_PluginMeta, metaclass=PluginRegistry):
                 action.setShortcut(shortcut)
                 action.setShortcutContext(Qt.ApplicationShortcut)
 
-            create_action(menubar, items, action, before)
+            self.__create_action(menubar, items, action, before)
+
+            return action
+
+    def __create_action(self, menu, location_tokens, new_action, before_tokens):
+        action_name = location_tokens[0]
+        action_target = None
+        before_name = before_tokens[0] if len(before_tokens) else None
+        before_action = None
+
+        # search for existing items
+        for action in menu.actions():
+            if action.text() == action_name:
+                action_target = action
+
+            if action.text() == before_name:
+                before_action = action
+
+        if action_target:
+            action_target = action_target.menu()
+        elif not action_target and before_action:
+            action_target = menu.insertMenu(before_action, QMenu(action_name, menu)).menu()
+        else:
+            action_target = menu.addMenu(action_name)
+
+        before_action = None
+        before_name = before_tokens[1] if len(before_tokens) > 1 else None
+
+        for item in action_target.actions():
+            if item.text() == before_name:
+                before_action = item
+                break
+
+        if len(location_tokens) == 1 and before_action:
+            if new_action:
+                action_target.insertAction(before_action, new_action)
+            else:
+                action_target.insertSeparator(before_action)
+        elif len(location_tokens) == 1:
+            if new_action:
+                action_target.addAction(new_action)
+            else:
+                action_target.addSeparator()
+        else:
+            self.__create_action(action_target, location_tokens[1:], new_action, before_tokens[1:])
 
 
 class _ComponentPluginRegistry(type(Component), PluginRegistry):
@@ -326,6 +331,11 @@ class Viewer(Component, _PluginMeta, metaclass=_ComponentPluginRegistry):
         """Returns stored property"""
 
         return default_key(self.__properties, key, default)
+
+    def properties(self):
+        """Returns all properties of viewer"""
+
+        return self.__properties
 
 
 class Configurator(Component, _PluginMeta, metaclass=_ComponentPluginRegistry):

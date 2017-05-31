@@ -14,7 +14,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
-from grailkit.qt import VLayout, Label, Spacer
+from grailkit.qt import VLayout, Label, Spacer, Toolbar
 from grail.core import Viewer
 
 
@@ -55,17 +55,14 @@ class TimeViewer(Viewer):
         self._ui_view_action.setIcon(QIcon(':/icons/menu.png'))
         self._ui_view_action.clicked.connect(self.view_action)
 
-        self._ui_toolbar = QToolBar()
+        self._ui_toolbar = Toolbar()
         self._ui_toolbar.setStyleSheet("""
-            QToolBar {
+            Toolbar {
                 color: #f1f1f1;
                 background: #222;
-                border-top: 1px solid #666;
+                border-top: 1px solid #333;
             }
             """)
-
-        self._ui_toolbar.setObjectName("library_toolbar")
-        self._ui_toolbar.setIconSize(QSize(16, 16))
         self._ui_toolbar.addWidget(self._ui_view_action)
         self._ui_toolbar.addWidget(Spacer())
 
@@ -79,7 +76,9 @@ class TimeViewer(Viewer):
 
         _time = datetime.datetime.now()
 
-        self._label.setText("%d:%d:%d" % (_time.hour, _time.minute, _time.second))
+        self._label.setText("%s:%s:%s" % (str(_time.hour).zfill(2),
+                                          str(_time.minute).zfill(2),
+                                          str(_time.second).zfill(2)))
 
     def view_action(self):
         """Replace current view with something other"""

@@ -16,7 +16,7 @@ from PyQt5.QtWidgets import *
 
 from grailkit.bible import Verse
 from grailkit.dna import DNA, SongEntity
-from grailkit.qt import SearchEdit, List, ListItem, Spacer, Dialog, Application
+from grailkit.qt import SearchEdit, List, ListItem, Spacer, VLayout, Toolbar
 
 from grail.core import Viewer
 from grail.ui import SongDialog
@@ -46,10 +46,8 @@ class LibraryViewer(Viewer):
 
         self.setObjectName("library")
 
-        self._ui_layout = QVBoxLayout()
-        self._ui_layout.setObjectName("library_layout")
-        self._ui_layout.setSpacing(0)
-        self._ui_layout.setContentsMargins(0, 0, 0, 0)
+        self._ui_layout = VLayout()
+        # self._ui_layout.setObjectName("library_layout")
 
         self._ui_search = SearchEdit()
         self._ui_search.setObjectName("library_search")
@@ -58,9 +56,7 @@ class LibraryViewer(Viewer):
         self._ui_search.keyPressed.connect(self._search_key_event)
         self._ui_search.focusOut.connect(self._search_focus_out)
 
-        self._ui_search_layout = QVBoxLayout()
-        self._ui_search_layout.setSpacing(0)
-        self._ui_search_layout.setContentsMargins(0, 0, 0, 0)
+        self._ui_search_layout = VLayout()
         self._ui_search_layout.addWidget(self._ui_search)
 
         self._ui_search_widget = QWidget()
@@ -83,11 +79,9 @@ class LibraryViewer(Viewer):
         self._ui_view_action.setIcon(QIcon(':/icons/menu.png'))
         self._ui_view_action.clicked.connect(self.view_action)
 
-        self._ui_toolbar = QToolBar()
-        self._ui_toolbar.setObjectName("library_toolbar")
-        self._ui_toolbar.setIconSize(QSize(16, 16))
+        self._ui_toolbar = Toolbar()
         self._ui_toolbar.addWidget(self._ui_view_action)
-        self._ui_toolbar.addWidget(Spacer())
+        self._ui_toolbar.addStretch()
         self._ui_toolbar.addAction(self._ui_add_action)
 
         self._ui_layout.addWidget(self._ui_search_widget)
@@ -242,11 +236,12 @@ class LibraryViewer(Viewer):
 
         self.song_dialog.set_entity(None)
         self.song_dialog.show()
+        self.song_dialog.raise_()
 
     def add_item_action(self, entity):
         """Add item to cuelist"""
 
-        self.emit('/cuelist/add', entity.id)
+        self.emit('/cuelist/add', entity)
 
     def delete_item_action(self, entity):
         """Delete item from library"""
@@ -258,6 +253,7 @@ class LibraryViewer(Viewer):
 
         self.song_dialog.set_entity(entity)
         self.song_dialog.show()
+        self.song_dialog.raise_()
 
     def _close(self):
         """Close this panel and child components"""

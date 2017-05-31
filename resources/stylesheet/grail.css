@@ -31,20 +31,6 @@
         height: 20px;
         }
 
-    #library_toolbar {
-        background: #4b5056;
-        border-top: 1px solid #4b5056;
-        padding: 5px;
-        min-height: 24px;
-        }
-
-        #library_toolbar QToolButton {
-            border: 1px solid transparent;
-            background: none;
-            border-radius: 3px;
-            padding: 2px;
-            }
-
 /**
  * @section cuelist panel
  */
@@ -117,20 +103,6 @@
             image: url(:/icons/branch-open-white.png);
             }
 
-    #cuelist_toolbar {
-        background: #4b5056;
-        border-top: 1px solid #4b5056;
-        padding: 5px;
-        min-height: 24px;
-        }
-
-        #cuelist_toolbar QToolButton {
-            border: 1px solid transparent;
-            background: none;
-            border-radius: 3px;
-            padding: 2px;
-            }
-
     #cuelist_label {
         qproperty-alignment: AlignCenter AlignCenter;
         color: #e0e0e1;
@@ -192,6 +164,7 @@
 /**
  * @section preview editor
  */
+#preview {}
 
     #preview_label {
         background: #000;
@@ -235,19 +208,7 @@
  * @section node editor
  */
 
-#node_toolbar {
-    background: #4b5056;
-    border-top: 1px solid #4b5056;
-    padding: 5px;
-    min-height: 24px;
-    }
-
-    #node_toolbar QToolButton {
-        border: 1px solid transparent;
-        background: none;
-        border-radius: 3px;
-        padding: 2px;
-        }
+#node {}
 
 /**
  * @section preferences dialog
@@ -261,26 +222,6 @@ PreferencesDialog {
     PreferencesDialog QLabel {
         color: #e9e9e9;
         }
-
-    #preferences_tabs {
-        border: none;
-        background-color: #626364;
-        alternate-background-color: #676869;
-        show-decoration-selected: 1;
-        outline: 0;
-        }
-
-        #preferences_tabs::item {
-            color: #e6e6e6;
-            padding: 6px 12px;
-            margin: 0;
-            border: none;
-            }
-
-        #preferences_tabs::item:selected {
-            background: #8a9fbb;
-            color: #e6e6e6;
-            }
 
     #preferences_splitter::handle {
         background-color: #343434;
@@ -304,21 +245,6 @@ PreferencesDialog {
         #bible_list::item:selected {
             background: #8a9fbb;
             color: #e6e6e6;
-            }
-
-    #bible_toolbar {
-        background: #4b5056;
-        border-top: 1px solid #4b5056;
-        padding: 0 5px;
-        }
-
-        #bible_toolbar QPushButton,
-        #bible_toolbar QToolButton {
-            border: 1px solid transparent;
-            background: none;
-            border-radius: 3px;
-            padding: 2px;
-            margin: 0;
             }
 
 /**

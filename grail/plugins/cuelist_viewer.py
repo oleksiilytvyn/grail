@@ -15,7 +15,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
 from grailkit.dna import DNA
-from grailkit.qt import Popup, Application, Spacer, MessageDialog
+from grailkit.qt import Popup, Application, Spacer, MessageDialog, Toolbar, Tree, TreeItem
 
 from grail.core import Viewer
 
@@ -307,9 +307,7 @@ class CuelistViewer(Viewer):
         self._ui_view_action.setIcon(QIcon(':/icons/menu.png'))
         self._ui_view_action.clicked.connect(self.view_action)
 
-        self._ui_toolbar = QToolBar()
-        self._ui_toolbar.setObjectName("cuelist_toolbar")
-        self._ui_toolbar.setIconSize(QSize(16, 16))
+        self._ui_toolbar = Toolbar()
         self._ui_toolbar.addWidget(self._ui_view_action)
         self._ui_toolbar.addWidget(self._ui_label)
 
@@ -368,7 +366,7 @@ class CuelistViewer(Viewer):
 
         def add_childs(tree_item, parent_id):
             for child in dna.childs(parent_id):
-                child_item = TreeItemWidget(child)
+                child_item = TreeItem(child)
                 child_item.setText(0, child.name)
 
                 add_childs(child_item, child.id)
@@ -377,7 +375,7 @@ class CuelistViewer(Viewer):
                 child_item.setExpanded(bool(child.get('expanded', default=False)))
 
         for entity in cuelist.cues():
-            item = TreeItemWidget(entity)
+            item = TreeItem(entity)
             item.setText(0, entity.name)
 
             add_childs(item, entity.id)
@@ -385,20 +383,27 @@ class CuelistViewer(Viewer):
             self._ui_tree.addTopLevelItem(item)
             item.setExpanded(bool(entity.get('expanded', default=False)))
 
-    def _add_entity(self, entity_id):
+    def _add_entity(self, entity):
         """Add entity to cuelist"""
 
         cuelist_id = self._cuelist_id
-        entity = self.library.item(entity_id)
         cuelist = self.project.cuelist(cuelist_id)
 
-        if entity and cuelist:
+        if not entity and not cuelist:
+            return False
+
+        if entity.type == DNA.TYPE_SONG:
             new_entity = cuelist.append(entity)
 
             pages = re.sub(r'([\s]+?[\n]+)', '\n', new_entity.lyrics if new_entity.lyrics else '').split('\n\n')
 
             for page in pages:
                 new_entity.create(name=page, entity_type=DNA.TYPE_CUE)
+
+            self.cuelist_selected(cuelist_id)
+        elif entity.type == DNA.TYPE_VERSE:
+            cuelist.create(name="%s\n%s" % (entity.text, entity.reference),
+                           entity_type=DNA.TYPE_CUE)
 
             self.cuelist_selected(cuelist_id)
 
@@ -444,7 +449,7 @@ class CuelistViewer(Viewer):
         """Tree item expanded
 
         Args:
-            item (TreeItemWidget): tree item
+            item (TreeItem): tree item
         """
 
         item.object().set('expanded', True)
@@ -453,7 +458,7 @@ class CuelistViewer(Viewer):
         """Tree item collapsed
 
         Args:
-            item (TreeItemWidget): tree item
+            item (TreeItem): tree item
         """
 
         item.object().set('expanded', False)
@@ -464,22 +469,10 @@ class CuelistViewer(Viewer):
         self._dialog.close()
 
 
-class TreeWidget(QTreeWidget):
+class TreeWidget(Tree):
 
-    def __init__(self, parent=None):
-        super(TreeWidget, self).__init__(parent)
-
-        self.setAlternatingRowColors(True)
-        self.setAttribute(Qt.WA_MacShowFocusRect, False)
-        self.header().close()
-        self.setSelectionMode(QAbstractItemView.SingleSelection)
-        self.setDragEnabled(True)
-        self.viewport().setAcceptDrops(True)
-        self.setDropIndicatorShown(True)
-        self.setDragDropMode(QAbstractItemView.InternalMove)
-        self.setWordWrap(True)
-        self.setAnimated(False)
-        self.setSortingEnabled(False)
+    def __init__(self, *args):
+        super(TreeWidget, self).__init__(*args)
 
     def dropEvent(self, event):
 
@@ -513,20 +506,3 @@ class TreeWidget(QTreeWidget):
             pass
 
         QTreeWidget.dropEvent(self, event)
-
-
-class TreeItemWidget(QTreeWidgetItem):
-    """Representation of node as QTreeWidgetItem"""
-
-    def __init__(self, data=None):
-        super(TreeItemWidget, self).__init__()
-
-        self._data = data
-
-    def object(self):
-
-        return self._data
-
-    def setObject(self, data):
-
-        self._data = data

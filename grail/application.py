@@ -113,6 +113,7 @@ class Grail(Application):
         self.welcome_dialog.close()
 
         self._plugins = []
+        self._actions = []
 
         # launch plugins and store them in list
         # this code prevents from GC on qt widgets
@@ -163,6 +164,7 @@ class Grail(Application):
             # remove empty file for qt to create a file at same place
             os.remove(path)
 
+            # copy file from qt resource to local file system
             ref = QFile(':default/bible-en-kjv.grail-bible')
             ref.copy(path)
             ref.close()
@@ -227,9 +229,37 @@ class Grail(Application):
         """Register global action
 
         Args:
-            plugin: plugin instance
-            name: name of action
-            fn: callback
+            plugin (grail.core.Plugin): plugin instance
+            name (str): name of action
+            fn (callable): callback
+        Raises:
+            ValueError if one of arguments type isn't supported
         """
 
-        pass
+        if not callable(fn):
+            raise ValueError("Given argument `fn` is not callable")
+
+        if not isinstance(name, str):
+            raise ValueError("Given argument `name` is not of type str")
+
+        ref = CallableAction(fn)
+        ref.name = name
+        ref.plugin = plugin
+
+        self._actions.append(ref)
+
+        self.emit('/app/actions')
+
+    def actions(self):
+        """Get list of actions"""
+
+        return self._actions
+
+
+class CallableAction(object):
+
+    def __init__(self, fn):
+        self._fn = fn
+
+    def __call__(self, *args, **kwargs):
+        self._fn(*args, **kwargs)

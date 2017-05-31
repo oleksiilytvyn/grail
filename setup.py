@@ -5,7 +5,7 @@
     ~~~~~
 
     Setup Script
-    Run the build process by running the command 'python setup.py build'
+    Run the build process by executing command 'python setup.py build'
 """
 
 import os
@@ -46,8 +46,8 @@ def compile_resources():
     """try to build resources file"""
 
     try:
-        os.system("pyrcc5 -o grail/resources.py resources/resources.qrc")
         print("Building resource file")
+        os.system("pyrcc5 -o grail/resources.py resources/resources.qrc")
     except:
         print("Failed to build resource file")
 
@@ -168,7 +168,5 @@ setup(
                             shortcutDir="ProgramMenuFolder")])
 
 # fix Mac OS app file
-if OS_MAC:
-
-    if os.path.exists(app_resources):
-        shutil.copyfile("resources/bdist/qt.conf", app_resources + '/qt.conf')
+if OS_MAC and os.path.exists(app_resources):
+    shutil.copyfile("resources/bdist/qt.conf", app_resources + '/qt.conf')

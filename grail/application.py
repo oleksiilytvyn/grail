@@ -17,6 +17,7 @@ from PyQt5.QtCore import QFile, pyqtSignal
 from grailkit.dna import SettingsFile, Project, Library
 from grailkit.bible import BibleHost
 from grailkit.qt import Application, MessageDialog
+from grailkit.core import Signalable
 
 import grail
 import grail.resources
@@ -51,13 +52,15 @@ class Grail(Application):
         self._actions = []
         self._relaunch = False
         self._relaunch_args = []
+        self._settings = SettingsFile(grail.SETTINGS_PATH, create=True)
+        self._osc_host = None
+        self._midi_host = None
+        self._project = None
+        self._library = None
+        self._bible = None
+        self._signals = Signalable()
+        self._executor = Executor()
 
-        self.settings = SettingsFile(grail.SETTINGS_PATH, create=True)
-        self.osc_host = None
-        self.project = None
-        self.library = None
-        self.bible = None
-        self.executor = Executor()
         self.change_bible(self.settings.get('bible/default', ""))
 
         self.main_window = None
@@ -78,6 +81,38 @@ class Grail(Application):
 
         if path:
             self.open(path, create)
+
+    @property
+    def settings(self):
+        return self._settings
+
+    @property
+    def project(self):
+        return self._project
+
+    @property
+    def bible(self):
+        return self._bible
+
+    @property
+    def library(self):
+        return self._library
+
+    @property
+    def executor(self):
+        return self._executor
+
+    @property
+    def signals(self):
+        return self._signals
+
+    @property
+    def osc(self):
+        return self._osc_host
+
+    @property
+    def midi(self):
+        return self._midi_host
 
     def moreThanOneInstanceAllowed(self):
         """Do not allow multiple instances"""
@@ -102,8 +137,8 @@ class Grail(Application):
             self._relaunch_args = [path, '-c']
             self.main_window.close()
 
-        self.project = Project(path, create=create)
-        self.library = Library(grail.LIBRARY_PATH, create=True)
+        self._project = Project(path, create=create)
+        self._library = Library(grail.LIBRARY_PATH, create=True)
 
         self.settings.set('project/last', path)
 
@@ -115,7 +150,7 @@ class Grail(Application):
         self._plugins = []
         self._actions = []
 
-        # launch plugins and store them in list
+        # launch plugins and store them into list
         # this code prevents from GC on qt widgets
         for plug in Plugin.plugins():
             instance = plug()
@@ -128,8 +163,8 @@ class Grail(Application):
         for plug in Plugin.plugins() + Viewer.plugins() + Configurator.plugins():
             plug.unloaded()
 
-        if self.library:
-            self.library.close()
+        if self._library:
+            self._library.close()
 
         if self.settings:
             self.settings.close()
@@ -149,12 +184,12 @@ class Grail(Application):
 
         # if bible already selected
         if bible_id in bibles:
-            self.bible = BibleHost.get(bible_id)
+            self._bible = BibleHost.get(bible_id)
         # if bible not selected but available
         # pick first bible
         elif len(bibles) > 0:
             for bible_id, bible in bibles.items():
-                self.bible = BibleHost.get(bible_id)
+                self._bible = BibleHost.get(bible_id)
                 self.settings.set('bible/default', bible_id)
                 break
         # if there is no bibles available
@@ -176,54 +211,10 @@ class Grail(Application):
             bibles = BibleHost.list()
 
             for bible_id, bible in bibles.items():
-                self.bible = BibleHost.get(bible_id)
+                self._bible = BibleHost.get(bible_id)
                 self.settings.set('bible/default', bible_id)
 
                 break
-
-    def connect(self, message, fn):
-        """Connect a message listener
-
-        Args:
-            message (str): message name
-            fn (callable): function to call
-        Raises:
-            Exception when message or fn arguments is incorrect
-        """
-
-        if not message or not isinstance(message, str):
-            raise Exception("Message argument is wrong")
-
-        if not callable(fn):
-            raise Exception("Given function is not callable.")
-
-        if message not in self._slots:
-            self._slots[message] = []
-
-        self._slots[message].append(fn)
-
-    def disconnect_signal(self, message, fn):
-        """Disconnect given function from signal
-
-        Args:
-            message (str): signal message
-            fn (callable): original function
-        """
-
-        if message in self._slots:
-            self._slots[message].remove(fn)
-
-    def emit(self, message, *args):
-        """Emit a message with arguments
-
-        Args:
-            message (str): message name
-            *args: any arguments
-        """
-
-        if message in self._slots:
-            for fn in self._slots[message]:
-                fn(*args)
 
     def register_action(self, plugin, name, fn):
         """Register global action
@@ -247,8 +238,7 @@ class Grail(Application):
         ref.plugin = plugin
 
         self._actions.append(ref)
-
-        self.emit('/app/actions')
+        self.signals.emit('/app/actions')
 
     def actions(self):
         """Get list of actions"""

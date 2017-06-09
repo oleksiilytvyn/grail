@@ -250,7 +250,19 @@ class CuelistsListWidget(QTableWidget):
 
 
 class CuelistViewer(Viewer):
-    """Library viewer"""
+    """Library viewer
+
+    Connected:
+        '/app/close'
+        '/cuelist/selected'
+        '/cuelist/add'
+
+    Emits:
+        '/app/lock', flag:bool
+        '/message/master', message:str
+        '/message/preview', message:str
+        '/cuelist/selected', id:int
+    """
 
     id = 'cuelist'
     name = 'Cuelist'
@@ -325,7 +337,7 @@ class CuelistViewer(Viewer):
     def lock_action(self):
 
         self._locked = not self._locked
-        self.emit("app/lock", self._locked)
+        self.emit("/app/lock", self._locked)
 
     def menu_action(self):
 
@@ -349,6 +361,9 @@ class CuelistViewer(Viewer):
         self.cuelist_selected(self._cuelist_id)
 
     def cuelist_selected(self, cuelist_id=0):
+
+        if self.is_destroyed:
+            return False
 
         self._cuelist_id = cuelist_id
         cuelist = self.project.cuelist(cuelist_id)

@@ -9,7 +9,6 @@
     :license: GNU, see LICENSE for more details.
 """
 
-import os
 import json
 
 from PyQt5.QtCore import *
@@ -18,23 +17,19 @@ from PyQt5.QtWidgets import *
 
 from grailkit.dna import DNA
 from grailkit.util import *
-from grailkit.qt import AboutDialog, MessageDialog
+from grailkit.qt import AboutDialog, MessageDialog, Application
 
 import grail
-from grail.core import Viewer, Plugin
-from grail.ui import PreferencesDialog, ViewArranger, ActionsDialog
 
 
 class MainWindow(QMainWindow):
     """Grail application class"""
 
-    def __init__(self, app=None):
+    def __init__(self, parent=None):
         super(MainWindow, self).__init__()
 
-        self.app = app
+        self.app = Application.instance()
         self.project = self.app.project
-
-        self._test_card = True
 
         self.__ui__()
 
@@ -48,15 +43,17 @@ class MainWindow(QMainWindow):
         self.about_dialog.url_report = "http://grailapp.com/"
         self.about_dialog.url_help = "http://grailapp.com/help"
 
-        self.preferences_dialog = PreferencesDialog()
+        self.preferences_dialog = grail.ui.PreferencesDialog()
 
-        self.actions_dialog = ActionsDialog()
+        self.actions_dialog = grail.ui.ActionsDialog()
 
         self._ui_menubar()
 
-        self.view_arranger = ViewArranger()
+        self.view_arranger = grail.ui.ViewArranger()
         self.view_arranger.updated.connect(self._arranger_updated)
         self.view_arranger.compose(self._compose())
+        # save new structure to project
+        self._arranger_updated()
 
         self.setCentralWidget(self.view_arranger)
         self.setWindowIcon(QIcon(':/icon/256.png'))
@@ -211,7 +208,10 @@ class MainWindow(QMainWindow):
                     "y": entity.get("y", default=0)
                     })
 
-        return structure if len(structure) > 0 else [default, []][1 if _root else 0]
+        if len(structure) > 1:
+            return structure
+        else:
+            return [default, []][1 if _root else 0]
 
     def _arranger_updated(self, _structure=None, _root=None):
         """Layout of arranger is changed"""
@@ -409,5 +409,5 @@ class MainWindow(QMainWindow):
     def closeEvent(self, event):
         """Save project"""
 
-        self.app.emit('/app/close')
+        self.app.signals.emit('/app/close')
         self.app.project.close()

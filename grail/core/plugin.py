@@ -54,7 +54,7 @@ class _PluginMeta(object):
             *args: any arguments
         """
 
-        self.__app.emit(message, *args)
+        self.__app.signals.emit(message, *args)
 
     def connect(self, message, fn):
         """Connect a message listener
@@ -64,14 +64,13 @@ class _PluginMeta(object):
             fn (callable): function to call
         """
 
-        self.__app.connect(message, fn)
+        self.__app.signals.connect(message, fn)
         self.__slots.append([message, fn])
 
     def destroy(self):
         """Gracefully destroy widget and disconnect any signals
         Please call this method when you don't need instance anymore
         """
-
         # prevent from destructing several times
         if self.__destroyed:
             return None
@@ -79,9 +78,10 @@ class _PluginMeta(object):
         # clear slots as they keeping this object alive
         # and preventing from gc collection
         for slot in self.__slots:
-            self.__app.disconnect_signal(*slot)
+            self.__app.signals.disconnect(*slot)
 
         self.__slots = []
+        self.__destroyed = True
 
     @property
     def app(self):
@@ -100,6 +100,10 @@ class _PluginMeta(object):
     @property
     def bible(self):
         return self.__app.bible
+
+    @property
+    def is_destroyed(self):
+        return self.__destroyed
 
     @classmethod
     def loaded(cls):

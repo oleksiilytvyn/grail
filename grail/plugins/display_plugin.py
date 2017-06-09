@@ -21,7 +21,14 @@ from grail.core import Plugin
 
 
 class DisplayPlugin(Plugin):
-    """Plugin for displaying cues"""
+    """Plugin for displaying cues
+
+    Connected:
+        '/app/close'
+
+    Emits:
+        -
+    """
 
     id = 'display'
     name = 'Display'

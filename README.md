@@ -11,7 +11,7 @@ The goal of project to provide beautiful, simple and fast application for christ
 * PyQt 5 or higher
 * grailkit (https://bitbucket.org/grailapp/grailkit or pip install grailkit)
 
-If you want to _build, you also need:
+If you want to build, you also need:
 
 * cx_Freeze 5.0 or higher
 * hgapi (https://bitbucket.org/haard/hgapi)
@@ -24,8 +24,8 @@ execute following command in terminal:
 
     python grail.py
 
-## How to _build ##
+## How to build ##
 
-Just run in terminal following command to _build for your current platform
+Just run in terminal following command to build for your current platform
 
-    python setup.py _build
+    python setup.py build

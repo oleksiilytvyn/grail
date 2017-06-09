@@ -21,8 +21,8 @@ class ActionsDialog(Dialog):
         super(ActionsDialog, self).__init__(parent)
 
         self.app = Application.instance()
-        self.app.connect('/app/close', self.close)
-        self.app.connect('/app/actions', self._update)
+        self.app.signals.connect('/app/close', self.close)
+        self.app.signals.connect('/app/actions', self._update)
 
         self.__ui__()
         self._update()
@@ -30,9 +30,11 @@ class ActionsDialog(Dialog):
     def __ui__(self):
 
         self._ui_list = List()
+        self._ui_list.itemDoubleClicked.connect(self.go_action)
 
         self._ui_label = Label("0 Actions")
         self._ui_label.setAlignment(Qt.AlignCenter)
+        self._ui_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
         self._ui_go_action = QAction(QIcon(':/icons/play.png'), "Execute", self)
         self._ui_go_action.setIconVisibleInMenu(True)
@@ -49,6 +51,7 @@ class ActionsDialog(Dialog):
         self.setLayout(self._ui_layout)
         self.setWindowTitle("Actions")
         self.setGeometry(0, 0, 300, 400)
+        self.setMinimumSize(200, 200)
         self.moveCenter()
 
     def _update(self):

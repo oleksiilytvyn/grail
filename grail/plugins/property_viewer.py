@@ -18,7 +18,15 @@ from grail.core import Viewer
 
 
 class PropertyViewer(Viewer):
-    """Simple property editor"""
+    """Simple property editor
+
+    Connected:
+        '/node/selected'
+
+    Emits:
+        '/property/changed'
+
+    """
 
     id = 'property'
     name = 'Properties'

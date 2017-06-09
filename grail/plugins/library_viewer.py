@@ -23,7 +23,15 @@ from grail.ui import SongDialog
 
 
 class LibraryViewer(Viewer):
-    """Library viewer"""
+    """Library viewer
+
+    Connected:
+        '/app/close'
+
+    Emits:
+        '/message/preview', message:str
+        '/cuelist/add', entity:DNAEntity
+    """
 
     id = 'library'
     name = 'Library'

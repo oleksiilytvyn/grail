@@ -21,6 +21,14 @@ from grail.core import Viewer
 
 
 class NodeViewer(Viewer):
+    """
+
+    Connected:
+        '/property/changed'
+
+    Emits:
+        '/node/selected', id:int
+    """
 
     id = 'node'
     name = 'Nodes'

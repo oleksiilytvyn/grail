@@ -26,8 +26,10 @@ class TimeViewer(Viewer):
     author = 'Grail Team'
     description = 'Display current time'
 
-    def __init__(self, parent=None):
-        super(TimeViewer, self).__init__(parent)
+    # todo: Add options like color, size and background
+
+    def __init__(self, *args):
+        super(TimeViewer, self).__init__(*args)
 
         self.__ui__()
 
@@ -39,16 +41,8 @@ class TimeViewer(Viewer):
 
     def __ui__(self):
 
-        self._label = Label('Hello World!')
-        self._label.setStyleSheet("""
-            Label {
-                color: #f1f1f1;
-                background: #222;
-                text-align: center;
-                font-size: 48px;
-                qproperty-alignment: AlignCenter AlignCenter;
-            }
-            """)
+        self._label = Label('00:00:00')
+        self._label.setObjectName("TimeViewer_label")
 
         self._ui_view_action = QToolButton()
         self._ui_view_action.setText("View")
@@ -56,13 +50,7 @@ class TimeViewer(Viewer):
         self._ui_view_action.clicked.connect(self.view_action)
 
         self._ui_toolbar = Toolbar()
-        self._ui_toolbar.setStyleSheet("""
-            Toolbar {
-                color: #f1f1f1;
-                background: #222;
-                border-top: 1px solid #333;
-            }
-            """)
+        self._ui_toolbar.setObjectName("TimeViewer_toolbar")
         self._ui_toolbar.addWidget(self._ui_view_action)
         self._ui_toolbar.addWidget(Spacer())
 
@@ -73,6 +61,7 @@ class TimeViewer(Viewer):
         self.setLayout(self._layout)
 
     def _update(self):
+        """Update time"""
 
         _time = datetime.datetime.now()
 
@@ -83,5 +72,4 @@ class TimeViewer(Viewer):
     def view_action(self):
         """Replace current view with something other"""
 
-        menu = self.plugin_menu()
-        menu.exec_(self._ui_toolbar.mapToGlobal(self._ui_view_action.pos()))
+        self.plugin_menu().exec_(self._ui_toolbar.mapToGlobal(self._ui_view_action.pos()))

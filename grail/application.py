@@ -17,6 +17,7 @@ from PyQt5.QtCore import QFile, pyqtSignal
 from grailkit.dna import SettingsFile, Project, Library
 from grailkit.bible import BibleHost
 from grailkit.qt import Application, MessageDialog
+from grailkit.osc import OSCClient
 from grailkit.core import Signalable
 
 import grail
@@ -47,13 +48,12 @@ class Grail(Application):
         self.setOrganizationDomain(grail.ORGANISATION_DOMAIN)
         self.setStyleSheetFile(":/stylesheet/grail.css")
 
-        self._slots = {}
         self._plugins = []
         self._actions = []
         self._relaunch = False
         self._relaunch_args = []
         self._settings = SettingsFile(grail.SETTINGS_PATH, create=True)
-        self._osc_host = None
+        self._osc_host = OSCClient()
         self._midi_host = None
         self._project = None
         self._library = None
@@ -166,8 +166,8 @@ class Grail(Application):
         if self._library:
             self._library.close()
 
-        if self.settings:
-            self.settings.close()
+        if self._settings:
+            self._settings.close()
 
         if self._relaunch:
             python = sys.executable

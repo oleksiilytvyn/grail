@@ -47,10 +47,7 @@ class ViewArranger(Component):
 
         for view in views:
             if isinstance(view, dict):
-                viewer = self._create(view['view/id'], splitter)
-
-                for key, value in view.items():
-                    viewer.set(key, value)
+                viewer = self._create(view['view/id'], splitter, view)
 
                 splitter.addWidget(viewer)
                 sizes.append(view['width'] if horizontal else view['height'])
@@ -196,7 +193,7 @@ class ViewArranger(Component):
         if viewer in self._viewers:
             self._viewers.remove(viewer)
 
-    def _create(self, name, parent):
+    def _create(self, name, parent, properties=None):
         """Returns viewer by id or empty viewer"""
 
         viewer = EmptyViewer
@@ -204,8 +201,9 @@ class ViewArranger(Component):
         for plug in Viewer.plugins():
             if plug.id == name:
                 viewer = plug
+                break
 
-        ref = viewer(parent)
+        ref = viewer(parent, properties)
         self._viewers.append(ref)
 
         return ref

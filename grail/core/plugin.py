@@ -202,6 +202,16 @@ class Plugin(_PluginMeta, metaclass=PluginRegistry):
             return action
 
     def __create_action(self, menu, location_tokens, new_action, before_tokens):
+        """
+
+        Args:
+            menu:
+            location_tokens:
+            new_action:
+            before_tokens:
+        """
+        # todo: write doc-string
+
         action_name = location_tokens[0]
         action_target = None
         before_name = before_tokens[0] if len(before_tokens) else None
@@ -259,11 +269,15 @@ class Viewer(Component, _PluginMeta, metaclass=_ComponentPluginRegistry):
     Viewer class can only create self and listen/emit global events
     """
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, properties=None):
         Component.__init__(self, parent)
 
         # viewer properties
-        self.__properties = {}
+        if properties and isinstance(properties, dict):
+            self.__properties = properties
+        else:
+            self.__properties = {}
+
         # destroy all signals when qt object destroyed
         self.destroyed.connect(lambda: _PluginMeta.destroy(self))
 

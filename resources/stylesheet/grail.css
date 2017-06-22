@@ -1,251 +1,13 @@
-
 /**
  * Grail application QSS file
  */
 
-#main_splitter::handle {
-    background-color: #343434;
-    }
 
-/**
- * @section library panel
- */
-
-#library {
-    background-color: #626364;
-    padding: 0;
-    margin: 0;
-    }
-
-    #library_search_widget {
-        background-color: #626364;
-        }
-
-    #library_search {
-        border: none;
-        border-radius: 11px;
-        margin: 12px 16px 10px 16px;
-        padding: 1px 8px;
-        background: #e9e9e9;
-        min-height: 20px;
-        height: 20px;
-        }
-
-/**
- * @section cuelist panel
- */
-
-#cuelist {
-    background-color: #626364;
-    padding: 0;
-    margin: 0;
-    }
-
-    #cuelist_list {
-        border: none;
-        show-decoration-selected: 1;
-        padding: 0;
-        background-color: #626364;
-        alternate-background-color: #676869;
-        outline: 0;
-        }
-
-        #cuelist_list::item {
-            color: #e6e6e6;
-            padding: 4px 0;
-            margin: 0;
-            outline: none;
-            border: none;
-            border-bottom: 1px solid #626364;
-            qproperty-wordWrap: true;
-            }
-
-        #cuelist_list::item:selected {
-            background: #8a9fbb;
-            border-bottom: 1px solid #8a9fbb;
-            color: #e6e6e6;
-            }
-
-        #cuelist_list::branch {
-            margin: 0;
-            padding: 0;
-            background: transparent;
-            border: none;
-            border-bottom: 1px solid #626364;
-            }
-
-        #cuelist_list::branch:selected {
-            background: #8a9fbb;
-            border-bottom: 1px solid #8a9fbb;
-            }
-
-        #cuelist_list::branch:has-children:!has-siblings:closed,
-        #cuelist_list::branch:closed:has-children:has-siblings {
-            border-image: none;
-            image: url(:/icons/branch-closed.png);
-            }
-
-        #cuelist_list::branch:open:has-children:!has-siblings,
-        #cuelist_list::branch:open:has-children:has-siblings  {
-            border-image: none;
-            image: url(:/icons/branch-open.png);
-            }
-
-        #cuelist_list::branch:has-children:!has-siblings:closed:selected,
-        #cuelist_list::branch:closed:has-children:has-siblings:selected {
-            border-image: none;
-            image: url(:/icons/branch-closed-white.png);
-            }
-
-        #cuelist_list::branch:open:has-children:!has-siblings:selected,
-        #cuelist_list::branch:open:has-children:has-siblings:selected  {
-            border-image: none;
-            image: url(:/icons/branch-open-white.png);
-            }
-
-    #cuelist_label {
-        qproperty-alignment: AlignCenter AlignCenter;
-        color: #e0e0e1;
-        margin: 3px;
-        }
-
-/**
- * @section cuelist panel
- */
-
-#cuelist_dialog {
-    background-color: #2f2f2f;
-    }
-
-    #cuelist_dialog_list {
-        border: none;
-        background-color: #2f2f2f;
-        alternate-background-color: #393939;
-        show-decoration-selected: 1;
-        outline: 0;
-        }
-
-        #cuelist_dialog_list QScrollBar::handle:vertical {
-            background: #ddd;
-            min-height: 20px;
-            border-radius: 3px;
-            }
-
-        #cuelist_dialog_list::item {
-            color: #e6e6e6;
-            padding: 4px 12px;
-            margin: 0;
-            border-bottom: 1px solid transparent;
-            qproperty-wordWrap: true;
-            }
-
-        #cuelist_dialog_list::item:selected {
-            background: #8a9fbb;
-            border-bottom: 1px solid #8a9fbb;
-            color: #e6e6e6;
-            }
-
-    #cuelist_dialog_toolbar {
-        background: #222;
-        border-top: 1px solid #8a9fbb;
-        border: none;
-        padding: 0;
-        margin: 0;
-        min-height: 24px;
-        }
-
-        #cuelist_dialog_toolbar QToolButton {
-            border: 1px solid transparent;
-            background: none;
-            border-radius: 3px;
-            padding: 4px 4px;
-            }
-
-/**
- * @section preview editor
- */
-#preview {}
-
-    #preview_label {
-        background: #000;
-        color: #fff;
-        padding: 8px;
-        qproperty-alignment: AlignCenter AlignCenter;
-        qproperty-wordWrap: true;
-        }
-
-    #preview_edit {
-        border: none;
-        background: #131313;
-        color: #f1f1f1;
-        padding: 3px 6px;
-        }
-
-        #preview_edit QScrollBar::handle:vertical {
-            background: #ddd;
-            min-height: 20px;
-            border-radius: 3px;
-            }
-
-    #preview_toolbar {
-        background: #1e1e1e;
-        border-top: 1px solid #1e1e1e;
-        padding: 3px 5px;
-        }
-
-        #preview_toolbar QToolButton {
-            border: 1px solid transparent;
-            background: none;
-            border-radius: 3px;
-            padding: 2px;
-            }
-
-    #preview_splitter::handle {
-        background-color: #333;
-        }
-
-/**
- * @section node editor
- */
-
-#node {}
-
-/**
- * @section preferences dialog
- */
-
-PreferencesDialog {
-    background: #2f2f2f;
-    color: #e9e9e9;
-    }
-
-    PreferencesDialog QLabel {
-        color: #e9e9e9;
-        }
-
-    #preferences_splitter::handle {
-        background-color: #343434;
-        }
-
-    #bible_list {
-        border: none;
-        outline: 0;
-        background: #2f2f2f;
-        show-decoration-selected: 1;
-        alternate-background-color: #393939;
-        }
-
-        #bible_list::item {
-            border: none;
-            color: #e6e6e6;
-            padding: 6px 12px;
-            qproperty-wordWrap: true;
-            }
-
-        #bible_list::item:selected {
-            background: #8a9fbb;
-            color: #e6e6e6;
-            }
+/******************************************************************************
+ *
+ * @section Application
+ *
+ *****************************************************************************/
 
 /**
  * @section welcome dialog
@@ -291,6 +53,10 @@ SongDialog {
         min-height: 20px;
         border-radius: 3px;
         }
+
+/**
+ * @section QTreeWidget
+ */
 
 QTreeWidget {
     border: none;
@@ -353,3 +119,287 @@ QTreeWidget {
         border-image: none;
         image: url(:/i/branch-open-white.png);
         }
+
+/******************************************************************************
+ *
+ * @section TimeViewer
+ *
+ *****************************************************************************/
+
+#TimeViewer {
+    }
+
+    #TimeViewer_toolbar {
+        color: #f1f1f1;
+        background: #222;
+        border-top: 1px solid #333;
+        }
+
+    #TimeViewer_label {
+        color: #f1f1f1;
+        background: #222;
+        text-align: center;
+        font-size: 48px;
+        qproperty-alignment: AlignCenter AlignCenter;
+        }
+
+
+/******************************************************************************
+ *
+ * @section LibraryViewer
+ *
+ *****************************************************************************/
+
+#LibraryViewer {
+    background-color: #626364;
+    padding: 0;
+    margin: 0;
+    }
+
+    #LibraryViewer_search_widget {
+        background-color: #626364;
+        }
+
+    #LibraryViewer_search {
+        border: none;
+        border-radius: 11px;
+        margin: 12px 16px 10px 16px;
+        padding: 1px 8px;
+        background: #e9e9e9;
+        min-height: 20px;
+        height: 20px;
+        }
+
+
+/******************************************************************************
+ *
+ * @section CuelistViewer
+ *
+ *****************************************************************************/
+
+#CuelistViewer {
+    background-color: #626364;
+    padding: 0;
+    margin: 0;
+    }
+
+    #CuelistViewer_empty {
+        background-color: #2f2f2f;
+        }
+
+        #CuelistViewer_empty_title {
+            qproperty-alignment: AlignCenter AlignCenter;
+            text-align: center;
+            font-size: 22px;
+            margin: 0 0 6px 0;
+            color: #f1f1f1;
+            }
+
+        #CuelistViewer_empty_info {
+            text-align: center;
+            font-size: 13px;
+            qproperty-alignment: AlignCenter AlignCenter;
+            font-weight: 300;
+            color: #929292;
+            margin: 0 0 16px 0;
+            }
+
+    #CuelistViewer_label {
+        qproperty-alignment: AlignCenter AlignCenter;
+        color: #e0e0e1;
+        margin: 3px;
+        }
+
+    /**
+     * @section cuelist panel
+     */
+
+    #cuelist_dialog {
+        background-color: #2f2f2f;
+        }
+
+        #cuelist_dialog_list {
+            border: none;
+            background-color: #2f2f2f;
+            alternate-background-color: #393939;
+            show-decoration-selected: 1;
+            outline: 0;
+            }
+
+            #cuelist_dialog_list QScrollBar::handle:vertical {
+                background: #ddd;
+                min-height: 20px;
+                border-radius: 3px;
+                }
+
+            #cuelist_dialog_list::item {
+                color: #e6e6e6;
+                padding: 4px 12px;
+                margin: 0;
+                border-bottom: 1px solid transparent;
+                qproperty-wordWrap: true;
+                }
+
+            #cuelist_dialog_list::item:selected {
+                background: #8a9fbb;
+                border-bottom: 1px solid #8a9fbb;
+                color: #e6e6e6;
+                }
+
+        #cuelist_dialog_toolbar {
+            background: #222;
+            border-top: 1px solid #8a9fbb;
+            border: none;
+            padding: 0;
+            margin: 0;
+            min-height: 24px;
+            }
+
+            #cuelist_dialog_toolbar QToolButton {
+                border: 1px solid transparent;
+                background: none;
+                border-radius: 3px;
+                padding: 4px 4px;
+                }
+
+
+/******************************************************************************
+ *
+ * @section NodeViewer
+ *
+ *****************************************************************************/
+
+#NodeViewer {
+    }
+
+
+/******************************************************************************
+ *
+ * @section PropertyViewer
+ *
+ *****************************************************************************/
+
+#PropertyViewer {
+    }
+
+    #PropertyViewer_empty {
+        background-color: #2f2f2f;
+        }
+
+        #PropertyViewer_empty_title {
+            qproperty-alignment: AlignCenter AlignCenter;
+            text-align: center;
+            font-size: 22px;
+            margin: 0 0 6px 0;
+            color: #f1f1f1;
+            }
+
+        #PropertyViewer_empty_info {
+            text-align: center;
+            font-size: 13px;
+            qproperty-alignment: AlignCenter AlignCenter;
+            font-weight: 300;
+            color: #929292;
+            margin: 0 0 16px 0;
+            }
+
+    #PropertyViewer QTableWidget {
+        border: none;
+        background-color: #2f2f2f;
+        alternate-background-color: #393939;
+        show-decoration-selected: 1;
+        outline: 0;
+        }
+
+        #PropertyViewer QTableWidget QScrollBar::handle:vertical {
+            background: #ddd;
+            min-height: 20px;
+            border-radius: 3px;
+            }
+
+        #PropertyViewer QTableWidget::item {
+            color: #e6e6e6;
+            padding: 4px 12px;
+            margin: 0;
+            border-bottom: 1px solid transparent;
+            qproperty-wordWrap: true;
+            }
+
+        #PropertyViewer QTableWidget::item:selected {
+            background: #8a9fbb;
+            border-bottom: 1px solid #8a9fbb;
+            color: #e6e6e6;
+            }
+
+
+/******************************************************************************
+ *
+ * @section PreferencesDialog
+ *
+ *****************************************************************************/
+
+PreferencesDialog {
+    background: #2f2f2f;
+    color: #e9e9e9;
+    }
+
+    PreferencesDialog QLabel {
+        color: #e9e9e9;
+        }
+
+    /**
+     * @section GeneralConfigurator
+     */
+
+    #GeneralConfigurator {
+        }
+
+    /**
+     * @section BibleConfigurator
+     */
+
+    #BibleConfigurator_list {
+        border: none;
+        outline: 0;
+        background: #2f2f2f;
+        show-decoration-selected: 1;
+        alternate-background-color: #393939;
+        }
+
+        #BibleConfigurator_list::item {
+            border: none;
+            color: #e6e6e6;
+            padding: 6px 12px;
+            qproperty-wordWrap: true;
+            }
+
+        #BibleConfigurator_list::item:selected {
+            background: #8a9fbb;
+            color: #e6e6e6;
+            }
+
+
+    /**
+     * @section PluginsConfigurator
+     */
+
+    #PluginsConfigurator_list {
+        border: none;
+        outline: 0;
+        background: #2f2f2f;
+        show-decoration-selected: 1;
+        alternate-background-color: #393939;
+        }
+
+        #PluginsConfigurator_list::item {
+            border: none;
+            color: #e6e6e6;
+            padding: 6px 12px;
+            qproperty-wordWrap: true;
+            }
+
+        #PluginsConfigurator_list::item:selected {
+            background: #8a9fbb;
+            color: #e6e6e6;
+            }
+

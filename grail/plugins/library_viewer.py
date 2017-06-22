@@ -16,7 +16,7 @@ from PyQt5.QtWidgets import *
 
 from grailkit.bible import Verse
 from grailkit.dna import DNA, SongEntity
-from grailkit.qt import SearchEdit, List, ListItem, Spacer, VLayout, Toolbar
+from grailkit.qt import SearchEdit, List, ListItem, Spacer, VLayout, Toolbar, Icon
 
 from grail.core import Viewer
 from grail.ui import SongDialog
@@ -38,8 +38,10 @@ class LibraryViewer(Viewer):
     author = 'Grail Team'
     description = 'Manage grail library'
 
-    def __init__(self, parent=None):
-        super(LibraryViewer, self).__init__(parent)
+    # todo: Add media items
+
+    def __init__(self, *args):
+        super(LibraryViewer, self).__init__(*args)
 
         self.song_dialog = SongDialog()
         self.song_dialog.changed.connect(self._update)
@@ -52,13 +54,12 @@ class LibraryViewer(Viewer):
 
     def __ui__(self):
 
-        self.setObjectName("library")
+        self.setObjectName("LibraryViewer")
 
         self._ui_layout = VLayout()
-        # self._ui_layout.setObjectName("library_layout")
 
         self._ui_search = SearchEdit()
-        self._ui_search.setObjectName("library_search")
+        self._ui_search.setObjectName("LibraryViewer_search")
         self._ui_search.setPlaceholderText("Search library...")
         self._ui_search.textChanged.connect(self._search_event)
         self._ui_search.keyPressed.connect(self._search_key_event)
@@ -68,11 +69,10 @@ class LibraryViewer(Viewer):
         self._ui_search_layout.addWidget(self._ui_search)
 
         self._ui_search_widget = QWidget()
-        self._ui_search_widget.setObjectName("library_search_widget")
+        self._ui_search_widget.setObjectName("LibraryViewer_search_widget")
         self._ui_search_widget.setLayout(self._ui_search_layout)
 
         self._ui_list = List()
-        self._ui_list.setObjectName("library_list")
         self._ui_list.setContextMenuPolicy(Qt.CustomContextMenu)
         self._ui_list.currentItemChanged.connect(self._item_clicked)
         self._ui_list.itemDoubleClicked.connect(self._item_doubleclicked)
@@ -111,6 +111,9 @@ class LibraryViewer(Viewer):
 
         self._ui_list.clear()
 
+        icon_song = Icon.colored(':/icons/txt.png', QColor('#ffffff'), QColor('#e3e3e3'))
+        icon_bible = Icon.colored(':/icons/book.png', QColor('#03A9F4'), QColor('#e3e3e3'))
+
         if not keyword:
 
             # show songs from library
@@ -126,6 +129,7 @@ class LibraryViewer(Viewer):
         # show bible references (limit to 3)
         for verse in self.bible.match_reference(keyword):
             item = ListItem()
+            item.setIcon(icon_bible)
             item.setText("%s" % (verse.reference,))
             item.setObject(verse)
 
@@ -133,8 +137,9 @@ class LibraryViewer(Viewer):
 
         # show songs from library (limit to 9)
         for song in self.library.items(filter_keyword=keyword, filter_type=DNA.TYPE_SONG,
-                                      sort="name", reverse=True, limit=9):
+                                       sort="name", reverse=True, limit=9):
             item = ListItem()
+            item.setIcon(icon_song)
             item.setText("%s" % (song.name,))
             item.setObject(song)
 

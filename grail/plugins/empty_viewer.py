@@ -24,8 +24,8 @@ class EmptyViewer(Viewer):
     description = 'This viewer created after split or if viewer not found'
     private = True
 
-    def __init__(self, parent=None):
-        super(EmptyViewer, self).__init__(parent)
+    def __init__(self, *args):
+        super(EmptyViewer, self).__init__(*args)
 
         self.__ui__()
 
@@ -83,5 +83,4 @@ class EmptyViewer(Viewer):
     def menu_action(self):
         """Open menu with available viewers and other options"""
 
-        menu = self.plugin_menu()
-        menu.exec_(self.mapToGlobal(self._ui_button.pos()))
+        self.plugin_menu().exec_(self.mapToGlobal(self._ui_button.pos()))

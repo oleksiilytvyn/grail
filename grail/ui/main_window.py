@@ -200,13 +200,7 @@ class MainWindow(QMainWindow):
             if entity.type == DNA.TYPE_LAYOUT:
                 structure.append(self._compose(entity))
             elif entity.type == DNA.TYPE_VIEW:
-                structure.append({
-                    "view/id": entity.get("view/id", default="empty"),
-                    "width": entity.get("width", default=100),
-                    "height": entity.get("height", default=100),
-                    "x": entity.get("x", default=0),
-                    "y": entity.get("y", default=0)
-                    })
+                structure.append(entity.properties())
 
         if len(structure) > 1:
             return structure
@@ -234,26 +228,12 @@ class MainWindow(QMainWindow):
             entity = root.create(name="Layout",
                                  entity_type=DNA.TYPE_LAYOUT,
                                  parent=0,
-                                 properties={
-                                     'layout/type': layout['layout/type'],
-                                     'layout/orientation': layout['layout/orientation'],
-                                     'height': layout['height'],
-                                     'width': layout['width'],
-                                     'x': layout['x'],
-                                     'y': layout['y']
-                                 })
+                                 properties=layout)
         else:
             # create child entity
             entity = root.create(name="Layout",
                                  entity_type=DNA.TYPE_LAYOUT,
-                                 properties={
-                                    'layout/type': layout['layout/type'],
-                                    'layout/orientation': layout['layout/orientation'],
-                                    'height': layout['height'],
-                                    'width': layout['width'],
-                                    'x': layout['x'],
-                                    'y': layout['y']
-                                 })
+                                 properties=layout)
 
         for view in views:
             if isinstance(view, list):
@@ -261,13 +241,7 @@ class MainWindow(QMainWindow):
             elif isinstance(view, dict):
                 entity.create(name="View",
                               entity_type=DNA.TYPE_VIEW,
-                              properties={
-                                "view/id": view["view/id"],
-                                "width": view["width"],
-                                "height": view["height"],
-                                "x": view["x"],
-                                "y": view["y"]
-                              })
+                              properties=view)
 
     def center(self):
         """Move window to the center of current screen"""
@@ -298,6 +272,7 @@ class MainWindow(QMainWindow):
     def save_project(self):
         """Save current project"""
 
+        self._arranger_updated()
         self.project.save()
 
     def save_project_as(self):
@@ -409,5 +384,6 @@ class MainWindow(QMainWindow):
     def closeEvent(self, event):
         """Save project"""
 
+        self._arranger_updated()
         self.app.signals.emit('/app/close')
         self.app.project.close()

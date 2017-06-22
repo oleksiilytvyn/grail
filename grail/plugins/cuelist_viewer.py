@@ -15,7 +15,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
 from grailkit.dna import DNA
-from grailkit.qt import Popup, Application, Spacer, MessageDialog, Toolbar, Tree, TreeItem
+from grailkit.qt import Popup, Application, Spacer, MessageDialog, Toolbar, Tree, TreeItem, VLayout, Label
 
 from grail.core import Viewer
 
@@ -103,7 +103,7 @@ class CuelistDialog(Popup):
         item = self._ui_list.item(self._ui_list.currentRow(), 0)
 
         if item:
-            Application.instance().emit('/cuelist/selected', item.cuelist_id)
+            Application.instance().signals.emit('/cuelist/selected', item.cuelist_id)
 
     def _list_cell_changed(self, row, column):
 
@@ -264,13 +264,19 @@ class CuelistViewer(Viewer):
         '/cuelist/selected', id:int
     """
 
+    # todo: Add cue edit dialog
+    # todo: Add cuelist locking
+    # todo: Add color context menu to cues
+    # todo: Add 'Create cue' button
+    # todo: Make previous item selected after deletion
+
     id = 'cuelist'
     name = 'Cuelist'
     author = 'Grail Team'
     description = 'Manage cuelists'
 
-    def __init__(self, parent=None):
-        super(CuelistViewer, self).__init__(parent)
+    def __init__(self, *args):
+        super(CuelistViewer, self).__init__(*args)
 
         self._locked = False
         self._cuelist_id = self.project.settings().get('cuelist/current', default=0)
@@ -290,15 +296,15 @@ class CuelistViewer(Viewer):
 
     def __ui__(self):
 
-        self.setObjectName("cuelist")
+        self.setObjectName("CuelistViewer")
 
         self._ui_layout = QVBoxLayout()
-        self._ui_layout.setObjectName("cuelist_layout")
+        self._ui_layout.setObjectName("CuelistViewer_layout")
         self._ui_layout.setSpacing(0)
         self._ui_layout.setContentsMargins(0, 0, 0, 0)
 
         self._ui_tree = TreeWidget()
-        self._ui_tree.setObjectName('playlist_tree')
+        self._ui_tree.setObjectName('CuelistViewer_tree')
         self._ui_tree.setContextMenuPolicy(Qt.CustomContextMenu)
         self._ui_tree.customContextMenuRequested.connect(self._context_menu)
         self._ui_tree.itemSelectionChanged.connect(self._selection_changed)
@@ -307,8 +313,33 @@ class CuelistViewer(Viewer):
         self._ui_tree.itemClicked.connect(self._item_clicked)
         self._ui_tree.itemDoubleClicked.connect(self._item_double_clicked)
 
+        # Empty
+        self._ui_empty_title = Label("No Cuelist")
+        self._ui_empty_title.setObjectName('CuelistViewer_empty_title')
+
+        self._ui_empty_info = Label("Cuelist not selected or there are no cuelist.")
+        self._ui_empty_info.setObjectName('CuelistViewer_empty_info')
+        self._ui_empty_info.setWordWrap(True)
+
+        self._ui_empty_layout = VLayout()
+        self._ui_empty_layout.setContentsMargins(12, 12, 12, 12)
+        self._ui_empty_layout.setAlignment(Qt.AlignHCenter)
+        self._ui_empty_layout.addWidget(Spacer())
+        self._ui_empty_layout.addWidget(self._ui_empty_title)
+        self._ui_empty_layout.addWidget(self._ui_empty_info)
+        self._ui_empty_layout.addWidget(Spacer())
+
+        self._ui_empty = QWidget()
+        self._ui_empty.setObjectName('CuelistViewer_empty')
+        self._ui_empty.setLayout(self._ui_empty_layout)
+
+        self._ui_stack = QStackedWidget()
+        self._ui_stack.addWidget(self._ui_empty)
+        self._ui_stack.addWidget(self._ui_tree)
+        self._ui_stack.setCurrentIndex(0)
+
         self._ui_label = QLabel("...")
-        self._ui_label.setObjectName("cuelist_label")
+        self._ui_label.setObjectName("CuelistViewer_label")
         self._ui_label.setAlignment(Qt.AlignCenter)
         self._ui_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self._ui_label.setContextMenuPolicy(Qt.CustomContextMenu)
@@ -323,7 +354,7 @@ class CuelistViewer(Viewer):
         self._ui_toolbar.addWidget(self._ui_view_action)
         self._ui_toolbar.addWidget(self._ui_label)
 
-        self._ui_layout.addWidget(self._ui_tree)
+        self._ui_layout.addWidget(self._ui_stack)
         self._ui_layout.addWidget(self._ui_toolbar)
 
         self.setLayout(self._ui_layout)
@@ -371,8 +402,11 @@ class CuelistViewer(Viewer):
 
         if cuelist is None:
             self._ui_label.setText("...")
+            self._ui_stack.setCurrentIndex(0)
+
             return False
 
+        self._ui_stack.setCurrentIndex(1)
         self._ui_tree.clear()
 
         self.project.settings().set('cuelist/current', cuelist_id)
@@ -426,6 +460,7 @@ class CuelistViewer(Viewer):
         """Preview cue text"""
 
         self.emit('/message/preview', item.object().name)
+        self.emit('!node/selected', item.object().id)
 
     def _item_double_clicked(self, item):
         """Send cue text"""

@@ -12,7 +12,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
-from grail.core import Configurator
+from grail.core import Configurator, Plugin, Viewer
 from grailkit.qt import List, ListItem, Switch, Application, Button, VLayout, Label, Spacer, Toolbar
 from grailkit.bible import BibleHost, BibleHostError
 
@@ -107,9 +107,11 @@ class BibleConfigurator(Configurator):
     def __ui__(self):
         """Build UI"""
 
+        self.setObjectName("BibleConfigurator")
+
         self._ui_layout = VLayout()
         self._ui_list = List()
-        self._ui_list.setObjectName('bible_list')
+        self._ui_list.setObjectName("BibleConfigurator_list")
 
         self._ui_toolbar_label = Label("0 installed")
         self._ui_toolbar_label.setAlignment(Qt.AlignCenter)
@@ -174,5 +176,44 @@ class BibleConfigurator(Configurator):
             item.bible_id = bible.identifier
             item.setText("%s (%s)%s" % (bible.title, bible.identifier,
                                         " - selected" if bible_selected_id == bible.identifier else ""))
+
+            self._ui_list.addItem(item)
+
+
+class PluginsConfigurator(Configurator):
+    """Configure general preferences"""
+
+    id = 'plugins-configurator'
+    name = 'Plugins'
+    author = 'Grail Team'
+    description = 'View and configure plugins'
+
+    def __init__(self, parent=None):
+        super(PluginsConfigurator, self).__init__(parent)
+
+        self.__ui__()
+        self._clicked()
+
+    def __ui__(self):
+
+        self.setObjectName("PluginsConfigurator")
+
+        self._ui_list = List()
+        self._ui_list.setObjectName("PluginsConfigurator_list")
+
+        self._ui_layout = VLayout()
+        self._ui_layout.addWidget(self._ui_list)
+
+        self.setLayout(self._ui_layout)
+
+    def _clicked(self):
+        """Update list of plugins"""
+
+        self._ui_list.clear()
+
+        for plug in Plugin.plugins() + Viewer.plugins() + Configurator.plugins():
+            text = "%s by %s\n%s" % (plug.name, plug.author, plug.description)
+            item = ListItem(text)
+            item.setData(Qt.UserRole, text)
 
             self._ui_list.addItem(item)

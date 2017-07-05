@@ -26,6 +26,7 @@ class CuelistDialog(Popup):
         super(CuelistDialog, self).__init__()
 
         self._updating_list = False
+        self._app = Application.instance()
 
         self.__ui__()
         self.update_list()
@@ -94,7 +95,7 @@ class CuelistDialog(Popup):
 
     def _remove_clicked(self, item):
 
-        Application.instance().project.remove(item.cuelist_id)
+        self._app.project.remove(item.cuelist_id)
 
         self.update_list()
 
@@ -103,7 +104,7 @@ class CuelistDialog(Popup):
         item = self._ui_list.item(self._ui_list.currentRow(), 0)
 
         if item:
-            Application.instance().signals.emit('/cuelist/selected', item.cuelist_id)
+            self._app.signals.emit('/cuelist/selected', item.cuelist_id)
 
     def _list_cell_changed(self, row, column):
 
@@ -112,7 +113,7 @@ class CuelistDialog(Popup):
             return False
 
         item = self._ui_list.item(row, column)
-        cuelist = Application.instance().project.cuelist(item.cuelist_id)
+        cuelist = self._app.project.cuelist(item.cuelist_id)
         cuelist.name = item.text()
         cuelist.update()
 
@@ -129,7 +130,7 @@ class CuelistDialog(Popup):
     def add_action(self):
         """Add button clicked"""
 
-        Application.instance().project.create(name="Untitled")
+        self._app.project.create(name="Untitled")
 
         self.update_list()
         self._ui_list.editItem(self._ui_list.item(self._ui_list.rowCount() - 1, 0))
@@ -258,10 +259,9 @@ class CuelistViewer(Viewer):
         '/cuelist/add'
 
     Emits:
-        '/app/lock', flag:bool
-        '/message/master', message:str
-        '/message/preview', message:str
-        '/cuelist/selected', id:int
+        !cue/execute <message:DNAEntity>
+        !cue/preview <message:DNAEntity>
+        /cuelist/selected <id:int>
     """
 
     # todo: Add cue edit dialog
@@ -365,11 +365,6 @@ class CuelistViewer(Viewer):
         menu = self.plugin_menu()
         menu.exec_(self._ui_toolbar.mapToGlobal(self._ui_view_action.pos()))
 
-    def lock_action(self):
-
-        self._locked = not self._locked
-        self.emit("/app/lock", self._locked)
-
     def menu_action(self):
 
         point = QPoint(self.rect().width() / 2, self.rect().height() - 16)
@@ -459,13 +454,13 @@ class CuelistViewer(Viewer):
     def _item_clicked(self, item):
         """Preview cue text"""
 
-        self.emit('/message/preview', item.object().name)
         self.emit('!node/selected', item.object().id)
+        self.emit('!cue/preview', item.object())
 
     def _item_double_clicked(self, item):
         """Send cue text"""
 
-        self.emit('/message/master', item.object().name)
+        self.emit('!cue/execute', item.object())
 
     def _context_menu(self, pos):
         """Context menu on cue item"""

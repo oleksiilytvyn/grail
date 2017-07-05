@@ -8,11 +8,13 @@
     :copyright: (c) 2017 by Grail Team.
     :license: GNU, see LICENSE for more details.
 """
+import json
 import random
 
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtGui import QIcon, QColor
-from PyQt5.QtWidgets import QAbstractItemView, QHeaderView, QAction, QWidget, QStackedWidget, QToolButton
+from PyQt5.QtWidgets import QAbstractItemView, QHeaderView, QAction, QWidget, QStackedWidget, QToolButton, \
+    QStyledItemDelegate, QLineEdit, QStyle, QMenu
 
 from grailkit.qt import Toolbar, Icon, Label, Spacer, VLayout, Popup, Table, TableItem
 
@@ -31,8 +33,6 @@ class PropertyViewer(Viewer):
         entity (int, None): Id of selected entity. Default value is None
         property (str, None): Key of selected property name. Default value is None
     """
-
-    # todo: Add property editor that supports all types (True, False, None, int, float, string, JSON)
 
     id = 'property'
     name = 'Properties'
@@ -72,6 +72,9 @@ class PropertyViewer(Viewer):
         self._ui_properties.itemChanged.connect(self._item_changed)
         self._ui_properties.itemClicked.connect(self._item_clicked)
         self._ui_properties.itemSelectionChanged.connect(self._selection_changed)
+
+        delegate = _PropertyDelegate(self._ui_properties)
+        self._ui_properties.setItemDelegateForColumn(1, delegate)
 
         header = self._ui_properties.horizontalHeader()
         header.setVisible(True)
@@ -187,19 +190,29 @@ class PropertyViewer(Viewer):
             item_key.entity_key = key
 
             item_value = TableItem(str(value))
+            item_value.setData(Qt.UserRole, value)
             item_value.entity_id = self._entity_id
             item_value.entity_key = key
 
-            if isinstance(value, int):
-                color = QColor('#03A9F4')
-            elif isinstance(value, str):
+            # True and False
+            if isinstance(value, bool) and value is True:
                 color = QColor('#8BC34A')
-            elif isinstance(value, bool):
-                color = QColor('#673AB7')
-            elif value is None:
+            elif isinstance(value, bool) and value is False:
+                color = QColor('#B71C1C')
+            # Number
+            elif isinstance(value, int):
                 color = QColor('#EF6C00')
+            elif isinstance(value, float):
+                color = QColor('#FFEB3B')
+            # String
+            elif isinstance(value, str):
+                color = QColor('#03A9F4')
+            # JSON
+            elif isinstance(value, dict) or isinstance(value, list):
+                color = QColor('#673AB7')
+            # None
             else:
-                color = QColor('#f1f1f1')
+                color = QColor('#BDBDBD')
 
             item_value.setIcon(Icon.colored(':/icons/live.png', color, QColor('#e3e3e3')))
 
@@ -311,7 +324,7 @@ class PropertyViewer(Viewer):
 
         if item.column() == 1:
             key = item.entity_key
-            value = str(item.text())
+            value = item.data(Qt.UserRole)
             entity = dna.entity(item.entity_id)
 
             if key in std_props:
@@ -333,11 +346,196 @@ class PropertyViewer(Viewer):
         self._update(item.entity_id)
 
 
-class PropertyPopup(Popup):
-    """Popup dialog that allows users to edit DNA properties of all types."""
+class _PropertyEdit(QLineEdit):
 
-    def __init__(self, parent=None):
-        super(PropertyPopup, self).__init__(parent)
+    TYPES = {
+        "None": 'type_none',
+        "True": 'type_true',
+        "False": 'type_false',
+        "Float": 'type_float',
+        "Integer": 'type_int',
+        "String": 'type_str',
+        "JSON": 'type_json'
+        }
 
-    def __ui__(self):
-        pass
+    TYPES_ORDER = ['None', 'True', 'False', 'Float', 'Integer', 'String', 'JSON']
+
+    def __init__(self, *args):
+        super(_PropertyEdit, self).__init__(*args)
+
+        self._type = 'type_none'
+        self._data = None
+
+        self.setAttribute(Qt.WA_MacShowFocusRect, False)
+        self.textChanged.connect(self._text_changed)
+
+        self._ui_clear = QToolButton(self)
+        self._ui_clear.setIconSize(QSize(14, 14))
+        self._ui_clear.setIcon(QIcon(':/i/branch-open.png'))
+        self._ui_clear.setCursor(Qt.ArrowCursor)
+        self._ui_clear.setStyleSheet("""
+            QToolButton {
+                background: none;
+                border: none;
+                }
+            """)
+        self._ui_clear.clicked.connect(self._context_menu)
+
+        frame_width = self.style().pixelMetric(QStyle.PM_DefaultFrameWidth)
+
+        self.setStyleSheet("""
+                QLineEdit {
+                    background-color: #e9e9e9;
+                    padding-right: %spx;
+                    border: 1px solid #888;
+                    border-radius: 2px;
+                    }
+                """ % str(self._ui_clear.sizeHint().width() / 2 + frame_width + 1))
+
+    def setData(self, value):
+        """Store something"""
+
+        if isinstance(value, int):
+            _type = 'type_int'
+        elif isinstance(value, float):
+            _type = 'type_float'
+        elif isinstance(value, str):
+            _type = 'type_str'
+        elif value is True:
+            _type = 'type_true'
+        elif value is False:
+            _type = 'type_false'
+        elif isinstance(value, dict) or isinstance(value, list):
+            _type = 'type_json'
+        else:
+            _type = 'type_none'
+
+        self._type = _type
+        self._data = value
+
+    def data(self):
+        """Returns stored data"""
+
+        return self._data
+
+    def resizeEvent(self, event):
+        """Redraw some elements"""
+
+        size = self.rect()
+        btn_size = self._ui_clear.sizeHint()
+        frame_width = self.style().pixelMetric(QStyle.PM_DefaultFrameWidth)
+
+        self._ui_clear.move(size.width() - btn_size.width() - frame_width * 2,
+                            size.height() / 2 - btn_size.height() / 2)
+
+    def _context_menu(self):
+        """Open context menu"""
+
+        menu = QMenu("Select Type", self)
+
+        def wrap(_type, name):
+            return lambda: self._menu_item(_type, name)
+
+        for name in self.TYPES_ORDER:
+            _type = self.TYPES[name]
+            action = QAction(name, menu)
+            action.triggered.connect(wrap(name, _type))
+
+            menu.addAction(action)
+
+        menu.exec_(self.mapToGlobal(self._ui_clear.pos()))
+
+    def _menu_item(self, name, _type):
+        """Context menu item clicked"""
+
+        self._type = _type
+        self._data = self.type(self._type, str(self.text()))
+
+        self.setText(str(self._data))
+
+    def _text_changed(self):
+        """Update user data"""
+
+        self._data = self.type(self._type, str(self.text()))
+
+    @classmethod
+    def type(cls, _type, value):
+        """Convert `type`"""
+
+        return getattr(cls, _type)(value)
+
+    @classmethod
+    def type_none(cls, value):
+        """Convert anything to None"""
+
+        return None
+
+    @classmethod
+    def type_true(cls, value):
+        """Convert anything to True"""
+
+        return True
+
+    @classmethod
+    def type_false(cls, value):
+        """Convert anything to False"""
+
+        return False
+
+    @classmethod
+    def type_str(cls, value):
+        """Convert anything to string"""
+
+        try:
+            return str(value)
+        except:
+            return ""
+
+    @classmethod
+    def type_float(cls, value):
+        """Convert anything to float"""
+
+        try:
+            return float(value)
+        except ValueError:
+            return 0
+
+    @classmethod
+    def type_int(cls, value):
+        """Convert anything to int"""
+        try:
+            return int(value)
+        except ValueError:
+            return 0
+
+    @classmethod
+    def type_json(cls, value):
+        """Convert anything to json object (dict, list)"""
+
+        try:
+            return json.loads(str(value))
+        except:
+            return {}
+
+
+class _PropertyDelegate(QStyledItemDelegate):
+
+    def __init__(self, *args):
+        super(_PropertyDelegate, self).__init__(*args)
+
+    def createEditor(self, parent, option, index):
+        """Create editor widget"""
+
+        editor = _PropertyEdit(parent)
+
+        return editor
+
+    def setEditorData(self, editor, index):
+        """Set"""
+        super(_PropertyDelegate, self).setEditorData(editor, index)
+
+        editor.setData(index.data(Qt.UserRole))
+
+    def setModelData(self, editor, model, index):
+        """Store data"""
+        index.model().setData(index, editor.data(), Qt.UserRole)

@@ -16,10 +16,147 @@ from PyQt5.QtWidgets import *
 
 from grailkit.bible import Verse
 from grailkit.dna import DNA, SongEntity
-from grailkit.qt import SearchEdit, List, ListItem, Spacer, VLayout, Toolbar, Icon
+from grailkit.qt import SearchEdit, List, ListItem, Spacer, VLayout, Toolbar, Icon, Dialog, Button, HLayout, Application
 
 from grail.core import Viewer
-from grail.ui import SongDialog
+
+
+class SongDialog(Dialog):
+    """Song edit dialog"""
+
+    MODE_CREATE = 0
+    MODE_UPDATE = 1
+
+    changed = pyqtSignal()
+
+    def __init__(self, parent=None, song=None):
+        super(SongDialog, self).__init__(parent)
+
+        self._mode = SongDialog.MODE_CREATE
+        self._entity = song
+
+        self.__ui__()
+
+    def __ui__(self):
+        """Create UI of this dialog"""
+
+        self._ui_title = QLineEdit()
+        self._ui_title.setPlaceholderText("Song title")
+        self._ui_title.setAttribute(Qt.WA_MacShowFocusRect, 0)
+
+        self._ui_artist = QLineEdit()
+        self._ui_artist.setPlaceholderText("Artist name")
+        self._ui_artist.setAttribute(Qt.WA_MacShowFocusRect, 0)
+
+        self._ui_album = QLineEdit()
+        self._ui_album.setPlaceholderText("Album")
+        self._ui_album.setAttribute(Qt.WA_MacShowFocusRect, 0)
+
+        self._ui_year = QLineEdit()
+        self._ui_year.setPlaceholderText("Year")
+        self._ui_year.setAttribute(Qt.WA_MacShowFocusRect, 0)
+
+        self._ui_lyrics = QTextEdit()
+        self._ui_lyrics.setPlaceholderText("Lyrics")
+        self._ui_lyrics.setAttribute(Qt.WA_MacShowFocusRect, 0)
+        self._ui_lyrics.setAcceptRichText(False)
+
+        policy = self._ui_lyrics.sizePolicy()
+        policy.setVerticalStretch(1)
+
+        self._ui_lyrics.setSizePolicy(policy)
+
+        self._ui_button_ok = Button("Ok")
+        self._ui_button_ok.clicked.connect(self.accept_action)
+
+        self._ui_button_cancel = Button("Cancel")
+        self._ui_button_cancel.clicked.connect(self.reject_action)
+
+        self._ui_buttons = HLayout()
+        self._ui_buttons.setSpacing(10)
+        self._ui_buttons.setContentsMargins(0, 0, 0, 0)
+        self._ui_buttons.addWidget(Spacer())
+        self._ui_buttons.addWidget(self._ui_button_cancel)
+        self._ui_buttons.addWidget(self._ui_button_ok)
+
+        self._ui_layout = QGridLayout()
+        self._ui_layout.setSpacing(8)
+        self._ui_layout.setContentsMargins(12, 12, 12, 10)
+        self._ui_layout.setColumnMinimumWidth(0, 200)
+
+        self._ui_layout.addWidget(self._ui_title, 1, 0, 1, 2)
+        self._ui_layout.addWidget(self._ui_album, 3, 0, 1, 2)
+        self._ui_layout.addWidget(self._ui_artist, 5, 0)
+        self._ui_layout.addWidget(self._ui_year, 5, 1)
+        self._ui_layout.addWidget(self._ui_lyrics, 7, 0, 1, 2)
+        self._ui_layout.addLayout(self._ui_buttons, 8, 0, 1, 2)
+
+        self.setLayout(self._ui_layout)
+        self.setWindowIcon(QIcon(':/icons/32.png'))
+        self.setWindowTitle('Add song')
+        self.setGeometry(300, 300, 300, 400)
+        self.setMinimumSize(300, 400)
+        self.setWindowFlags(Qt.WindowCloseButtonHint)
+
+    def closeEvent(self, event):
+        """Reject on close"""
+        super(SongDialog, self).closeEvent(event)
+
+        self.reject_action()
+
+    def reject_action(self):
+        """Close window"""
+
+        self.changed.emit()
+        self.reject()
+
+    def accept_action(self):
+        """Save or create a song"""
+
+        title = str(self._ui_title.text())
+        album = str(self._ui_album.text())
+        artist = str(self._ui_artist.text())
+        lyrics = str(self._ui_lyrics.toPlainText()).strip()
+        year = int(''.join(x for x in self._ui_year.text() if x.isdigit()))
+
+        if self._mode == SongDialog.MODE_CREATE:
+            entity = Application.instance().library.create(name=title, entity_type=DNA.TYPE_SONG)
+        else:
+            entity = self._entity
+
+        entity.name = title
+        entity.album = album
+        entity.artist = artist
+        entity.lyrics = lyrics
+        entity.year = year
+        entity.update()
+
+        self.changed.emit()
+        self.accept()
+
+    def set_entity(self, entity):
+        """Set entity to edit"""
+
+        self._entity = entity
+
+        self.setWindowTitle("Edit song" if entity else "Add song")
+
+        if entity:
+            self._ui_title.setText(entity.name)
+            self._ui_album.setText(entity.album)
+            self._ui_artist.setText(entity.artist)
+            self._ui_lyrics.setText(entity.lyrics)
+            self._ui_year.setText(str(entity.year))
+
+            self._mode = SongDialog.MODE_UPDATE
+        else:
+            self._ui_title.setText('')
+            self._ui_album.setText('')
+            self._ui_artist.setText('')
+            self._ui_lyrics.setText('')
+            self._ui_year.setText('')
+
+            self._mode = SongDialog.MODE_CREATE
 
 
 class LibraryViewer(Viewer):
@@ -47,6 +184,8 @@ class LibraryViewer(Viewer):
         self.song_dialog.changed.connect(self._update)
 
         self.connect('/app/close', self._close)
+
+        self.library.entity_added.connect(self._update)
         self.library.entity_changed.connect(self._update)
         self.library.entity_removed.connect(self._update)
 
@@ -66,6 +205,7 @@ class LibraryViewer(Viewer):
         self._ui_search.focusOut.connect(self._search_focus_out)
 
         self._ui_search_layout = VLayout()
+        self._ui_search_layout.setContentsMargins(8, 8, 8, 8)
         self._ui_search_layout.addWidget(self._ui_search)
 
         self._ui_search_widget = QWidget()
@@ -223,12 +363,7 @@ class LibraryViewer(Viewer):
         if not item:
             return
 
-        entity = item.object()
-
-        if isinstance(entity, Verse):
-            self.emit('/message/preview', "%s\n%s" % (entity.text, entity.reference))
-        elif isinstance(entity, SongEntity):
-            self.emit('/message/preview', entity.lyrics)
+        self.emit('!cue/preview', item.object())
 
     def _item_doubleclicked(self, item):
         """List item double-clicked"""

@@ -12,9 +12,11 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
-from grail.core import Configurator, Plugin, Viewer
-from grailkit.qt import List, ListItem, Switch, Application, Button, VLayout, Label, Spacer, Toolbar
+import grailkit.dna as dna
+from grailkit.qt import *
 from grailkit.bible import BibleHost, BibleHostError
+
+from grail.core import Configurator, Plugin, Viewer
 
 
 class GeneralConfigurator(Configurator):
@@ -22,6 +24,7 @@ class GeneralConfigurator(Configurator):
 
     id = 'general-configurator'
     name = 'General'
+    index = -100
     author = 'Grail Team'
     description = 'General configuration page'
 
@@ -32,31 +35,40 @@ class GeneralConfigurator(Configurator):
 
     def __ui__(self):
 
+        self.ui_layout = QGridLayout()
+
+        # Reset
         self.ui_reset_btn = Button("Restore")
         self.ui_reset_btn.clicked.connect(self.restore_action)
         self.ui_reset_label = QLabel("Restore Grail to it's original state")
 
+        self.ui_layout.addWidget(self.ui_reset_btn, 0, 1, Qt.AlignRight)
+        self.ui_layout.addWidget(self.ui_reset_label, 0, 0, Qt.AlignLeft)
+
+        # Import
         self.ui_import_btn = Button("Import library")
         self.ui_import_btn.clicked.connect(self.import_action)
         self.ui_import_label = QLabel("Add songs from a library file.")
 
+        self.ui_layout.addWidget(self.ui_import_btn, 1, 1, Qt.AlignRight)
+        self.ui_layout.addWidget(self.ui_import_label, 1, 0, Qt.AlignLeft)
+
+        # Export
         self.ui_export_btn = Button("Export library")
         self.ui_export_btn.clicked.connect(self.export_action)
         self.ui_export_label = QLabel("Save my library of songs to file.")
 
-        self.ui_layout = QGridLayout()
-
-        self.ui_layout.addWidget(self.ui_reset_btn, 0, 1, Qt.AlignRight)
-        self.ui_layout.addWidget(self.ui_reset_label, 0, 0, Qt.AlignLeft)
-
-        self.ui_layout.addWidget(self.ui_import_btn, 1, 1, Qt.AlignRight)
-        self.ui_layout.addWidget(self.ui_import_label, 1, 0, Qt.AlignLeft)
-
         self.ui_layout.addWidget(self.ui_export_btn, 2, 1, Qt.AlignRight)
         self.ui_layout.addWidget(self.ui_export_label, 2, 0, Qt.AlignLeft)
 
-        self.ui_layout.addWidget(Switch(), 3, 1, Qt.AlignRight)
-        self.ui_layout.addWidget(Label("Continue last project on startup"), 3, 0, Qt.AlignLeft)
+        # Continue last project
+        self.ui_continue = Switch()
+        self.ui_continue.setValue(self.app.settings.get('project/continue', default=False))
+        self.ui_continue.changed.connect(self.continue_action)
+        self.ui_continue_label = Label("Continue last project on startup")
+
+        self.ui_layout.addWidget(self.ui_continue, 3, 1, Qt.AlignRight)
+        self.ui_layout.addWidget(self.ui_continue_label, 3, 0, Qt.AlignLeft)
 
         self.ui_layout.addWidget(Spacer(), 4, 0)
         self.ui_layout.setColumnStretch(0, 1)
@@ -69,25 +81,63 @@ class GeneralConfigurator(Configurator):
         This menu_action will remove all songs and clear all preferences
         """
 
-        # Todo: implement this
-        pass
+        message = MessageDialog(title="Restore settings",
+                                text="Do you want to restore all setting and library to defaults?",
+                                buttons=[MessageDialog.Cancel, MessageDialog.RestoreDefaults],
+                                icon=MessageDialog.Warning)
+
+        if message.exec_() != MessageDialog.RestoreDefaults:
+            return False
+
+        # clear library
+        self.app.library.clear()
 
     def import_action(self):
         """Import a library of songs to grail"""
 
-        path, ext = QFileDialog.getOpenFileName(self, "Import...", "", "*.grail-library")
+        location = QStandardPaths.locate(QStandardPaths.DocumentsLocation, "",
+                                         QStandardPaths.LocateDirectory)
+        path, ext = QFileDialog.getOpenFileName(self, "Import...", location, "*.grail-library")
 
-        # Todo: implement this
-        pass
+        if not path:
+            return False
+
+        try:
+            library = dna.Library(path, create=False)
+            items = library.items()
+            progress = ProgressDialog(title="Importing...", text="Importing items to library")
+            progress.setAutoClose(True)
+            progress.setMaximum(len(items))
+            progress.show()
+
+            for index, entity in enumerate(items):
+                self.app.library.copy(entity)
+                progress.setValue(index)
+
+            MessageDialog.information(title="Import",
+                          text="Items from <b>%s</b> imported successfully." % path).exec_()
+        except dna.DNAError:
+            MessageDialog.warning(title="Updates",
+                          text="Unable to check for updates...").exec_()
+
+            return False
 
     def export_action(self):
         """Create a library file"""
 
-        library_name = "untitled"
-        path, ext = QFileDialog.getSaveFileName(self, "Export...", library_name, "*.grail-library")
+        location = QStandardPaths.locate(QStandardPaths.DocumentsLocation, "",
+                                         QStandardPaths.LocateDirectory)
+        path, ext = QFileDialog.getSaveFileName(self, "Export library...", location, "*.grail-library")
 
-        # Todo: implement this
-        pass
+        if not path:
+            return False
+
+        self.app.library.save_copy(path, create=True)
+
+    def continue_action(self, flag):
+        """Continue last project"""
+
+        self.app.settings.set('project/continue', flag)
 
 
 class BibleConfigurator(Configurator):
@@ -95,6 +145,7 @@ class BibleConfigurator(Configurator):
 
     id = 'bible-configurator'
     name = 'Bible'
+    index = -98
     author = 'Grail Team'
     description = 'Configuration page for bibles'
 
@@ -185,6 +236,7 @@ class PluginsConfigurator(Configurator):
 
     id = 'plugins-configurator'
     name = 'Plugins'
+    index = -99
     author = 'Grail Team'
     description = 'View and configure plugins'
 
@@ -192,7 +244,7 @@ class PluginsConfigurator(Configurator):
         super(PluginsConfigurator, self).__init__(parent)
 
         self.__ui__()
-        self._clicked()
+        self.clicked()
 
     def __ui__(self):
 
@@ -206,14 +258,45 @@ class PluginsConfigurator(Configurator):
 
         self.setLayout(self._ui_layout)
 
-    def _clicked(self):
+    def clicked(self):
         """Update list of plugins"""
 
         self._ui_list.clear()
 
         for plug in Plugin.plugins() + Viewer.plugins() + Configurator.plugins():
-            text = "%s by %s\n%s" % (plug.name, plug.author, plug.description)
-            item = ListItem(text)
-            item.setData(Qt.UserRole, text)
+            text = "<small>by %s</small><br/>%s" % (plug.author, plug.description)
+            item = ListItem()
+
+            custom = _PluginItem(self._ui_list, plug.name, text)
 
             self._ui_list.addItem(item)
+            self._ui_list.setItemWidget(item, custom)
+            item.setSizeHint(custom.sizeHint())
+
+
+class _PluginItem(QWidget):
+
+    def __init__(self, parent, title, text):
+        super(_PluginItem, self).__init__()
+
+        self._parent = parent
+
+        self._title = Label(title)
+        self._title.setStyleSheet("font-weight: bold;margin: 0 0 4px 0;")
+
+        self._text = Label(text)
+        self._text.setStyleSheet("color: #bbb;margin: 0 2px 0 2px;")
+
+        self._layout = VLayout()
+        self._layout.addWidget(self._title)
+        self._layout.addWidget(self._text)
+
+        self.setLayout(self._layout)
+
+    def minimumSizeHint(self):
+
+        return QSize(0, QWidget.minimumSizeHint(self).height() + 10)
+
+    def sizeHint(self):
+
+        return QSize(0, QWidget.sizeHint(self).height() + 10)

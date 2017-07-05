@@ -9,3 +9,4 @@
 
 from .plugin import Plugin, Viewer, Configurator
 from .executor import Executor
+from .osc_host import OSCHost

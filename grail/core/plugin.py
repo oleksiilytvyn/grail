@@ -118,10 +118,10 @@ class _PluginMeta(object):
         pass
 
     @classmethod
-    def plugins(cls):
+    def plugins(cls, sort_reverse=True, sort_key=lambda x: str(x)):
         """Returns list of classes extended from Plugin in alphabetical order"""
 
-        return sorted(cls.__registry__, key=lambda x: str(x), reverse=True)
+        return sorted(cls.__registry__, key=sort_key, reverse=sort_reverse)
 
 
 class Plugin(_PluginMeta, metaclass=PluginRegistry):
@@ -358,6 +358,8 @@ class Viewer(Component, _PluginMeta, metaclass=_ComponentPluginRegistry):
 
 class Configurator(Component, _PluginMeta, metaclass=_ComponentPluginRegistry):
     """Visual plugin that will be shown in settings dialog as page"""
+
+    index = 0
 
     def __init__(self, parent=None):
         Component.__init__(self, parent)

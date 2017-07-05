@@ -11,6 +11,7 @@
 
 # configurators
 from .configurators import *
+from .osc_configurators import *
 
 # viewers
 from .empty_viewer import EmptyViewer

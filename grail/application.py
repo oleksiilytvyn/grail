@@ -17,13 +17,12 @@ from PyQt5.QtCore import QFile, pyqtSignal
 from grailkit.dna import SettingsFile, Project, Library
 from grailkit.bible import BibleHost
 from grailkit.qt import Application, MessageDialog
-from grailkit.osc import OSCClient
 from grailkit.core import Signalable
 
 import grail
 import grail.resources
 from grail.ui import MainWindow, WelcomeDialog
-from grail.core import Plugin, Viewer, Executor
+from grail.core import Plugin, Viewer, Executor, OSCHost
 
 # load internal plugins and viewers
 from grail.plugins import *
@@ -53,7 +52,7 @@ class Grail(Application):
         self._relaunch = False
         self._relaunch_args = []
         self._settings = SettingsFile(grail.SETTINGS_PATH, create=True)
-        self._osc_host = OSCClient()
+        self._osc_host = OSCHost()
         self._midi_host = None
         self._project = None
         self._library = None
@@ -84,34 +83,50 @@ class Grail(Application):
 
     @property
     def settings(self):
+        """Returns global grail settings"""
+
         return self._settings
 
     @property
     def project(self):
+        """Returns DNAProject instance"""
+
         return self._project
 
     @property
     def bible(self):
+        """Returns Bible instance"""
+
         return self._bible
 
     @property
     def library(self):
+        """Returns Grail library"""
+
         return self._library
 
     @property
     def executor(self):
+        """Returns executor instance"""
+
         return self._executor
 
     @property
     def signals(self):
+        """Returns signals"""
+
         return self._signals
 
     @property
     def osc(self):
+        """Returns OSC in/out host"""
+
         return self._osc_host
 
     @property
     def midi(self):
+        """Returns midi in/out host"""
+
         return self._midi_host
 
     def moreThanOneInstanceAllowed(self):

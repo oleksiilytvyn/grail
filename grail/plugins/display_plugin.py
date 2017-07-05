@@ -15,9 +15,10 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
 from grailkit.util import OS_MAC
-from grailkit.qt import Frameless, Dialog, VLayout, Spacer
+from grailkit.dna import DNA
+from grailkit.qt import *
 
-from grail.core import Plugin
+from grail.core import Plugin, Viewer, Configurator
 
 
 class DisplayPlugin(Plugin):
@@ -55,11 +56,12 @@ class DisplayPlugin(Plugin):
         self.register_action("Toggle test card", self.testcard_action)
         self.register_action("Advanced preferences...", self.preferences_action)
 
-        # Connect signals
-        self.connect('/app/close', self.close)
-
         self.window = DisplayWindow()
         self.preferences_dialog = PreferencesDialog()
+
+        # Connect signals
+        self.connect('/app/close', self.close)
+        self.connect('!cue/execute', self._execute)
 
         desktop = QApplication.desktop()
         desktop.resized.connect(self._screens_changed)
@@ -101,6 +103,17 @@ class DisplayPlugin(Plugin):
         self.window.close()
         self.preferences_dialog.close()
 
+    def _execute(self, cue):
+
+        if cue.type == DNA.TYPE_SONG:
+            text = cue.lyrics
+        elif cue.type == DNA.TYPE_VERSE:
+            text = "%s<br/><small>%s</small>" % (cue.text, cue.reference)
+        else:
+            text = cue.name
+
+        self.window.setText(text)
+
     def _screens_changed(self):
         """Display configuration changed"""
 
@@ -116,6 +129,26 @@ class DisplayWindow(Frameless):
         self._position = QPoint(0, 0)
         self._display_test = False
 
+        self._text = ""
+        self._style_color = QColor('#fff')
+        self._style_background = QColor('#222')
+        self._style_case_transform = False
+        self._style_font = QFont('decorative', 28)
+
+        self._shadow_x = 0
+        self._shadow_y = 5
+        self._shadow_blur = 0
+        self._shadow_color = QColor("#000000")
+
+        self._padding = QMargins(10, 10, 10, 10)
+        self._align_horizontal = Qt.AlignHCenter
+        self._align_vertical = Qt.AlignVCenter
+
+        self._transform = QTransform()
+        self._composition = QRect(0, 0, 800, 600)
+        self._fullscreen = False
+        self._geometry = QRect(100, 100, 800, 600)
+
         self.setGeometry(100, 100, 800, 600)
         self.setFixedSize(800, 600)
         self.setWindowTitle("Display")
@@ -129,6 +162,7 @@ class DisplayWindow(Frameless):
         """Draw image"""
 
         output = event.rect()
+        composition = output
 
         painter = QPainter()
         painter.begin(self)
@@ -136,8 +170,25 @@ class DisplayWindow(Frameless):
 
         painter.fillRect(output, Qt.black)
 
+        # corner-pin transform
+        t = QTransform()
+        q = QPolygonF([QPointF(0, 0),
+                       QPointF(composition.width(), 0),
+                       QPointF(composition.width(), composition.height()),
+                       QPointF(0, composition.height())])
+        p = QPolygonF([QPointF(0, 0),
+                       QPointF(output.width(), 0),
+                       QPointF(output.width(), output.height()),
+                       QPointF(0, output.height())])
+
+        QTransform.quadToQuad(QPolygonF(q), QPolygonF(p), t)
+        world_transform = t * self._transform
+        painter.setTransform(world_transform)
+
         if self._display_test:
             painter.drawPixmap(output, self._generate_testcard(output.width(), output.height()))
+        else:
+            self._draw_text(painter)
 
         painter.end()
 
@@ -161,6 +212,33 @@ class DisplayWindow(Frameless):
 
         self._display_test = flag
         self.update()
+
+    def setText(self, text):
+        self._text = text
+        self.update()
+
+    def _draw_text(self, painter):
+        """Draw text"""
+
+        painter.setFont(self._style_font)
+        painter.setPen(self._shadow_color)
+
+        padding = self._padding
+
+        box = QRect(self._composition.topLeft(), self._composition.bottomRight())
+        box.adjust(padding.left(), padding.top(), -padding.right(), -padding.bottom())
+        box.setX(box.x() + self._shadow_x)
+        box.setY(box.y() + self._shadow_y)
+
+        painter.drawText(box, self._align_vertical | self._align_horizontal | Qt.TextWordWrap, self._text)
+
+        painter.setPen(self._style_color)
+
+        box = QRect(self._composition.topLeft(), self._composition.bottomRight())
+        box.adjust(padding.left(), padding.top(), -padding.right(), -padding.bottom())
+
+        painter.drawText(box, self._align_vertical | self._align_horizontal | Qt.TextWordWrap, self._text)
+
 
     @classmethod
     def _generate_testcard(cls, width, height):
@@ -220,6 +298,7 @@ class DisplayWindow(Frameless):
 
 
 class PreferencesDialog(Dialog):
+    """Display preferences window"""
 
     def __init__(self, parent=None):
         super(PreferencesDialog, self).__init__(parent)
@@ -240,3 +319,58 @@ class PreferencesDialog(Dialog):
         self.setGeometry(100, 100, 480, 360)
         self.setMinimumSize(300, 200)
         self.moveCenter()
+
+
+class DisplayPreviewViewer(Viewer):
+    """Preview display output in a Viewer"""
+
+    id = "display-preview-viewer"
+    name = "Preview"
+    author = "Grail Team"
+    description = "Preview items from library and cuelists"
+
+    def __init__(self, *args, **kwargs):
+        super(DisplayPreviewViewer, self).__init__(*args, **kwargs)
+
+        self.connect('!cue/preview', self._preview)
+
+        self.__ui__()
+
+    def __ui__(self):
+
+        self._label = Label()
+        self._label.setAlignment(Qt.AlignCenter | Qt.AlignCenter)
+        self._label.setObjectName("DisplayPreviewViewer_label")
+
+        self._ui_view_action = QToolButton()
+        self._ui_view_action.setText("View")
+        self._ui_view_action.setIcon(Icon.colored(':/icons/menu.png', QColor('#555'), QColor('#e3e3e3')))
+        self._ui_view_action.clicked.connect(self.view_action)
+
+        self._ui_toolbar = Toolbar()
+        self._ui_toolbar.setObjectName("DisplayPreviewViewer_toolbar")
+        self._ui_toolbar.addWidget(self._ui_view_action)
+        self._ui_toolbar.addWidget(Spacer())
+
+        self._layout = VLayout()
+        self._layout.addWidget(self._label)
+        self._layout.addWidget(self._ui_toolbar)
+
+        self.setLayout(self._layout)
+
+    def _preview(self, cue):
+        """Handle !cue/preview signal"""
+
+        if cue.type == DNA.TYPE_SONG:
+            text = cue.lyrics
+        elif cue.type == DNA.TYPE_VERSE:
+            text = "%s<br/><small>%s</small>" % (cue.text, cue.reference)
+        else:
+            text = cue.name
+
+        self._label.setText(text)
+
+    def view_action(self):
+        """Replace current view with something other"""
+
+        self.plugin_menu().exec_(self._ui_toolbar.mapToGlobal(self._ui_view_action.pos()))

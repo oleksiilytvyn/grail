@@ -12,13 +12,13 @@
 import os
 import sys
 
-from grailkit import util
+from grailkit.util import application_location
 from grail.application import Grail
 
 
 if __name__ == "__main__":
 
-    os.chdir(util.path_app())
+    os.chdir(application_location())
 
     app = Grail(sys.argv)
     sys.exit(app.exec_())

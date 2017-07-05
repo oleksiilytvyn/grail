@@ -38,7 +38,7 @@ class PreferencesDialog(Dialog):
 
         self._ui_panel = QStackedWidget()
 
-        plugins = Configurator.plugins()
+        plugins = Configurator.plugins(sort_key=lambda x: x.index, sort_reverse=False)
 
         for index, plug in enumerate(plugins):
             panel = plug()

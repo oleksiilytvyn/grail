@@ -15,7 +15,7 @@ import sys
 
 import grailkit
 from grailkit import util
-from grailkit.util import path_appdata
+from grailkit.util import data_location, application_location
 
 from grail.application import Grail
 
@@ -27,7 +27,7 @@ ORGANISATION_NAME = "Grail"
 ORGANISATION_DOMAIN = "grailapp.com"
 
 LIBRARY_PATH = grailkit.PATH_LIBRARY
-SETTINGS_PATH = os.path.join(path_appdata("grail"), "app.grail")
+SETTINGS_PATH = os.path.join(data_location("grail"), "app.grail")
 
 DEBUG = False
 
@@ -35,7 +35,7 @@ DEBUG = False
 def main():
     """Run Grail application from location of installation"""
 
-    os.chdir(util.path_app())
+    os.chdir(application_location())
 
     app = Grail(sys.argv)
     sys.exit(app.exec_())

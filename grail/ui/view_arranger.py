@@ -46,6 +46,9 @@ class ViewArranger(Component):
         sizes = []
 
         for view in views:
+            if not view:
+                continue
+
             if isinstance(view, dict):
                 viewer = self._create(view['view/id'], splitter, view)
 

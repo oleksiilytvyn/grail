@@ -8,13 +8,13 @@ The goal of project to provide beautiful, simple and fast application for christ
 ## Dependencies ##
 
 * Python 3.3 or higher
-* PyQt 5 or higher
-* grailkit (https://bitbucket.org/grailapp/grailkit or pip install grailkit)
+* PyQt 5
+* grailkit (https://bitbucket.org/grailapp/grailkit)
 
-If you want to build, you also need:
+If you want to build from source, you also need:
 
 * cx_Freeze 5.0 or higher
-* hgapi (https://bitbucket.org/haard/hgapi)
+* hgapi
 * pyrcc5 terminal utility (bundled with Qt)
 
 ## Running from sources ##

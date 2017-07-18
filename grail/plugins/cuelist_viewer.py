@@ -15,12 +15,14 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
 from grailkit.dna import DNA
-from grailkit.qt import Popup, Application, Spacer, MessageDialog, Toolbar, Tree, TreeItem, VLayout, Label
+from grailkit.qt import *
 
 from grail.core import Viewer
 
 
 class CuelistDialog(Popup):
+
+    selected = pyqtSignal(int)
 
     def __init__(self):
         super(CuelistDialog, self).__init__()
@@ -105,6 +107,7 @@ class CuelistDialog(Popup):
 
         if item:
             self._app.signals.emit('/cuelist/selected', item.cuelist_id)
+            self.selected.emit(item.cuelist_id)
 
     def _list_cell_changed(self, row, column):
 
@@ -250,25 +253,98 @@ class CuelistsListWidget(QTableWidget):
         self.scrollToItem(self.item(x, 0))
 
 
+class CueDialog(Dialog):
+
+    def __init__(self, viewer):
+        super(CueDialog, self).__init__()
+
+        self._viewer = viewer
+        self.__ui__()
+
+    def __ui__(self):
+        """Build UI"""
+
+        self._ui_title = LineEdit()
+        self._ui_title.setPlaceholderText("Cue name")
+        self._ui_title.setAttribute(Qt.WA_MacShowFocusRect, 0)
+
+        self._ui_artist = LineEdit()
+        self._ui_artist.setPlaceholderText("Artist name")
+        self._ui_artist.setAttribute(Qt.WA_MacShowFocusRect, 0)
+
+        self._ui_album = LineEdit()
+        self._ui_album.setPlaceholderText("Album")
+        self._ui_album.setAttribute(Qt.WA_MacShowFocusRect, 0)
+
+        self._ui_year = LineEdit()
+        self._ui_year.setPlaceholderText("Year")
+        self._ui_year.setAttribute(Qt.WA_MacShowFocusRect, 0)
+
+        self._ui_lyrics = TextEdit()
+        self._ui_lyrics.setPlaceholderText("Lyrics")
+        self._ui_lyrics.setAttribute(Qt.WA_MacShowFocusRect, 0)
+        self._ui_lyrics.setAcceptRichText(False)
+
+        policy = self._ui_lyrics.sizePolicy()
+        policy.setVerticalStretch(1)
+
+        self._ui_lyrics.setSizePolicy(policy)
+
+        self._ui_button_ok = Button("Ok")
+        self._ui_button_ok.clicked.connect(self.accept_action)
+
+        self._ui_button_cancel = Button("Cancel")
+        self._ui_button_cancel.clicked.connect(self.reject_action)
+
+        self._ui_buttons = HLayout()
+        self._ui_buttons.setSpacing(10)
+        self._ui_buttons.setContentsMargins(0, 0, 0, 0)
+        self._ui_buttons.addWidget(Spacer())
+        self._ui_buttons.addWidget(self._ui_button_cancel)
+        self._ui_buttons.addWidget(self._ui_button_ok)
+
+        self._ui_layout = QGridLayout()
+        self._ui_layout.setSpacing(8)
+        self._ui_layout.setContentsMargins(12, 12, 12, 10)
+        self._ui_layout.setColumnMinimumWidth(0, 200)
+
+        self._ui_layout.addWidget(self._ui_title, 1, 0, 1, 2)
+        self._ui_layout.addWidget(self._ui_album, 3, 0, 1, 2)
+        self._ui_layout.addWidget(self._ui_artist, 5, 0)
+        self._ui_layout.addWidget(self._ui_year, 5, 1)
+        self._ui_layout.addWidget(self._ui_lyrics, 7, 0, 1, 2)
+        self._ui_layout.addLayout(self._ui_buttons, 8, 0, 1, 2)
+
+        self.setLayout(self._ui_layout)
+        self.setWindowIcon(QIcon(':/icons/32.png'))
+        self.setWindowTitle('Edit Cue')
+        self.setGeometry(300, 300, 300, 400)
+        self.setMinimumSize(300, 400)
+        self.setWindowFlags(Qt.WindowCloseButtonHint)
+
+    def accept_action(self):
+        pass
+
+    def reject_action(self):
+        pass
+
+    def set_entity(self, entity):
+        """Update edited entity information"""
+
+        pass
+
+
 class CuelistViewer(Viewer):
     """Library viewer
 
     Connected:
         '/app/close'
-        '/cuelist/selected'
         '/cuelist/add'
 
     Emits:
         !cue/execute <message:DNAEntity>
         !cue/preview <message:DNAEntity>
-        /cuelist/selected <id:int>
     """
-
-    # todo: Add cue edit dialog
-    # todo: Add cuelist locking
-    # todo: Add color context menu to cues
-    # todo: Add 'Create cue' button
-    # todo: Make previous item selected after deletion
 
     id = 'cuelist'
     name = 'Cuelist'
@@ -281,6 +357,9 @@ class CuelistViewer(Viewer):
         self._locked = False
         self._cuelist_id = self.project.settings().get('cuelist/current', default=0)
         self._dialog = CuelistDialog()
+        self._dialog.selected.connect(self.cuelist_selected)
+        self._cuedialog = CueDialog(self)
+        self._selected_id = None
 
         # Track project changes
         self.project.entity_changed.connect(self._update)
@@ -288,7 +367,6 @@ class CuelistViewer(Viewer):
 
         # Application signals
         self.connect('/app/close', self._close)
-        self.connect('/cuelist/selected', self.cuelist_selected)
         self.connect('/cuelist/add', self._add_entity)
 
         self.__ui__()
@@ -312,6 +390,7 @@ class CuelistViewer(Viewer):
         self._ui_tree.itemCollapsed.connect(self._item_collapsed)
         self._ui_tree.itemClicked.connect(self._item_clicked)
         self._ui_tree.itemDoubleClicked.connect(self._item_double_clicked)
+        self._ui_tree.currentItemChanged.connect(self._item_clicked)
 
         # Empty
         self._ui_empty_title = Label("No Cuelist")
@@ -350,9 +429,14 @@ class CuelistViewer(Viewer):
         self._ui_view_action.setIcon(QIcon(':/icons/menu.png'))
         self._ui_view_action.clicked.connect(self.view_action)
 
+        self._ui_add_action = QAction(QIcon(':/icons/add.png'), 'Add node', self)
+        self._ui_add_action.setIconVisibleInMenu(True)
+        self._ui_add_action.triggered.connect(self.add_action)
+
         self._ui_toolbar = Toolbar()
         self._ui_toolbar.addWidget(self._ui_view_action)
         self._ui_toolbar.addWidget(self._ui_label)
+        self._ui_toolbar.addAction(self._ui_add_action)
 
         self._ui_layout.addWidget(self._ui_stack)
         self._ui_layout.addWidget(self._ui_toolbar)
@@ -372,15 +456,36 @@ class CuelistViewer(Viewer):
         self._dialog.update_list()
         self._dialog.showAt(self.mapToGlobal(point))
 
+    def add_action(self):
+        """Add new entity"""
+
+        self.project.cuelist(self._cuelist_id).create("Untitled item")
+
     def item_delete(self, item):
         """Remove cue item menu_action"""
 
+        if not item:
+            return False
+
+        above = self._ui_tree.itemAbove(item)
+
+        if above:
+            self._selected_id = above.object().id
+
+        # remove selected item
         item.object().delete()
 
     def item_edit(self, item):
         """Edit cue menu_action"""
 
-        print('edit', item)
+        return False
+
+        # entity = item.object()
+
+        # if entity:
+        #     self._cuedialog.set_entity(entity)
+        #     self._cuedialog.show()
+        #     self._cuedialog.raise_()
 
     def _update(self, *args):
 
@@ -394,6 +499,7 @@ class CuelistViewer(Viewer):
         self._cuelist_id = cuelist_id
         cuelist = self.project.cuelist(cuelist_id)
         dna = self.project.dna
+        selected_item = None
 
         if cuelist is None:
             self._ui_label.setText("...")
@@ -405,10 +511,12 @@ class CuelistViewer(Viewer):
         self._ui_tree.clear()
 
         self.project.settings().set('cuelist/current', cuelist_id)
-
         self._ui_label.setText("%s <small>(%d cues)</small>" % (cuelist.name, len(cuelist)))
 
         def add_childs(tree_item, parent_id):
+            nonlocal selected_item
+            # nonlocal self
+
             for child in dna.childs(parent_id):
                 child_item = TreeItem(child)
                 child_item.setText(0, child.name)
@@ -418,6 +526,9 @@ class CuelistViewer(Viewer):
                 tree_item.addChild(child_item)
                 child_item.setExpanded(bool(child.get('expanded', default=False)))
 
+                if child.id == self._selected_id:
+                    selected_item = item
+
         for entity in cuelist.cues():
             item = TreeItem(entity)
             item.setText(0, entity.name)
@@ -426,6 +537,13 @@ class CuelistViewer(Viewer):
 
             self._ui_tree.addTopLevelItem(item)
             item.setExpanded(bool(entity.get('expanded', default=False)))
+
+            if entity.id == self._selected_id:
+                selected_item = item
+
+        if selected_item:
+            index = self._ui_tree.indexFromItem(selected_item)
+            self._ui_tree.setCurrentIndex(index)
 
     def _add_entity(self, entity):
         """Add entity to cuelist"""
@@ -454,11 +572,21 @@ class CuelistViewer(Viewer):
     def _item_clicked(self, item):
         """Preview cue text"""
 
+        if not item:
+            return False
+
+        self._selected_id = item.object().id
+
         self.emit('!node/selected', item.object().id)
         self.emit('!cue/preview', item.object())
 
     def _item_double_clicked(self, item):
         """Send cue text"""
+
+        if not item:
+            return False
+
+        self._selected_id = item.object().id
 
         self.emit('!cue/execute', item.object())
 
@@ -476,7 +604,7 @@ class CuelistViewer(Viewer):
             edit_action = QAction('Edit cue', menu)
             edit_action.triggered.connect(lambda: self.item_edit(item))
 
-            menu.addAction(edit_action)
+            # menu.addAction(edit_action)
             menu.addAction(delete_action)
 
             menu.exec_(self._ui_tree.mapToGlobal(pos))

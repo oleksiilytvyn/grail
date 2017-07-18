@@ -256,7 +256,11 @@ class MainWindow(QMainWindow):
         """Create a new project"""
 
         project_name = "untitled"
-        path, ext = QFileDialog.getSaveFileName(self, "New project", project_name, "*.grail")
+        location = QStandardPaths.locate(QStandardPaths.DocumentsLocation, "",
+                                         QStandardPaths.LocateDirectory)
+        location = os.path.join(location, project_name)
+
+        path, ext = QFileDialog.getSaveFileName(self, "New project", location, "*.grail")
 
         if path:
             self.app.open(path, create=True)
@@ -264,7 +268,9 @@ class MainWindow(QMainWindow):
     def open_project(self):
         """Open an existing file"""
 
-        path, ext = QFileDialog.getOpenFileName(self, "Open File...", "", "*.grail")
+        location = QStandardPaths.locate(QStandardPaths.DocumentsLocation, "",
+                                         QStandardPaths.LocateDirectory)
+        path, ext = QFileDialog.getOpenFileName(self, "Open File...", location, "*.grail")
 
         if path:
             self.app.open(path, create=False)
@@ -279,7 +285,11 @@ class MainWindow(QMainWindow):
         """Save current project as another project"""
 
         project_name = "%s copy" % (self.project.name, )
-        path, ext = QFileDialog.getSaveFileName(self, "Save project as", project_name, "*.grail")
+        location = QStandardPaths.locate(QStandardPaths.DocumentsLocation, "",
+                                         QStandardPaths.LocateDirectory)
+        location = os.path.join(location, project_name)
+
+        path, ext = QFileDialog.getSaveFileName(self, "Save project as", location, "*.grail")
 
         self.project.save_copy(path)
 
@@ -335,9 +345,7 @@ class MainWindow(QMainWindow):
 
             return True
         except ValueError:
-            pass
-
-        return False
+            return False
 
     def export_action(self):
         """Export library or project"""

@@ -16,7 +16,7 @@ from PyQt5.QtWidgets import *
 
 from grailkit.bible import Verse
 from grailkit.dna import DNA, SongEntity
-from grailkit.qt import SearchEdit, List, ListItem, Spacer, VLayout, Toolbar, Icon, Dialog, Button, HLayout, Application
+from grailkit.qt import *
 
 from grail.core import Viewer
 
@@ -40,25 +40,20 @@ class SongDialog(Dialog):
     def __ui__(self):
         """Create UI of this dialog"""
 
-        self._ui_title = QLineEdit()
+        self._ui_title = LineEdit()
         self._ui_title.setPlaceholderText("Song title")
-        self._ui_title.setAttribute(Qt.WA_MacShowFocusRect, 0)
 
-        self._ui_artist = QLineEdit()
+        self._ui_artist = LineEdit()
         self._ui_artist.setPlaceholderText("Artist name")
-        self._ui_artist.setAttribute(Qt.WA_MacShowFocusRect, 0)
 
-        self._ui_album = QLineEdit()
+        self._ui_album = LineEdit()
         self._ui_album.setPlaceholderText("Album")
-        self._ui_album.setAttribute(Qt.WA_MacShowFocusRect, 0)
 
-        self._ui_year = QLineEdit()
+        self._ui_year = LineEdit()
         self._ui_year.setPlaceholderText("Year")
-        self._ui_year.setAttribute(Qt.WA_MacShowFocusRect, 0)
 
-        self._ui_lyrics = QTextEdit()
+        self._ui_lyrics = TextEdit()
         self._ui_lyrics.setPlaceholderText("Lyrics")
-        self._ui_lyrics.setAttribute(Qt.WA_MacShowFocusRect, 0)
         self._ui_lyrics.setAcceptRichText(False)
 
         policy = self._ui_lyrics.sizePolicy()
@@ -285,7 +280,7 @@ class LibraryViewer(Viewer):
 
             self._ui_list.addItem(item)
 
-        # todo: show media items from library (limit to 6)
+        # xxx: show media items from library (limit to 6)
 
     def _search_key_event(self, event):
         """Process key evens before search menu_action begins"""
@@ -389,6 +384,7 @@ class LibraryViewer(Viewer):
     def add_item_action(self, entity):
         """Add item to cuelist"""
 
+        # xxx: cue will be added to all opened cuelists
         self.emit('/cuelist/add', entity)
 
     def delete_item_action(self, entity):

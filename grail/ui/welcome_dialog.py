@@ -12,6 +12,7 @@
 import os
 
 from PyQt5.QtGui import *
+from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
 from grailkit.qt import Dialog, Welcome, WelcomeAction
@@ -71,7 +72,9 @@ class WelcomeDialog(Dialog):
     def _open(self):
         """Open a existing project"""
 
-        path, ext = QFileDialog.getOpenFileName(self, "Open File...", "", "*.grail")
+        location = QStandardPaths.locate(QStandardPaths.DocumentsLocation, "",
+                                         QStandardPaths.LocateDirectory)
+        path, ext = QFileDialog.getOpenFileName(self, "Open File...", location, "*.grail")
 
         if path:
             self.app.open(path)
@@ -80,7 +83,11 @@ class WelcomeDialog(Dialog):
         """Create a new project"""
 
         project_name = "untitled"
-        path, ext = QFileDialog.getSaveFileName(self, "New project", project_name, "*.grail")
+        location = QStandardPaths.locate(QStandardPaths.DocumentsLocation, "",
+                                         QStandardPaths.LocateDirectory)
+        location = os.path.join(location, project_name)
+
+        path, ext = QFileDialog.getSaveFileName(self, "New project", location, "*.grail")
 
         if path:
             self.app.open(path, create=True)

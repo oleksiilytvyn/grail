@@ -24,22 +24,22 @@ OS_UNIX = platform.system() == "Linux"
 
 
 def get_revision():
-    """try to add revision number to version"""
+    """try to add revision number to version string"""
 
-    rev = grail.__version__
+    revision = grail.__version__
 
     try:
         import hgapi
 
-        repo = hgapi.Repo(os.path.abspath(os.curdir))
-        rev = "%sb%d" % (grail.__version__, repo['tip'].rev)
+        repository = hgapi.Repo(os.path.abspath(os.curdir))
+        revision = "%sb%d" % (grail.__version__, repository['tip'].rev)
     except ImportError:
-        print("Failed to get revision number. Install 'hgapi' python module")
-    except Exception as e:
-        print("Unable to get revision number")
-        print(e)
+        print("Failed to get revision number. Install 'hgapi' module.")
+    except Exception as error:
+        print("Unable to get revision number, following error occurred:")
+        print(error)
 
-    return rev
+    return revision
 
 
 def compile_resources():
@@ -48,11 +48,12 @@ def compile_resources():
     try:
         print("Building resource file")
         os.system("pyrcc5 -o grail/resources.py resources/resources.qrc")
-    except:
-        print("Failed to build resource file")
+    except Exception as error:
+        print("Failed to build resource file, following error occurred:")
+        print(error)
 
 
-def create_version_file(path, version):
+def create_version_file(path, revision):
     """Create .version file inside app directory"""
 
     directory = os.path.dirname(os.path.realpath(path))
@@ -63,21 +64,22 @@ def create_version_file(path, version):
     # add version file to build
     try:
         f = open(path, "w+")
-        f.write(version)
+        f.write(revision)
         f.close()
-    except:
-        print("Failed to create a version file")
+    except Exception as error:
+        print("Failed to create a version file, following error occurred:")
+        print(error)
 
 
 # Constants
-version = get_revision()
-version_path = "build/.version"
-application_title = "Grail"
-application_file = "grail.py"
-bundle_name = "%s-%s" % (application_title, version)
-app_bundle = "%s.app" % (bundle_name,)
-app_contents = "build/%s/Contents" % app_bundle
-app_resources = "%s/Resources" % app_contents
+VERSION = get_revision()
+VERSION_PATH = "build/.version"
+TITLE = "Grail"
+FILE = "grail.py"
+BUNDLE_NAME = "%s-%s" % (TITLE, VERSION)
+BUNDLE_FILE = "%s.app" % (BUNDLE_NAME,)
+BUNDLE_CONTENTS = "build/%s/Contents" % BUNDLE_FILE
+BUNDLE_RESOURCES = "%s/Resources" % BUNDLE_CONTENTS
 
 includes = ["atexit"]
 excludes = ["nt",
@@ -96,12 +98,14 @@ excludes = ["nt",
 files = [('LICENSE', 'LICENSE'),
          ('build/.version', '.version')]
 
+# compile Qt resources
 compile_resources()
-create_version_file(version_path, version)
+# Create new version file
+create_version_file(VERSION_PATH, VERSION)
 
 setup(
-    name=application_title,
-    version=version,
+    name=TITLE,
+    version=VERSION,
     url='http://grailapp.com/',
 
     author='Oleksii Lytvyn',
@@ -112,7 +116,6 @@ setup(
     license='GNU General Public License v3',
 
     requires=['grailkit', 'PyQt5'],
-    install_requires=['grailkit', 'PyQt5'],
 
     classifiers=[
         'Development Status :: 4 - Beta',
@@ -150,23 +153,22 @@ setup(
             "upgrade_code": "{1f82a4c1-681d-43c3-b1b6-d63788c147a0}"
             },
         "bdist_mac": {
-            "bundle_name": bundle_name,
-            # "qt_menu_nib": None
+            "bundle_name": BUNDLE_NAME,
             "custom_info_plist": "resources/bdist/Info.plist",
             "iconfile": "icon/grail.icns"
             },
         "bdist_dmg": {
-            "volume_label": application_title,
+            "volume_label": TITLE,
             "applications_shortcut": True
             }
         },
-    executables=[Executable(application_file,
+    executables=[Executable(FILE,
                             base="Win32GUI" if sys.platform == "win32" else None,
                             icon="icon/grail.ico",
                             compress=True,
-                            shortcutName=application_title,
+                            shortcutName=TITLE,
                             shortcutDir="ProgramMenuFolder")])
 
 # fix Mac OS app file
-if OS_MAC and os.path.exists(app_resources):
-    shutil.copyfile("resources/bdist/qt.conf", app_resources + '/qt.conf')
+if OS_MAC and os.path.exists(BUNDLE_RESOURCES):
+    shutil.copyfile("resources/bdist/qt.conf", BUNDLE_RESOURCES + '/qt.conf')

@@ -36,8 +36,14 @@ class DisplayPlugin(Plugin):
     author = 'Grail Team'
     description = 'Display 2d graphics in window or in fullscreen mode'
 
+    _instance = None
+
     def __init__(self):
         super(DisplayPlugin, self).__init__()
+
+        # Register instance
+        if not DisplayPlugin._instance:
+            DisplayPlugin._instance = self
 
         # Register menu items
         self.menu_disable = self.register_menu("Display->Disable", self.disable_action,
@@ -56,7 +62,7 @@ class DisplayPlugin(Plugin):
         self.register_action("Toggle test card", self.testcard_action)
         self.register_action("Advanced preferences...", self.preferences_action)
 
-        self.window = DisplayWindow()
+        self.window = DisplayWindow(self)
         self.preferences_dialog = PreferencesDialog()
 
         # Connect signals
@@ -68,6 +74,33 @@ class DisplayPlugin(Plugin):
         desktop.screenCountChanged.connect(self._screens_changed)
         desktop.workAreaResized.connect(self._screens_changed)
 
+        self._composition = CompositionTexture()
+
+        # render update loop
+        self._timer = QTimer()
+        self._timer.timeout.connect(self._render)
+        self._timer.start(1000 / 30)
+
+        self._render()
+
+    @property
+    def composition(self):
+        """Returns composition instance"""
+
+        return self._composition
+
+    def _render(self):
+        """Update composition and windows"""
+
+        # don't render if output disabled
+        # if self.disabled:
+        #    return False
+
+        # render a composition
+        self._composition.render()
+        # notify others
+        self.emit('!composition/update')
+
     def testcard_action(self, action=None):
         """Show or hide test card"""
 
@@ -76,7 +109,7 @@ class DisplayPlugin(Plugin):
             action = self.menu_testcard
             action.setChecked(not action.isChecked())
 
-        self.window.setTestCard(action.isChecked())
+        self._composition.setTestCard(action.isChecked())
 
     def preferences_action(self, action=None):
         """Show display preferences dialog"""
@@ -112,21 +145,76 @@ class DisplayPlugin(Plugin):
         else:
             text = cue.name
 
-        self.window.setText(text)
+        self._composition.setText(text)
 
     def _screens_changed(self):
         """Display configuration changed"""
 
         self.disable_action()
 
+    @classmethod
+    def instance(cls):
+        """Get instance of DisplayPlugin"""
+
+        return cls._instance
+
 
 class DisplayWindow(Frameless):
     """Window that displays 2d graphics"""
 
-    def __init__(self, parent=None):
-        super(DisplayWindow, self).__init__(parent)
+    def __init__(self, parent):
+        super(DisplayWindow, self).__init__(None)
 
         self._position = QPoint(0, 0)
+        self._plugin = parent
+
+        Application.instance().signals.connect('!composition/update', self.update)
+
+        self.setGeometry(100, 100, 800, 600)
+        self.setFixedSize(800, 600)
+        self.setWindowTitle("Display")
+        self.setWindowFlags((Qt.Dialog if OS_MAC else Qt.Tool) |
+                            Qt.FramelessWindowHint |
+                            Qt.WindowSystemMenuHint |
+                            Qt.WindowStaysOnTopHint)
+        self.moveCenter()
+
+    def paintEvent(self, event):
+        """Draw image"""
+
+        output = event.rect()
+        composition = output
+
+        painter = QPainter()
+        painter.begin(self)
+        painter.setRenderHints(QPainter.Antialiasing | QPainter.TextAntialiasing | QPainter.SmoothPixmapTransform)
+
+        painter.fillRect(output, Qt.black)
+        painter.drawImage(output, self._plugin.composition)
+
+        painter.end()
+
+    def hideEvent(self, event):
+
+        event.ignore()
+
+    def mousePressEvent(self, event):
+
+        self._position = event.globalPos()
+
+    def mouseMoveEvent(self, event):
+
+        delta = QPoint(event.globalPos() - self._position)
+
+        self.move(self.x() + delta.x(), self.y() + delta.y())
+        self._position = event.globalPos()
+
+
+class CompositionTexture(QImage):
+
+    def __init__(self):
+        super(CompositionTexture, self).__init__(QSize(800, 600), QImage.Format_RGB32)
+
         self._display_test = False
 
         self._text = ""
@@ -149,73 +237,31 @@ class DisplayWindow(Frameless):
         self._fullscreen = False
         self._geometry = QRect(100, 100, 800, 600)
 
-        self.setGeometry(100, 100, 800, 600)
-        self.setFixedSize(800, 600)
-        self.setWindowTitle("Display")
-        self.setWindowFlags((Qt.Dialog if OS_MAC else Qt.Tool) |
-                            Qt.FramelessWindowHint |
-                            Qt.WindowSystemMenuHint |
-                            Qt.WindowStaysOnTopHint)
-        self.moveCenter()
+    def render(self):
+        """Render composition"""
 
-    def paintEvent(self, event):
-        """Draw image"""
+        p = QPainter()
+        p.begin(self)
 
-        output = event.rect()
-        composition = output
-
-        painter = QPainter()
-        painter.begin(self)
-        painter.setRenderHints(QPainter.Antialiasing | QPainter.TextAntialiasing | QPainter.SmoothPixmapTransform)
-
-        painter.fillRect(output, Qt.black)
-
-        # corner-pin transform
-        t = QTransform()
-        q = QPolygonF([QPointF(0, 0),
-                       QPointF(composition.width(), 0),
-                       QPointF(composition.width(), composition.height()),
-                       QPointF(0, composition.height())])
-        p = QPolygonF([QPointF(0, 0),
-                       QPointF(output.width(), 0),
-                       QPointF(output.width(), output.height()),
-                       QPointF(0, output.height())])
-
-        QTransform.quadToQuad(QPolygonF(q), QPolygonF(p), t)
-        world_transform = t * self._transform
-        painter.setTransform(world_transform)
+        p.fillRect(self.rect(), Qt.black)
 
         if self._display_test:
-            painter.drawPixmap(output, self._generate_testcard(output.width(), output.height()))
+            p.drawPixmap(self.rect(), CompositionTexture.generate_testcard(self.width(), self.height()))
         else:
-            self._draw_text(painter)
+            self._draw_text(p)
 
-        painter.end()
-
-    def hideEvent(self, event):
-
-        event.ignore()
-
-    def mousePressEvent(self, event):
-
-        self._position = event.globalPos()
-
-    def mouseMoveEvent(self, event):
-
-        delta = QPoint(event.globalPos() - self._position)
-
-        self.move(self.x() + delta.x(), self.y() + delta.y())
-        self._position = event.globalPos()
+        p.end()
 
     def setTestCard(self, flag):
         """Show test card or not"""
 
         self._display_test = flag
-        self.update()
+        self.render()
 
     def setText(self, text):
+
         self._text = text
-        self.update()
+        self.render()
 
     def _draw_text(self, painter):
         """Draw text"""
@@ -239,9 +285,8 @@ class DisplayWindow(Frameless):
 
         painter.drawText(box, self._align_vertical | self._align_horizontal | Qt.TextWordWrap, self._text)
 
-
     @classmethod
-    def _generate_testcard(cls, width, height):
+    def generate_testcard(cls, width, height):
         """Generate test card QPixmap"""
 
         comp = QRect(0, 0, width, height)
@@ -297,6 +342,61 @@ class DisplayWindow(Frameless):
         return image
 
 
+class DisplayWidget(QWidget):
+    """Display composition texture in QWidget"""
+
+    def __init__(self, parent=None):
+        super(DisplayWidget, self).__init__(parent)
+
+        self._plugin = None
+        self._texture = None
+
+        parent.connect('!composition/update', self.repaint)
+
+    def paintEvent(self, event):
+
+        p = QPainter()
+        p.begin(self)
+        p.setRenderHints(QPainter.Antialiasing | QPainter.TextAntialiasing | QPainter.SmoothPixmapTransform)
+        p.fillRect(self.rect(), Qt.black)
+
+        # Connect texture if available
+        if not self._plugin:
+            self._plugin = DisplayPlugin.instance()
+            self._texture = self._plugin.composition if self._plugin else None
+
+        # draw texture
+        if self._texture:
+            s = self.size()
+            t = self._texture.size()
+
+            scale = min(s.width() / t.width(), s.height() / t.height()) * 0.9
+
+            w = t.width() * scale
+            h = t.height() * scale
+
+            x = s.width() / 2 - w / 2
+            y = s.height() / 2 - h / 2
+
+            p.fillRect(QRect(x - 1, y - 1, w + 2, h + 2), Qt.red)
+            p.drawImage(QRect(x, y, w, h), self._texture)
+
+        p.end()
+
+
+class TransformWidget(QWidget):
+    """Corner-pin transformation with composition display"""
+
+    def __init__(self, parent=None):
+        super(TransformWidget, self).__init__(parent)
+
+    def paintEvent(self, event):
+
+        p = QPainter()
+        p.begin(self)
+        p.end()
+
+
 class PreferencesDialog(Dialog):
     """Display preferences window"""
 
@@ -308,7 +408,7 @@ class PreferencesDialog(Dialog):
     def __ui__(self):
         """Build UI"""
 
-        self._ui_toolbar = QToolBar()
+        self._ui_toolbar = Toolbar()
 
         self._ui_layout = VLayout()
         self._ui_layout.addWidget(Spacer())
@@ -369,6 +469,45 @@ class DisplayPreviewViewer(Viewer):
             text = cue.name
 
         self._label.setText(text)
+
+    def view_action(self):
+        """Replace current view with something other"""
+
+        self.plugin_menu().exec_(self._ui_toolbar.mapToGlobal(self._ui_view_action.pos()))
+
+
+class DisplayViewer(Viewer):
+    """View composition output as viewer"""
+
+    id = "display-viewer"
+    name = "Display Output"
+    author = "Grail Team"
+    description = "View composition output"
+
+    def __init__(self, *args, **kwargs):
+        super(DisplayViewer, self).__init__(*args, **kwargs)
+
+        self.__ui__()
+
+    def __ui__(self):
+
+        self._widget = DisplayWidget(self)
+
+        self._ui_view_action = QToolButton()
+        self._ui_view_action.setText("View")
+        self._ui_view_action.setIcon(Icon.colored(':/icons/menu.png', QColor('#555'), QColor('#e3e3e3')))
+        self._ui_view_action.clicked.connect(self.view_action)
+
+        self._ui_toolbar = Toolbar()
+        self._ui_toolbar.setObjectName("DisplayPreviewViewer_toolbar")
+        self._ui_toolbar.addWidget(self._ui_view_action)
+        self._ui_toolbar.addWidget(Spacer())
+
+        self._layout = VLayout()
+        self._layout.addWidget(self._widget)
+        self._layout.addWidget(self._ui_toolbar)
+
+        self.setLayout(self._layout)
 
     def view_action(self):
         """Replace current view with something other"""

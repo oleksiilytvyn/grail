@@ -170,8 +170,6 @@ class LibraryViewer(Viewer):
     author = 'Grail Team'
     description = 'Manage grail library'
 
-    # todo: Add media items
-
     def __init__(self, *args):
         super(LibraryViewer, self).__init__(*args)
 
@@ -270,6 +268,19 @@ class LibraryViewer(Viewer):
 
             self._ui_list.addItem(item)
 
+        # Show bible full text search
+        for verse in self.bible.match_text(keyword, limit=2):
+            striped_keyword = keyword.lstrip().rstrip().lower()
+            striped_text = verse.text.lower()
+            start_index = striped_text.index(striped_keyword)
+
+            item = ListItem()
+            item.setIcon(icon_bible)
+            item.setText("...%s" % verse.text[start_index:])
+            item.setObject(verse)
+
+            self._ui_list.addItem(item)
+
         # show songs from library (limit to 9)
         for song in self.library.items(filter_keyword=keyword, filter_type=DNA.TYPE_SONG,
                                        sort="name", reverse=True, limit=9):
@@ -288,8 +299,8 @@ class LibraryViewer(Viewer):
         event_key = event.key()
 
         if event_key == Qt.Key_Return:
-            # to-do: self.showQuickAction()
-            pass
+            item = self._ui_list.item(0)
+            self.emit('!cue/execute', item.object())
 
         elif event_key == Qt.Key_Z and event.modifiers() & Qt.ControlModifier:
             # to-do: self.blackoutAction()

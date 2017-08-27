@@ -141,7 +141,7 @@ class DisplayPlugin(Plugin):
         if cue.type == DNA.TYPE_SONG:
             text = cue.lyrics
         elif cue.type == DNA.TYPE_VERSE:
-            text = "%s<br/><small>%s</small>" % (cue.text, cue.reference)
+            text = "%s\n%s" % (cue.text, cue.reference)
         else:
             text = cue.name
 
@@ -435,12 +435,20 @@ class DisplayPreviewViewer(Viewer):
         self.connect('!cue/preview', self._preview)
 
         self.__ui__()
+        self._label.setText(self.get('preview-text', default=""))
 
     def __ui__(self):
 
         self._label = Label()
         self._label.setAlignment(Qt.AlignCenter | Qt.AlignCenter)
         self._label.setObjectName("DisplayPreviewViewer_label")
+
+        self._frame = QScrollArea()
+        self._frame.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self._frame.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self._frame.setWidgetResizable(True)
+        self._frame.setStyleSheet("border: none;")
+        self._frame.setWidget(self._label)
 
         self._ui_view_action = QToolButton()
         self._ui_view_action.setText("View")
@@ -453,13 +461,13 @@ class DisplayPreviewViewer(Viewer):
         self._ui_toolbar.addWidget(Spacer())
 
         self._layout = VLayout()
-        self._layout.addWidget(self._label)
+        self._layout.addWidget(self._frame)
         self._layout.addWidget(self._ui_toolbar)
 
         self.setLayout(self._layout)
 
     def _preview(self, cue):
-        """Handle !cue/preview signal"""
+        """Handle '!cue/preview' signal"""
 
         if cue.type == DNA.TYPE_SONG:
             text = cue.lyrics
@@ -468,6 +476,7 @@ class DisplayPreviewViewer(Viewer):
         else:
             text = cue.name
 
+        self.set('preview-text', text)
         self._label.setText(text)
 
     def view_action(self):

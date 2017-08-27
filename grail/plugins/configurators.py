@@ -189,12 +189,17 @@ class BibleConfigurator(Configurator):
     def install_action(self):
         """Install new bible"""
 
-        path, ext = QFileDialog.getOpenFileName(self, "Open File...", "", "*.grail-bible")
+        location = QStandardPaths.locate(QStandardPaths.DocumentsLocation, "",
+                                         QStandardPaths.LocateDirectory)
+        path, ext = QFileDialog.getOpenFileName(self, "Open File...", location, "*.grail-bible")
 
         try:
             BibleHost.install(path)
-        except BibleHostError as msg:
-            print(msg)
+        except BibleHostError as error:
+            message = MessageDialog(title="Unable to install",
+                                    text=str(error),
+                                    icon=MessageDialog.Critical)
+            message.exec_()
 
         self._update_list()
 
@@ -206,7 +211,10 @@ class BibleConfigurator(Configurator):
         if len(items) > 0:
             bible_id = items[0].bible_id
 
-            Application.instance().settings.set('bible/default', bible_id)
+            # change settings
+            self.app.settings.set('bible/default', bible_id)
+            # update bible object
+            self.app.change_bible(bible_id)
 
         self._update_list()
 

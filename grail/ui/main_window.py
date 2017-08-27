@@ -114,7 +114,6 @@ class MainWindow(QMainWindow):
         self.ui_menu_file.addAction(self.ui_save_as_action)
         self.ui_menu_file.addSeparator()
         self.ui_menu_file.addAction(self.ui_import_action)
-        self.ui_menu_file.addAction(self.ui_export_action)
         self.ui_menu_file.addSeparator()
         self.ui_menu_file.addAction(self.ui_preferences_action)
         self.ui_menu_file.addAction(self.ui_quit_action)
@@ -302,7 +301,9 @@ class MainWindow(QMainWindow):
     def import_action(self):
         """Import data into Grail library or current project"""
 
-        path, ext = QFileDialog.getOpenFileName(self, "Import...", "", "*")
+        location = QStandardPaths.locate(QStandardPaths.DocumentsLocation, "",
+                                         QStandardPaths.LocateDirectory)
+        path, ext = QFileDialog.getOpenFileName(self, "Import...", location, "*.json, *.grail, *.grail-library")
         ext = path.split('.')[-1]
         message = ""
 
@@ -353,7 +354,7 @@ class MainWindow(QMainWindow):
         project_name = "untitled"
         path, ext = QFileDialog.getSaveFileName(self, "Export...", project_name, "*.grail")
 
-        # todo: implement this
+        # todo: implement export of project
 
     def about_action(self):
         """About dialog menu_action"""

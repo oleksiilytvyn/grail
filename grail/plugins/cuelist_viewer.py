@@ -351,6 +351,11 @@ class CuelistViewer(Viewer):
     author = 'Grail Team'
     description = 'Manage cuelists'
 
+    # todo: add edit action to context menu
+    # todo: add colors to context menu
+    # todo: add cue edit dialog
+    # todo: context menu layout - edit, duplicate, delete | colors
+
     def __init__(self, *args):
         super(CuelistViewer, self).__init__(*args)
 
@@ -556,8 +561,9 @@ class CuelistViewer(Viewer):
 
         if entity.type == DNA.TYPE_SONG:
             new_entity = cuelist.append(entity)
+            lyrics = new_entity.lyrics or ''
 
-            pages = re.sub(r'([\s]+?[\n]+)', '\n', new_entity.lyrics if new_entity.lyrics else '').split('\n\n')
+            pages = [re.sub(r'([\s]+?[\n]+)', '\n', page) for page in lyrics.split('\n\n')]
 
             for page in pages:
                 new_entity.create(name=page, entity_type=DNA.TYPE_CUE)

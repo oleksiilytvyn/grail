@@ -22,7 +22,7 @@ from grailkit.core import Signalable
 import grail
 import grail.resources
 from grail.ui import MainWindow, WelcomeDialog
-from grail.core import Plugin, Viewer, Executor, OSCHost
+from grail.core import Plugin, Viewer, OSCHost
 
 # load internal plugins and viewers
 from grail.plugins import *
@@ -58,7 +58,6 @@ class Grail(Application):
         self._library = None
         self._bible = None
         self._signals = Signalable()
-        self._executor = Executor()
 
         self.change_bible(self.settings.get('bible/default', ""))
 
@@ -104,12 +103,6 @@ class Grail(Application):
         """Returns Grail library"""
 
         return self._library
-
-    @property
-    def executor(self):
-        """Returns executor instance"""
-
-        return self._executor
 
     @property
     def signals(self):

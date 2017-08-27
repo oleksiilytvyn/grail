@@ -202,15 +202,14 @@ class Plugin(_PluginMeta, metaclass=PluginRegistry):
             return action
 
     def __create_action(self, menu, location_tokens, new_action, before_tokens):
-        """
+        """Create menu item
 
         Args:
-            menu:
-            location_tokens:
-            new_action:
-            before_tokens:
+            menu: menu reference
+            location_tokens: path string that represents location of new action in menu
+            new_action: action reference
+            before_tokens: path string, it used to determinate where to place item above or below others
         """
-        # todo: write doc-string
 
         action_name = location_tokens[0]
         action_target = None
@@ -259,6 +258,13 @@ class _ComponentPluginRegistry(type(Component), PluginRegistry):
     Combines properties of grailkit.qt.Component and grailkit.plug.PluginRegistry"""
 
     def __init__(cls, name, bases, attrs):
+        """This class makes bridge between Regular plugin and Qt Widget component
+
+        Args:
+            name (str): class name
+            bases (list): class parents
+            attrs (dict): attributes
+        """
         type(Component).__init__(cls, name, bases, attrs)
         PluginRegistry.__init__(cls, name, bases, attrs)
 

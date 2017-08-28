@@ -14,7 +14,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
-from grailkit.dna import DNA
+from grailkit.dna import DNA, CueEntity
 from grailkit.qt import *
 
 from grail.core import Viewer
@@ -259,36 +259,21 @@ class CueDialog(Dialog):
         super(CueDialog, self).__init__()
 
         self._viewer = viewer
+        self._entity = None
         self.__ui__()
 
     def __ui__(self):
         """Build UI"""
 
-        self._ui_title = LineEdit()
-        self._ui_title.setPlaceholderText("Cue name")
-        self._ui_title.setAttribute(Qt.WA_MacShowFocusRect, 0)
+        self._ui_text = TextEdit()
+        self._ui_text.setPlaceholderText("Lyrics")
+        self._ui_text.setAttribute(Qt.WA_MacShowFocusRect, 0)
+        self._ui_text.setAcceptRichText(False)
 
-        self._ui_artist = LineEdit()
-        self._ui_artist.setPlaceholderText("Artist name")
-        self._ui_artist.setAttribute(Qt.WA_MacShowFocusRect, 0)
-
-        self._ui_album = LineEdit()
-        self._ui_album.setPlaceholderText("Album")
-        self._ui_album.setAttribute(Qt.WA_MacShowFocusRect, 0)
-
-        self._ui_year = LineEdit()
-        self._ui_year.setPlaceholderText("Year")
-        self._ui_year.setAttribute(Qt.WA_MacShowFocusRect, 0)
-
-        self._ui_lyrics = TextEdit()
-        self._ui_lyrics.setPlaceholderText("Lyrics")
-        self._ui_lyrics.setAttribute(Qt.WA_MacShowFocusRect, 0)
-        self._ui_lyrics.setAcceptRichText(False)
-
-        policy = self._ui_lyrics.sizePolicy()
+        policy = self._ui_text.sizePolicy()
         policy.setVerticalStretch(1)
 
-        self._ui_lyrics.setSizePolicy(policy)
+        self._ui_text.setSizePolicy(policy)
 
         self._ui_button_ok = Button("Ok")
         self._ui_button_ok.clicked.connect(self.accept_action)
@@ -303,35 +288,38 @@ class CueDialog(Dialog):
         self._ui_buttons.addWidget(self._ui_button_cancel)
         self._ui_buttons.addWidget(self._ui_button_ok)
 
-        self._ui_layout = QGridLayout()
+        self._ui_layout = VLayout()
         self._ui_layout.setSpacing(8)
         self._ui_layout.setContentsMargins(12, 12, 12, 10)
-        self._ui_layout.setColumnMinimumWidth(0, 200)
 
-        self._ui_layout.addWidget(self._ui_title, 1, 0, 1, 2)
-        self._ui_layout.addWidget(self._ui_album, 3, 0, 1, 2)
-        self._ui_layout.addWidget(self._ui_artist, 5, 0)
-        self._ui_layout.addWidget(self._ui_year, 5, 1)
-        self._ui_layout.addWidget(self._ui_lyrics, 7, 0, 1, 2)
-        self._ui_layout.addLayout(self._ui_buttons, 8, 0, 1, 2)
+        self._ui_layout.addWidget(self._ui_text)
+        self._ui_layout.addLayout(self._ui_buttons)
 
         self.setLayout(self._ui_layout)
         self.setWindowIcon(QIcon(':/icons/32.png'))
         self.setWindowTitle('Edit Cue')
-        self.setGeometry(300, 300, 300, 400)
-        self.setMinimumSize(300, 400)
+        self.setMinimumSize(100, 100)
+        self.setGeometry(200, 200, 250, 200)
         self.setWindowFlags(Qt.WindowCloseButtonHint)
 
     def accept_action(self):
-        pass
+        """Accept entity changes"""
+
+        self._entity.name = str(self._ui_text.toPlainText())
+
+        self.accept()
 
     def reject_action(self):
-        pass
+
+        self.reject()
 
     def set_entity(self, entity):
         """Update edited entity information"""
 
-        pass
+        self._entity = entity
+
+        self.setWindowTitle("Edit Cue - %s" % entity.name.split('\n')[0])
+        self._ui_text.setText(entity.name)
 
 
 class CuelistViewer(Viewer):
@@ -350,11 +338,6 @@ class CuelistViewer(Viewer):
     name = 'Cuelist'
     author = 'Grail Team'
     description = 'Manage cuelists'
-
-    # todo: add edit action to context menu
-    # todo: add colors to context menu
-    # todo: add cue edit dialog
-    # todo: context menu layout - edit, duplicate, delete | colors
 
     def __init__(self, *args):
         super(CuelistViewer, self).__init__(*args)
@@ -464,7 +447,8 @@ class CuelistViewer(Viewer):
     def add_action(self):
         """Add new entity"""
 
-        self.project.cuelist(self._cuelist_id).create("Untitled item")
+        self.project.cuelist(self._cuelist_id).create("Untitled item",
+                                                      entity_type=DNA.TYPE_CUE)
 
     def item_delete(self, item):
         """Remove cue item menu_action"""
@@ -483,14 +467,38 @@ class CuelistViewer(Viewer):
     def item_edit(self, item):
         """Edit cue menu_action"""
 
-        return False
+        if not item:
+            return False
 
-        # entity = item.object()
+        entity = item.object()
 
-        # if entity:
-        #     self._cuedialog.set_entity(entity)
-        #     self._cuedialog.show()
-        #     self._cuedialog.raise_()
+        if entity:
+            self._cuedialog.set_entity(entity)
+            self._cuedialog.show()
+            self._cuedialog.raise_()
+
+    def item_duplicate(self, item):
+        """Duplicate cue menu_action"""
+
+        if not item:
+            return False
+
+        entity = item.object()
+        new_entity = entity.parent.insert(entity.index + 1, entity)
+        new_entity.name = entity.name + " copy"
+
+        self._selected_id = new_entity.id
+        self._update()
+
+    def item_color(self, item, color):
+        """Change cue color menu_action"""
+
+        entity = item.object()
+
+        if isinstance(entity, CueEntity) and color in CueEntity.COLORS:
+            entity.color = color
+
+        self._update()
 
     def _update(self, *args):
 
@@ -518,14 +526,20 @@ class CuelistViewer(Viewer):
         self.project.settings().set('cuelist/current', cuelist_id)
         self._ui_label.setText("%s <small>(%d cues)</small>" % (cuelist.name, len(cuelist)))
 
+        def create_item(entity):
+            item = TreeItem(entity)
+            item.setText(0, entity.name)
+
+            if isinstance(entity, CueEntity) and entity.color != CueEntity.COLOR_DEFAULT:
+                item.setIcon(0, Icon.colored(':/icons/live.png', QColor(entity.color), QColor('#e3e3e3')))
+
+            return item
+
         def add_childs(tree_item, parent_id):
             nonlocal selected_item
-            # nonlocal self
 
             for child in dna.childs(parent_id):
-                child_item = TreeItem(child)
-                child_item.setText(0, child.name)
-
+                child_item = create_item(child)
                 add_childs(child_item, child.id)
 
                 tree_item.addChild(child_item)
@@ -535,8 +549,7 @@ class CuelistViewer(Viewer):
                     selected_item = item
 
         for entity in cuelist.cues():
-            item = TreeItem(entity)
-            item.setText(0, entity.name)
+            item = create_item(entity)
 
             add_childs(item, entity.id)
 
@@ -601,19 +614,37 @@ class CuelistViewer(Viewer):
 
         item = self._ui_tree.itemAt(pos)
 
-        if item:
-            menu = QMenu("Context Menu", self)
+        if not item:
+            return False
 
-            delete_action = QAction('Delete cue', menu)
-            delete_action.triggered.connect(lambda: self.item_delete(item))
+        def create_color_action(self, index, name, menu):
+            action = QAction(name, menu)
+            action.triggered.connect(lambda: self.item_color(item, CueEntity.COLORS[index]))
 
-            edit_action = QAction('Edit cue', menu)
-            edit_action.triggered.connect(lambda: self.item_edit(item))
+            return action
 
-            # menu.addAction(edit_action)
-            menu.addAction(delete_action)
+        menu = QMenu("Context Menu", self)
 
-            menu.exec_(self._ui_tree.mapToGlobal(pos))
+        delete_action = QAction('Delete Cue', menu)
+        delete_action.triggered.connect(lambda: self.item_delete(item))
+
+        edit_action = QAction('Edit Cue', menu)
+        edit_action.triggered.connect(lambda: self.item_edit(item))
+
+        duplicate_action = QAction('Duplicate Cue', menu)
+        duplicate_action.triggered.connect(lambda: self.item_duplicate(item))
+
+        menu.addAction(edit_action)
+        menu.addAction(duplicate_action)
+        menu.addSeparator()
+
+        for index, color_name in enumerate(CueEntity.COLOR_NAMES):
+            menu.addAction(create_color_action(self, index, color_name, menu))
+
+        menu.addSeparator()
+        menu.addAction(delete_action)
+
+        menu.exec_(self._ui_tree.mapToGlobal(pos))
 
     def _key_event(self):
         pass

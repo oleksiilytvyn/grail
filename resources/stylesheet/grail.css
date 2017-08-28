@@ -265,6 +265,17 @@ CueDialog {
         margin: 0;
         }
 
+    CueDialog QLineEdit,
+    CueDialog QTextEdit {
+        border: 1px solid #1a1a1a;
+        border-radius: 2px;
+        padding: 2px;
+        margin: 0;
+        background: #212121;
+        min-height: 20px;
+        color: #b3b3b3;
+        }
+
     CueDialog QScrollBar:vertical {
         background: transparent;
         border: none;

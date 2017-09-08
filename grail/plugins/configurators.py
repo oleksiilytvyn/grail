@@ -115,10 +115,10 @@ class GeneralConfigurator(Configurator):
                 progress.setValue(index)
 
             MessageDialog.information(title="Import",
-                          text="Items from <b>%s</b> imported successfully." % path).exec_()
+                                      text="Items from <b>%s</b> imported successfully." % path).exec_()
         except dna.DNAError:
-            MessageDialog.warning(title="Updates",
-                          text="Unable to check for updates...").exec_()
+            MessageDialog.warning(title="Import",
+                                  text="Unable to import Grail Library...").exec_()
 
             return False
 

@@ -114,8 +114,7 @@ class DisplayPlugin(Plugin):
     def preferences_action(self, action=None):
         """Show display preferences dialog"""
 
-        self.preferences_dialog.show()
-        self.preferences_dialog.raise_()
+        self.preferences_dialog.showWindow()
 
     def disable_action(self, action=None):
         """Disable display output"""

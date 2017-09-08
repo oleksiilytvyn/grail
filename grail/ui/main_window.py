@@ -15,9 +15,10 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
-from grailkit.dna import DNA
+from grailkit.dna import DNA, DNAError, Library
 from grailkit.util import *
-from grailkit.qt import AboutDialog, MessageDialog, Application
+from grailkit.bible import BibleHost, BibleHostError
+from grailkit.qt import AboutDialog, MessageDialog, Application, ProgressDialog
 
 import grail
 
@@ -114,6 +115,7 @@ class MainWindow(QMainWindow):
         self.ui_menu_file.addAction(self.ui_save_as_action)
         self.ui_menu_file.addSeparator()
         self.ui_menu_file.addAction(self.ui_import_action)
+        self.ui_menu_file.addAction(self.ui_export_action)
         self.ui_menu_file.addSeparator()
         self.ui_menu_file.addAction(self.ui_preferences_action)
         self.ui_menu_file.addAction(self.ui_quit_action)
@@ -295,8 +297,7 @@ class MainWindow(QMainWindow):
     def open_actions_action(self):
         """Open actions dialog"""
 
-        self.actions_dialog.show()
-        self.actions_dialog.raise_()
+        self.actions_dialog.showWindow()
 
     def import_action(self):
         """Import data into Grail library or current project"""
@@ -308,11 +309,11 @@ class MainWindow(QMainWindow):
         message = ""
 
         if ext == 'grail':
-            message = "Import of grail files not supported"
+            message = "Import of grail files not supported. Try to open as Grail Project."
         elif ext == 'grail-library':
-            message = "Import of grail library files not supported"
+            self._import_library(path)
         elif ext == 'grail-bible':
-            message = "Import of grail bible files not supported"
+            self._import_bible(path)
         elif ext == 'json':
             self._import_json(path)
         else:
@@ -348,21 +349,70 @@ class MainWindow(QMainWindow):
         except ValueError:
             return False
 
+    def _import_library(self, path):
+        """Import *.grail-library file"""
+
+        if not path:
+            return False
+
+        try:
+            library = Library(path, create=False)
+            items = library.items()
+            progress = ProgressDialog(title="Importing...", text="Importing items to library")
+            progress.setAutoClose(True)
+            progress.setMaximum(len(items))
+            progress.show()
+
+            for index, entity in enumerate(items):
+                self.app.library.copy(entity)
+                progress.setValue(index)
+
+            MessageDialog.information(title="Import",
+                                      text="Items from <b>%s</b> imported successfully." % path).exec_()
+        except DNAError:
+            MessageDialog.warning(title="Import",
+                                  text="Unable to import Grail Library...").exec_()
+
+            return False
+
+    def _import_bible(self, path):
+        """Import and install new grail bible"""
+
+        if not path:
+            return False
+
+        try:
+            BibleHost.install(path)
+        except BibleHostError as error:
+            message = MessageDialog(title="Import",
+                                    text=str(error),
+                                    icon=MessageDialog.Warning)
+            message.exec_()
+
+        self._update_list()
+
     def export_action(self):
-        """Export library or project"""
+        """Export grail library as single file"""
 
-        project_name = "untitled"
-        path, ext = QFileDialog.getSaveFileName(self, "Export...", project_name, "*.grail")
+        location = QStandardPaths.locate(QStandardPaths.DocumentsLocation, "",
+                                         QStandardPaths.LocateDirectory)
+        path, ext = QFileDialog.getSaveFileName(self, "Export library...", location, "*.grail-library")
 
-        # todo: implement export of project
+        if not path:
+            return False
+
+        try:
+            self.app.library.save_copy(path, create=True)
+        except DNAError:
+            message = MessageDialog(title="Export",
+                                    text="Unable to export Grail Library to location %s.",
+                                    icon=MessageDialog.Warning)
+            message.exec_()
 
     def about_action(self):
         """About dialog menu_action"""
 
-        self.about_dialog.show()
-        self.about_dialog.raise_()
-        self.about_dialog.setWindowState(self.about_dialog.windowState() & ~Qt.WindowMinimized | Qt.WindowActive)
-        self.about_dialog.activateWindow()
+        self.about_dialog.showWindow()
 
     def update_action(self):
         """Check for updates menu_action"""
@@ -385,10 +435,7 @@ class MainWindow(QMainWindow):
     def preferences_action(self):
         """Open a preferences dialog"""
 
-        self.preferences_dialog.show()
-        self.preferences_dialog.raise_()
-        self.preferences_dialog.setWindowState(self.preferences_dialog.windowState() & ~Qt.WindowMinimized | Qt.WindowActive)
-        self.preferences_dialog.activateWindow()
+        self.preferences_dialog.showWindow()
 
     def closeEvent(self, event):
         """Save project"""

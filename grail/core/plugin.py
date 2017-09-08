@@ -76,7 +76,7 @@ class _PluginMeta(object):
             return None
 
         # clear slots as they keeping this object alive
-        # and preventing from gc collection
+        # and preventing from garbage collection
         for slot in self.__slots:
             self.__app.signals.disconnect(*slot)
 
@@ -91,18 +91,26 @@ class _PluginMeta(object):
 
     @property
     def library(self):
+        """Library instance"""
+
         return self.__app.library
 
     @property
     def project(self):
+        """Current project instance"""
+
         return self.__app.project
 
     @property
     def bible(self):
+        """Bible instance"""
+
         return self.__app.bible
 
     @property
     def is_destroyed(self):
+        """Returns True if plugin is destroyed by host"""
+
         return self.__destroyed
 
     @classmethod
@@ -294,6 +302,8 @@ class Viewer(Component, _PluginMeta, metaclass=_ComponentPluginRegistry):
 
     @property
     def __arranger(self):
+        """Returns ViewArranger instance"""
+
         return Application.instance().main_window.view_arranger
 
     def paintEvent(self, event):

@@ -373,12 +373,12 @@ class CuelistViewer(Viewer):
         self._ui_tree.setObjectName('CuelistViewer_tree')
         self._ui_tree.setContextMenuPolicy(Qt.CustomContextMenu)
         self._ui_tree.customContextMenuRequested.connect(self._context_menu)
-        self._ui_tree.itemSelectionChanged.connect(self._selection_changed)
-        self._ui_tree.itemExpanded.connect(self._item_expanded)
-        self._ui_tree.itemCollapsed.connect(self._item_collapsed)
-        self._ui_tree.itemClicked.connect(self._item_clicked)
-        self._ui_tree.itemDoubleClicked.connect(self._item_double_clicked)
-        self._ui_tree.currentItemChanged.connect(self._item_clicked)
+        self._ui_tree.itemExpanded.connect(self.item_expanded)
+        self._ui_tree.itemCollapsed.connect(self.item_collapsed)
+        self._ui_tree.itemClicked.connect(self.item_clicked)
+        self._ui_tree.itemDoubleClicked.connect(self.item_double_clicked)
+        self._ui_tree.currentItemChanged.connect(self.item_clicked)
+        self._ui_tree.keyPressEvent = self._key_event
 
         # Empty
         self._ui_empty_title = Label("No Cuelist")
@@ -438,6 +438,7 @@ class CuelistViewer(Viewer):
         menu.exec_(self._ui_toolbar.mapToGlobal(self._ui_view_action.pos()))
 
     def menu_action(self):
+        """Open a list of all cuelists"""
 
         point = QPoint(self.rect().width() / 2, self.rect().height() - 16)
 
@@ -445,13 +446,16 @@ class CuelistViewer(Viewer):
         self._dialog.showAt(self.mapToGlobal(point))
 
     def add_action(self):
-        """Add new entity"""
+        """Add new entity to current cuelist"""
 
-        self.project.cuelist(self._cuelist_id).create("Untitled item",
-                                                      entity_type=DNA.TYPE_CUE)
+        self.project.cuelist(self._cuelist_id).create("Untitled item", entity_type=DNA.TYPE_CUE)
 
     def item_delete(self, item):
-        """Remove cue item menu_action"""
+        """Remove cue item menu_action
+
+        Args:
+            item (TreeItem): tree item
+        """
 
         if not item:
             return False
@@ -465,7 +469,11 @@ class CuelistViewer(Viewer):
         item.object().delete()
 
     def item_edit(self, item):
-        """Edit cue menu_action"""
+        """Edit cue menu_action
+
+        Args:
+            item (TreeItem): tree item
+        """
 
         if not item:
             return False
@@ -474,11 +482,14 @@ class CuelistViewer(Viewer):
 
         if entity:
             self._cuedialog.set_entity(entity)
-            self._cuedialog.show()
-            self._cuedialog.raise_()
+            self._cuedialog.showWindow()
 
     def item_duplicate(self, item):
-        """Duplicate cue menu_action"""
+        """Duplicate cue menu_action
+
+        Args:
+            item (TreeItem): tree item
+        """
 
         if not item:
             return False
@@ -491,7 +502,11 @@ class CuelistViewer(Viewer):
         self._update()
 
     def item_color(self, item, color):
-        """Change cue color menu_action"""
+        """Change cue color menu_action
+
+        Args:
+            item (TreeItem): tree item
+        """
 
         entity = item.object()
 
@@ -500,9 +515,65 @@ class CuelistViewer(Viewer):
 
         self._update()
 
-    def _update(self, *args):
+    def item_clicked(self, item):
+        """Preview cue text
 
-        self.cuelist_selected(self._cuelist_id)
+        Args:
+            item (TreeItem): tree item
+        """
+
+        if not item:
+            return False
+
+        self._selected_id = item.object().id
+
+        self.emit('!node/selected', item.object().id)
+        self.emit('!cue/preview', item.object())
+
+    def item_double_clicked(self, item):
+        """Send cue text
+
+        Args:
+            item (TreeItem): tree item
+        """
+
+        if not item:
+            return False
+
+        self._selected_id = item.object().id
+
+        self.emit('!cue/execute', item.object())
+
+    def item_expanded(self, item):
+        """Tree item expanded
+
+        Args:
+            item (TreeItem): tree item
+        """
+
+        self.item_toggle(item, True)
+
+    def item_collapsed(self, item):
+        """Tree item collapsed
+
+        Args:
+            item (TreeItem): tree item
+        """
+
+        self.item_toggle(item, False)
+
+    def item_toggle(self, item, flag=False):
+        """Change item collapsed/expanded state
+
+        Args:
+            item (TreeItem): tree item
+            flag (bool): True if expanded
+        """
+
+        if not item:
+            return
+
+        item.object().set('expanded', flag)
 
     def cuelist_selected(self, cuelist_id=0):
 
@@ -563,6 +634,11 @@ class CuelistViewer(Viewer):
             index = self._ui_tree.indexFromItem(selected_item)
             self._ui_tree.setCurrentIndex(index)
 
+    def _update(self, *args):
+        """Internal update"""
+
+        self.cuelist_selected(self._cuelist_id)
+
     def _add_entity(self, entity):
         """Add entity to cuelist"""
 
@@ -574,9 +650,10 @@ class CuelistViewer(Viewer):
 
         if entity.type == DNA.TYPE_SONG:
             new_entity = cuelist.append(entity)
-            lyrics = new_entity.lyrics or ''
+            new_entity.type = DNA.TYPE_CUE
 
-            pages = [re.sub(r'([\s]+?[\n]+)', '\n', page) for page in lyrics.split('\n\n')]
+            lyrics = new_entity.lyrics or ''
+            pages = [re.sub(r'([\s]+?[\n\r]+)', '\n', page) for page in lyrics.replace('\r', '').split('\n\n')]
 
             for page in pages:
                 new_entity.create(name=page, entity_type=DNA.TYPE_CUE)
@@ -587,27 +664,6 @@ class CuelistViewer(Viewer):
                            entity_type=DNA.TYPE_CUE)
 
             self.cuelist_selected(cuelist_id)
-
-    def _item_clicked(self, item):
-        """Preview cue text"""
-
-        if not item:
-            return False
-
-        self._selected_id = item.object().id
-
-        self.emit('!node/selected', item.object().id)
-        self.emit('!cue/preview', item.object())
-
-    def _item_double_clicked(self, item):
-        """Send cue text"""
-
-        if not item:
-            return False
-
-        self._selected_id = item.object().id
-
-        self.emit('!cue/execute', item.object())
 
     def _context_menu(self, pos):
         """Context menu on cue item"""
@@ -646,36 +702,31 @@ class CuelistViewer(Viewer):
 
         menu.exec_(self._ui_tree.mapToGlobal(pos))
 
-    def _key_event(self):
-        pass
+    def _key_event(self, event):
+        """Process keyboard events of Tree widget"""
 
-    def _list_reordered(self):
-        pass
+        item = self._ui_tree.currentItem()
+        key = event.key()
 
-    def _selection_changed(self):
-        pass
+        if item:
+            if key == Qt.Key_Return:
+                self.item_double_clicked(item)
+                return
+            elif key == Qt.Key_Delete or key == Qt.Key_Backspace:
+                self.item_delete(item)
+                return
+            elif key == Qt.Key_Up:
+                self.item_clicked(item)
+            elif key == Qt.Key_Down:
+                self.item_clicked(item)
 
-    def _item_expanded(self, item):
-        """Tree item expanded
-
-        Args:
-            item (TreeItem): tree item
-        """
-
-        item.object().set('expanded', True)
-
-    def _item_collapsed(self, item):
-        """Tree item collapsed
-
-        Args:
-            item (TreeItem): tree item
-        """
-
-        item.object().set('expanded', False)
+        # call default event handler
+        QTreeWidget.keyPressEvent(self._ui_tree, event)
 
     def _close(self):
         """Close child dialogs"""
 
+        self._cuedialog.close()
         self._dialog.close()
 
 

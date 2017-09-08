@@ -389,8 +389,7 @@ class LibraryViewer(Viewer):
         """Add menu_action"""
 
         self.song_dialog.set_entity(None)
-        self.song_dialog.show()
-        self.song_dialog.raise_()
+        self.song_dialog.showWindow()
 
     def add_item_action(self, entity):
         """Add item to cuelist"""
@@ -407,8 +406,7 @@ class LibraryViewer(Viewer):
         """Edit library item"""
 
         self.song_dialog.set_entity(entity)
-        self.song_dialog.show()
-        self.song_dialog.raise_()
+        self.song_dialog.showWindow()
 
     def _close(self):
         """Close this panel and child components"""

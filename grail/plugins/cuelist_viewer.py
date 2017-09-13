@@ -448,7 +448,10 @@ class CuelistViewer(Viewer):
     def add_action(self):
         """Add new entity to current cuelist"""
 
-        self.project.cuelist(self._cuelist_id).create("Untitled item", entity_type=DNA.TYPE_CUE)
+        cuelist = self.project.cuelist(self._cuelist_id)
+
+        if cuelist:
+            cuelist.create("Untitled item", entity_type=DNA.TYPE_CUE)
 
     def item_delete(self, item):
         """Remove cue item menu_action

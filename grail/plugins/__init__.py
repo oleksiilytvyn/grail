@@ -22,4 +22,4 @@ from .node_viewer import NodeViewer
 from .time_viewer import TimeViewer
 
 # plugins
-from .display_plugin import DisplayPlugin
+# from .display_plugin import DisplayPlugin

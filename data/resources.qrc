@@ -1,0 +1,56 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+	<qresource>
+
+		<!-- ./default/ -->
+		<file alias="default/bible-en-kjv.grail-bible">default/bible-en-kjv.grail-bible</file>
+
+		<!-- ./i/ -->
+		<file alias="i/branch-closed-white.png">i/branch-closed-white.png</file>
+		<file alias="i/branch-closed.png">i/branch-closed.png</file>
+		<file alias="i/branch-open-white.png">i/branch-open-white.png</file>
+		<file alias="i/branch-open.png">i/branch-open.png</file>
+		<file alias="i/welcome_bg.png">i/welcome_bg.png</file>
+
+		<!-- ./icon/ -->
+		<file alias="icon/1024.png">icon/1024.png</file>
+		<file alias="icon/128.png">icon/128.png</file>
+		<file alias="icon/16.png">icon/16.png</file>
+		<file alias="icon/256.png">icon/256.png</file>
+		<file alias="icon/32.png">icon/32.png</file>
+		<file alias="icon/48.png">icon/48.png</file>
+		<file alias="icon/64.png">icon/64.png</file>
+		<file alias="icon/grail.icns">icon/grail.icns</file>
+		<file alias="icon/grail.ico">icon/grail.ico</file>
+
+		<!-- ./icons/ -->
+		<file alias="icons/add.png">icons/add.png</file>
+		<file alias="icons/align.png">icons/align.png</file>
+		<file alias="icons/at.png">icons/at.png</file>
+		<file alias="icons/background.png">icons/background.png</file>
+		<file alias="icons/book.png">icons/book.png</file>
+		<file alias="icons/case.png">icons/case.png</file>
+		<file alias="icons/color.png">icons/color.png</file>
+		<file alias="icons/edit.png">icons/edit.png</file>
+		<file alias="icons/font.png">icons/font.png</file>
+		<file alias="icons/live.png">icons/live.png</file>
+		<file alias="icons/lock.png">icons/lock.png</file>
+		<file alias="icons/menu.png">icons/menu.png</file>
+		<file alias="icons/play.png">icons/play.png</file>
+		<file alias="icons/remove-white.png">icons/remove-white.png</file>
+		<file alias="icons/remove.png">icons/remove.png</file>
+		<file alias="icons/save.png">icons/save.png</file>
+		<file alias="icons/search-clear.png">icons/search-clear.png</file>
+		<file alias="icons/selection-select.png">icons/selection-select.png</file>
+		<file alias="icons/shadow.png">icons/shadow.png</file>
+		<file alias="icons/stop.png">icons/stop.png</file>
+		<file alias="icons/testcard.png">icons/testcard.png</file>
+		<file alias="icons/text-padding-box.png">icons/text-padding-box.png</file>
+		<file alias="icons/txt.png">icons/txt.png</file>
+		<file alias="icons/unlock.png">icons/unlock.png</file>
+		<file alias="icons/zone-select.png">icons/zone-select.png</file>
+
+		<!-- ./stylesheet/ -->
+		<file alias="stylesheet/grail.css">stylesheet/grail.css</file>
+	</qresource>
+</RCC>

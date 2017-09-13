@@ -6,11 +6,13 @@
 
     Setup Script
     Run the build process by executing command 'python setup.py build'
+
+    Additional build arguments:
+        !fix-png: fix PNG color profile errors
 """
 
 import os
 import sys
-import glob
 import shutil
 import platform
 
@@ -21,14 +23,19 @@ from cx_Freeze import setup, Executable
 import grail
 
 
-# constants
+# os constants
 OS_SYSTEM = platform.system()
 OS_WIN = OS_SYSTEM == "Windows"
 OS_MAC = OS_SYSTEM == "Darwin"
 OS_UNIX = OS_SYSTEM == "Linux"
 
+# Add support for custom arguments
+USER_ARGS = [arg for arg in sys.argv if arg.startswith('!')]
+sys.argv = [arg for arg in sys.argv if not arg.startswith('!')]
+
 # used for png utility
-app = QGuiApplication(sys.argv)
+if '!fix-png' in USER_ARGS:
+    app = QGuiApplication(sys.argv)
 
 
 def get_revision():
@@ -50,15 +57,57 @@ def get_revision():
     return revision
 
 
-def compile_resources():
-    """try to build resources file"""
+def compile_resources(source=None, destination=None, exclude=None):
+    """try to build resources file
+
+    Args:
+        source (str): path to folder with resources
+        destination (str): path to python resource file
+        exclude (list): list of excluded files and folders relative to given source
+    """
+
+    data_path = './data'
+    source_file = os.path.join(source, 'resources.qrc')
+    qrc_source = '''<!DOCTYPE RCC>\n<RCC version="1.0">\n\t<qresource>\n'''
+
+    if not exclude:
+        exclude = []
+
+    for index, path in enumerate(exclude):
+        exclude[index] = os.path.abspath(os.path.join(data_path, path))
+
+    print("\nGenerating QRC file:")
+    print(" - source: %s" % source)
+    print(" - destination: %s" % destination)
+    print(" - qrc file: %s" % source_file)
+
+    for directory, directories, file_names in os.walk("./data"):
+
+        # exclude directories
+        if os.path.abspath(directory) in exclude:
+            continue
+
+        qrc_source += '\n\t\t<!-- ./%s/ -->\n' % directory[len(data_path) + 1:]
+
+        for name in file_names:
+            # skip system files
+            if name.startswith('.'):
+                continue
+
+            file_path = os.path.join(directory, name)[len(data_path)+1:]
+            qrc_source += '\t\t<file alias="%s">%s</file>\n' % (file_path, file_path)
+
+    qrc_source += '\t</qresource>\n</RCC>'
+
+    qrc_file = open(source_file, 'w')
+    qrc_file.write(qrc_source)
+    qrc_file.close()
 
     try:
         print("\nBuilding resource file")
-        os.system("pyrcc5 -o grail/resources.py resources/resources.qrc")
+        os.system("pyrcc5 -o %s %s" % (destination, source_file))
     except Exception as error:
-        print("Failed to build resource file, following error occurred:")
-        print(error)
+        print("Failed to build resource file, following error occurred:\n %s" % error)
 
 
 def create_version_file(path, revision):
@@ -146,15 +195,17 @@ files = [('LICENSE', 'LICENSE'),
          ('build/.version', '.version')]
 
 # fix png warnings
-# fix_png_profile('./resources', recursive=True)
+if '!fix-png' in USER_ARGS:
+    fix_png_profile('./data', recursive=True)
 
 # compile Qt resources
-compile_resources()
+compile_resources(source='./data', destination='./grail/resources.py', exclude=['./dist', '.'])
+
 # Create new version file
 create_version_file(VERSION_PATH, VERSION)
 
 # Building executable
-print("\n-------------------------------------------------\n")
+print("\n%s\n" % ('- ' * 30))
 
 setup(
     name=TITLE,
@@ -162,7 +213,7 @@ setup(
     url='http://grailapp.com/',
 
     author='Oleksii Lytvyn',
-    author_email='grailapplication@gmail.com',
+    author_email='programer95@gmail.com',
     description="Simple and fast lyrics application.",
     long_description="Simple and powerful media software for churches",
     keywords='open source osc church lyrics projection song bible display',
@@ -207,8 +258,8 @@ setup(
             },
         "bdist_mac": {
             "bundle_name": BUNDLE_NAME,
-            "custom_info_plist": "resources/bdist/Info.plist",
-            "iconfile": "icon/grail.icns"
+            "custom_info_plist": "data/dist/Info.plist",
+            "iconfile": "data/icon/grail.icns"
             },
         "bdist_dmg": {
             "volume_label": TITLE,
@@ -217,14 +268,14 @@ setup(
         },
     executables=[Executable(FILE,
                             base="Win32GUI" if sys.platform == "win32" else None,
-                            icon="icon/grail.ico",
+                            icon="data/icon/grail.ico",
                             compress=True,
                             shortcutName=TITLE,
                             shortcutDir="ProgramMenuFolder")])
 
 # fix Mac OS app file
 if OS_MAC and os.path.exists(BUNDLE_RESOURCES):
-    shutil.copyfile("resources/bdist/qt.conf", BUNDLE_RESOURCES + '/qt.conf')
+    shutil.copyfile("data/dist/qt.conf", BUNDLE_RESOURCES + '/qt.conf')
 
 # Exit script as it uses Qt Application instance
 sys.exit(0)

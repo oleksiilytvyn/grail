@@ -63,7 +63,7 @@ class DisplayPlugin(Plugin):
         self.register_action("Advanced preferences...", self.preferences_action)
 
         self.window = DisplayWindow(self)
-        self.preferences_dialog = PreferencesDialog()
+        self.preferences_dialog = PreferencesDialog(self)
 
         # Connect signals
         self.connect('/app/close', self.close)
@@ -210,6 +210,7 @@ class DisplayWindow(Frameless):
 
 
 class CompositionTexture(QImage):
+    """Display output texture"""
 
     def __init__(self):
         super(CompositionTexture, self).__init__(QSize(800, 600), QImage.Format_RGB32)
@@ -386,31 +387,711 @@ class DisplayWidget(QWidget):
 class TransformWidget(QWidget):
     """Corner-pin transformation with composition display"""
 
+    updated = pyqtSignal()
+
     def __init__(self, parent=None):
         super(TransformWidget, self).__init__(parent)
 
-    def paintEvent(self, event):
+        self.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.MinimumExpanding)
+        self.setMouseTracking(True)
+        self.setContextMenuPolicy(Qt.CustomContextMenu)
 
-        p = QPainter()
-        p.begin(self)
-        p.end()
+        screen = QGuiApplication.screens()[0].availableSize()
+        self.screen = QRectF(0, 0, screen.width(), screen.height())
+        self.points = [QPointF(0, 0), QPointF(0, 0), QPointF(0, 0), QPointF(0, 0)]
+        self.wholeTransformation()
+
+        self.mouse_x = 0
+        self.mouse_y = 0
+        self.mouse_hold = False
+        self.mouse_hold_x = 0
+        self.mouse_hold_y = 0
+        self.x = 0
+        self.y = 0
+        self.scale = 1.0
+        self.point_index = -1
+        self.font = QFont("decorative", 14)
+        self.text = ""
+
+        self._menu = QMenu("Menu", self)
+
+        whole_action = QAction('Whole area', self._menu)
+        whole_action.triggered.connect(self.wholeTransformation)
+
+        left_action = QAction('Left side', self._menu)
+        left_action.triggered.connect(self.leftTransformation)
+
+        right_action = QAction('Right side', self._menu)
+        right_action.triggered.connect(self.rightTransformation)
+
+        center_action = QAction('Center', self._menu)
+        center_action.triggered.connect(self.centerTransformation)
+
+        self._menu.addAction(left_action)
+        self._menu.addAction(right_action)
+        self._menu.addAction(whole_action)
+        self._menu.addSeparator()
+        self._menu.addAction(center_action)
+
+        self.customContextMenuRequested.connect(self._context_menu)
+
+    def _context_menu(self, event):
+        """Open context menu"""
+
+        self._menu.exec_(self.mapToGlobal(event))
+
+    def _map_to_widget(self, point):
+        """Map point to widget coordinates"""
+
+        return QPointF(self.x + self.scale * point.x(), self.y + self.scale * point.y())
+
+    def _map_to_screen(self, point):
+        """Map point to screen coordinates"""
+
+        return QPointF(point.x() * (1 / self.scale), point.y() * (1 / self.scale))
+
+    def mousePressEvent(self, event):
+        """Handle mouse press event"""
+
+        self.mouse_hold = True
+        index = 0
+
+        for point in self.points:
+            point = self._map_to_widget(point)
+
+            if math.sqrt(pow(point.x() - event.x(), 2) + pow(point.y() - event.y(), 2)) <= 5:
+                self.point_index = index
+                self.mouse_hold_x = event.x() - point.x()
+                self.mouse_hold_y = event.y() - point.y()
+
+            index = index + 1
+
+    def mouseReleaseEvent(self, event):
+        """Handle mouse release event"""
+
+        self.mouse_hold = False
+        self.point_index = -1
+
+    def mouseMoveEvent(self, event):
+        """Handle mouse move event"""
+
+        self.mouse_x = event.x()
+        self.mouse_y = event.y()
+
+        if self.point_index >= 0:
+            point = self._map_to_screen(QPointF(event.x() - self.x, event.y() - self.y))
+
+            self.text = "(%d, %d)" % (point.x(), point.y())
+            self.points[self.point_index] = point
+
+            self.updated.emit()
+        else:
+            self.text = ""
+
+        self.update()
+
+    def paintEvent(self, event):
+        """Draw widget"""
+
+        painter = QPainter()
+        painter.begin(self)
+        painter.setRenderHints(QPainter.Antialiasing | QPainter.TextAntialiasing)
+
+        painter.fillRect(event.rect(), QColor("#626364"))
+
+        rect = event.rect()
+        scale = min(rect.width() / self.screen.width(), rect.height() / self.screen.height()) * 0.9
+
+        w = self.screen.width() * scale
+        h = self.screen.height() * scale
+
+        x = (rect.width() - w) / 2
+        y = (rect.height() - h) / 2
+
+        self.x = x
+        self.y = y
+        self.scale = scale
+
+        painter.fillRect(QRect(x, y, w, h), QColor("#000000"))
+
+        painter.setPen(QColor("#d6d6d6"))
+        painter.setBrush(QColor("#111111"))
+
+        points = []
+
+        for point in self.points:
+            points.append(self._map_to_widget(point))
+
+        painter.drawPolygon(QPolygonF(points))
+
+        painter.setPen(QColor("#8a9fbb"))
+        painter.setBrush(QColor("#8a9fbb"))
+
+        for point in points:
+            painter.drawEllipse(point, 4, 4)
+
+        painter.setPen(QColor("#e6e6e6"))
+        painter.setFont(self.font)
+        painter.drawText(event.rect(), Qt.AlignCenter | Qt.TextWordWrap, self.text)
+
+        painter.end()
+
+    def centerTransformation(self):
+        """Center transformation"""
+
+        w = self.screen.width()
+        h = self.screen.height()
+        min_x = w
+        min_y = h
+        max_x = 0
+        max_y = 0
+
+        for point in self.points:
+            if point.x() < min_x:
+                min_x = point.x()
+
+            if point.y() < min_y:
+                min_y = point.y()
+
+            if point.x() > max_x:
+                max_x = point.x()
+
+            if point.y() > max_y:
+                max_y = point.y()
+
+        x = w / 2 - (max_x - min_x) / 2
+        y = h / 2 - (max_y - min_y) / 2
+
+        index = 0
+
+        for point in self.points:
+            point.setX(point.x() - min_x + x)
+            point.setY(point.y() - min_y + y)
+
+            self.points[index] = point
+            index = index + 1
+
+        self.updated.emit()
+        self.update()
+
+    def wholeTransformation(self):
+        """Transform to fill whole screen"""
+
+        w = self.screen.width()
+        h = self.screen.height()
+
+        self.points[0] = QPointF(0, 0)
+        self.points[1] = QPointF(w, 0)
+        self.points[2] = QPointF(w, h)
+        self.points[3] = QPointF(0, h)
+
+        self.updated.emit()
+        self.update()
+
+    def leftTransformation(self):
+        """Transform to fill left side of screen"""
+
+        w = self.screen.width()
+        h = self.screen.height()
+
+        self.points[0] = QPointF(0, 0)
+        self.points[1] = QPointF(w / 2, 0)
+        self.points[2] = QPointF(w / 2, h)
+        self.points[3] = QPointF(0, h)
+
+        self.updated.emit()
+        self.update()
+
+    def rightTransformation(self):
+        """Transform to fill right side of screen"""
+
+        w = self.screen.width()
+        h = self.screen.height()
+
+        self.points[0] = QPointF(w / 2, 0)
+        self.points[1] = QPointF(w, 0)
+        self.points[2] = QPointF(w, h)
+        self.points[3] = QPointF(w / 2, h)
+
+        self.updated.emit()
+        self.update()
+
+    def setRect(self, rect):
+        """Set size of transformed area
+
+        Args:
+            rect (QRectF, QRect):
+        """
+
+        if not isinstance(rect, QRect) or not isinstance(rect, QRectF):
+            raise Exception("Given rect is not of type QRect or QRectF")
+
+        self.screen = QRectF(rect.x(), rect.y(), rect.width(), rect.height())
+
+        # reset transformation
+        self.wholeTransformation()
+
+    def getTransform(self):
+        """Returns QTransform object"""
+
+        t = QTransform()
+        p = [QPointF(o.x(), o.y()) for o in self.points]
+        w = self.screen.width()
+        h = self.screen.height()
+        q = [QPointF(0, 0), QPointF(w, 0), QPointF(w, h), QPointF(0, h)]
+
+        QTransform.quadToQuad(QPolygonF(q), QPolygonF(p), t)
+
+        return t
+
+
+class PaddingDialog(Popup):
+    """Padding popup dialog"""
+
+    updated = pyqtSignal(int, int, int, int)
+
+    def __init__(self, padding_left=0, padding_top=0, padding_right=0, padding_bottom=0, parent=None):
+        super(PaddingDialog, self).__init__(parent)
+
+        self._padding = [padding_left, padding_top, padding_right, padding_bottom]
+
+        self.__ui__()
+
+    def __ui__(self):
+
+        self.ui_left = QSpinBox()
+        self.ui_left.setRange(0, 1000)
+        self.ui_left.setValue(self._padding[0])
+        self.ui_left.valueChanged.connect(self._value_changed)
+
+        self.ui_right = QSpinBox()
+        self.ui_right.setRange(0, 1000)
+        self.ui_right.setValue(self._padding[2])
+        self.ui_right.valueChanged.connect(self._value_changed)
+
+        self.ui_top = QSpinBox()
+        self.ui_top.setRange(0, 1000)
+        self.ui_top.setValue(self._padding[1])
+        self.ui_top.valueChanged.connect(self._value_changed)
+
+        self.ui_bottom = QSpinBox()
+        self.ui_bottom.setRange(0, 1000)
+        self.ui_bottom.setValue(self._padding[3])
+        self.ui_bottom.valueChanged.connect(self._value_changed)
+
+        self.ui_layout = QGridLayout()
+        self.ui_layout.setSpacing(8)
+        self.ui_layout.setContentsMargins(12, 12, 12, 12)
+
+        self.ui_layout.addWidget(QLabel('Left'), 0, 0)
+        self.ui_layout.addWidget(self.ui_left, 1, 0)
+
+        self.ui_layout.addWidget(QLabel('Right'), 0, 1)
+        self.ui_layout.addWidget(self.ui_right, 1, 1)
+
+        self.ui_layout.addWidget(QLabel('Top'), 2, 0)
+        self.ui_layout.addWidget(self.ui_top, 3, 0)
+
+        self.ui_layout.addWidget(QLabel('Bottom'), 2, 1)
+        self.ui_layout.addWidget(self.ui_bottom, 3, 1)
+
+        self.setLayout(self.ui_layout)
+        self.setWindowTitle('Padding')
+        self.setGeometry(100, 300, 240, 128)
+
+    def _value_changed(self, i):
+        """Value spinbox has changed"""
+
+        self._padding = [int(self.ui_left.value()), int(self.ui_top.value()),
+                         int(self.ui_right.value()), int(self.ui_bottom.value())]
+        self.updated.emit(*self._padding)
+
+    def setPadding(self, padding_left=0, padding_top=0, padding_right=0, padding_bottom=0):
+        """Set padding values
+
+        Args:
+            padding_left (int): left padding
+            padding_top (int): top padding
+            padding_right (int): right padding
+            padding_bottom (int): bottom padding
+        """
+
+        self._padding = [padding_left, padding_top, padding_right, padding_bottom]
+
+
+class AlignDialog(Popup):
+    """Text align popup dialog"""
+
+    updated = pyqtSignal(int, int)
+
+    def __init__(self, horizontal, vertical, parent=None):
+        super(AlignDialog, self).__init__(parent)
+
+        self.align_horizontal = horizontal
+        self.align_vertical = vertical
+
+        self.__ui__()
+
+    def __ui__(self):
+
+        self.ui_horizontal = QComboBox()
+        self.ui_horizontal.activated.connect(self._value_changed)
+
+        h_index = [Qt.AlignLeft, Qt.AlignHCenter, Qt.AlignRight].index(self.align_horizontal)
+        v_index = [Qt.AlignTop, Qt.AlignVCenter, Qt.AlignBottom].index(self.align_vertical)
+
+        self.ui_horizontal.addItem("Left", QVariant(Qt.AlignLeft))
+        self.ui_horizontal.addItem("Center", QVariant(Qt.AlignHCenter))
+        self.ui_horizontal.addItem("Right", QVariant(Qt.AlignRight))
+        self.ui_horizontal.setCurrentIndex(h_index)
+
+        self.ui_vertical = QComboBox()
+        self.ui_vertical.activated.connect(self._value_changed)
+
+        self.ui_vertical.addItem("Top", QVariant(Qt.AlignTop))
+        self.ui_vertical.addItem("Middle", QVariant(Qt.AlignVCenter))
+        self.ui_vertical.addItem("Bottom", QVariant(Qt.AlignBottom))
+        self.ui_vertical.setCurrentIndex(v_index)
+
+        self.ui_layout = QGridLayout()
+        self.ui_layout.setSpacing(8)
+        self.ui_layout.setContentsMargins(12, 12, 12, 12)
+
+        self.ui_layout.addWidget(QLabel('Horizontal'), 0, 0)
+        self.ui_layout.addWidget(self.ui_horizontal, 1, 0)
+
+        self.ui_layout.addWidget(QLabel('Vertical'), 2, 0)
+        self.ui_layout.addWidget(self.ui_vertical, 3, 0)
+
+        self.setWindowTitle('Align')
+        self.setLayout(self.ui_layout)
+        self.setGeometry(100, 300, 120, 128)
+
+    def _value_changed(self, i):
+        """Value has been changed"""
+
+        self.align_horizontal = self.ui_horizontal.currentData()
+        self.align_vertical = self.ui_vertical.currentData()
+
+        self.updated.emit(self.align_horizontal, self.align_vertical)
+
+    def setAlign(self, horizontal, vertical):
+        """Set align values
+
+        Args:
+            horizontal (int): align type id
+            vertical (int): align type id
+        """
+
+        self.align_horizontal = horizontal
+        self.align_vertical = vertical
+
+
+class ShadowDialog(Popup):
+    """Shadow popup"""
+
+    updated = pyqtSignal("QPoint", "int", "QColor")
+
+    def __init__(self, offset, blur, color):
+        super(ShadowDialog, self).__init__(None)
+
+        self.offset = offset
+        self.blur = blur
+        self.color = color
+
+        # initialize ui components
+        self.ui_color_button = QPushButton("Set Color")
+        self.ui_color_button.clicked.connect(self._color_action)
+
+        self.ui_top = QSpinBox()
+        self.ui_top.setRange(0, 100)
+        self.ui_top.setValue(self.offset.y())
+        self.ui_top.valueChanged.connect(self._value_changed)
+
+        self.ui_left = QSpinBox()
+        self.ui_left.setRange(0, 100)
+        self.ui_left.setValue(self.offset.x())
+        self.ui_left.valueChanged.connect(self._value_changed)
+
+        self.ui_layout = VLayout()
+
+        self.ui_controls_layout = GridLayout()
+        self.ui_controls_layout.setSpacing(8)
+        self.ui_controls_layout.setContentsMargins(12, 12, 12, 0)
+        self.ui_controls_layout.addWidget(QLabel('Top'), 0, 0)
+        self.ui_controls_layout.addWidget(self.ui_top, 1, 0)
+        self.ui_controls_layout.addWidget(QLabel('Left'), 0, 1)
+        self.ui_controls_layout.addWidget(self.ui_left, 1, 1)
+
+        self.ui_button_layout = VLayout()
+        self.ui_button_layout.setSpacing(8)
+        self.ui_button_layout.setContentsMargins(12, 12, 12, 12)
+        self.ui_button_layout.addWidget(self.ui_color_button)
+
+        top = QWidget()
+        top.setLayout(self.ui_controls_layout)
+
+        line = QWidget()
+        line.setObjectName("line-divider")
+
+        self.ui_layout.addWidget(top)
+        self.ui_layout.addWidget(line)
+
+        bottom = QWidget()
+        bottom.setLayout(self.ui_button_layout)
+
+        self.ui_layout.addWidget(bottom)
+
+        self.setLayout(self.ui_layout)
+
+        self.setWindowTitle('Shadow')
+        self.setGeometry(100, 300, 240, 140)
+
+    def _color_action(self):
+        """Value of color picker changed"""
+
+        self.color = QColorDialog.getColor(self.color)
+        self.updated.emit(self.offset, self.blur, self.color)
+
+    def _value_changed(self, i):
+        """Value of UI components changed"""
+
+        self.offset = QPoint(self.ui_left.value(), self.ui_top.value())
+        self.updated.emit(self.offset, self.blur, self.color)
+
+
+class CompositionDialog(Popup):
+    """Composition preferences popup"""
+
+    updated = pyqtSignal("QSize")
+
+    def __init__(self, size, parent=None):
+        super(CompositionDialog, self).__init__(parent)
+
+        self.composition = size
+
+        self.__ui__()
+        self.update()
+
+    def __ui__(self):
+
+        self.ui_width = QSpinBox()
+        self.ui_width.setRange(100, 32000)
+        self.ui_width.valueChanged.connect(self._value_changed)
+
+        self.ui_height = QSpinBox()
+        self.ui_height.setRange(100, 32000)
+        self.ui_height.valueChanged.connect(self._value_changed)
+
+        self.ui_preset = QComboBox()
+        self.ui_preset.currentIndexChanged.connect(self._preset_changed)
+
+        self._update_list()
+
+        self.ui_layout = QGridLayout()
+        self.ui_layout.setSpacing(8)
+        self.ui_layout.setContentsMargins(12, 12, 12, 12)
+
+        self.ui_layout.addWidget(self.ui_preset, 0, 0, 1, 2)
+
+        self.ui_layout.addWidget(self.ui_width, 1, 0)
+        self.ui_layout.addWidget(self.ui_height, 1, 1)
+
+        self.setLayout(self.ui_layout)
+
+        self.setWindowTitle('Composition')
+        self.setGeometry(100, 300, 240, 108)
+
+    def update(self):
+        """Update UI"""
+        super(CompositionDialog, self).update()
+
+        width = self.composition.width()
+        height = self.composition.height()
+
+        self.ui_width.setValue(width)
+        self.ui_height.setValue(height)
+        self.ui_preset.setItemText(0, "Current (%dx%d)" % (width, height))
+
+    def _update_list(self):
+
+        comp = self.composition
+        presets = [("Current (%dx%d)" % (comp.width(), comp.height()), comp)]
+
+        for screen in QGuiApplication.screens():
+            width = screen.size().width()
+            height = screen.size().height()
+            mode = (screen.name() + " (%dx%d)" % (width, height), QSize(width, height))
+
+            presets.append(mode)
+
+        presets.extend([
+            ("Full HD (1920x1080)", QSize(1920, 1080)),
+            ("HD (1366x768)", QSize(1366, 768)),
+            ("XGA (1024x768)", QSize(1024, 768)),
+            ("WXGA (1280x800)", QSize(1280, 800)),
+            ("SXGA (1280x1024)", QSize(1280, 1024)),
+            ("UXGA (1600x1200)", QSize(1600, 1200)),
+            ("SVGA (800x600)", QSize(800, 600))])
+
+        self.ui_preset.clear()
+
+        for preset in presets:
+            self.ui_preset.addItem(preset[0], preset[1])
+
+        self.ui_preset.insertSeparator(1)
+
+    def _value_changed(self, i):
+
+        self.set_composition(QSize(self.ui_width.value(), self.ui_height.value()))
+
+    def _preset_changed(self, index):
+
+        rect = self.ui_preset.itemData(index)
+
+        if rect is None or index == 0:
+            return
+
+        self.set_composition(rect)
+
+    def set_composition(self, size):
+
+        self.composition = size
+        self.updated.emit(size)
+        self.update()
+
+
+class CaseDialog(Popup):
+
+    updated = pyqtSignal(int)
+
+    def __init__( self, case=0):
+        super(CaseDialog, self).__init__( None )
+
+        self.case = case
+
+        self.__ui__()
+
+    def __ui__(self):
+
+        self.ui_case = QComboBox()
+        self.ui_case.activated.connect(self.valueChanged)
+
+        h_index = [0, 1, 2, 3].index(self.case)
+
+        self.ui_case.addItem("Normal", QVariant(0))
+        self.ui_case.addItem("Title", QVariant(1))
+        self.ui_case.addItem("Upper", QVariant(2))
+        self.ui_case.addItem("Lower", QVariant(3))
+        self.ui_case.addItem("Capitalize", QVariant(4))
+        self.ui_case.setCurrentIndex(h_index)
+
+        self.ui_layout = QGridLayout()
+        self.ui_layout.setSpacing(8)
+        self.ui_layout.setContentsMargins(12, 12, 12, 12)
+
+        self.ui_layout.addWidget(QLabel('Text Case'), 0, 0)
+        self.ui_layout.addWidget(self.ui_case, 1, 0)
+
+        self.setLayout(self.ui_layout)
+
+        self.setWindowTitle('Align')
+        self.setGeometry(100, 300, 120, 80)
+
+    def valueChanged(self, i):
+
+        self.case = self.ui_case.currentData()
+
+        self.updated.emit(self.case)
+
+    def setCase(self, case):
+
+        self.case = case
 
 
 class PreferencesDialog(Dialog):
     """Display preferences window"""
 
-    def __init__(self, parent=None):
-        super(PreferencesDialog, self).__init__(parent)
+    updated = pyqtSignal()
+
+    def __init__(self, parent):
+        """Initialize PreferencesDialog
+
+        Args:
+            parent (DisplayPlugin): reference to DisplayPlugin instance
+        """
+        super(PreferencesDialog, self).__init__(None)
+
+        self._parent = parent
+
+        self.padding_popup = PaddingDialog(0, 0, 0, 0)
+        self.align_popup = AlignDialog(Qt.AlignHCenter, Qt.AlignVCenter)
+        self.shadow_popup = ShadowDialog(QPoint(0, 0), 0, QColor('#000000'))
+        self.composition_popup = CompositionDialog(QSize(800, 600))
+        self.case_popup = CaseDialog(0)
 
         self.__ui__()
 
     def __ui__(self):
         """Build UI"""
 
+        self._ui_transform = TransformWidget()
+        self._ui_transform.updated.connect(self._transform_event)
+
+        # toolbar actions
+        self._ui_output_menu = QMenu(self)
+
+        self._ui_output_action = Button("Output", self)
+        self._ui_output_action.setMenu(self._ui_output_menu)
+
+        self._ui_font_action = QToolButton(self)
+        self._ui_font_action.setIcon(QIcon(':/icons/font.png'))
+        self._ui_font_action.clicked.connect(self.font_action)
+
+        self._ui_shadow_action = QToolButton(self)
+        self._ui_shadow_action.setIcon(QIcon(':/icons/shadow.png'))
+        self._ui_shadow_action.clicked.connect(self.shadow_action)
+
+        self._ui_align_action = QToolButton(self)
+        self._ui_align_action.setIcon(QIcon(':/icons/align.png'))
+        self._ui_align_action.clicked.connect(self.align_action)
+
+        self._ui_case_action = QToolButton(self)
+        self._ui_case_action.setIcon(QIcon(':/icons/case.png'))
+        self._ui_case_action.clicked.connect(self.case_action)
+
+        self._ui_color_action = QToolButton(self)
+        self._ui_color_action.setIcon(QIcon(':/icons/color.png'))
+        self._ui_color_action.clicked.connect(self.color_action)
+
+        self._ui_composition_action = QToolButton(self)
+        self._ui_composition_action.setIcon(QIcon(':/icons/zone-select.png'))
+        self._ui_composition_action.clicked.connect(self.composition_action)
+
+        self._ui_padding_action = QToolButton(self)
+        self._ui_padding_action.setIcon(QIcon(':/icons/selection-select.png'))
+        self._ui_padding_action.clicked.connect(self.padding_action)
+
+        self._ui_testcard_action = QToolButton(self)
+        self._ui_testcard_action.setIcon(QIcon(':/icons/testcard.png'))
+        self._ui_testcard_action.setCheckable(True)
+        self._ui_testcard_action.clicked.connect(self.testcard_action)
+        self._ui_testcard_action.setChecked(False)
+
         self._ui_toolbar = Toolbar()
+        self._ui_toolbar.addWidget(self._ui_font_action)
+        self._ui_toolbar.addWidget(self._ui_shadow_action)
+        self._ui_toolbar.addWidget(self._ui_align_action)
+        self._ui_toolbar.addWidget(self._ui_case_action)
+        self._ui_toolbar.addWidget(self._ui_color_action)
+        self._ui_toolbar.addWidget(self._ui_composition_action)
+        self._ui_toolbar.addWidget(self._ui_padding_action)
+        self._ui_toolbar.addWidget(self._ui_testcard_action)
+        self._ui_toolbar.addWidget(Spacer())
+        self._ui_toolbar.addWidget(self._ui_output_action)
 
         self._ui_layout = VLayout()
-        self._ui_layout.addWidget(Spacer())
+        self._ui_layout.addWidget(self._ui_transform)
         self._ui_layout.addWidget(self._ui_toolbar)
 
         self.setLayout(self._ui_layout)
@@ -418,6 +1099,68 @@ class PreferencesDialog(Dialog):
         self.setGeometry(100, 100, 480, 360)
         self.setMinimumSize(300, 200)
         self.moveCenter()
+
+    def _transform_event(self):
+        """Called when transformation is changed"""
+
+        pass
+
+    @staticmethod
+    def _map_action_position(action):
+        """Returns point in middle of action"""
+
+        return action.mapToGlobal(action.rect().center())
+
+    def font_action(self):
+        """Font action clicked"""
+
+        # todo: supply current font
+        font, accept = QFontDialog.getFont(QFont('decorative'))
+
+        if accept:
+            print(font)
+
+        self.showWindow()
+
+    def padding_action(self):
+        """Padding action clicked"""
+
+        self.padding_popup.showAt(self._map_action_position(self._ui_padding_action))
+
+    def testcard_action(self):
+        """Testcard action clicked"""
+
+        flag = False
+
+        self._ui_testcard_action.setChecked(flag)
+
+    def shadow_action(self):
+        """Handle text shadow action click"""
+
+        self.shadow_popup.showAt(self._map_action_position(self._ui_shadow_action))
+
+    def color_action(self):
+        """Handle color action click"""
+
+        # todo: supply current text color
+        color = QColorDialog.getColor(QColor('#ffffff'))
+
+        self.showWindow()
+
+    def composition_action(self):
+        """Handle composition action click"""
+
+        self.composition_popup.showAt(self._map_action_position(self._ui_composition_action))
+
+    def align_action(self):
+        """Handle text align action click"""
+
+        self.align_popup.showAt(self._map_action_position(self._ui_align_action))
+
+    def case_action(self):
+        """Handle case action click"""
+
+        self.case_popup.showAt(self._map_action_position(self._ui_case_action))
 
 
 class DisplayPreviewViewer(Viewer):

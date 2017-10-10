@@ -139,7 +139,7 @@ class _PropertiesPopup(Popup):
         # size
         self._ui_size = QSpinBox()
         self._ui_size.setMinimum(12)
-        self._ui_size.setMaximum(80)
+        self._ui_size.setMaximum(180)
         self._ui_size.setValue(self._viewer.style_size)
         self._ui_size.valueChanged.connect(self.size_changed)
 

@@ -68,6 +68,9 @@ class DisplayPlugin(Plugin):
         # Connect signals
         self.connect('/app/close', self.close)
         self.connect('!cue/execute', self._execute)
+        self.connect('/comp/testcard', self._testcard)
+        self.connect('/comp/width', self._composition_changed)
+        self.connect('/comp/height', self._composition_changed)
 
         desktop = QApplication.desktop()
         desktop.resized.connect(self._screens_changed)
@@ -92,10 +95,6 @@ class DisplayPlugin(Plugin):
     def _render(self):
         """Update composition and windows"""
 
-        # don't render if output disabled
-        # if self.disabled:
-        #    return False
-
         # render a composition
         self._composition.render()
         # notify others
@@ -109,7 +108,7 @@ class DisplayPlugin(Plugin):
             action = self.menu_testcard
             action.setChecked(not action.isChecked())
 
-        self._composition.setTestCard(action.isChecked())
+        self.emit('/comp/testcard', action.isChecked())
 
     def preferences_action(self, action=None):
         """Show display preferences dialog"""
@@ -129,6 +128,8 @@ class DisplayPlugin(Plugin):
         else:
             self.window.show()
 
+        self.emit('/display/disabled', action.isChecked())
+
     def close(self):
         """Close display and friends on application exit"""
 
@@ -144,12 +145,24 @@ class DisplayPlugin(Plugin):
         else:
             text = cue.name
 
-        self._composition.setText(text)
+        self.emit('/clip/text/source', text)
 
     def _screens_changed(self):
         """Display configuration changed"""
 
         self.disable_action()
+
+    def _testcard(self, flag):
+        """Update action according to"""
+
+        action = self.menu_testcard
+        action.setChecked(flag)
+
+    def _composition_changed(self, size=0):
+        """Swap composition texture as QImage can change size after initialization"""
+
+        self._composition = CompositionTexture()
+        self.emit('!composition/update')
 
     @classmethod
     def instance(cls):
@@ -166,6 +179,7 @@ class DisplayWindow(Frameless):
 
         self._position = QPoint(0, 0)
         self._plugin = parent
+        self._preferences = CompositionPreferences.instance()
 
         Application.instance().signals.connect('!composition/update', self.update)
 
@@ -182,12 +196,25 @@ class DisplayWindow(Frameless):
         """Draw image"""
 
         output = event.rect()
-        composition = output
+        comp = self._plugin.composition
 
         painter = QPainter()
         painter.begin(self)
         painter.setRenderHints(QPainter.Antialiasing | QPainter.TextAntialiasing | QPainter.SmoothPixmapTransform)
 
+        t = QTransform()
+        q = QPolygonF([QPointF(0, 0),
+                       QPointF(comp.width(), 0),
+                       QPointF(comp.width(), comp.height()),
+                       QPointF(0, comp.height())])
+        p = QPolygonF([QPointF(0, 0),
+                       QPointF(output.width(), 0),
+                       QPointF(output.width(), output.height()),
+                       QPointF(0, output.height())])
+
+        QTransform.quadToQuad(q, p, t)
+
+        painter.setTransform(t)  # * self._preferences.transformation)
         painter.fillRect(output, Qt.black)
         painter.drawImage(output, self._plugin.composition)
 
@@ -213,77 +240,66 @@ class CompositionTexture(QImage):
     """Display output texture"""
 
     def __init__(self):
-        super(CompositionTexture, self).__init__(QSize(800, 600), QImage.Format_RGB32)
 
-        self._display_test = False
+        self._p = CompositionPreferences.instance()
 
-        self._text = ""
-        self._style_color = QColor('#fff')
-        self._style_background = QColor('#222')
-        self._style_case_transform = False
-        self._style_font = QFont('decorative', 28)
+        # create composition
+        super(CompositionTexture, self).__init__(self._p.composition, QImage.Format_RGB32)
 
-        self._shadow_x = 0
-        self._shadow_y = 5
-        self._shadow_blur = 0
-        self._shadow_color = QColor("#000000")
+        # connect signals
+        signals = Application.instance().signals
+        signals.connect('/comp/testcard', self._testcard_cb)
+        signals.connect('/clip/text/source', self._text_cb)
 
-        self._padding = QMargins(10, 10, 10, 10)
-        self._align_horizontal = Qt.AlignHCenter
-        self._align_vertical = Qt.AlignVCenter
+    def _testcard_cb(self, flag=False):
+        """Show test card or not"""
 
-        self._transform = QTransform()
-        self._composition = QRect(0, 0, 800, 600)
-        self._fullscreen = False
-        self._geometry = QRect(100, 100, 800, 600)
+        self._p.display_test = flag
+        self.render()
+
+    def _text_cb(self, text):
+
+        self._p.text = text
+        self.render()
 
     def render(self):
         """Render composition"""
 
         p = QPainter()
         p.begin(self)
+        p.setRenderHints(QPainter.Antialiasing | QPainter.TextAntialiasing | QPainter.SmoothPixmapTransform)
 
         p.fillRect(self.rect(), Qt.black)
 
-        if self._display_test:
-            p.drawPixmap(self.rect(), CompositionTexture.generate_testcard(self.width(), self.height()))
+        if self._p.display_test:
+            p.drawPixmap(self.rect(), CompositionTexture.generate_testcard(self._p.composition.width(),
+                                                                           self._p.composition.height()))
         else:
             self._draw_text(p)
 
         p.end()
 
-    def setTestCard(self, flag):
-        """Show test card or not"""
-
-        self._display_test = flag
-        self.render()
-
-    def setText(self, text):
-
-        self._text = text
-        self.render()
-
     def _draw_text(self, painter):
         """Draw text"""
 
-        painter.setFont(self._style_font)
-        painter.setPen(self._shadow_color)
+        painter.setFont(self._p.style_font)
+        painter.setPen(self._p.shadow_color)
 
-        padding = self._padding
+        padding = self._p.padding
 
-        box = QRect(self._composition.topLeft(), self._composition.bottomRight())
+        box = QRect(0, 0, self._p.composition.width(), self._p.composition.height())
         box.adjust(padding.left(), padding.top(), -padding.right(), -padding.bottom())
-        box.setX(box.x() + self._shadow_x)
-        box.setY(box.y() + self._shadow_y)
+        box.setX(box.x() + self._p.shadow_x)
+        box.setY(box.y() + self._p.shadow_y)
 
-        painter.drawText(box, self._align_vertical | self._align_horizontal | Qt.TextWordWrap, self._text)
+        painter.drawText(box, self._p.align_vertical | self._p.align_horizontal | Qt.TextWordWrap, self._p.text)
 
-        painter.setPen(self._style_color)
+        painter.setPen(self._p.style_color)
 
-        box = QRect(self._composition.topLeft(), self._composition.bottomRight())
+        box = QRect(0, 0, self._p.composition.width(), self._p.composition.height())
         box.adjust(padding.left(), padding.top(), -padding.right(), -padding.bottom())
 
-        painter.drawText(box, self._align_vertical | self._align_horizontal | Qt.TextWordWrap, self._text)
+        painter.drawText(box, self._p.align_vertical | self._p.align_horizontal | Qt.TextWordWrap, self._p.text)
 
     @classmethod
     def generate_testcard(cls, width, height):
@@ -303,7 +319,7 @@ class CompositionTexture(QImage):
         pen.setWidth(1)
 
         painter.setPen(pen)
-        lines = math.ceil(max(comp.width(), comp.height()) / offset)
+        lines = int(max(comp.width(), comp.height()) / offset)
 
         for index in range(-lines, lines):
             o = index * offset
@@ -322,7 +338,7 @@ class CompositionTexture(QImage):
         painter.setPen(pen)
 
         radius = min(comp.height(), comp.width()) / 2
-        circles = math.ceil((comp.width() / radius) / 2) + 1
+        circles = int((comp.width() / radius) / 2) + 1
 
         for index in range(-circles, circles + 1):
             ox = index * (radius * 1.25)
@@ -340,6 +356,85 @@ class CompositionTexture(QImage):
         painter.end()
 
         return image
+
+
+class CompositionPreferences(object):
+    """This class holds attributes used to render composition as Qt objects"""
+
+    __instance = None
+
+    def __init__(self):
+
+        # private
+        self._app = Application.instance()
+        self._signals = self._app.signals
+        self._settings = self._app.project.settings()
+
+        # public
+        self.display_test = False
+
+        self.text = ""
+        self.style_color = QColor('#fff')
+        self.style_background = QColor('#222')
+        self.style_case_transform = 0
+        self.style_font = QFont('decorative', 28)
+
+        self.shadow_x = 0
+        self.shadow_y = 5
+        self.shadow_blur = 0
+        self.shadow_color = QColor("#000000")
+
+        self.padding = QMargins(10, 10, 10, 10)
+        self.align_horizontal = Qt.AlignHCenter
+        self.align_vertical = Qt.AlignVCenter
+
+        self.transform = QTransform()
+        self.composition = QSize(800, 600)
+        self.fullscreen = False
+        self.geometry = QRect(100, 100, 800, 600)
+
+    def bind(self):
+        """Bind signals"""
+
+        pass
+
+    def parse(self):
+        """Get properties from project settings"""
+
+        s = self._settings
+
+        self.style_color = QColor(s.get('/clip/text/color', default='#ffffff'))
+        self.style_background = QColor('#000')
+        self.style_case_transform = s.get('/clip/text/transform', default=0)
+        self.style_font = QFont('decorative', 28)
+
+        self.shadow_x = s.get('/clip/text/shadow/x', default=0)
+        self.shadow_y = s.get('/clip/text/shadow/y', default=0)
+        self.shadow_blur = s.get('/clip/text/shadow/blur', default=0)
+        self.shadow_color = QColor(s.get('/clip/text/shadow/color', default='#000000'))
+
+        # self.padding = QMargins(*s.get('/clip/text/padding', default=[0, 0, 0, 0]))
+        self.align_horizontal = s.get('/clip/text/align', default=Qt.AlignVCenter)
+        self.align_vertical = s.get('/clip/text/valign', default=Qt.AlignHCenter)
+
+        self.transform = QTransform()
+        self.composition = QSize(s.get('/comp/width', default=800),
+                                 s.get('/comp/height', default=600))
+        self.fullscreen = s.get('/display/fullscreen', default=False)
+        self.geometry = QRect(s.get('/display/x', default=0),
+                              s.get('/display/y', default=0),
+                              s.get('/display/width', default=800),
+                              s.get('/display/height', default=600))
+
+    @classmethod
+    def instance(cls):
+        """Returns instance"""
+
+        if not cls.__instance:
+            cls.__instance = CompositionPreferences()
+            cls.__instance.parse()
+
+        return cls.__instance
 
 
 class DisplayWidget(QWidget):
@@ -737,8 +832,15 @@ class AlignDialog(Popup):
         self.ui_horizontal = QComboBox()
         self.ui_horizontal.activated.connect(self._value_changed)
 
-        h_index = [Qt.AlignLeft, Qt.AlignHCenter, Qt.AlignRight].index(self.align_horizontal)
-        v_index = [Qt.AlignTop, Qt.AlignVCenter, Qt.AlignBottom].index(self.align_vertical)
+        try:
+            h_index = [Qt.AlignLeft, Qt.AlignHCenter, Qt.AlignRight].index(self.align_horizontal)
+        except:
+            h_index = Qt.AlignHCenter
+
+        try:
+            v_index = [Qt.AlignTop, Qt.AlignVCenter, Qt.AlignBottom].index(self.align_vertical)
+        except:
+            v_index = Qt.AlignVCenter
 
         self.ui_horizontal.addItem("Left", QVariant(Qt.AlignLeft))
         self.ui_horizontal.addItem("Center", QVariant(Qt.AlignHCenter))
@@ -869,6 +971,7 @@ class CompositionDialog(Popup):
         super(CompositionDialog, self).__init__(parent)
 
         self.composition = size
+        self._ignore_update = False
 
         self.__ui__()
         self.update()
@@ -942,6 +1045,10 @@ class CompositionDialog(Popup):
         self.ui_preset.insertSeparator(1)
 
     def _value_changed(self, i):
+        """Value of spinner is changed"""
+
+        if self._ignore_update:
+            return False
 
         self.set_composition(QSize(self.ui_width.value(), self.ui_height.value()))
 
@@ -956,9 +1063,11 @@ class CompositionDialog(Popup):
 
     def set_composition(self, size):
 
+        self._ignore_update = True
         self.composition = size
         self.updated.emit(size)
         self.update()
+        self._ignore_update = False
 
 
 class CaseDialog(Popup):
@@ -1023,12 +1132,24 @@ class PreferencesDialog(Dialog):
         super(PreferencesDialog, self).__init__(None)
 
         self._parent = parent
+        self._settings = self._parent.project.settings()
+        self._preferences = CompositionPreferences.instance()
+        p = self._preferences
 
-        self.padding_popup = PaddingDialog(0, 0, 0, 0)
-        self.align_popup = AlignDialog(Qt.AlignHCenter, Qt.AlignVCenter)
-        self.shadow_popup = ShadowDialog(QPoint(0, 0), 0, QColor('#000000'))
-        self.composition_popup = CompositionDialog(QSize(800, 600))
-        self.case_popup = CaseDialog(0)
+        self.padding_popup = PaddingDialog(p.padding.left(), p.padding.top(), p.padding.right(), p.padding.bottom())
+        self.padding_popup.updated.connect(self.padding_updated)
+
+        self.align_popup = AlignDialog(p.align_horizontal, p.align_vertical)
+        self.align_popup.updated.connect(self.align_updated)
+
+        self.shadow_popup = ShadowDialog(QPoint(p.shadow_x, p.shadow_y), p.shadow_blur, p.shadow_color)
+        self.shadow_popup.updated.connect(self.shadow_updated)
+
+        self.composition_popup = CompositionDialog(p.composition)
+        self.composition_popup.updated.connect(self.composition_updated)
+
+        self.case_popup = CaseDialog(p.style_case_transform)
+        self.case_popup.updated.connect(self.case_updated)
 
         self.__ui__()
 
@@ -1075,8 +1196,8 @@ class PreferencesDialog(Dialog):
         self._ui_testcard_action = QToolButton(self)
         self._ui_testcard_action.setIcon(QIcon(':/icons/testcard.png'))
         self._ui_testcard_action.setCheckable(True)
+        self._ui_testcard_action.setChecked(self._preferences.display_test)
         self._ui_testcard_action.clicked.connect(self.testcard_action)
-        self._ui_testcard_action.setChecked(False)
 
         self._ui_toolbar = Toolbar()
         self._ui_toolbar.addWidget(self._ui_font_action)
@@ -1111,14 +1232,50 @@ class PreferencesDialog(Dialog):
 
         return action.mapToGlobal(action.rect().center())
 
+    def emit(self, message, *args):
+        """Emit message to all"""
+
+        self._settings.set(message, args[0] if len(args) == 1 else args)
+        self._parent.emit(message, *args)
+        self._preferences.parse()
+
+    def padding_updated(self, left, top, right, bottom):
+        """Text padding updated"""
+
+        self.emit('/clip/text/padding', left, top, right, bottom)
+
+    def shadow_updated(self, offset, blur, color):
+        """Shadow properties changed"""
+
+        self.emit('/clip/text/shadow/x', offset.x())
+        self.emit('/clip/text/shadow/y', offset.y())
+        self.emit('/clip/text/shadow/color', color.name())
+        self.emit('/clip/text/shadow/blur', blur)
+
+    def align_updated(self, horizontal, vertical):
+        """Align changed"""
+
+        self.emit('/clip/text/align', horizontal)
+        self.emit('/clip/text/valign', vertical)
+
+    def case_updated(self, index):
+        """Text case changed"""
+
+        self.emit('/clip/text/transform', index)
+
+    def composition_updated(self, size):
+        """Composition size updated"""
+
+        self.emit('/comp/width', size.width())
+        self.emit('/comp/height', size.height())
+
     def font_action(self):
         """Font action clicked"""
 
-        # todo: supply current font
-        font, accept = QFontDialog.getFont(QFont('decorative'))
+        font, accept = QFontDialog.getFont(self._preferences.style_font)
 
         if accept:
-            print(font)
+            print('font', font)
 
         self.showWindow()
 
@@ -1130,9 +1287,7 @@ class PreferencesDialog(Dialog):
     def testcard_action(self):
         """Testcard action clicked"""
 
-        flag = False
-
-        self._ui_testcard_action.setChecked(flag)
+        self.emit('/comp/testcard', not self._preferences.display_test)
 
     def shadow_action(self):
         """Handle text shadow action click"""
@@ -1142,8 +1297,10 @@ class PreferencesDialog(Dialog):
     def color_action(self):
         """Handle color action click"""
 
-        # todo: supply current text color
-        color = QColorDialog.getColor(QColor('#ffffff'))
+        color = QColorDialog.getColor(self._preferences.style_color)
+
+        if color:
+            self.emit('/clip/text/color', color.name())
 
         self.showWindow()
 

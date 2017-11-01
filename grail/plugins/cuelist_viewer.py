@@ -15,7 +15,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
 from grailkit.dna import DNA, CueEntity
-from grailkit.qt import *
+from grail.qt import *
 
 from grail.core import Viewer
 
@@ -648,7 +648,7 @@ class CuelistViewer(Viewer):
         cuelist_id = self._cuelist_id
         cuelist = self.project.cuelist(cuelist_id)
 
-        if not entity and not cuelist:
+        if not entity or not cuelist:
             return False
 
         if entity.type == DNA.TYPE_SONG:

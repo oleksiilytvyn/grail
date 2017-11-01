@@ -14,7 +14,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
-from grailkit.qt import *
+from grail.qt import *
 from grail.core import Viewer
 
 

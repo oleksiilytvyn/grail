@@ -16,7 +16,7 @@ from PyQt5.QtGui import QIcon, QColor
 from PyQt5.QtWidgets import QAbstractItemView, QHeaderView, QAction, QWidget, QStackedWidget, QToolButton, \
     QStyledItemDelegate, QLineEdit, QStyle, QMenu
 
-from grailkit.qt import Toolbar, Icon, Label, Spacer, VLayout, Popup, Table, TableItem
+from grail.qt import Toolbar, Icon, Label, Spacer, VLayout, Popup, Table, TableItem
 
 from grail.core import Viewer
 

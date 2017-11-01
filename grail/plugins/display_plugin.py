@@ -16,7 +16,7 @@ from PyQt5.QtWidgets import *
 
 from grailkit.util import OS_MAC
 from grailkit.dna import DNA
-from grailkit.qt import *
+from grail.qt import *
 
 from grail.core import Plugin, Viewer, Configurator
 

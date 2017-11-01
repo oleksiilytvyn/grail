@@ -18,7 +18,7 @@ from PyQt5.QtWidgets import *
 from grailkit.dna import DNA, DNAError, Library
 from grailkit.util import *
 from grailkit.bible import BibleHost, BibleHostError
-from grailkit.qt import AboutDialog, MessageDialog, Application, ProgressDialog
+from grail.qt import AboutDialog, MessageDialog, Application, ProgressDialog
 
 import grail
 

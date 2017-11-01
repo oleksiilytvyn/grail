@@ -11,7 +11,7 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QStackedWidget
 
-from grailkit.qt import Dialog, List, ListItem, Splitter, VLayout, Component, Icon
+from grail.qt import Dialog, List, ListItem, Splitter, VLayout, Component, Icon
 
 from grail.core import Configurator
 

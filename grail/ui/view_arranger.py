@@ -13,7 +13,7 @@ import json
 from PyQt5.QtCore import *
 
 from grailkit.core import Signal
-from grailkit.qt import Component, HLayout, Splitter
+from grail.qt import Component, HLayout, Splitter
 
 from grail.core import Viewer
 from grail.plugins import EmptyViewer

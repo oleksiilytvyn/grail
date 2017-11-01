@@ -16,7 +16,7 @@ from PyQt5.QtWidgets import *
 
 from grailkit.bible import Verse
 from grailkit.dna import DNA, SongEntity
-from grailkit.qt import *
+from grail.qt import *
 
 from grail.core import Viewer
 

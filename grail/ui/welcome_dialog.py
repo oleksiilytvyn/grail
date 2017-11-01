@@ -15,7 +15,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
-from grailkit.qt import Dialog, Welcome, WelcomeAction
+from grail.qt import Dialog, Welcome, WelcomeAction
 
 
 class WelcomeDialog(Dialog):

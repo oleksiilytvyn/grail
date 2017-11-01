@@ -13,7 +13,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
 import grailkit.dna as dna
-from grailkit.qt import *
+from grail.qt import *
 from grailkit.bible import BibleHost, BibleHostError
 
 from grail.core import Configurator, Plugin, Viewer

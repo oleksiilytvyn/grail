@@ -13,7 +13,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
 from grailkit.util import default_key
-from grailkit.qt import Component, Application
+from grail.qt import Component, Application
 from grailkit.plug import PluginRegistry
 
 

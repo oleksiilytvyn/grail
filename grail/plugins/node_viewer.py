@@ -14,7 +14,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QAction, QToolButton, QAbstractItemView, QTreeWidget
 
-from grailkit.qt import Spacer, MessageDialog, Toolbar, Tree, TreeItem, VLayout
+from grail.qt import Spacer, MessageDialog, Toolbar, Tree, TreeItem, VLayout
 from grailkit.dna import DNA
 
 from grail.core import Viewer

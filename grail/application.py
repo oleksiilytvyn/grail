@@ -16,7 +16,7 @@ from PyQt5.QtCore import QFile, pyqtSignal
 
 from grailkit.dna import SettingsFile, Project, Library
 from grailkit.bible import BibleHost
-from grailkit.qt import Application, MessageDialog
+from grail.qt import Application, MessageDialog
 from grailkit.core import Signalable
 
 import grail

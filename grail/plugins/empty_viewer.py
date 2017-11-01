@@ -11,7 +11,7 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QSizePolicy
 
-from grailkit.qt import Label, Button, Spacer, VLayout
+from grail.qt import Label, Button, Spacer, VLayout
 
 from grail.core import Viewer
 

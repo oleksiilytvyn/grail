@@ -18,10 +18,12 @@ from grailkit.plug import PluginRegistry
 
 
 class _PluginMeta(object):
-    """Plugin base class.
-    All plugin types must have properties and methods defined by this class"""
+    """
+    Plugin base class.
+    All plugin types must have properties and methods defined by this class.
+    """
 
-    # unique plugin identifier
+    # Unique plugin identifier
     id = 'dummy-plugin'
 
     # Plugin display name

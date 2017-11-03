@@ -1,9 +1,12 @@
 # -*- coding: UTF-8 -*-
 """
-    grailkit.qt.text_edit
-    ~~~~~~~~~~~~~~~~~~~~~
+    grail.qt.text_edit
+    ~~~~~~~~~~~~~~~~~~
 
-    
+    Simple text edit widget
+
+    :copyright: (c) 2017 by Oleksii Lytvyn.
+    :license: GNU, see LICENSE for more details.
 """
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QTextEdit

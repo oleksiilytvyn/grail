@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 """
-    grailkit.qt.switch
-    ~~~~~~~~~~~~~~~~~~
+    grail.qt.switch
+    ~~~~~~~~~~~~~~~
 
     Simple two state switch component
 

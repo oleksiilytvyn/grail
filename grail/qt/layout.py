@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 """
-    grailkit.qt.layout
-    ~~~~~~~~~~~~~~~~~~
+    grail.qt.layout
+    ~~~~~~~~~~~~~~~
 
     Layouts
 

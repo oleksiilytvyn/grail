@@ -4,6 +4,9 @@
     ~~~~~~~~~~~~~~~~~~~
 
     Host in/out OSC connections
+
+    :copyright: (c) 2017 by Grail Team.
+    :license: GNU, see LICENSE for more details.
 """
 import socketserver
 
@@ -13,7 +16,7 @@ from grailkit.osc import *
 class OSCHost:
 
     def __init__(self):
-        """"""
+        """Take care of OSC in/out"""
 
         self._client = _OSCClient()
         self._server = _OSCServer()

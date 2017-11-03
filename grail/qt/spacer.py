@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 """
-    grailkit.qt.spacer
-    ~~~~~~~~~~~~~~~~~~
+    grail.qt.spacer
+    ~~~~~~~~~~~~~~~
 
     Transparent widget that only task to stretch components and fill space
 

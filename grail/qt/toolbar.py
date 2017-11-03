@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 """
-    grailkit.qt.toolbar
-    ~~~~~~~~~~~~~~~~~~~
+    grail.qt.toolbar
+    ~~~~~~~~~~~~~~~~
 
     Toolbar component
 

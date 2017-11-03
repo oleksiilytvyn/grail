@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 """
-    grailkit.qt.list
-    ~~~~~~~~~~~~~~~~
+    grail.qt.list
+    ~~~~~~~~~~~~~
 
     Simple list widget
 

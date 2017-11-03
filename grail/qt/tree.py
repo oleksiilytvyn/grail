@@ -1,9 +1,12 @@
 # -*- coding: UTF-8 -*-
 """
-    grailkit.qt.tree
-    ~~~~~~~~~~~~~~~~
+    grail.qt.tree
+    ~~~~~~~~~~~~~
 
     TreeWidget and TreeItem
+
+    :copyright: (c) 2017 by Oleksii Lytvyn.
+    :license: GNU, see LICENSE for more details.
 """
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QTreeWidget, QTreeWidgetItem, QAbstractItemView, QScrollBar

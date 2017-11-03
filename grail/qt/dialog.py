@@ -1,9 +1,9 @@
 # -*- coding: UTF-8 -*-
 """
-    grailkit.qt.dialog
-    ~~~~~~~~~~~~~~~~~~
+    grail.qt.dialog
+    ~~~~~~~~~~~~~~~
 
-    Base class for all Grail Kit UI dialogs
+    Base class for all Grail UI dialogs
 
     :copyright: (c) 2017 by Oleksii Lytvyn.
     :license: GNU, see LICENSE for more details.

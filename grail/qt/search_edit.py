@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 """
-    grailkit.qt.search_edit
-    ~~~~~~~~~~~~~~~~~~~~~~~
+    grail.qt.search_edit
+    ~~~~~~~~~~~~~~~~~~~~
 
     Line edit with clear button and more signals
 

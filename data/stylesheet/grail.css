@@ -59,25 +59,13 @@ QTreeWidget {
         border-bottom: 1px solid #8a9fbb;
         }
 
-    QTreeWidget::branch:has-children:!has-siblings:closed,
-    QTreeWidget::branch:closed:has-children:has-siblings {
-        border-image: none;
-        image: url(:/i/branch-closed-white.png);
-        }
-
-    QTreeWidget::branch:open:has-children:!has-siblings,
-    QTreeWidget::branch:open:has-children:has-siblings  {
-        border-image: none;
-        image: url(:/i/branch-open-white.png);
-        }
-
-    QTreeWidget::branch:has-children:!has-siblings:closed:selected,
+    QTreeWidget::branch:closed:has-children:has-siblings,
     QTreeWidget::branch:closed:has-children:has-siblings:selected {
         border-image: none;
         image: url(:/i/branch-closed-white.png);
         }
 
-    QTreeWidget::branch:open:has-children:!has-siblings:selected,
+    QTreeWidget::branch:open:has-children:has-siblings,
     QTreeWidget::branch:open:has-children:has-siblings:selected  {
         border-image: none;
         image: url(:/i/branch-open-white.png);
@@ -238,7 +226,6 @@ SongDialog {
 
         #cuelist_dialog_toolbar {
             background: #222;
-            border-top: 1px solid #8a9fbb;
             border: none;
             padding: 0;
             margin: 0;
@@ -494,6 +481,33 @@ PreferencesDialog {
                 }
 
             #OSCOutConfigurator_list::item:selected {
+                background: #8a9fbb;
+                color: #e6e6e6;
+                }
+
+    /**
+     * @section OSCInConfigurator
+     */
+
+    #OSCInConfigurator {
+        }
+
+        #OSCInConfigurator_list {
+            border: none;
+            outline: 0;
+            background: #2f2f2f;
+            show-decoration-selected: 1;
+            alternate-background-color: #393939;
+            }
+
+            #OSCInConfigurator_list::item {
+                border: none;
+                color: #e6e6e6;
+                padding: 6px 12px;
+                qproperty-wordWrap: true;
+                }
+
+            #OSCInConfigurator_list::item:selected {
                 background: #8a9fbb;
                 color: #e6e6e6;
                 }

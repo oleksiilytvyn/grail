@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 """
-    grailkit.qt.button
-    ~~~~~~~~~~~~~~~~~~
+    grail.qt.button
+    ~~~~~~~~~~~~~~~
 
     Button component
 

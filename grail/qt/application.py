@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 """
-    grailkit.qt.application
-    ~~~~~~~~~~~~~~~~~~~~~~~~
+    grail.qt.application
+    ~~~~~~~~~~~~~~~~~~~~
 
     Extended QApplication class
 
@@ -140,7 +140,7 @@ class Application(QApplication):
         pass
 
     @classmethod
-    def instance(self):
+    def instance(cls):
         """Get instance of Application
 
         Returns: instance of QCoreApplication or Application

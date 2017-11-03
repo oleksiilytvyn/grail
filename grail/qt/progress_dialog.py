@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 """
-    grailkit.qt.progress_dialog
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    grail.qt.progress_dialog
+    ~~~~~~~~~~~~~~~~~~~~~~~~
 
     Dialog for displaying any progress
 

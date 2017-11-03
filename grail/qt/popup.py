@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 """
-    grailkit.qt.balloon_dialog
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    grail.qt.balloon_dialog
+    ~~~~~~~~~~~~~~~~~~~~~~~
 
     Floating dialog with pointer and without title bar
 
@@ -9,9 +9,9 @@
     :license: GNU, see LICENSE for more details.
 """
 
-from PyQt5.QtCore import Qt, QPointF, QSize, QEvent, QObject
+from PyQt5.QtCore import Qt, QPoint, QPointF, QSize, QEvent, QObject, QRect
 from PyQt5.QtGui import QPolygonF, QColor, QPainter, QPainterPath, QBrush
-from PyQt5.QtWidgets import QGraphicsDropShadowEffect
+from PyQt5.QtWidgets import QGraphicsDropShadowEffect, QApplication, QDesktopWidget, QWidget
 
 from grail.qt import Dialog
 from grailkit.util import OS_MAC
@@ -19,8 +19,6 @@ from grailkit.util import OS_MAC
 
 class Popup(Dialog):
     """Dialog without title bar and frame, but with rounded corners and pointing triangle"""
-
-    # todo: fix bug when popup show at right position but part of dialog is on second screen or offscreen
 
     def __init__(self, parent=None):
         super(Popup, self).__init__(parent)
@@ -106,7 +104,18 @@ class Popup(Dialog):
 
         self.show()
         self.raise_()
-        self.move(point.x() - self.width() / 2, point.y() - self.height() + 12)
+
+        desktop = QDesktopWidget()
+        screen = desktop.screenGeometry(point)
+        location = QPoint(point.x() - self.width() / 2, point.y() - self.height() + 12)
+
+        # calculate point location inside current screen
+        if location.x() <= screen.x():
+            location.setX(screen.x())
+        elif location.x() + self.width() >= screen.x() + screen.width():
+            location.setX(screen.x() + screen.width() - self.width())
+
+        self.move(location.x(), location.y())
 
     def setBackgroundColor(self, color):
         """Set a color of whole dialog

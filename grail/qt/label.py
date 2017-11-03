@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 """
-    grailkit.qt.label
-    ~~~~~~~~~~~~~~~~~
+    grail.qt.label
+    ~~~~~~~~~~~~~~
 
     Text label component
 

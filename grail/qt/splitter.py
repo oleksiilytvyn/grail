@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 """
-    grailkit.qt.splitter
-    ~~~~~~~~~~~~~~~~~~~~
+    grail.qt.splitter
+    ~~~~~~~~~~~~~~~~~
 
     Splitter component
 

@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 """
-    grailkit.qt.icon
-    ~~~~~~~~~~~~~~~~
+    grail.qt.icon
+    ~~~~~~~~~~~~~
 
     QIcon with color changing capabilities
 

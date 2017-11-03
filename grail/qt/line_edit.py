@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 """
-    grailkit.qt.line_edit
-    ~~~~~~~~~~~~~~~~~~~~~
+    grail.qt.line_edit
+    ~~~~~~~~~~~~~~~~~~
 
     Line edit
 

@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 """
-    grailkit.qt.table
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    grail.qt.table
+    ~~~~~~~~~~~~~~
 
     Table widget
 

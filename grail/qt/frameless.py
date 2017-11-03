@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 """
-    grailkit.qt.frameless
-    ~~~~~~~~~~~~~~~~~~~~~
+    grail.qt.frameless
+    ~~~~~~~~~~~~~~~~~~
 
     Frameless dialog implementation
 

@@ -1,10 +1,9 @@
 # -*- coding: UTF-8 -*-
 """
-    grailkit.qt
-    ~~~~~~~~~~~
+    grail.qt
+    ~~~~~~~~
 
-    Application development toolkit on top of Qt,
-    this set of components and widgets developed for consistent look of grail-like applications
+    Application development toolkit on top of Qt
 
     :copyright: (c) 2017 by Oleksii Lytvyn.
     :license: GNU, see LICENSE for more details.

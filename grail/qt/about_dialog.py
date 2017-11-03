@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 """
-    grailkit.qt.about_dialog
-    ~~~~~~~~~~~~~~~~~~~~~~~~
+    grail.qt.about_dialog
+    ~~~~~~~~~~~~~~~~~~~~~
 
     Generic about dialog window
 

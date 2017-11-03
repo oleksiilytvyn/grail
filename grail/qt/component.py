@@ -1,9 +1,9 @@
 # -*- coding: UTF-8 -*-
 """
-    grailkit.qt.component
-    ~~~~~~~~~~~~~~~~~~~~~
+    grail.qt.component
+    ~~~~~~~~~~~~~~~~~~
 
-    Base widget for all Grail Kit Qt components
+    Base widget for all Grail Qt components
 
     :copyright: (c) 2017 by Oleksii Lytvyn.
     :license: GNU, see LICENSE for more details.

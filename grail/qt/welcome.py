@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 """
-    grailkit.qt.welcome
-    ~~~~~~~~~~~~~~~~~~~
+    grail.qt.welcome
+    ~~~~~~~~~~~~~~~~
 
     Welcome component
 

@@ -28,21 +28,16 @@ Label {
  */
 
 Button {
-    background: #e6e6e6;
     color: #31343a;
-    border: none;
     border-radius: 3px;
     padding: 4px 8px;
     margin: 3px;
-
     background: #4facfe;
     border: 1px solid #2c71ae;
     }
 
     Button:hover {
-        background: #f1f1f1;
         color: #31343a;
-
         background: #6bbaff;
         }
 
@@ -97,8 +92,8 @@ QScrollBar:horizontal {
     QScrollBar::add-line:vertical {
         background: transparent;
         border: none;
-        height: 0px;
-        width: 0px;
+        height: 0;
+        width: 0;
         subcontrol-position: bottom;
         subcontrol-origin: margin;
         }
@@ -106,22 +101,22 @@ QScrollBar:horizontal {
     QScrollBar::sub-line:vertical {
         background: transparent;
         border: none;
-        height: 0px;
-        width: 0px;
+        height: 0;
+        width: 0;
         subcontrol-position: top;
         subcontrol-origin: margin;
         }
 
     QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical {
-        width: 0px;
-        height: 0px;
+        width: 0;
+        height: 0;
         background: none;
         border: none;
         }
 
     QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
-        width: 0px;
-        height: 0px;
+        width: 0;
+        height: 0;
         background: none;
         border: none;
         }
@@ -179,7 +174,65 @@ List {
     List::item:selected {
         background: #8a9fbb;
         border-bottom: 1px solid #8a9fbb;
+        color: #ffffff;
+        }
+
+/**
+ * @section Tree
+ */
+
+Tree {
+    border: none;
+    show-decoration-selected: 1;
+    padding: 0;
+    background-color: #626364;
+    alternate-background-color: #676869;
+    outline: 0;
+    }
+
+    Tree::item {
         color: #e6e6e6;
+        padding: 4px 0;
+        margin: 0;
+        outline: none;
+        border: none;
+        border-bottom: 1px solid #626364;
+        qproperty-wordWrap: true;
+        }
+
+    Tree::item:selected {
+        background: #8a9fbb;
+        border-bottom: 1px solid #8a9fbb;
+        color: #ffffff;
+        }
+
+    Tree::branch {
+        margin: 0;
+        padding: 0;
+        background: transparent;
+        border: none;
+        border-bottom: 1px solid #626364;
+        }
+
+    Tree::branch:selected {
+        background: #8a9fbb;
+        border-bottom: 1px solid #8a9fbb;
+        }
+
+    Tree::branch:has-children:!has-siblings:closed,
+    Tree::branch:closed:has-children:has-siblings,
+    Tree::branch:has-children:!has-siblings:closed:selected,
+    Tree::branch:closed:has-children:has-siblings:selected {
+        border-image: none;
+        image: url(:/i/branch-closed-white.png);
+        }
+
+    Tree::branch:open:has-children:!has-siblings,
+    Tree::branch:open:has-children:has-siblings,
+    Tree::branch:open:has-children:!has-siblings:selected,
+    Tree::branch:open:has-children:has-siblings:selected {
+        border-image: none;
+        image: url(:/i/branch-open-white.png);
         }
 
 /**

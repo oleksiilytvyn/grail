@@ -434,8 +434,7 @@ class CuelistViewer(Viewer):
     def view_action(self):
         """Replace current view with something other"""
 
-        menu = self.plugin_menu()
-        menu.exec_(self._ui_toolbar.mapToGlobal(self._ui_view_action.pos()))
+        self.show_menu(self._ui_view_action.pos(), self._ui_toolbar)
 
     def menu_action(self):
         """Open a list of all cuelists"""

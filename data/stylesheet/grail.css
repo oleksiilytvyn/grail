@@ -17,59 +17,6 @@ Welcome {
     background: #2f2f2f url(:/i/welcome_bg.png) scroll no-repeat 0 0;
     }
 
-/**
- * @section QTreeWidget
- */
-
-QTreeWidget {
-    border: none;
-    show-decoration-selected: 1;
-    padding: 0;
-    background-color: #626364;
-    alternate-background-color: #676869;
-    outline: 0;
-    }
-
-    QTreeWidget::item {
-        color: #e6e6e6;
-        padding: 4px 0;
-        margin: 0;
-        outline: none;
-        border: none;
-        border-bottom: 1px solid #626364;
-        qproperty-wordWrap: true;
-        }
-
-    QTreeWidget::item:selected {
-        background: #8a9fbb;
-        border-bottom: 1px solid #8a9fbb;
-        color: #e6e6e6;
-        }
-
-    QTreeWidget::branch {
-        margin: 0;
-        padding: 0;
-        background: transparent;
-        border: none;
-        border-bottom: 1px solid #626364;
-        }
-
-    QTreeWidget::branch:selected {
-        background: #8a9fbb;
-        border-bottom: 1px solid #8a9fbb;
-        }
-
-    QTreeWidget::branch:closed:has-children:has-siblings,
-    QTreeWidget::branch:closed:has-children:has-siblings:selected {
-        border-image: none;
-        image: url(:/i/branch-closed-white.png);
-        }
-
-    QTreeWidget::branch:open:has-children:has-siblings,
-    QTreeWidget::branch:open:has-children:has-siblings:selected  {
-        border-image: none;
-        image: url(:/i/branch-open-white.png);
-        }
 
 /******************************************************************************
  *
@@ -372,6 +319,59 @@ DisplayPreviewViewer {
 
 /******************************************************************************
  *
+ * @section NotesViewer
+ *
+ *****************************************************************************/
+
+NotesViewer {
+    }
+
+    #NotesViewer_text {
+        background: #f6f6f4;
+        color: #2d2d32;
+        padding: 8px;
+        border: none;
+        }
+
+    #NotesViewer_toolbar {
+        color: #2d2d32;
+        background: #f6f6f4;
+        border-top: 1px solid transparent;
+        }
+
+        #NotesViewer_toolbar Label {
+            color: #2d2d32;
+            }
+
+
+/******************************************************************************
+ *
+ * @section NotesViewer
+ *
+ *****************************************************************************/
+
+ConsoleViewer {
+    }
+
+    #ConsoleViewer_text {
+        background: #2f2f2f;
+        color: #ffffff;
+        padding: 8px;
+        border: none;
+        font-family: Consolas, "Andale Mono WT", "Andale Mono", "Lucida Console", "Lucida Sans Typewriter",
+            "DejaVu Sans Mono", "Bitstream Vera Sans Mono", "Liberation Mono", "Nimbus Mono L",
+            Monaco, "Courier New", Courier, monospace;
+        }
+
+    #ConsoleViewer_toolbar {
+        color: #ffffff;
+        background: #2f2f2f;
+        border-top: 1px solid #2f2f2f;
+        }
+
+
+/******************************************************************************
+ *
  * @section PreferencesDialog
  *
  *****************************************************************************/
@@ -438,25 +438,8 @@ PreferencesDialog {
 
         #PluginsConfigurator_list::item:selected {
             background: #8a9fbb;
-            color: #e6e6e6;
+            color: #ffffff;
             }
-
-
-    /**
-     * @section OSCInConfigurator
-     */
-
-    #OSCInConfigurator {
-        }
-
-        #OSCInConfigurator_title {
-            qproperty-alignment: AlignCenter AlignCenter;
-            text-align: center;
-            font-size: 14px;
-            margin: 0 0 6px 0;
-            color: #f1f1f1;
-            }
-
 
     /**
      * @section OSCOutConfigurator

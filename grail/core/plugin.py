@@ -355,6 +355,19 @@ class Viewer(Component, _PluginMeta, metaclass=_ComponentPluginRegistry):
 
         return menu
 
+    def show_menu(self, position, widget=None):
+        """Show viewer menu
+
+        Args:
+            position (QPoint): location where to show menu
+            widget (QWidget): Qt widget, if given location will be calculated relative to this widget
+        """
+
+        if widget:
+            self.plugin_menu().exec_(widget.mapToGlobal(position))
+        else:
+            self.plugin_menu().exec_(position)
+
     def set(self, key, value):
         """Store viewer state using key-value storage"""
 

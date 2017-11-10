@@ -8,6 +8,7 @@
     :copyright: (c) 2017 by Grail Team.
     :license: GNU, see LICENSE for more details.
 """
+import io
 import os
 import sys
 import tempfile
@@ -17,7 +18,7 @@ from PyQt5.QtCore import QFile, pyqtSignal
 from grailkit.dna import SettingsFile, Project, Library
 from grailkit.bible import BibleHost
 from grail.qt import Application, MessageDialog
-from grailkit.core import Signalable
+from grailkit.core import Signalable, Signal
 
 import grail
 import grail.resources
@@ -29,6 +30,7 @@ from grail.plugins import *
 
 
 class Grail(Application):
+    """Main application class"""
 
     def __init__(self, argv):
         super(Grail, self).__init__(argv)
@@ -121,6 +123,12 @@ class Grail(Application):
         """Returns midi in/out host"""
 
         return self._midi_host
+
+    @property
+    def console(self):
+        """Returns console object"""
+
+        return Console.instance()
 
     def moreThanOneInstanceAllowed(self):
         """Do not allow multiple instances"""
@@ -254,7 +262,82 @@ class Grail(Application):
         return self._actions
 
 
+class _ConsoleOutput(io.StringIO):
+    """Wrapper for console output"""
+
+    def __init__(self):
+        super(_ConsoleOutput, self).__init__("")
+
+        self.changed = Signal()
+
+        self._stdout = sys.stdout
+        self._output = ""
+
+    def write(self, msg):
+        """Write message to std output
+
+        Args:
+            msg (str, object): Message to add to console output
+        """
+
+        self._stdout.write(msg)
+        self._output += msg
+
+        self.changed.emit()
+
+    def read(self):
+        """Read output of console"""
+
+        return self._output
+
+    def flush(self):
+        """Clear console output"""
+
+        self._stdout.flush()
+        self._output = ""
+
+        self.changed.emit()
+
+
+class Console(object):
+    """Take control over console input/output"""
+
+    __instance = None
+
+    def __init__(self):
+        self._stdout = sys.stdout
+        self._stdin = sys.stdin
+
+        self._in = None
+        self._out = _ConsoleOutput()
+
+        sys.stdout = self._out
+        sys.stdin = self._in
+
+    @property
+    def output(self):
+        """Console output"""
+
+        return self._out
+
+    @property
+    def input(self):
+        """Console input"""
+
+        return self._stdin
+
+    @classmethod
+    def instance(cls):
+        """Return console instance"""
+
+        if not cls.__instance:
+            cls.__instance = cls()
+
+        return cls.__instance
+
+
 class CallableAction(object):
+    """Wrapper for callable object"""
 
     def __init__(self, fn):
         self._fn = fn

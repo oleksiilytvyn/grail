@@ -9,6 +9,8 @@
     :license: GNU, see LICENSE for more details.
 """
 
+# todo: Write replacement to default FontDialog and ColorDialog
+
 # core
 from grail.qt.application import Application
 from grail.qt.layout import VLayout, HLayout, GridLayout

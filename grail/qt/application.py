@@ -75,7 +75,7 @@ class Application(QApplication):
 
             return re.sub(r'(\\n)|(\\r)|(\\t)', '', data)[2:-1]
 
-        self._stylesheet = read_stylesheet(":/gk/ui.qss")
+        self._stylesheet = read_stylesheet(":/gk/ui.css")
         self._stylesheet += read_stylesheet(self._stylesheet_file)
 
         return self._stylesheet

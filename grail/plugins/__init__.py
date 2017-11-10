@@ -20,6 +20,8 @@ from .cuelist_viewer import CuelistViewer
 from .property_viewer import PropertyViewer
 from .node_viewer import NodeViewer
 from .time_viewer import TimeViewer
+from .notes_viewer import NotesViewer
+from .console_viewer import ConsoleViewer
 
 # plugins
-# from .display_plugin import DisplayPlugin
+from .display_plugin import DisplayPlugin

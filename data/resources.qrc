@@ -43,7 +43,7 @@
 		<file alias="icons/live.png">icons/live.png</file>
 
 		<!-- ./gk/ -->
-		<file alias="gk/ui.qss">gk/ui.qss</file>
+		<file alias="gk/ui.css">gk/ui.css</file>
 
 		<!-- ./gk/icon/ -->
 		<file alias="gk/icon/close.svg">gk/icon/close.svg</file>

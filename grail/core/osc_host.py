@@ -37,8 +37,10 @@ class OSCHost:
 class _OSCServer(OSCServer, socketserver.ThreadingMixIn):
     """Handle incoming messages"""
 
+    # todo: Chose port to listen from
+
     def __init__(self):
-        super(_OSCServer, self).__init__()
+        super(_OSCServer, self).__init__('0.0.0.0', 8000)
 
     def handle(self, address, message, date):
         pass

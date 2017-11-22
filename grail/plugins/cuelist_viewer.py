@@ -47,10 +47,10 @@ class CuelistDialog(Popup):
         self._ui_list.cellChanged.connect(self._list_cell_changed)
         self._ui_list.itemSelectionChanged.connect(self._list_item_selected)
 
-        self._ui_edit_action = QAction(QIcon(':/icons/edit.png'), 'Edit', self)
+        self._ui_edit_action = QAction(QIcon(':/rc/edit.png'), 'Edit', self)
         self._ui_edit_action.triggered.connect(self.edit_action)
 
-        self._ui_add_action = QAction(QIcon(':/icons/add.png'), 'Add', self)
+        self._ui_add_action = QAction(QIcon(':/rc/add.png'), 'Add', self)
         self._ui_add_action.setIconVisibleInMenu(True)
         self._ui_add_action.triggered.connect(self.add_action)
 
@@ -155,7 +155,7 @@ class CuelistsListButton(QWidget):
     def __init__(self, parent):
         super(CuelistsListButton, self).__init__(parent)
 
-        self._icon = QPixmap(':/icons/remove-white.png')
+        self._icon = QPixmap(':/rc/remove-white.png')
 
     def paintEvent(self, event):
 
@@ -296,7 +296,7 @@ class CueDialog(Dialog):
         self._ui_layout.addLayout(self._ui_buttons)
 
         self.setLayout(self._ui_layout)
-        self.setWindowIcon(QIcon(':/icons/32.png'))
+        self.setWindowIcon(QIcon(':/icon/32.png'))
         self.setWindowTitle('Edit Cue')
         self.setMinimumSize(100, 100)
         self.setGeometry(200, 200, 250, 200)
@@ -414,10 +414,10 @@ class CuelistViewer(Viewer):
 
         self._ui_view_action = QToolButton()
         self._ui_view_action.setText("View")
-        self._ui_view_action.setIcon(QIcon(':/icons/menu.png'))
+        self._ui_view_action.setIcon(QIcon(':/rc/menu.png'))
         self._ui_view_action.clicked.connect(self.view_action)
 
-        self._ui_add_action = QAction(QIcon(':/icons/add.png'), 'Add node', self)
+        self._ui_add_action = QAction(QIcon(':/rc/add.png'), 'Add node', self)
         self._ui_add_action.setIconVisibleInMenu(True)
         self._ui_add_action.triggered.connect(self.add_action)
 
@@ -604,7 +604,7 @@ class CuelistViewer(Viewer):
             item.setText(0, entity.name)
 
             if isinstance(entity, CueEntity) and entity.color != CueEntity.COLOR_DEFAULT:
-                item.setIcon(0, Icon.colored(':/icons/live.png', QColor(entity.color), QColor('#e3e3e3')))
+                item.setIcon(0, Icon.colored(':/rc/live.png', QColor(entity.color), QColor('#e3e3e3')))
 
             return item
 

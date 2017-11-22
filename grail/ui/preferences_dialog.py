@@ -69,7 +69,7 @@ class PreferencesDialog(Dialog):
 
         self.setLayout(self._ui_layout)
 
-        self.setWindowIcon(Icon(':/icons/32.png'))
+        self.setWindowIcon(Icon(':/icon/32.png'))
         self.setWindowTitle('Preferences')
         self.setGeometry(300, 300, 600, 400)
         self.setMinimumSize(600, 400)

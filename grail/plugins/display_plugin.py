@@ -1166,35 +1166,35 @@ class PreferencesDialog(Dialog):
         self._ui_output_action.setMenu(self._ui_output_menu)
 
         self._ui_font_action = QToolButton(self)
-        self._ui_font_action.setIcon(QIcon(':/icons/font.png'))
+        self._ui_font_action.setIcon(QIcon(':/rc/font.png'))
         self._ui_font_action.clicked.connect(self.font_action)
 
         self._ui_shadow_action = QToolButton(self)
-        self._ui_shadow_action.setIcon(QIcon(':/icons/shadow.png'))
+        self._ui_shadow_action.setIcon(QIcon(':/rc/shadow.png'))
         self._ui_shadow_action.clicked.connect(self.shadow_action)
 
         self._ui_align_action = QToolButton(self)
-        self._ui_align_action.setIcon(QIcon(':/icons/align.png'))
+        self._ui_align_action.setIcon(QIcon(':/rc/align.png'))
         self._ui_align_action.clicked.connect(self.align_action)
 
         self._ui_case_action = QToolButton(self)
-        self._ui_case_action.setIcon(QIcon(':/icons/case.png'))
+        self._ui_case_action.setIcon(QIcon(':/rc/case.png'))
         self._ui_case_action.clicked.connect(self.case_action)
 
         self._ui_color_action = QToolButton(self)
-        self._ui_color_action.setIcon(QIcon(':/icons/color.png'))
+        self._ui_color_action.setIcon(QIcon(':/rc/color.png'))
         self._ui_color_action.clicked.connect(self.color_action)
 
         self._ui_composition_action = QToolButton(self)
-        self._ui_composition_action.setIcon(QIcon(':/icons/zone-select.png'))
+        self._ui_composition_action.setIcon(QIcon(':/rc/zone-select.png'))
         self._ui_composition_action.clicked.connect(self.composition_action)
 
         self._ui_padding_action = QToolButton(self)
-        self._ui_padding_action.setIcon(QIcon(':/icons/selection-select.png'))
+        self._ui_padding_action.setIcon(QIcon(':/rc/selection-select.png'))
         self._ui_padding_action.clicked.connect(self.padding_action)
 
         self._ui_testcard_action = QToolButton(self)
-        self._ui_testcard_action.setIcon(QIcon(':/icons/testcard.png'))
+        self._ui_testcard_action.setIcon(QIcon(':/rc/testcard.png'))
         self._ui_testcard_action.setCheckable(True)
         self._ui_testcard_action.setChecked(self._preferences.display_test)
         self._ui_testcard_action.clicked.connect(self.testcard_action)
@@ -1351,7 +1351,7 @@ class DisplayPreviewViewer(Viewer):
 
         self._ui_view_action = QToolButton()
         self._ui_view_action.setText("View")
-        self._ui_view_action.setIcon(Icon.colored(':/icons/menu.png', QColor('#555'), QColor('#e3e3e3')))
+        self._ui_view_action.setIcon(Icon.colored(':/rc/menu.png', QColor('#555'), QColor('#e3e3e3')))
         self._ui_view_action.clicked.connect(self.view_action)
 
         self._ui_toolbar = Toolbar()
@@ -1403,7 +1403,7 @@ class DisplayViewer(Viewer):
 
         self._ui_view_action = QToolButton()
         self._ui_view_action.setText("View")
-        self._ui_view_action.setIcon(Icon.colored(':/icons/menu.png', QColor('#555'), QColor('#e3e3e3')))
+        self._ui_view_action.setIcon(Icon.colored(':/rc/menu.png', QColor('#555'), QColor('#e3e3e3')))
         self._ui_view_action.clicked.connect(self.view_action)
 
         self._ui_toolbar = Toolbar()

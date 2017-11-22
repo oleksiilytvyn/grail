@@ -20,6 +20,7 @@ from grail.plugins import EmptyViewer
 
 
 class ViewArranger(Component):
+    """Widget that manages grail layout and visual representation of plugins"""
 
     def __init__(self, parent=None):
         super(ViewArranger, self).__init__(parent)
@@ -41,7 +42,7 @@ class ViewArranger(Component):
         views = structure[1:]
         layout = structure[0]
         horizontal = layout['layout/orientation'] == 'horizontal'
-        splitter = Splitter(Qt.Horizontal if horizontal else Qt.Vertical)
+        splitter = _Splitter(Qt.Horizontal if horizontal else Qt.Vertical)
         splitter.splitterMoved.connect(self._splitter_moved)
         sizes = []
 
@@ -95,7 +96,7 @@ class ViewArranger(Component):
         for index in range(len(sizes)):
             widget = splitter.widget(index)
 
-            if isinstance(widget, Splitter):
+            if isinstance(widget, _Splitter):
 
                 structure.append(self.decompose(widget))
 
@@ -179,7 +180,7 @@ class ViewArranger(Component):
         else:
             viewer.setParent(None)
 
-            sub = Splitter(orientation)
+            sub = _Splitter(orientation)
             sub.addWidget(viewer)
             sub.addWidget(view)
 
@@ -227,3 +228,12 @@ class ViewArranger(Component):
 
         self._timer.stop()
         self._update()
+
+
+class _Splitter(Splitter):
+    """Customized splitter for ViewArranger"""
+
+    def __init__(self, orientation):
+        super(_Splitter, self).__init__(orientation)
+
+        self.setChildrenCollapsible(False)

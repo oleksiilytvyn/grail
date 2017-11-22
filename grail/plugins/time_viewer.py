@@ -138,11 +138,11 @@ class TimeViewer(Viewer):
             color = QColor("#222")
             original = QColor("#e3e3e3")
 
-            self._ui_view_action.setIcon(Icon.colored(':/icons/menu.png', color, original))
-            self._ui_settings_action.setIcon(Icon.colored(':/icons/edit.png', color, original))
+            self._ui_view_action.setIcon(Icon.colored(':/rc/menu.png', color, original))
+            self._ui_settings_action.setIcon(Icon.colored(':/rc/edit.png', color, original))
         else:
-            self._ui_view_action.setIcon(QIcon(':/icons/menu.png'))
-            self._ui_settings_action.setIcon(QIcon(':/icons/edit.png'))
+            self._ui_view_action.setIcon(QIcon(':/rc/menu.png'))
+            self._ui_settings_action.setIcon(QIcon(':/rc/edit.png'))
 
         self.set('background', self.style_background)
         self.set('color', self.style_color)

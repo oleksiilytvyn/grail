@@ -17,6 +17,7 @@ from grail.core import Viewer
 
 
 class EmptyViewer(Viewer):
+    """Default viewer"""
 
     id = 'empty'
     name = 'Empty'
@@ -32,28 +33,6 @@ class EmptyViewer(Viewer):
     def __ui__(self):
         """Setup UI components"""
 
-        self.setStyleSheet("""
-            #EmptyViewer {
-                background-color: #2f2f2f;
-                }
-
-            #EmptyViewer_title {
-                qproperty-alignment: AlignCenter AlignCenter;
-                text-align: center;
-                font-size: 22px;
-                margin: 0 0 6px 0;
-                color: #f1f1f1;
-                }
-
-            #EmptyViewer_info {
-                text-align: center;
-                font-size: 13px;
-                qproperty-alignment: AlignCenter AlignCenter;
-                font-weight: 300;
-                color: #929292;
-                margin: 0 0 16px 0;
-                }
-            """)
         self.setObjectName("EmptyViewer")
 
         self._ui_title_label = Label("No view")
@@ -78,6 +57,7 @@ class EmptyViewer(Viewer):
         self._ui_layout.addWidget(self._ui_button, 0, Qt.AlignHCenter)
         self._ui_layout.addWidget(Spacer())
 
+        self.setMinimumHeight(140)
         self.setLayout(self._ui_layout)
 
     def menu_action(self):

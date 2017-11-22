@@ -20,6 +20,8 @@ from grail.core import Configurator
 class OSCInConfigurator(Configurator):
     """Configure OSC input"""
 
+    # todo: Add context menu to list
+
     id = 'osc-in-configurator'
     name = 'OSC Input'
     index = 10
@@ -47,6 +49,12 @@ class OSCInConfigurator(Configurator):
         else:
             self._osc_entity = self._osc_entity[0]
 
+        # Add clients from project settings
+        for entity in self._osc_entity.childs():
+            if entity.get('mode', default=None) == 'in':
+                self._osc_host.input.add(entity.get('host', default='127.0.0.1'),
+                                         entity.get('port', default=9000))
+
         self.__ui__()
         self.clicked()
 
@@ -69,10 +77,10 @@ class OSCInConfigurator(Configurator):
         header.setSectionResizeMode(0, QHeaderView.Stretch)
         header.setSectionResizeMode(1, QHeaderView.Stretch)
 
-        self._ui_clear_action = QAction(QIcon(':/icons/remove-white.png'), 'Clear', self)
+        self._ui_clear_action = QAction(QIcon(':/rc/remove-white.png'), 'Clear', self)
         self._ui_clear_action.triggered.connect(self.clear_action)
 
-        self._ui_add_action = QAction(QIcon(':/icons/add.png'), 'Add', self)
+        self._ui_add_action = QAction(QIcon(':/rc/add.png'), 'Add', self)
         self._ui_add_action.setIconVisibleInMenu(True)
         self._ui_add_action.triggered.connect(self.add_action)
 
@@ -125,6 +133,9 @@ class OSCInConfigurator(Configurator):
         if self._do_not_update:
             return False
 
+        # Remove OSC clients
+        self._osc_host.input.clear()
+
         # Remove OSC output settings
         for entity in self._osc_entity.childs():
             if entity.get('mode', default=None) == 'in':
@@ -137,6 +148,8 @@ class OSCInConfigurator(Configurator):
             if host and port:
                 host = str(self._ui_list.item(index, 0).text())
                 port = int(self._ui_list.item(index, 1).text())
+
+                self._osc_host.input.add(host, port)
 
                 entity = self._osc_entity.create('Input from %s:%d' % (host, port))
                 entity.set('host', host)
@@ -156,6 +169,9 @@ class OSCInConfigurator(Configurator):
         host = '127.0.0.1'
         port = self._last_port
 
+        # Add to OSC clients
+        self._osc_host.input.add(host, port)
+
         # Save in settings
         entity = self._osc_entity.create('Input from %s:%d' % (host, port))
         entity.set('host', host)
@@ -169,7 +185,7 @@ class OSCInConfigurator(Configurator):
         """Remove all clients from list"""
 
         # Remove all clients
-        self._osc_host.output.clear()
+        self._osc_host.input.clear()
 
         # Remove OSC output settings
         for entity in self._osc_entity.childs():
@@ -181,6 +197,8 @@ class OSCInConfigurator(Configurator):
 
 class OSCOutConfigurator(Configurator):
     """Configure OSC input"""
+
+    # todo: Add context menu to list
 
     id = 'osc-out-configurator'
     name = 'OSC Output'
@@ -237,10 +255,10 @@ class OSCOutConfigurator(Configurator):
         header.setSectionResizeMode(0, QHeaderView.Stretch)
         header.setSectionResizeMode(1, QHeaderView.Stretch)
 
-        self._ui_clear_action = QAction(QIcon(':/icons/remove-white.png'), 'Clear', self)
+        self._ui_clear_action = QAction(QIcon(':/rc/remove-white.png'), 'Clear', self)
         self._ui_clear_action.triggered.connect(self.clear_action)
 
-        self._ui_add_action = QAction(QIcon(':/icons/add.png'), 'Add', self)
+        self._ui_add_action = QAction(QIcon(':/rc/add.png'), 'Add', self)
         self._ui_add_action.setIconVisibleInMenu(True)
         self._ui_add_action.triggered.connect(self.add_action)
 

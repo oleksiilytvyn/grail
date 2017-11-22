@@ -168,11 +168,11 @@ class BibleConfigurator(Configurator):
         self._ui_toolbar_label.setAlignment(Qt.AlignCenter)
         self._ui_toolbar_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
-        self._ui_install_action = QAction(QIcon(':/icons/add.png'), 'Install', self)
+        self._ui_install_action = QAction(QIcon(':/rc/add.png'), 'Install', self)
         self._ui_install_action.setIconVisibleInMenu(True)
         self._ui_install_action.triggered.connect(self.install_action)
 
-        self._ui_primary_action = QAction(QIcon(':/icons/save.png'), 'Set as primary', self)
+        self._ui_primary_action = QAction(QIcon(':/rc/save.png'), 'Set as primary', self)
         self._ui_primary_action.setIconVisibleInMenu(True)
         self._ui_primary_action.triggered.connect(self.primary_action)
 

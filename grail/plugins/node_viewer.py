@@ -58,17 +58,17 @@ class NodeViewer(Viewer):
         self._ui_tree.itemExpanded.connect(self._item_expanded)
         self._ui_tree.itemCollapsed.connect(self._item_collapsed)
 
-        self._ui_add_action = QAction(QIcon(':/icons/add.png'), 'Add node', self)
+        self._ui_add_action = QAction(QIcon(':/rc/add.png'), 'Add node', self)
         self._ui_add_action.setIconVisibleInMenu(True)
         self._ui_add_action.triggered.connect(self.add_action)
 
-        self._ui_remove_action = QAction(QIcon(':/icons/remove-white.png'), 'Remove node', self)
+        self._ui_remove_action = QAction(QIcon(':/rc/remove-white.png'), 'Remove node', self)
         self._ui_remove_action.setIconVisibleInMenu(True)
         self._ui_remove_action.triggered.connect(self.remove_action)
 
         self._ui_view_action = QToolButton()
         self._ui_view_action.setText("View")
-        self._ui_view_action.setIcon(QIcon(':/icons/menu.png'))
+        self._ui_view_action.setIcon(QIcon(':/rc/menu.png'))
         self._ui_view_action.clicked.connect(self.view_action)
 
         self._ui_toolbar = Toolbar()

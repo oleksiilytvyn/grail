@@ -87,7 +87,7 @@ class PropertyViewer(Viewer):
         self._ui_empty_title = Label("No properties")
         self._ui_empty_title.setObjectName('PropertyViewer_empty_title')
 
-        self._ui_empty_info = Label("Node not selected or node don't have properties.")
+        self._ui_empty_info = Label("Node not selected or don't have properties.")
         self._ui_empty_info.setObjectName('PropertyViewer_empty_info')
         self._ui_empty_info.setWordWrap(True)
 
@@ -109,21 +109,21 @@ class PropertyViewer(Viewer):
         self._ui_stack.setCurrentIndex(0)
 
         # Action
-        self._ui_follow_action = QAction(QIcon(':/icons/at.png'), 'Follow', self)
+        self._ui_follow_action = QAction(QIcon(':/rc/at.png'), 'Follow', self)
         self._ui_follow_action.setIconVisibleInMenu(True)
         self._ui_follow_action.triggered.connect(self.follow_action)
 
-        self._ui_add_action = QAction(QIcon(':/icons/add.png'), 'Add property', self)
+        self._ui_add_action = QAction(QIcon(':/rc/add.png'), 'Add property', self)
         self._ui_add_action.setIconVisibleInMenu(True)
         self._ui_add_action.triggered.connect(self.add_action)
 
-        self._ui_remove_action = QAction(QIcon(':/icons/remove-white.png'), 'Remove property', self)
+        self._ui_remove_action = QAction(QIcon(':/rc/remove-white.png'), 'Remove property', self)
         self._ui_remove_action.setIconVisibleInMenu(True)
         self._ui_remove_action.triggered.connect(self.remove_action)
 
         self._ui_view_action = QToolButton()
         self._ui_view_action.setText("View")
-        self._ui_view_action.setIcon(QIcon(':/icons/menu.png'))
+        self._ui_view_action.setIcon(QIcon(':/rc/menu.png'))
         self._ui_view_action.clicked.connect(self.view_action)
 
         # Toolbar
@@ -214,7 +214,7 @@ class PropertyViewer(Viewer):
             else:
                 color = QColor('#BDBDBD')
 
-            item_value.setIcon(Icon.colored(':/icons/live.png', color, QColor('#e3e3e3')))
+            item_value.setIcon(Icon.colored(':/rc/live.png', color, QColor('#e3e3e3')))
 
             self._ui_properties.setItem(index, 0, item_key)
             self._ui_properties.setItem(index, 1, item_value)
@@ -235,9 +235,9 @@ class PropertyViewer(Viewer):
         self.set('follow', self._follow)
 
         if self._follow:
-            self._ui_follow_action.setIcon(Icon.colored(':/icons/at.png', QColor('#aeca4b'), QColor('#e3e3e3')))
+            self._ui_follow_action.setIcon(Icon.colored(':/rc/at.png', QColor('#aeca4b'), QColor('#e3e3e3')))
         else:
-            self._ui_follow_action.setIcon(QIcon(':/icons/at.png'))
+            self._ui_follow_action.setIcon(QIcon(':/rc/at.png'))
 
     def view_action(self):
         """Replace current view with something else"""
@@ -371,7 +371,7 @@ class _PropertyEdit(QLineEdit):
 
         self._ui_clear = QToolButton(self)
         self._ui_clear.setIconSize(QSize(14, 14))
-        self._ui_clear.setIcon(QIcon(':/i/branch-open.png'))
+        self._ui_clear.setIcon(QIcon(':/rc/branch-open.png'))
         self._ui_clear.setCursor(Qt.ArrowCursor)
         self._ui_clear.setStyleSheet("""
             QToolButton {

@@ -31,7 +31,7 @@ class SearchEdit(LineEdit):
 
         self._ui_clear = QToolButton(self)
         self._ui_clear.setIconSize(QSize(14, 14))
-        self._ui_clear.setIcon(QIcon(':/gk/icon/search-clear.png'))
+        self._ui_clear.setIcon(QIcon(':/rc/search-clear.png'))
         self._ui_clear.setCursor(Qt.ArrowCursor)
         self._ui_clear.setStyleSheet("QToolButton {background: none;}")
         self._ui_clear.hide()

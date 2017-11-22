@@ -48,7 +48,7 @@ class ProgressDialog(Dialog):
 
         self._ui_cancel_btn = QToolButton(self)
         self._ui_cancel_btn.setIconSize(QSize(14, 14))
-        self._ui_cancel_btn.setIcon(QIcon(':/gk/icon/search-clear.png'))
+        self._ui_cancel_btn.setIcon(QIcon(':/rc/search-clear.png'))
         self._ui_cancel_btn.setCursor(Qt.ArrowCursor)
         self._ui_cancel_btn.setGeometry(0, 0, 14, 14)
         self._ui_cancel_btn.clicked.connect(self.cancel)

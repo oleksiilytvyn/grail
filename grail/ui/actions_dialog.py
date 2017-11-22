@@ -36,7 +36,7 @@ class ActionsDialog(Dialog):
         self._ui_label.setAlignment(Qt.AlignCenter)
         self._ui_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
-        self._ui_go_action = QAction(QIcon(':/icons/play.png'), "Execute", self)
+        self._ui_go_action = QAction(QIcon(':/rc/play.png'), "Execute", self)
         self._ui_go_action.setIconVisibleInMenu(True)
         self._ui_go_action.triggered.connect(self.go_action)
 

@@ -87,7 +87,7 @@ class SongDialog(Dialog):
         self._ui_layout.addLayout(self._ui_buttons, 8, 0, 1, 2)
 
         self.setLayout(self._ui_layout)
-        self.setWindowIcon(QIcon(':/icons/32.png'))
+        self.setWindowIcon(QIcon(':/icon/32.png'))
         self.setWindowTitle('Add song')
         self.setGeometry(300, 300, 300, 400)
         self.setMinimumSize(300, 400)
@@ -211,13 +211,13 @@ class LibraryViewer(Viewer):
         self._ui_list.itemDoubleClicked.connect(self._item_doubleclicked)
         self._ui_list.customContextMenuRequested.connect(self._context_menu)
 
-        self._ui_add_action = QAction(QIcon(':/icons/add.png'), 'Add', self)
+        self._ui_add_action = QAction(QIcon(':/rc/add.png'), 'Add', self)
         self._ui_add_action.setIconVisibleInMenu(True)
         self._ui_add_action.triggered.connect(self.add_action)
 
         self._ui_view_action = QToolButton()
         self._ui_view_action.setText("View")
-        self._ui_view_action.setIcon(QIcon(':/icons/menu.png'))
+        self._ui_view_action.setIcon(QIcon(':/rc/menu.png'))
         self._ui_view_action.clicked.connect(self.view_action)
 
         self._ui_toolbar = Toolbar()
@@ -244,8 +244,8 @@ class LibraryViewer(Viewer):
 
         self._ui_list.clear()
 
-        icon_song = Icon.colored(':/icons/txt.png', QColor('#ffffff'), QColor('#e3e3e3'))
-        icon_bible = Icon.colored(':/icons/book.png', QColor('#03A9F4'), QColor('#e3e3e3'))
+        icon_song = Icon.colored(':/rc/txt.png', QColor('#ffffff'), QColor('#e3e3e3'))
+        icon_bible = Icon.colored(':/rc/book.png', QColor('#03A9F4'), QColor('#e3e3e3'))
 
         if not keyword:
 

@@ -49,12 +49,12 @@ class NotesViewer(Viewer):
 
         self._ui_view_action = QToolButton()
         self._ui_view_action.setText("View")
-        self._ui_view_action.setIcon(Icon.colored(':/icons/menu.png', QColor('#2d2d32'), QColor('#e3e3e3')))
+        self._ui_view_action.setIcon(Icon.colored(':/rc/menu.png', QColor('#2d2d32'), QColor('#e3e3e3')))
         self._ui_view_action.clicked.connect(self.view_action)
 
         self._ui_run_action = QToolButton()
         self._ui_run_action.setText("Run")
-        self._ui_run_action.setIcon(QIcon(':/icons/play.png'))
+        self._ui_run_action.setIcon(QIcon(':/rc/play.png'))
         self._ui_run_action.clicked.connect(self.run_action)
 
         self._ui_toolbar = Toolbar()

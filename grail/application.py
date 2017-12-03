@@ -32,8 +32,6 @@ from grail.plugins import *
 class Grail(Application):
     """Main application class"""
 
-    # todo: Disable errors output to std out
-
     def __init__(self, argv):
         super(Grail, self).__init__(argv)
 
@@ -282,7 +280,6 @@ class _ConsoleOutput(io.StringIO):
             msg (str, object): Message to add to console output
         """
 
-        self._stdout.write(msg)
         self._output += msg
 
         self.changed.emit()

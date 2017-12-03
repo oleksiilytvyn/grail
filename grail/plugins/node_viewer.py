@@ -12,7 +12,7 @@ from collections import defaultdict
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QAction, QToolButton, QAbstractItemView, QTreeWidget
+from PyQt5.QtWidgets import QAction, QToolButton, QAbstractItemView, QTreeWidget, QMenu
 
 from grail.qt import Spacer, MessageDialog, Toolbar, Tree, TreeItem, VLayout
 from grailkit.dna import DNA
@@ -28,8 +28,6 @@ class NodeViewer(Viewer):
     Emits:
         '!node/selected', id:int
     """
-
-    # todo: add context menu
 
     id = 'node'
     name = 'Nodes'
@@ -59,6 +57,7 @@ class NodeViewer(Viewer):
         self._ui_tree.itemSelectionChanged.connect(self._selection_changed)
         self._ui_tree.itemExpanded.connect(self._item_expanded)
         self._ui_tree.itemCollapsed.connect(self._item_collapsed)
+        self._ui_tree.customContextMenuRequested.connect(self._context_menu)
 
         self._ui_add_action = QAction(QIcon(':/rc/add.png'), 'Add node', self)
         self._ui_add_action.setIconVisibleInMenu(True)
@@ -130,6 +129,25 @@ class NodeViewer(Viewer):
         """Tree item collapsed"""
 
         self._folded[item.object().id] = False
+
+    def _context_menu(self, point):
+        """Context menu callback
+
+        Args:
+            point (QPoint): point where context menu requested
+        """
+
+        menu = QMenu("Context menu", self)
+
+        remove_action = QAction('Remove', menu)
+        remove_action.triggered.connect(lambda: self.remove_action())
+
+        add_action = QAction('Add', menu)
+        add_action.triggered.connect(lambda: self.add_action())
+
+        menu.addAction(remove_action)
+        menu.addAction(add_action)
+        menu.exec_(self._ui_tree.mapToGlobal(point))
 
     def view_action(self):
         """Replace current view with something other"""

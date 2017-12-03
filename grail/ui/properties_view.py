@@ -22,8 +22,6 @@ from grail.qt import Icon, Label, Spacer, VLayout, Table, TableItem, Application
 class PropertiesView(Component):
     """View for editing entity properties"""
 
-    # todo: add context menu
-
     def __init__(self, parent=None):
         super(PropertiesView, self).__init__(parent)
 
@@ -46,6 +44,8 @@ class PropertiesView(Component):
         self._ui_properties.itemClicked.connect(self._item_clicked)
         self._ui_properties.itemSelectionChanged.connect(self._selection_changed)
         self._ui_properties.setItemDelegateForColumn(1, _PropertyDelegate(self))
+        self._ui_properties.setContextMenuPolicy(Qt.CustomContextMenu)
+        self._ui_properties.customContextMenuRequested.connect(self._context_menu)
 
         header = self._ui_properties.horizontalHeader()
         header.setVisible(True)
@@ -90,6 +90,26 @@ class PropertiesView(Component):
         project.entity_removed.connect(self._update)
         project.property_changed.connect(lambda entity_id, key, value: self._update())
 
+    def _context_menu(self, point):
+        """Context menu callback
+
+        Args:
+            point (QPoint): point where context menu requested
+        """
+
+        menu = QMenu("Context menu", self)
+
+        remove_action = QAction('Remove property', menu)
+        remove_action.triggered.connect(lambda: self.removeSelected())
+
+        add_action = QAction('Add property', menu)
+        add_action.triggered.connect(lambda: self.addProperty())
+
+        menu.addAction(add_action)
+        menu.addAction(remove_action)
+
+        menu.exec_(self._ui_properties.mapToGlobal(point))
+
     def addProperty(self):
         """Add a new property"""
 
@@ -105,10 +125,10 @@ class PropertiesView(Component):
         self._update()
 
         # find and edit new property
-        index = self.rowCount()-1
+        index = self._ui_properties.rowCount()-1
 
         for i in range(self._ui_properties.rowCount()-1):
-            if self.item(i, 0).text() == property_key:
+            if self._ui_properties.item(i, 0).text() == property_key:
                 index = i
                 break
 

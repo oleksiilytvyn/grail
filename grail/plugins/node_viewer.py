@@ -29,6 +29,8 @@ class NodeViewer(Viewer):
         '!node/selected', id:int
     """
 
+    # todo: add context menu
+
     id = 'node'
     name = 'Nodes'
     author = 'Grail Team'

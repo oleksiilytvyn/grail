@@ -275,10 +275,10 @@ class MessageDialog(Dialog):
         else:
             raise Exception("Invalid argument passed, %s" % str(button))
 
-        def triggered(cls, _btn):
+        def triggered(_self, _btn):
             """Wrap button callback"""
 
-            return lambda flag: cls._button_clicked(_btn)
+            return lambda flag: _self.button_clicked(_btn)
 
         btn = button if isinstance(button, Button) else Button(name)
         btn.role = role
@@ -304,7 +304,7 @@ class MessageDialog(Dialog):
 
             self.addButton(button)
 
-    def _button_clicked(self, button):
+    def button_clicked(self, button):
         """Button clicked proxy function"""
 
         self.buttonClicked.emit(button)

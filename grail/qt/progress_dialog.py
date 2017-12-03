@@ -191,15 +191,15 @@ class ProgressDialog(Dialog):
 
         self._ui_progress.setMinimum(value)
 
-    def setRange(self, min, max):
+    def setRange(self, minimum, maximum):
         """Set a minimum and maximum values of progress bar
 
         Args:
-            min (int): minimum value
-            max (int): maximum value
+            minimum (int): minimum value
+            maximum (int): maximum value
         """
 
-        self._ui_progress.setRange(min, max)
+        self._ui_progress.setRange(minimum, maximum)
 
     def setAutoClose(self, flag):
         """Close dialog when progress reaches maximum value

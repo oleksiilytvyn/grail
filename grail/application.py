@@ -13,24 +13,26 @@ import os
 import sys
 import tempfile
 
-from PyQt5.QtCore import QFile, pyqtSignal
+from PyQt5.QtCore import QFile
 
 from grailkit.dna import SettingsFile, Project, Library
 from grailkit.bible import BibleHost
-from grail.qt import Application, MessageDialog
 from grailkit.core import Signalable, Signal
 
 import grail
 import grail.resources
-from grail.ui import MainWindow, WelcomeDialog
-from grail.core import Plugin, Viewer, OSCHost
 
+from grail.qt import Application, MessageDialog
+from grail.ui import MainWindow, WelcomeDialog
+from grail.core import OSCHost
 # load internal plugins and viewers
 from grail.plugins import *
 
 
 class Grail(Application):
     """Main application class"""
+
+    # todo: Disable errors output to std out
 
     def __init__(self, argv):
         super(Grail, self).__init__(argv)

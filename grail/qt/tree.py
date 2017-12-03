@@ -61,6 +61,7 @@ class Tree(QTreeWidget):
 
         self._update_scrollbar()
 
+
 class TreeItem(QTreeWidgetItem):
     """Representation of node as QTreeWidgetItem"""
 

@@ -13,8 +13,9 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
 from grailkit.util import default_key
-from grail.qt import Component, Application
 from grailkit.plug import PluginRegistry
+
+from grail.qt import Component, Application
 
 
 class _PluginMeta(object):
@@ -131,7 +132,10 @@ class _PluginMeta(object):
     def plugins(cls, sort_reverse=True, sort_key=lambda x: str(x)):
         """Returns list of classes extended from Plugin in alphabetical order"""
 
-        return sorted(cls.__registry__, key=sort_key, reverse=sort_reverse)
+        if hasattr(cls, '__registry__'):
+            return sorted(cls.__registry__, key=sort_key, reverse=sort_reverse)
+        else:
+            return set()
 
 
 class Plugin(_PluginMeta, metaclass=PluginRegistry):
@@ -194,6 +198,8 @@ class Plugin(_PluginMeta, metaclass=PluginRegistry):
         # add action
         else:
             def trigger(_fn, _action):
+                """Callback wrapper"""
+
                 return lambda: _fn(_action)
 
             action = QAction(name, menubar)
@@ -272,7 +278,7 @@ class _ComponentPluginRegistry(type(Component), PluginRegistry):
 
         Args:
             name (str): class name
-            bases (list): class parents
+            bases (tuple): class parents
             attrs (dict): attributes
         """
         type(Component).__init__(cls, name, bases, attrs)
@@ -326,6 +332,8 @@ class Viewer(Component, _PluginMeta, metaclass=_ComponentPluginRegistry):
         menu = QMenu("Viewers", self)
 
         def triggered(plugin_id):
+            """Action callback closure"""
+
             return lambda item: self.__arranger.replace(self, plugin_id)
 
         for plug in self.plugins():

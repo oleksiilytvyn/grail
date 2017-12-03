@@ -15,12 +15,13 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
 from grailkit.dna import DNA, CueEntity
-from grail.qt import *
-
 from grail.core import Viewer
+from grail.ui import PropertiesView
+from grail.qt import *
 
 
 class CuelistDialog(Popup):
+    """Displays list of Cuelist's"""
 
     selected = pyqtSignal(int)
 
@@ -84,12 +85,12 @@ class CuelistDialog(Popup):
             item = CuelistsListItem(cuelist.name)
             item.cuelist_id = cuelist.id
 
-            button = CuelistsListButton(self)
-            button.cuelist_id = cuelist.id
-            button.clicked.connect(self._remove_clicked)
+            item_button = CuelistsListButton(self)
+            item_button.cuelist_id = cuelist.id
+            item_button.clicked.connect(self._remove_clicked)
 
             self._ui_list.setItem(x, 0, item)
-            self._ui_list.setCellWidget(x, 1, button)
+            self._ui_list.setCellWidget(x, 1, item_button)
 
             x += 1
 
@@ -149,6 +150,7 @@ class CuelistsListItem(QTableWidgetItem):
 
 
 class CuelistsListButton(QWidget):
+    """Button widget used in list of Cuelist's"""
 
     clicked = pyqtSignal("QWidget")
 
@@ -174,6 +176,7 @@ class CuelistsListButton(QWidget):
 
 
 class CuelistsListWidget(QTableWidget):
+    """Cuelist list widget used in CuelistDialog"""
 
     def __init__(self, parent=None):
         """Initialize"""
@@ -254,6 +257,7 @@ class CuelistsListWidget(QTableWidget):
 
 
 class CueDialog(Dialog):
+    """Cue editor dialog"""
 
     def __init__(self, viewer):
         super(CueDialog, self).__init__()
@@ -265,40 +269,69 @@ class CueDialog(Dialog):
     def __ui__(self):
         """Build UI"""
 
+        # General section
         self._ui_text = TextEdit()
-        self._ui_text.setPlaceholderText("Lyrics")
+        self._ui_text.setPlaceholderText("Name")
         self._ui_text.setAttribute(Qt.WA_MacShowFocusRect, 0)
         self._ui_text.setAcceptRichText(False)
+        self._ui_text.sizePolicy().setVerticalStretch(1)
 
-        policy = self._ui_text.sizePolicy()
-        policy.setVerticalStretch(1)
+        self._ui_pre_wait = LineEdit()
+        self._ui_pre_wait.setPlaceholderText("Pre wait")
 
-        self._ui_text.setSizePolicy(policy)
+        self._ui_post_wait = LineEdit()
+        self._ui_post_wait.setPlaceholderText("Post wait")
 
-        self._ui_button_ok = Button("Ok")
-        self._ui_button_ok.clicked.connect(self.accept_action)
+        # Properties
+        self._ui_properties = PropertiesView(self)
+        self._ui_properties.setEntityFollow(True)
 
-        self._ui_button_cancel = Button("Cancel")
-        self._ui_button_cancel.clicked.connect(self.reject_action)
+        # Toolbar
+        self._ui_add_action = QAction(QIcon(':/rc/add.png'), 'Add property', self)
+        self._ui_add_action.setIconVisibleInMenu(True)
+        self._ui_add_action.triggered.connect(self._ui_properties.addProperty)
 
-        self._ui_buttons = HLayout()
-        self._ui_buttons.setSpacing(10)
-        self._ui_buttons.setContentsMargins(0, 0, 0, 0)
-        self._ui_buttons.addWidget(Spacer())
-        self._ui_buttons.addWidget(self._ui_button_cancel)
-        self._ui_buttons.addWidget(self._ui_button_ok)
+        self._ui_remove_action = QAction(QIcon(':/rc/remove-white.png'), 'Remove property', self)
+        self._ui_remove_action.setIconVisibleInMenu(True)
+        self._ui_remove_action.triggered.connect(self._ui_properties.removeSelected)
 
+        self._ui_done_action = Button('Done', self)
+        self._ui_done_action.clicked.connect(self.accept_action)
+
+        self._ui_toolbar = Toolbar()
+        self._ui_toolbar.setObjectName("CueDialog_toolbar")
+        self._ui_toolbar.setMinimumHeight(40)
+        self._ui_toolbar.addAction(self._ui_remove_action)
+        self._ui_toolbar.addAction(self._ui_add_action)
+        self._ui_toolbar.addStretch()
+        self._ui_toolbar.addWidget(self._ui_done_action)
+
+        # Layout
         self._ui_layout = VLayout()
-        self._ui_layout.setSpacing(8)
-        self._ui_layout.setContentsMargins(12, 12, 12, 10)
 
-        self._ui_layout.addWidget(self._ui_text)
-        self._ui_layout.addLayout(self._ui_buttons)
+        self._ui_general_layout = GridLayout()
+        self._ui_general_layout.setSpacing(8)
+        self._ui_general_layout.setContentsMargins(12, 12, 12, 10)
+        self._ui_general_layout.addWidget(self._ui_text, 0, 0)
+
+        self._ui_general = Component()
+        self._ui_general.setLayout(self._ui_general_layout)
+
+        self._ui_splitter = Splitter(Qt.Vertical)
+        self._ui_splitter.setHandleWidth(2)
+        self._ui_splitter.addWidget(self._ui_general)
+        self._ui_splitter.addWidget(self._ui_properties)
+        size = self._ui_splitter.height()
+        self._ui_splitter.setSizes([size * 0.2, size * 0.8])
+        self._ui_splitter.setCollapsible(0, False)
+
+        self._ui_layout.addWidget(self._ui_splitter)
+        self._ui_layout.addWidget(self._ui_toolbar)
 
         self.setLayout(self._ui_layout)
         self.setWindowIcon(QIcon(':/icon/32.png'))
-        self.setWindowTitle('Edit Cue')
-        self.setMinimumSize(100, 100)
+        self.setWindowTitle('Cue Inspector')
+        self.setMinimumSize(280, 400)
         self.setGeometry(200, 200, 250, 200)
         self.setWindowFlags(Qt.WindowCloseButtonHint)
 
@@ -310,6 +343,7 @@ class CueDialog(Dialog):
         self.accept()
 
     def reject_action(self):
+        """Cancel editing of entity"""
 
         self.reject()
 
@@ -317,8 +351,10 @@ class CueDialog(Dialog):
         """Update edited entity information"""
 
         self._entity = entity
+        self._ui_properties.setEntity(entity)
 
-        self.setWindowTitle("Edit Cue - %s" % entity.name.split('\n')[0])
+        # Update UI
+        self.setWindowTitle("Cue Inspector - %s" % entity.name.split('\n')[0])
         self._ui_text.setText(entity.name)
 
 
@@ -508,6 +544,7 @@ class CuelistViewer(Viewer):
 
         Args:
             item (TreeItem): tree item
+            color (int): cue color constant
         """
 
         entity = item.object()
@@ -599,16 +636,20 @@ class CuelistViewer(Viewer):
         self.project.settings().set('cuelist/current', cuelist_id)
         self._ui_label.setText("%s <small>(%d cues)</small>" % (cuelist.name, len(cuelist)))
 
-        def create_item(entity):
-            item = TreeItem(entity)
-            item.setText(0, entity.name)
+        def create_item(_entity):
+            """Create tree item from entity"""
 
-            if isinstance(entity, CueEntity) and entity.color != CueEntity.COLOR_DEFAULT:
-                item.setIcon(0, Icon.colored(':/rc/live.png', QColor(entity.color), QColor('#e3e3e3')))
+            _item = TreeItem(_entity)
+            _item.setText(0, _entity.name)
 
-            return item
+            if isinstance(_entity, CueEntity) and _entity.color != CueEntity.COLOR_DEFAULT:
+                _item.setIcon(0, Icon.colored(':/rc/live.png', QColor(_entity.color), QColor('#e3e3e3')))
+
+            return _item
 
         def add_childs(tree_item, parent_id):
+            """Add childs to tree item"""
+
             nonlocal selected_item
 
             for child in dna.childs(parent_id):
@@ -675,9 +716,11 @@ class CuelistViewer(Viewer):
         if not item:
             return False
 
-        def create_color_action(self, index, name, menu):
-            action = QAction(name, menu)
-            action.triggered.connect(lambda: self.item_color(item, CueEntity.COLORS[index]))
+        def create_color_action(this, action_index, name, menu_ref):
+            """Create, connect and return QAction."""
+
+            action = QAction(name, menu_ref)
+            action.triggered.connect(lambda: this.item_color(item, CueEntity.COLORS[action_index]))
 
             return action
 
@@ -733,6 +776,7 @@ class CuelistViewer(Viewer):
 
 
 class TreeWidget(Tree):
+    """Tree widget used in CuelistViewer"""
 
     def __init__(self, *args):
         super(TreeWidget, self).__init__(*args)
@@ -769,3 +813,4 @@ class TreeWidget(Tree):
             pass
 
         QTreeWidget.dropEvent(self, event)
+

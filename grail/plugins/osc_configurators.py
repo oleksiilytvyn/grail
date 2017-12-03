@@ -20,8 +20,6 @@ from grail.core import Configurator
 class OSCInConfigurator(Configurator):
     """Configure OSC input"""
 
-    # todo: Add context menu to list
-
     id = 'osc-in-configurator'
     name = 'OSC Input'
     index = 10
@@ -68,10 +66,12 @@ class OSCInConfigurator(Configurator):
         self._ui_list.setColumnCount(2)
         self._ui_list.horizontalHeader().setVisible(False)
         self._ui_list.verticalHeader().setVisible(False)
-        self._ui_list.setHorizontalHeaderLabels(["Host", "Port", "Action"])
+        self._ui_list.setHorizontalHeaderLabels(["Host", "Port"])
         self._ui_list.setSelectionBehavior(QAbstractItemView.SelectRows)
         self._ui_list.setSelectionMode(QAbstractItemView.SingleSelection)
         self._ui_list.itemChanged.connect(self._updated)
+        self._ui_list.setContextMenuPolicy(Qt.CustomContextMenu)
+        self._ui_list.customContextMenuRequested.connect(self._context_menu)
 
         header = self._ui_list.horizontalHeader()
         header.setSectionResizeMode(0, QHeaderView.Stretch)
@@ -157,6 +157,24 @@ class OSCInConfigurator(Configurator):
                 entity.set('mode', 'in')
                 entity.update()
 
+    def _context_menu(self, point):
+        """Create context menu"""
+
+        position = self._ui_list.mapToGlobal(point)
+        item = self._ui_list.itemAt(point)
+
+        delete_action = QAction('Delete', self)
+        delete_action.triggered.connect(lambda action: self.delete_action(item))
+
+        add_action = QAction('Add', self)
+        add_action.triggered.connect(lambda action: self.add_action())
+
+        menu = QMenu()
+        menu.addAction(delete_action)
+        menu.addAction(add_action)
+
+        menu.exec(position)
+
     def clicked(self):
         """Configurator page was clicked"""
 
@@ -181,6 +199,12 @@ class OSCInConfigurator(Configurator):
 
         self._update()
 
+    def delete_action(self, item):
+        """Delete item"""
+
+        self._ui_list.removeRow(item.row())
+        self._updated()
+
     def clear_action(self):
         """Remove all clients from list"""
 
@@ -197,8 +221,6 @@ class OSCInConfigurator(Configurator):
 
 class OSCOutConfigurator(Configurator):
     """Configure OSC input"""
-
-    # todo: Add context menu to list
 
     id = 'osc-out-configurator'
     name = 'OSC Output'
@@ -246,10 +268,12 @@ class OSCOutConfigurator(Configurator):
         self._ui_list.setColumnCount(2)
         self._ui_list.horizontalHeader().setVisible(False)
         self._ui_list.verticalHeader().setVisible(False)
-        self._ui_list.setHorizontalHeaderLabels(["Host", "Port", "Action"])
+        self._ui_list.setHorizontalHeaderLabels(["Host", "Port"])
         self._ui_list.setSelectionBehavior(QAbstractItemView.SelectRows)
         self._ui_list.setSelectionMode(QAbstractItemView.SingleSelection)
         self._ui_list.itemChanged.connect(self._updated)
+        self._ui_list.setContextMenuPolicy(Qt.CustomContextMenu)
+        self._ui_list.customContextMenuRequested.connect(self._context_menu)
 
         header = self._ui_list.horizontalHeader()
         header.setSectionResizeMode(0, QHeaderView.Stretch)
@@ -331,6 +355,24 @@ class OSCOutConfigurator(Configurator):
                 entity.set('mode', 'out')
                 entity.update()
 
+    def _context_menu(self, point):
+        """Create context menu"""
+
+        position = self._ui_list.mapToGlobal(point)
+        item = self._ui_list.itemAt(point)
+
+        delete_action = QAction('Delete', self)
+        delete_action.triggered.connect(lambda action: self.delete_action(item))
+
+        add_action = QAction('Add', self)
+        add_action.triggered.connect(lambda action: self.add_action())
+
+        menu = QMenu()
+        menu.addAction(delete_action)
+        menu.addAction(add_action)
+
+        menu.exec(position)
+
     def clicked(self):
         """Configurator page was clicked"""
 
@@ -354,6 +396,12 @@ class OSCOutConfigurator(Configurator):
         entity.update()
 
         self._update()
+
+    def delete_action(self, item):
+        """Delete item"""
+
+        self._ui_list.removeRow(item.row())
+        self._updated()
 
     def clear_action(self):
         """Remove all clients from list"""

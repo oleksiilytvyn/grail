@@ -12,7 +12,7 @@ from PyQt5.QtCore import QSize
 from PyQt5.QtGui import QPainter
 from PyQt5.QtWidgets import QStyleOption, QStyle, QToolBar
 
-from grail.qt import Spacer,Component
+from grail.qt import Spacer, Component
 
 
 class Toolbar(QToolBar, Component):

@@ -10,7 +10,7 @@
 """
 import socketserver
 
-from PyQt5.QtCore import QThread
+from PyQt5.QtCore import QThread, pyqtSignal
 
 from grailkit.osc import *
 
@@ -68,6 +68,7 @@ class _OSCServer:
 
         if port not in self._ports:
             thread = _ListenerThread(port, self)
+            thread.received.connect(self.handle)
             thread.start()
 
             self._ports[port] = thread
@@ -94,7 +95,7 @@ class _OSCServer:
     def handle(self, address, message, date):
         """Handle incoming osc messages"""
 
-        print("OSC received from %s:%d" % address, date, message.address, *message.args)
+        print("OSC received from %s:%d by %s" % (address[0], address[1], self), date, message.address, *message.args)
 
 
 class _OSCListener(OSCServer, socketserver.ThreadingMixIn):
@@ -106,22 +107,30 @@ class _OSCListener(OSCServer, socketserver.ThreadingMixIn):
         self._parent = parent
 
     def handle(self, address, message, date):
-        """Handle incoming OSC messages"""
+        """Handle incoming message"""
 
         self._parent.handle(address, message, date)
 
 
 class _ListenerThread(QThread):
 
+    received = pyqtSignal(object, object, object)
+
     def __init__(self, port, parent):
         super(_ListenerThread, self).__init__()
 
         self.listener = None
+        self.parent = parent
 
         try:
-            self.listener = _OSCListener(port, parent)
+            self.listener = _OSCListener(port, self)
         except OSError:
             self.terminate()
+
+    def handle(self, address, message, date):
+        """Pass message to parent thread"""
+
+        self.received.emit(address, message, date)
 
     def run(self):
         """Run listener"""

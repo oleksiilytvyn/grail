@@ -20,6 +20,34 @@ Welcome {
 
 /******************************************************************************
  *
+ * @section PropertiesView
+ *
+ *****************************************************************************/
+
+#PropertiesView_empty {
+    background-color: #2f2f2f;
+    }
+
+    #PropertiesView_empty_title {
+        qproperty-alignment: AlignCenter AlignCenter;
+        text-align: center;
+        font-size: 22px;
+        margin: 0 0 6px 0;
+        color: #f1f1f1;
+        }
+
+    #PropertiesView_empty_info {
+        text-align: center;
+        font-size: 13px;
+        qproperty-alignment: AlignCenter AlignCenter;
+        font-weight: 300;
+        color: #929292;
+        margin: 0 0 16px 0;
+        }
+
+
+/******************************************************************************
+ *
  * @section EmptyViewer
  *
  *****************************************************************************/
@@ -251,6 +279,14 @@ CueDialog {
         border-radius: 3px;
         }
 
+    #CueDialog_toolbar {
+        background: #2f2f2f;
+        border: none;
+        padding: 0;
+        margin: 0;
+        min-height: 30px;
+        }
+
 
 /******************************************************************************
  *
@@ -271,55 +307,10 @@ CueDialog {
 #PropertyViewer {
     }
 
-    #PropertyViewer_empty {
-        background-color: #2f2f2f;
+    #PropertyViewer_toolbar {
+        background: #2f2f2f;
+        border-top: 1px solid #2f2f2f;
         }
-
-        #PropertyViewer_empty_title {
-            qproperty-alignment: AlignCenter AlignCenter;
-            text-align: center;
-            font-size: 22px;
-            margin: 0 0 6px 0;
-            color: #f1f1f1;
-            }
-
-        #PropertyViewer_empty_info {
-            text-align: center;
-            font-size: 13px;
-            qproperty-alignment: AlignCenter AlignCenter;
-            font-weight: 300;
-            color: #929292;
-            margin: 0 0 16px 0;
-            }
-
-    #PropertyViewer QTableWidget {
-        border: none;
-        background-color: #2f2f2f;
-        alternate-background-color: #393939;
-        show-decoration-selected: 1;
-        outline: 0;
-        }
-
-        #PropertyViewer QTableWidget QScrollBar::handle:vertical {
-            background: #ddd;
-            min-height: 20px;
-            border-radius: 3px;
-            }
-
-        #PropertyViewer QTableWidget::item {
-            color: #e6e6e6;
-            padding: 4px 12px;
-            margin: 0;
-            border-bottom: 1px solid transparent;
-            qproperty-wordWrap: true;
-            }
-
-        #PropertyViewer QTableWidget::item:selected {
-            background: #8a9fbb;
-            border-bottom: 1px solid #8a9fbb;
-            color: #e6e6e6;
-            }
-
 
 /******************************************************************************
  *
@@ -367,14 +358,17 @@ NotesViewer {
         border-top: 1px solid transparent;
         }
 
-        #NotesViewer_toolbar Label {
+        #NotesViewer_label {
+            padding: 8px;
+            qproperty-alignment: AlignCenter AlignCenter;
+            qproperty-wordWrap: true;
             color: #2d2d32;
             }
 
 
 /******************************************************************************
  *
- * @section NotesViewer
+ * @section ConsoleViewer
  *
  *****************************************************************************/
 
@@ -384,11 +378,12 @@ ConsoleViewer {
     #ConsoleViewer_text {
         background: #2f2f2f;
         color: #ffffff;
-        padding: 8px;
+        padding: 6px;
         border: none;
         font-family: Consolas, "Andale Mono WT", "Andale Mono", "Lucida Console", "Lucida Sans Typewriter",
             "DejaVu Sans Mono", "Bitstream Vera Sans Mono", "Liberation Mono", "Nimbus Mono L",
             Monaco, "Courier New", Courier, monospace;
+        font-size: 12pt;
         }
 
     #ConsoleViewer_toolbar {
@@ -396,6 +391,13 @@ ConsoleViewer {
         background: #2f2f2f;
         border-top: 1px solid #2f2f2f;
         }
+
+        #ConsoleViewer_label {
+            padding: 8px;
+            qproperty-alignment: AlignCenter AlignCenter;
+            qproperty-wordWrap: true;
+            color: #2d2d32;
+            }
 
 
 /******************************************************************************

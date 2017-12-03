@@ -9,6 +9,7 @@
     :license: GNU, see LICENSE for more details.
 """
 
+from grail.ui.properties_view import PropertiesView
 from grail.ui.view_arranger import ViewArranger
 from grail.ui.preferences_dialog import PreferencesDialog
 from grail.ui.actions_dialog import ActionsDialog

@@ -117,6 +117,57 @@ QMenu {
         image: url(:/rc/right_arrow.png);
         }
 
+
+/**
+ * @section QTableWidget
+ */
+
+QTableView {
+    border: none;
+    background-color: #2f2f2f;
+    alternate-background-color: #393939;
+    show-decoration-selected: 1;
+    outline: 0;
+    }
+
+    QHeaderView {
+        background: #393939;
+        color: #f1f1f1;
+        border: none;
+        border-bottom: 1px solid #2f2f2f;
+        }
+
+        QHeaderView::section {
+            border: none;
+            border-right: 1px solid #2f2f2f;
+            margin: 0;
+            background: #393939;
+            color: #f1f1f1;
+            padding: 3px;
+            min-height: 20px;
+            }
+
+    QTableView QScrollBar::handle:vertical {
+        background: #ddd;
+        min-height: 20px;
+        border-radius: 3px;
+        }
+
+    QTableView::item {
+        color: #e6e6e6;
+        padding: 4px 12px;
+        margin: 0;
+        border-bottom: 1px solid transparent;
+        qproperty-wordWrap: true;
+        }
+
+    QTableView::item:selected {
+        background: #8a9fbb;
+        border-bottom: 1px solid #8a9fbb;
+        color: #e6e6e6;
+        }
+
+
 /***
  * @section Splitter
  */

@@ -8,8 +8,6 @@
     :copyright: (c) 2017 by Grail Team.
     :license: GNU, see LICENSE for more details.
 """
-import json
-
 from PyQt5.QtCore import *
 
 from grailkit.core import Signal

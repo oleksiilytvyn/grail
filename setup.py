@@ -137,6 +137,7 @@ def fix_png_profile(path, recursive=False, _main=True):
     Args:
         path (str): path to directory
         recursive (bool): include sub-folders or not
+        _main (bool): True if this is first non-recursive call
     """
 
     path = os.path.abspath(path)
@@ -219,7 +220,7 @@ setup(
     keywords='open source osc church lyrics projection song bible display',
     license='GNU General Public License v3',
 
-    requires=['grailkit', 'PyQt5'],
+    requires=['grailkit', 'PyQt5', 'hgapi'],
 
     classifiers=[
         'Development Status :: 4 - Beta',

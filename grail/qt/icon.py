@@ -25,6 +25,7 @@ class Icon(QIcon):
             width (int): width of pixmap
             height (int): height of pixmap
             color (QColor): color of icon
+            original_color (QColor): new color
         Returns:
             QPixmap of icon
         """

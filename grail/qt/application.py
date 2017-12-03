@@ -14,9 +14,6 @@ import sys
 from PyQt5.QtCore import QSharedMemory, QFile, Qt, QCoreApplication
 from PyQt5.QtWidgets import QApplication, QStyleFactory
 
-# load qt resources related to grailkit.qt
-import grail.resources
-
 
 class Application(QApplication):
     """Base class for all grail applications"""

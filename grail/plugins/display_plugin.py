@@ -10,15 +10,15 @@
 """
 import math
 
-from PyQt5.QtCore import *
 from PyQt5.QtGui import *
+from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
-from grailkit.util import OS_MAC
 from grailkit.dna import DNA
-from grail.qt import *
+from grailkit.util import OS_MAC
 
-from grail.core import Plugin, Viewer, Configurator
+from grail.qt import *
+from grail.core import Plugin, Viewer
 
 
 class DisplayPlugin(Plugin):
@@ -834,12 +834,12 @@ class AlignDialog(Popup):
 
         try:
             h_index = [Qt.AlignLeft, Qt.AlignHCenter, Qt.AlignRight].index(self.align_horizontal)
-        except:
+        except ValueError:
             h_index = Qt.AlignHCenter
 
         try:
             v_index = [Qt.AlignTop, Qt.AlignVCenter, Qt.AlignBottom].index(self.align_vertical)
-        except:
+        except ValueError:
             v_index = Qt.AlignVCenter
 
         self.ui_horizontal.addItem("Left", QVariant(Qt.AlignLeft))
@@ -1074,8 +1074,8 @@ class CaseDialog(Popup):
 
     updated = pyqtSignal(int)
 
-    def __init__( self, case=0):
-        super(CaseDialog, self).__init__( None )
+    def __init__(self, case=0):
+        super(CaseDialog, self).__init__(None)
 
         self.case = case
 
@@ -1239,10 +1239,10 @@ class PreferencesDialog(Dialog):
         self._parent.emit(message, *args)
         self._preferences.parse()
 
-    def padding_updated(self, left, top, right, bottom):
+    def padding_updated(self, left_padding, top_padding, right_padding, bottom_padding):
         """Text padding updated"""
 
-        self.emit('/clip/text/padding', left, top, right, bottom)
+        self.emit('/clip/text/padding', left_padding, top_padding, right_padding, bottom_padding)
 
     def shadow_updated(self, offset, blur, color):
         """Shadow properties changed"""

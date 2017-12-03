@@ -18,9 +18,10 @@ from PyQt5.QtWidgets import *
 from grailkit.dna import DNA, DNAError, Library
 from grailkit.util import *
 from grailkit.bible import BibleHost, BibleHostError
-from grail.qt import AboutDialog, MessageDialog, Application, ProgressDialog
 
 import grail
+from grail.ui import ActionsDialog, PreferencesDialog, ViewArranger
+from grail.qt import AboutDialog, MessageDialog, Application, ProgressDialog
 
 
 class MainWindow(QMainWindow):
@@ -44,13 +45,13 @@ class MainWindow(QMainWindow):
         self.about_dialog.url_report = "http://grailapp.com/"
         self.about_dialog.url_help = "http://grailapp.com/help"
 
-        self.preferences_dialog = grail.ui.PreferencesDialog()
+        self.preferences_dialog = PreferencesDialog()
 
-        self.actions_dialog = grail.ui.ActionsDialog()
+        self.actions_dialog = ActionsDialog()
 
         self._ui_menubar()
 
-        self.view_arranger = grail.ui.ViewArranger()
+        self.view_arranger = ViewArranger()
         self.view_arranger.updated.connect(self._arranger_updated)
         self.view_arranger.compose(self._compose())
         # save new structure to project
@@ -419,7 +420,8 @@ class MainWindow(QMainWindow):
 
         message = MessageDialog(title="Updates",
                                 text="Unable to check for updates...",
-                                icon=MessageDialog.Warning)
+                                icon=MessageDialog.Warning,
+                                parent=self)
         message.exec_()
 
     def open_web_action(self):

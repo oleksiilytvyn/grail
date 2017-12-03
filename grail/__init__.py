@@ -14,7 +14,6 @@ import os
 import sys
 
 import grailkit
-from grailkit import util
 from grailkit.util import data_location, application_location
 
 from grail.application import Grail

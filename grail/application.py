@@ -47,7 +47,6 @@ class Grail(Application):
         self.setApplicationVersion(grail.__version__)
         self.setOrganizationName(grail.ORGANISATION_NAME)
         self.setOrganizationDomain(grail.ORGANISATION_DOMAIN)
-        self.setStyleSheetFile(":/qt/grail.css")
 
         self._plugins = []
         self._actions = []

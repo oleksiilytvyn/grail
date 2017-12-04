@@ -420,8 +420,7 @@ class MainWindow(QMainWindow):
 
         message = MessageDialog(title="Updates",
                                 text="Unable to check for updates...",
-                                icon=MessageDialog.Warning,
-                                parent=self)
+                                icon=MessageDialog.Warning)
         message.exec_()
 
     def open_web_action(self):

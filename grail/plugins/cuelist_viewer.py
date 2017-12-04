@@ -453,7 +453,7 @@ class CuelistViewer(Viewer):
         self._ui_view_action.setIcon(QIcon(':/rc/menu.png'))
         self._ui_view_action.clicked.connect(self.view_action)
 
-        self._ui_add_action = QAction(QIcon(':/rc/add.png'), 'Add node', self)
+        self._ui_add_action = QAction(QIcon(':/rc/add.png'), 'Add new Cue', self)
         self._ui_add_action.setIconVisibleInMenu(True)
         self._ui_add_action.triggered.connect(self.add_action)
 

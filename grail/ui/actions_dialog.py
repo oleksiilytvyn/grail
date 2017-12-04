@@ -16,6 +16,10 @@ from grail.qt import Dialog, VLayout, List, ListItem, Label, Application, Toolba
 
 
 class ActionsDialog(Dialog):
+    """Display actions registered by plugins"""
+
+    # todo: add search bar
+    # todo: add context menu
 
     def __init__(self, parent=None):
         super(ActionsDialog, self).__init__(parent)
@@ -74,5 +78,4 @@ class ActionsDialog(Dialog):
         items = self._ui_list.selectedItems()
 
         if len(items) > 0:
-            action = items[0].action
-            action()
+            items[0].action()

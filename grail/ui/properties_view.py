@@ -97,6 +97,9 @@ class PropertiesView(Component):
             point (QPoint): point where context menu requested
         """
 
+        if not self._ui_properties.itemAt(point):
+            return False
+
         menu = QMenu("Context menu", self)
 
         remove_action = QAction('Remove property', menu)

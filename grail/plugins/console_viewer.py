@@ -134,6 +134,8 @@ class ConsoleViewer(Viewer):
         """Console output changed"""
 
         self._ui_output.setPlainText(self.app.console.output.read())
+        scrollbar = self._ui_output.verticalScrollBar()
+        scrollbar.setValue(scrollbar.maximum())
 
     def _key_pressed(self, event):
         """Process key event on  console input"""

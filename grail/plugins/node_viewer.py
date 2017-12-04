@@ -137,6 +137,9 @@ class NodeViewer(Viewer):
             point (QPoint): point where context menu requested
         """
 
+        if not self._ui_tree.itemAt(point):
+            return False
+
         menu = QMenu("Context menu", self)
 
         remove_action = QAction('Remove', menu)

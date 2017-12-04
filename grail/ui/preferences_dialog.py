@@ -56,6 +56,7 @@ class PreferencesDialog(Dialog):
         self._ui_splitter.addWidget(self._ui_panel)
 
         self._ui_panel.setCurrentIndex(0)
+        self._ui_sidebar_list.setCurrentItem(self._ui_sidebar_list.item(0))
 
         self._ui_splitter.setCollapsible(0, False)
         self._ui_splitter.setCollapsible(1, False)

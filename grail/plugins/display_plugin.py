@@ -1071,6 +1071,7 @@ class CompositionDialog(Popup):
 
 
 class CaseDialog(Popup):
+    """Popup for selecting text transformation"""
 
     updated = pyqtSignal(int)
 
@@ -1275,6 +1276,7 @@ class PreferencesDialog(Dialog):
         font, accept = QFontDialog.getFont(self._preferences.style_font)
 
         if accept:
+            # todo: send message
             print('font', font)
 
         self.showWindow()

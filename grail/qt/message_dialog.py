@@ -158,8 +158,8 @@ class MessageDialog(Dialog):
         self._ui_icon.raise_()
         self.setWindowTitle(self._title if not OS_MAC else "")
         self.setMinimumSize(360, 60)
-        self._update_size()
         self.setWindowFlags(Qt.WindowCloseButtonHint | Qt.MSWindowsFixedSizeDialogHint)
+        self._update_size()
 
     def title(self):
         """Get a dialog title"""

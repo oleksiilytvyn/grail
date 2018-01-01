@@ -113,6 +113,7 @@ class _OSCListener(OSCServer, socketserver.ThreadingMixIn):
 
 
 class _ListenerThread(QThread):
+    """Qt thread with OSCServer"""
 
     received = pyqtSignal(object, object, object)
 

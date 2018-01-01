@@ -171,7 +171,7 @@ class DisplayPlugin(Plugin):
         return cls._instance
 
 
-class DisplayWindow(Frameless):
+class DisplayWindow(QDialog):
     """Window that displays 2d graphics"""
 
     def __init__(self, parent):

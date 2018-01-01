@@ -98,14 +98,11 @@ class MainWindow(QMainWindow):
         self.ui_about_action = QAction('About Grail', self)
         self.ui_about_action.triggered.connect(self.about_action)
 
-        self.ui_updates_action = QAction('Check for updates', self)
-        self.ui_updates_action.triggered.connect(self.update_action)
-
         self.ui_open_web_action = QAction('Visit grailapp.com', self)
-        self.ui_open_web_action.triggered.connect(self.open_web_action)
+        self.ui_open_web_action.triggered.connect(lambda: QDesktopServices.openUrl(QUrl("http://grailapp.com/")))
 
         self.ui_open_manual_action = QAction('View manual', self)
-        self.ui_open_manual_action.triggered.connect(self.open_manual_action)
+        self.ui_open_manual_action.triggered.connect(lambda: QDesktopServices.openUrl(QUrl("http://grailapp.com/help")))
 
         # File menu
         self.ui_menu_file = self.ui_menubar.addMenu('File')
@@ -129,8 +126,6 @@ class MainWindow(QMainWindow):
         self.ui_menu_help = self.ui_menubar.addMenu('Help')
         self.ui_menu_help.addAction(self.ui_open_manual_action)
         self.ui_menu_help.addAction(self.ui_open_web_action)
-        self.ui_menu_help.addSeparator()
-        self.ui_menu_help.addAction(self.ui_updates_action)
 
         if not OS_MAC:
             self.ui_menu_help.addSeparator()
@@ -264,8 +259,7 @@ class MainWindow(QMainWindow):
 
         path, ext = QFileDialog.getSaveFileName(self, "New project", location, "*.grail")
 
-        if path:
-            self.app.open(path, create=True)
+        self.app.open(path, create=True)
 
     def open_project(self):
         """Open an existing file"""
@@ -274,8 +268,7 @@ class MainWindow(QMainWindow):
                                          QStandardPaths.LocateDirectory)
         path, ext = QFileDialog.getOpenFileName(self, "Open File...", location, "*.grail")
 
-        if path:
-            self.app.open(path, create=False)
+        self.app.open(path, create=False)
 
     def save_project(self):
         """Save current project"""
@@ -414,24 +407,6 @@ class MainWindow(QMainWindow):
         """About dialog menu_action"""
 
         self.about_dialog.showWindow()
-
-    def update_action(self):
-        """Check for updates menu_action"""
-
-        message = MessageDialog(title="Updates",
-                                text="Unable to check for updates...",
-                                icon=MessageDialog.Warning)
-        message.exec_()
-
-    def open_web_action(self):
-        """Open a grailapp.com in a browser"""
-
-        QDesktopServices.openUrl(QUrl("http://grailapp.com/"))
-
-    def open_manual_action(self):
-        """Open a manual in browser"""
-
-        QDesktopServices.openUrl(QUrl("http://grailapp.com/help"))
 
     def preferences_action(self):
         """Open a preferences dialog"""

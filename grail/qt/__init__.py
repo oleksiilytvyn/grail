@@ -35,7 +35,6 @@ from grail.qt.table import Table, TableItem
 
 # dialogs & windows
 from grail.qt.dialog import Dialog
-from grail.qt.frameless import Frameless
 from grail.qt.popup import Popup
 from grail.qt.about_dialog import AboutDialog
 from grail.qt.message_dialog import MessageDialog

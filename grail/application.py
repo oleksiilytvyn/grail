@@ -147,6 +147,9 @@ class Grail(Application):
     def open(self, path, create=False):
         """Open a file"""
 
+        if not path:
+            return False
+
         if self.main_window:
             self._relaunch = True
             self._relaunch_args = [path, '-c']

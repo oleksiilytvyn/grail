@@ -34,7 +34,7 @@ class _PluginMeta(object):
     author = 'Grail Team'
 
     # Plugin description string
-    description = 'Dummy plugin that doesn\'t make anything useful'
+    description = 'Dummy plugin that doesn\'t do anything useful'
 
     # Do not list this plugin if True
     private = False

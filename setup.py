@@ -270,7 +270,6 @@ setup(
     executables=[Executable(FILE,
                             base="Win32GUI" if sys.platform == "win32" else None,
                             icon="data/icon/grail.ico",
-                            compress=True,
                             shortcutName=TITLE,
                             shortcutDir="ProgramMenuFolder")])
 

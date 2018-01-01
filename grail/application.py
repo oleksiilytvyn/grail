@@ -210,7 +210,10 @@ class Grail(Application):
         # if there is no bibles available
         # install default bible from resources
         else:
-            _file, path = tempfile.mkstemp(prefix='bible-', suffix='.grail-bible')
+            _file_id, path = tempfile.mkstemp(prefix='bible-', suffix='.grail-bible')
+            _file = os.fdopen(_file_id, 'w')
+            _file.close()
+
             # remove empty file for qt to create a file at same place
             os.remove(path)
 
@@ -220,8 +223,6 @@ class Grail(Application):
             ref.close()
 
             BibleHost.install(path, replace=True)
-            # remove temporary file
-            os.remove(path)
 
             bibles = BibleHost.list()
 

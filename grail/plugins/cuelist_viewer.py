@@ -15,6 +15,8 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
 from grailkit.dna import DNA, CueEntity
+from grailkit.osc import OSCMessage, OSCBundle
+
 from grail.core import Viewer
 from grail.ui import PropertiesView
 from grail.qt import *
@@ -392,6 +394,7 @@ class CuelistViewer(Viewer):
         # Application signals
         self.connect('/app/close', self._close)
         self.connect('/cuelist/add', self._add_entity)
+        self.connect('!cue/execute', self._osc_execute)
 
         self.__ui__()
         self.cuelist_selected(self._cuelist_id)
@@ -615,6 +618,11 @@ class CuelistViewer(Viewer):
         item.object().set('expanded', flag)
 
     def cuelist_selected(self, cuelist_id=0):
+        """Open cuelist in viewer
+
+        Args:
+            cuelist_id (int): cuelist id
+        """
 
         if self.is_destroyed:
             return False
@@ -767,6 +775,28 @@ class CuelistViewer(Viewer):
 
         # call default event handler
         QTreeWidget.keyPressEvent(self._ui_tree, event)
+
+    def _osc_execute(self, cue):
+        """Execute cue and send OSC bundle"""
+
+        # old style message
+        # todo: remove old style message in future
+        message = OSCMessage(address="/grail/message")
+        message.add(bytes(cue.name, "utf-8"))
+        message.add(0)
+
+        # new mechanism
+        bundle = OSCBundle()
+
+        for key, value in cue.properties().items():
+            property_message = OSCMessage(address=key)
+            property_message.add(value)
+
+            bundle.add(property_message)
+
+        osc_out = self.app.osc.output
+        osc_out.send(message)
+        osc_out.send(bundle)
 
     def _close(self):
         """Close child dialogs"""

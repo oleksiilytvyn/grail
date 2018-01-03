@@ -67,10 +67,10 @@ class DisplayPlugin(Plugin):
 
         # Connect signals
         self.connect('/app/close', self.close)
-        self.connect('!cue/execute', self._execute)
         self.connect('/comp/testcard', self._testcard)
         self.connect('/comp/width', self._composition_changed)
         self.connect('/comp/height', self._composition_changed)
+        self.connect('/display/disabled', self._disable_action)
 
         desktop = QApplication.desktop()
         desktop.resized.connect(self._screens_changed)
@@ -79,7 +79,7 @@ class DisplayPlugin(Plugin):
 
         self._composition = CompositionTexture()
 
-        # render update loop
+        # texture update loop
         self._timer = QTimer()
         self._timer.timeout.connect(self._render)
         self._timer.start(1000 / 30)
@@ -115,6 +115,11 @@ class DisplayPlugin(Plugin):
 
         self.preferences_dialog.showWindow()
 
+    def _disable_action(self, flag=True):
+        """Callback from '/display/disabled'"""
+
+        self.menu_disable.setChecked(flag)
+
     def disable_action(self, action=None):
         """Disable display output"""
 
@@ -123,10 +128,8 @@ class DisplayPlugin(Plugin):
             action = self.menu_disable
             action.setChecked(True)
 
-        if action.isChecked():
-            self.window.close()
-        else:
-            self.window.show()
+        CompositionPreferences.instance().disabled = action.isChecked()
+        self.window.updateWindowGeometry()
 
         self.emit('/display/disabled', action.isChecked())
 
@@ -136,17 +139,6 @@ class DisplayPlugin(Plugin):
         self.window.close()
         self.preferences_dialog.close()
 
-    def _execute(self, cue):
-
-        if cue.type == DNA.TYPE_SONG:
-            text = cue.lyrics
-        elif cue.type == DNA.TYPE_VERSE:
-            text = "%s\n%s" % (cue.text, cue.reference)
-        else:
-            text = cue.name
-
-        self.emit('/clip/text/source', text)
-
     def _screens_changed(self):
         """Display configuration changed"""
 
@@ -155,8 +147,7 @@ class DisplayPlugin(Plugin):
     def _testcard(self, flag):
         """Update action according to"""
 
-        action = self.menu_testcard
-        action.setChecked(flag)
+        self.menu_testcard.setChecked(flag)
 
     def _composition_changed(self, size=0):
         """Swap composition texture as QImage can change size after initialization"""
@@ -171,50 +162,64 @@ class DisplayPlugin(Plugin):
         return cls._instance
 
 
-class DisplayWindow(QDialog):
+class DisplayWindow(Dialog):
     """Window that displays 2d graphics"""
 
     def __init__(self, parent):
-        super(DisplayWindow, self).__init__(None)
+        super(DisplayWindow, self).__init__()
 
         self._position = QPoint(0, 0)
         self._plugin = parent
         self._preferences = CompositionPreferences.instance()
 
-        Application.instance().signals.connect('!composition/update', self.update)
+        signals = Application.instance().signals
+        signals.connect('!composition/update', self.repaint)
+        signals.connect('!display/update', self.updateWindowGeometry)
 
         self.setGeometry(100, 100, 800, 600)
         self.setFixedSize(800, 600)
         self.setWindowTitle("Display")
-        self.setWindowFlags((Qt.Dialog if OS_MAC else Qt.Tool) |
+        self.setWindowFlags(Qt.Window |
                             Qt.FramelessWindowHint |
                             Qt.WindowSystemMenuHint |
-                            Qt.WindowStaysOnTopHint)
+                            Qt.WindowStaysOnTopHint |
+                            Qt.NoDropShadowWindowHint |
+                            Qt.X11BypassWindowManagerHint)
         self.moveCenter()
+
+    def updateWindowGeometry(self):
+        """Update window geometry"""
+
+        p = self._preferences
+
+        if p.fullscreen:
+            self.showFullScreen()
+        else:
+            self.showNormal()
+
+        # ton the best solution, but it works
+        if p.disabled:
+            self.showNormal()
+            self.setGeometry(0, 0, 200, 150)
+            self.setFixedSize(200, 150)
+            self.close()
+
+            return True
+
+        self.setGeometry(p.geometry.x(), p.geometry.y(), p.geometry.width(), p.geometry.height())
+        self.setFixedSize(p.geometry.width(), p.geometry.height())
+
+        self.repaint()
 
     def paintEvent(self, event):
         """Draw image"""
 
         output = event.rect()
-        comp = self._plugin.composition
 
         painter = QPainter()
         painter.begin(self)
         painter.setRenderHints(QPainter.Antialiasing | QPainter.TextAntialiasing | QPainter.SmoothPixmapTransform)
 
-        t = QTransform()
-        q = QPolygonF([QPointF(0, 0),
-                       QPointF(comp.width(), 0),
-                       QPointF(comp.width(), comp.height()),
-                       QPointF(0, comp.height())])
-        p = QPolygonF([QPointF(0, 0),
-                       QPointF(output.width(), 0),
-                       QPointF(output.width(), output.height()),
-                       QPointF(0, output.height())])
-
-        QTransform.quadToQuad(q, p, t)
-
-        painter.setTransform(t)  # * self._preferences.transformation)
         painter.fillRect(output, Qt.black)
         painter.drawImage(output, self._plugin.composition)
 
@@ -250,12 +255,23 @@ class CompositionTexture(QImage):
         signals = Application.instance().signals
         signals.connect('/comp/testcard', self._testcard_cb)
         signals.connect('/clip/text/source', self._text_cb)
+        signals.connect('!cue/execute', self._execute)
 
     def _testcard_cb(self, flag=False):
         """Show test card or not"""
 
         self._p.display_test = flag
         self.render()
+
+    def _execute(self, cue):
+        """Execute cue"""
+
+        if cue.type == DNA.TYPE_SONG:
+            self._p.text = cue.lyrics
+        elif cue.type == DNA.TYPE_VERSE:
+            self._p.text = "%s\n%s" % (cue.text, cue.reference)
+        else:
+            self._p.text = cue.name
 
     def _text_cb(self, text):
 
@@ -264,6 +280,10 @@ class CompositionTexture(QImage):
 
     def render(self):
         """Render composition"""
+
+        # Do not render if disabled
+        if self._p.disabled:
+            return False
 
         p = QPainter()
         p.begin(self)
@@ -286,24 +306,34 @@ class CompositionTexture(QImage):
         painter.setPen(self._p.shadow_color)
 
         padding = self._p.padding
+        comp = self.rect()
 
-        box = QRect(0, 0, self._p.composition.width(), self._p.composition.height())
+        # Draw shadow
+        box = QRect(0, 0, comp.width(), comp.height())
         box.adjust(padding.left(), padding.top(), -padding.right(), -padding.bottom())
         box.setX(box.x() + self._p.shadow_x)
         box.setY(box.y() + self._p.shadow_y)
 
         painter.drawText(box, self._p.align_vertical | self._p.align_horizontal | Qt.TextWordWrap, self._p.text)
 
+        # Draw text
         painter.setPen(self._p.style_color)
 
-        box = QRect(0, 0, self._p.composition.width(), self._p.composition.height())
+        box = QRect(0, 0, comp.width(), comp.height())
         box.adjust(padding.left(), padding.top(), -padding.right(), -padding.bottom())
 
         painter.drawText(box, self._p.align_vertical | self._p.align_horizontal | Qt.TextWordWrap, self._p.text)
 
     @classmethod
     def generate_testcard(cls, width, height):
-        """Generate test card QPixmap"""
+        """Generate test card QPixmap
+
+        Args:
+            width (int): image width
+            height (int): image height
+        Returns:
+            QPixmap with test card pattern
+        """
 
         comp = QRect(0, 0, width, height)
         image = QPixmap(comp.width(), comp.height())
@@ -359,7 +389,64 @@ class CompositionTexture(QImage):
 
 
 class CompositionPreferences(object):
-    """This class holds attributes used to render composition as Qt objects"""
+    """This class holds attributes used to render composition as Qt objects
+
+    # Display
+
+    display/width int
+    display/height int
+    display/x int
+    display/y int
+    display/fullscreen bool
+    display/output str # name of display to output in fullscreen
+    display/disabled bool
+
+    # Composition
+
+    comp/width int
+    comp/height int
+    comp/opacity float
+    comp/transition float # seconds
+    comp/volume float
+    comp/pan float
+    comp/testcard bool
+
+    # Clip
+
+    clip/width float
+    clip/height float
+    clip/position float float
+    clip/rotate float
+    clip/opacity float
+    clip/scale float
+    clip/anchor float float float
+
+    clip/audio/volume float
+    clip/audio/pan float # -1 left, 1 right, 0 center
+
+    clip/text/source str
+    clip/text/color str
+    clip/text/padding float float float float # left, top, right, bottom
+    clip/text/align int # 0 - Left, 1 - Center, 2 - Right
+    clip/text/valign int # 0 - Top, 1 - Center, 2 - Bottom
+    clip/text/shadow/x int
+    clip/text/shadow/y int
+    clip/text/shadow/color str
+    clip/text/shadow/blur int
+    clip/text/transform int # 0 - Normal, 1 - Title, 2 - Upper, 3 - Lower, 4 - Capitalize
+    clip/text/font/name
+    clip/text/font/size
+    clip/text/font/style
+
+    clip/playback/source str
+    clip/playback/direction bool # playback direction True for forward, False for backwards
+    clip/playback/play
+    clip/playback/pause
+    clip/playback/stop
+    clip/playback/transport int # 0 - loop, 1 - bounce, 2 - stop in the end, 3 - pause in the end
+    clip/playback/start float # seconds
+    clip/playback/stop float # seconds
+    """
 
     __instance = None
 
@@ -390,6 +477,7 @@ class CompositionPreferences(object):
 
         self.transform = QTransform()
         self.composition = QSize(800, 600)
+        self.disabled = True
         self.fullscreen = False
         self.geometry = QRect(100, 100, 800, 600)
 
@@ -420,6 +508,7 @@ class CompositionPreferences(object):
         self.transform = QTransform()
         self.composition = QSize(s.get('/comp/width', default=800),
                                  s.get('/comp/height', default=600))
+        self.disabled = s.get('/display/disabled', default=True)
         self.fullscreen = s.get('/display/fullscreen', default=False)
         self.geometry = QRect(s.get('/display/x', default=0),
                               s.get('/display/y', default=0),
@@ -449,6 +538,7 @@ class DisplayWidget(QWidget):
         parent.connect('!composition/update', self.repaint)
 
     def paintEvent(self, event):
+        """Draw display texture on widget surface"""
 
         p = QPainter()
         p.begin(self)
@@ -1152,7 +1242,13 @@ class PreferencesDialog(Dialog):
         self.case_popup = CaseDialog(p.style_case_transform)
         self.case_popup.updated.connect(self.case_updated)
 
+        desktop = QApplication.desktop()
+        desktop.resized.connect(self._screens_changed)
+        desktop.screenCountChanged.connect(self._screens_changed)
+        desktop.workAreaResized.connect(self._screens_changed)
+
         self.__ui__()
+        self._update_output()
 
     def __ui__(self):
         """Build UI"""
@@ -1163,7 +1259,7 @@ class PreferencesDialog(Dialog):
         # toolbar actions
         self._ui_output_menu = QMenu(self)
 
-        self._ui_output_action = Button("Output", self)
+        self._ui_output_action = Button("Disabled", self)
         self._ui_output_action.setMenu(self._ui_output_menu)
 
         self._ui_font_action = QToolButton(self)
@@ -1209,7 +1305,7 @@ class PreferencesDialog(Dialog):
         self._ui_toolbar.addWidget(self._ui_composition_action)
         self._ui_toolbar.addWidget(self._ui_padding_action)
         self._ui_toolbar.addWidget(self._ui_testcard_action)
-        self._ui_toolbar.addWidget(Spacer())
+        self._ui_toolbar.addStretch()
         self._ui_toolbar.addWidget(self._ui_output_action)
 
         self._ui_layout = VLayout()
@@ -1227,6 +1323,63 @@ class PreferencesDialog(Dialog):
 
         pass
 
+    def _update_output(self):
+        """Update display output list"""
+
+        def triggered(menu_action):
+            """Trigger menu action"""
+            return lambda item=menu_action: self._update_display(*menu_action.property("mode"))
+
+        # Mode: (Output name, QRect, disabled, fullscreen, Display name)
+        modes = [("Disabled", QRect(0, 0, 800, 600), True, False, None)]
+        display = QDesktopWidget().geometry()
+
+        modes.append(None)
+
+        for screen in QGuiApplication.screens():
+            modes.append(("%s (%dx%d)" % (screen.name(), screen.size().width(), screen.size().height()),
+                         screen.geometry(), False, True, screen.name()))
+
+        modes.append(None)
+
+        for (w, h) in [(800, 600), (480, 320)]:
+            modes.append(("Windowed (%dx%d)" % (w, h),
+                          QRect(display.width() / 2 - w / 2, display.height() / 2 - h / 2, w, h), False, False, None))
+
+        self._ui_output_menu.clear()
+
+        for mode in modes:
+            if mode is None:
+                self._ui_output_menu.addSeparator()
+                continue
+
+            name, rect, disabled, fullscreen, display = mode
+
+            action = QAction(name, self)
+            action.setProperty("mode", QVariant(mode))
+            action.triggered.connect(triggered(action))
+
+            self._ui_output_menu.addAction(action)
+
+    def _screens_changed(self):
+        """Desktop geometry changed"""
+
+        self._update_output()
+
+    def _update_display(self, name, rect, disabled, fullscreen, display):
+        """Update display geometry"""
+
+        self._ui_output_action.setText(name)
+
+        self.emit('/display/disabled', disabled)
+        self.emit('/display/width', rect.width())
+        self.emit('/display/height', rect.height())
+        self.emit('/display/x', rect.x())
+        self.emit('/display/y', rect.y())
+        self.emit('/display/fullscreen', fullscreen)
+        self.emit('/display/output', display)
+        self.emit('!display/update')
+
     @staticmethod
     def _map_action_position(action):
         """Returns point in middle of action"""
@@ -1234,7 +1387,7 @@ class PreferencesDialog(Dialog):
         return action.mapToGlobal(action.rect().center())
 
     def emit(self, message, *args):
-        """Emit message to all"""
+        """Save and emit message"""
 
         self._settings.set(message, args[0] if len(args) == 1 else args)
         self._parent.emit(message, *args)
@@ -1276,8 +1429,9 @@ class PreferencesDialog(Dialog):
         font, accept = QFontDialog.getFont(self._preferences.style_font)
 
         if accept:
-            # todo: send message
-            print('font', font)
+            self.emit('/clip/text/font/name', str(font.family()))
+            self.emit('/clip/text/font/size', font.pixelSize())
+            self.emit('/clip/text/font/style', str(font.styleName()))
 
         self.showWindow()
 
@@ -1359,7 +1513,7 @@ class DisplayPreviewViewer(Viewer):
         self._ui_toolbar = Toolbar()
         self._ui_toolbar.setObjectName("DisplayPreviewViewer_toolbar")
         self._ui_toolbar.addWidget(self._ui_view_action)
-        self._ui_toolbar.addWidget(Spacer())
+        self._ui_toolbar.addStretch()
 
         self._layout = VLayout()
         self._layout.addWidget(self._frame)
@@ -1411,7 +1565,7 @@ class DisplayViewer(Viewer):
         self._ui_toolbar = Toolbar()
         self._ui_toolbar.setObjectName("DisplayPreviewViewer_toolbar")
         self._ui_toolbar.addWidget(self._ui_view_action)
-        self._ui_toolbar.addWidget(Spacer())
+        self._ui_toolbar.addStretch()
 
         self._layout = VLayout()
         self._layout.addWidget(self._widget)

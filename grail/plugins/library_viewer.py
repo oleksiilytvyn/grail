@@ -70,7 +70,7 @@ class SongDialog(Dialog):
         self._ui_buttons = HLayout()
         self._ui_buttons.setSpacing(10)
         self._ui_buttons.setContentsMargins(0, 0, 0, 0)
-        self._ui_buttons.addWidget(Spacer())
+        self._ui_buttons.addStretch()
         self._ui_buttons.addWidget(self._ui_button_cancel)
         self._ui_buttons.addWidget(self._ui_button_ok)
 

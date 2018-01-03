@@ -57,11 +57,10 @@ class CuelistDialog(Popup):
         self._ui_add_action.setIconVisibleInMenu(True)
         self._ui_add_action.triggered.connect(self.add_action)
 
-        self._ui_toolbar = QToolBar()
-        self._ui_toolbar.setIconSize(QSize(16, 16))
+        self._ui_toolbar = Toolbar()
         self._ui_toolbar.setObjectName("cuelist_dialog_toolbar")
         self._ui_toolbar.addAction(self._ui_edit_action)
-        self._ui_toolbar.addWidget(Spacer())
+        self._ui_toolbar.addStretch()
         self._ui_toolbar.addAction(self._ui_add_action)
 
         self._ui_layout.addWidget(self._ui_list)
@@ -162,6 +161,7 @@ class CuelistsListButton(QWidget):
         self._icon = QPixmap(':/rc/remove-white.png')
 
     def paintEvent(self, event):
+        """Draw button widget"""
 
         size = 18
 
@@ -173,6 +173,7 @@ class CuelistsListButton(QWidget):
         p.end()
 
     def mousePressEvent(self, event):
+        """Emit click event"""
 
         self.clicked.emit(self)
 
@@ -430,10 +431,10 @@ class CuelistViewer(Viewer):
         self._ui_empty_layout = VLayout()
         self._ui_empty_layout.setContentsMargins(12, 12, 12, 12)
         self._ui_empty_layout.setAlignment(Qt.AlignHCenter)
-        self._ui_empty_layout.addWidget(Spacer())
+        self._ui_empty_layout.addStretch()
         self._ui_empty_layout.addWidget(self._ui_empty_title)
         self._ui_empty_layout.addWidget(self._ui_empty_info)
-        self._ui_empty_layout.addWidget(Spacer())
+        self._ui_empty_layout.addStretch()
 
         self._ui_empty = QWidget()
         self._ui_empty.setObjectName('CuelistViewer_empty')
@@ -789,6 +790,10 @@ class CuelistViewer(Viewer):
         bundle = OSCBundle()
 
         for key, value in cue.properties().items():
+            # check if property name is valid OSC address pattern
+            if not OSCMessage.is_valid_address(key):
+                continue
+
             property_message = OSCMessage(address=key)
             property_message.add(value)
 
@@ -812,6 +817,7 @@ class TreeWidget(Tree):
         super(TreeWidget, self).__init__(*args)
 
     def dropEvent(self, event):
+        """Validate item while dropping"""
 
         dropping = self.itemAt(event.pos())
         dragging = self.currentItem()
@@ -837,10 +843,8 @@ class TreeWidget(Tree):
         # you're on an item, maybe add the current one as a child
         elif drop_indicator == QAbstractItemView.OnItem:
             dragging.object().parent_id = dropping.object().id
-            # dragging.object().index = dropping.object().id
         # you are not on your tree
         elif drop_indicator == QAbstractItemView.OnViewport:
             pass
 
         QTreeWidget.dropEvent(self, event)
-

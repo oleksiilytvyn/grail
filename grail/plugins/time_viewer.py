@@ -65,7 +65,7 @@ class TimeViewer(Viewer):
         self._ui_toolbar = Toolbar()
         self._ui_toolbar.setObjectName("TimeViewer_toolbar")
         self._ui_toolbar.addWidget(self._ui_view_action)
-        self._ui_toolbar.addWidget(Spacer())
+        self._ui_toolbar.addStretch()
         self._ui_toolbar.addWidget(self._ui_settings_action)
 
         self._layout = VLayout()

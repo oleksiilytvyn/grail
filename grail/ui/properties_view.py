@@ -16,7 +16,7 @@ from PyQt5.QtGui import QIcon, QColor
 from PyQt5.QtWidgets import QAbstractItemView, QHeaderView, QAction, QWidget, QStackedWidget, QToolButton, \
     QStyledItemDelegate, QLineEdit, QStyle, QMenu
 
-from grail.qt import Icon, Label, Spacer, VLayout, Table, TableItem, Application, Component
+from grail.qt import Icon, Label, VLayout, Table, TableItem, Application, Component
 
 
 class PropertiesView(Component):
@@ -65,10 +65,10 @@ class PropertiesView(Component):
         self._ui_empty_layout = VLayout()
         self._ui_empty_layout.setContentsMargins(12, 12, 12, 12)
         self._ui_empty_layout.setAlignment(Qt.AlignHCenter)
-        self._ui_empty_layout.addWidget(Spacer())
+        self._ui_empty_layout.addStretch()
         self._ui_empty_layout.addWidget(self._ui_empty_title)
         self._ui_empty_layout.addWidget(self._ui_empty_info)
-        self._ui_empty_layout.addWidget(Spacer())
+        self._ui_empty_layout.addStretch()
 
         self._ui_empty = QWidget()
         self._ui_empty.setObjectName('PropertiesView_empty')
@@ -506,7 +506,7 @@ class _PropertyEdit(QLineEdit):
 
         try:
             return json.loads(str(value))
-        except:
+        except ValueError:
             return {}
 
 
@@ -530,4 +530,5 @@ class _PropertyDelegate(QStyledItemDelegate):
 
     def setModelData(self, editor, model, index):
         """Store data"""
+
         index.model().setData(index, editor.data(), Qt.UserRole)

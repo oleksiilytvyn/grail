@@ -11,7 +11,7 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QSizePolicy
 
-from grail.qt import Label, Button, Spacer, VLayout
+from grail.qt import Label, Button, VLayout
 
 from grail.core import Viewer
 
@@ -51,11 +51,11 @@ class EmptyViewer(Viewer):
         self._ui_layout.setContentsMargins(12, 12, 12, 12)
         self._ui_layout.setAlignment(Qt.AlignHCenter)
 
-        self._ui_layout.addWidget(Spacer())
+        self._ui_layout.addStretch()
         self._ui_layout.addWidget(self._ui_title_label)
         self._ui_layout.addWidget(self._ui_info_label)
         self._ui_layout.addWidget(self._ui_button, 0, Qt.AlignHCenter)
-        self._ui_layout.addWidget(Spacer())
+        self._ui_layout.addStretch()
 
         self.setMinimumHeight(140)
         self.setLayout(self._ui_layout)

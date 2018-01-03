@@ -14,7 +14,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QAction, QToolButton, QAbstractItemView, QTreeWidget, QMenu
 
-from grail.qt import Spacer, MessageDialog, Toolbar, Tree, TreeItem, VLayout
+from grail.qt import MessageDialog, Toolbar, Tree, TreeItem, VLayout
 from grailkit.dna import DNA
 
 from grail.core import Viewer
@@ -74,7 +74,7 @@ class NodeViewer(Viewer):
 
         self._ui_toolbar = Toolbar()
         self._ui_toolbar.addWidget(self._ui_view_action)
-        self._ui_toolbar.addWidget(Spacer())
+        self._ui_toolbar.addStretch()
         self._ui_toolbar.addAction(self._ui_remove_action)
         self._ui_toolbar.addAction(self._ui_add_action)
 

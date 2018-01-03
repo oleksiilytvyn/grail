@@ -200,6 +200,14 @@ Button {
         background: #6bbaff;
         }
 
+    Button::menu-indicator {
+        image: url(:/rc/branch-open.png);
+        subcontrol-position: right center;
+        subcontrol-origin: padding;
+        left: -3px;
+        top: -1px;
+        }
+
 /**
  * @section Toolbar
  */
@@ -530,12 +538,23 @@ ProgressDialog {
  *****************************************************************************/
 
 /**
- * @section welcome dialog
+ * @section Welcome Dialog
  */
 
 Welcome {
     background: #2f2f2f url(:/rc/welcome_bg.png) scroll no-repeat 0 0;
     }
+
+
+/**
+ * @section Actions Dialog
+ */
+
+ActionsDialog {}
+
+    #ActionsDialog_search_widget {
+        background: #676869;
+        }
 
 
 /******************************************************************************

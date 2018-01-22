@@ -21,10 +21,12 @@
 
 		<!-- ./rc/ -->
 		<file alias="rc/add.png">rc/add.png</file>
+		<file alias="rc/down_arrow.png">rc/down_arrow.png</file>
 		<file alias="rc/branch-closed.png">rc/branch-closed.png</file>
 		<file alias="rc/stop.png">rc/stop.png</file>
 		<file alias="rc/branch-open-white.png">rc/branch-open-white.png</file>
 		<file alias="rc/book.png">rc/book.png</file>
+		<file alias="rc/up_arrow_disabled.png">rc/up_arrow_disabled.png</file>
 		<file alias="rc/at.png">rc/at.png</file>
 		<file alias="rc/case.png">rc/case.png</file>
 		<file alias="rc/selection-select.png">rc/selection-select.png</file>
@@ -42,10 +44,12 @@
 		<file alias="rc/remove.png">rc/remove.png</file>
 		<file alias="rc/search-clear.png">rc/search-clear.png</file>
 		<file alias="rc/unlock.png">rc/unlock.png</file>
+		<file alias="rc/up_arrow.png">rc/up_arrow.png</file>
 		<file alias="rc/edit.png">rc/edit.png</file>
 		<file alias="rc/testcard.png">rc/testcard.png</file>
 		<file alias="rc/shadow.png">rc/shadow.png</file>
 		<file alias="rc/play.png">rc/play.png</file>
+		<file alias="rc/down_arrow_disabled.png">rc/down_arrow_disabled.png</file>
 		<file alias="rc/save.png">rc/save.png</file>
 		<file alias="rc/branch-open.png">rc/branch-open.png</file>
 		<file alias="rc/branch-closed-white.png">rc/branch-closed-white.png</file>

@@ -15,7 +15,6 @@ from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
 from grailkit.dna import DNA
-from grailkit.util import OS_MAC
 
 from grail.qt import *
 from grail.core import Plugin, Viewer
@@ -281,10 +280,6 @@ class CompositionTexture(QImage):
     def render(self):
         """Render composition"""
 
-        # Do not render if disabled
-        if self._p.disabled:
-            return False
-
         p = QPainter()
         p.begin(self)
         p.setRenderHints(QPainter.Antialiasing | QPainter.TextAntialiasing | QPainter.SmoothPixmapTransform)
@@ -307,6 +302,20 @@ class CompositionTexture(QImage):
 
         padding = self._p.padding
         comp = self.rect()
+        text = self._p.text
+
+        # Title
+        if self._p.style_case_transform == 1:
+            text = text.title()
+        # Upper
+        elif self._p.style_case_transform == 2:
+            text = text.upper()
+        # Lower
+        elif self._p.style_case_transform == 3:
+            text = text.lower()
+        # Capitalize
+        elif self._p.style_case_transform == 4:
+            text = text.capitalize()
 
         # Draw shadow
         box = QRect(0, 0, comp.width(), comp.height())
@@ -314,7 +323,7 @@ class CompositionTexture(QImage):
         box.setX(box.x() + self._p.shadow_x)
         box.setY(box.y() + self._p.shadow_y)
 
-        painter.drawText(box, self._p.align_vertical | self._p.align_horizontal | Qt.TextWordWrap, self._p.text)
+        painter.drawText(box, self._p.align_vertical | self._p.align_horizontal | Qt.TextWordWrap, text)
 
         # Draw text
         painter.setPen(self._p.style_color)
@@ -322,7 +331,7 @@ class CompositionTexture(QImage):
         box = QRect(0, 0, comp.width(), comp.height())
         box.adjust(padding.left(), padding.top(), -padding.right(), -padding.bottom())
 
-        painter.drawText(box, self._p.align_vertical | self._p.align_horizontal | Qt.TextWordWrap, self._p.text)
+        painter.drawText(box, self._p.align_vertical | self._p.align_horizontal | Qt.TextWordWrap, text)
 
     @classmethod
     def generate_testcard(cls, width, height):
@@ -381,7 +390,7 @@ class CompositionTexture(QImage):
         painter.setPen(Qt.white)
         painter.setFont(QFont("decorative", 24))
         painter.drawText(box, Qt.AlignCenter | Qt.TextWordWrap,
-                         "composition size %d x %d" % (comp.width(), comp.height()))
+                         "Composition %d x %d" % (comp.width(), comp.height()))
 
         painter.end()
 
@@ -494,14 +503,16 @@ class CompositionPreferences(object):
         self.style_color = QColor(s.get('/clip/text/color', default='#ffffff'))
         self.style_background = QColor('#000')
         self.style_case_transform = s.get('/clip/text/transform', default=0)
-        self.style_font = QFont('decorative', 28)
+        self.style_font = QFont(s.get('/clip/text/font/name', default='decorative'),
+                                s.get('/clip/text/font/size', default=28))
+        self.style_font.setStyleName(s.get('/clip/text/font/style', default='Normal'))
 
         self.shadow_x = s.get('/clip/text/shadow/x', default=0)
         self.shadow_y = s.get('/clip/text/shadow/y', default=0)
         self.shadow_blur = s.get('/clip/text/shadow/blur', default=0)
         self.shadow_color = QColor(s.get('/clip/text/shadow/color', default='#000000'))
 
-        # self.padding = QMargins(*s.get('/clip/text/padding', default=[0, 0, 0, 0]))
+        self.padding = QMargins(*s.get('/clip/text/padding', default=[0, 0, 0, 0]))
         self.align_horizontal = s.get('/clip/text/align', default=Qt.AlignVCenter)
         self.align_vertical = s.get('/clip/text/valign', default=Qt.AlignHCenter)
 
@@ -552,16 +563,15 @@ class DisplayWidget(QWidget):
 
         # draw texture
         if self._texture:
-            s = self.size()
             t = self._texture.size()
 
-            scale = min(s.width() / t.width(), s.height() / t.height()) * 0.9
+            scale = min(self.width() / t.width(), self.height() / t.height()) * 0.9
 
             w = t.width() * scale
             h = t.height() * scale
 
-            x = s.width() / 2 - w / 2
-            y = s.height() / 2 - h / 2
+            x = self.width() / 2 - w / 2
+            y = self.height() / 2 - h / 2
 
             p.fillRect(QRect(x - 1, y - 1, w + 2, h + 2), Qt.red)
             p.drawImage(QRect(x, y, w, h), self._texture)
@@ -868,16 +878,16 @@ class PaddingDialog(Popup):
         self.ui_layout.setSpacing(8)
         self.ui_layout.setContentsMargins(12, 12, 12, 12)
 
-        self.ui_layout.addWidget(QLabel('Left'), 0, 0)
+        self.ui_layout.addWidget(Label('Left'), 0, 0)
         self.ui_layout.addWidget(self.ui_left, 1, 0)
 
-        self.ui_layout.addWidget(QLabel('Right'), 0, 1)
+        self.ui_layout.addWidget(Label('Right'), 0, 1)
         self.ui_layout.addWidget(self.ui_right, 1, 1)
 
-        self.ui_layout.addWidget(QLabel('Top'), 2, 0)
+        self.ui_layout.addWidget(Label('Top'), 2, 0)
         self.ui_layout.addWidget(self.ui_top, 3, 0)
 
-        self.ui_layout.addWidget(QLabel('Bottom'), 2, 1)
+        self.ui_layout.addWidget(Label('Bottom'), 2, 1)
         self.ui_layout.addWidget(self.ui_bottom, 3, 1)
 
         self.setLayout(self.ui_layout)
@@ -949,10 +959,10 @@ class AlignDialog(Popup):
         self.ui_layout.setSpacing(8)
         self.ui_layout.setContentsMargins(12, 12, 12, 12)
 
-        self.ui_layout.addWidget(QLabel('Horizontal'), 0, 0)
+        self.ui_layout.addWidget(Label('Horizontal'), 0, 0)
         self.ui_layout.addWidget(self.ui_horizontal, 1, 0)
 
-        self.ui_layout.addWidget(QLabel('Vertical'), 2, 0)
+        self.ui_layout.addWidget(Label('Vertical'), 2, 0)
         self.ui_layout.addWidget(self.ui_vertical, 3, 0)
 
         self.setWindowTitle('Align')
@@ -992,7 +1002,7 @@ class ShadowDialog(Popup):
         self.color = color
 
         # initialize ui components
-        self.ui_color_button = QPushButton("Set Color")
+        self.ui_color_button = Button("Set Color")
         self.ui_color_button.clicked.connect(self._color_action)
 
         self.ui_top = QSpinBox()
@@ -1010,9 +1020,9 @@ class ShadowDialog(Popup):
         self.ui_controls_layout = GridLayout()
         self.ui_controls_layout.setSpacing(8)
         self.ui_controls_layout.setContentsMargins(12, 12, 12, 0)
-        self.ui_controls_layout.addWidget(QLabel('Top'), 0, 0)
+        self.ui_controls_layout.addWidget(Label('Top'), 0, 0)
         self.ui_controls_layout.addWidget(self.ui_top, 1, 0)
-        self.ui_controls_layout.addWidget(QLabel('Left'), 0, 1)
+        self.ui_controls_layout.addWidget(Label('Left'), 0, 1)
         self.ui_controls_layout.addWidget(self.ui_left, 1, 1)
 
         self.ui_button_layout = VLayout()
@@ -1190,7 +1200,7 @@ class CaseDialog(Popup):
         self.ui_layout.setSpacing(8)
         self.ui_layout.setContentsMargins(12, 12, 12, 12)
 
-        self.ui_layout.addWidget(QLabel('Text Case'), 0, 0)
+        self.ui_layout.addWidget(Label('Text Case'), 0, 0)
         self.ui_layout.addWidget(self.ui_case, 1, 0)
 
         self.setLayout(self.ui_layout)
@@ -1430,7 +1440,7 @@ class PreferencesDialog(Dialog):
 
         if accept:
             self.emit('/clip/text/font/name', str(font.family()))
-            self.emit('/clip/text/font/size', font.pixelSize())
+            self.emit('/clip/text/font/size', font.pointSize())
             self.emit('/clip/text/font/style', str(font.styleName()))
 
         self.showWindow()

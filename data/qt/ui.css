@@ -115,6 +115,112 @@ QMenu {
         image: url(:/rc/right_arrow.png);
         }
 
+/**
+ * @section QComboBox
+ */
+
+QComboBox {
+    selection-background-color: #3daee9;
+    min-width: 75px;
+    color: #ffffff;
+    border-radius: 3px;
+    padding: 4px 8px;
+    margin: 3px;
+    background: #4facfe;
+    border: 1px solid #2c71ae;
+    }
+
+    QComboBox:on {
+        padding-top: 3px;
+        padding-left: 4px;
+        color: #ffffff;
+        selection-background-color: #4facfe;
+        }
+
+    QComboBox:hover {
+        background: #6bbaff;
+        }
+
+    QComboBox::menu-indicator {
+        image: url(:/rc/branch-open.png);
+        subcontrol-position: right center;
+        subcontrol-origin: padding;
+        left: -3px;
+        top: -1px;
+        border: none;
+        }
+
+    QComboBox::drop-down {
+        subcontrol-origin: padding;
+        subcontrol-position: top right;
+        width: 15px;
+        border: none;
+        border-radius: 3px;
+        }
+
+    QComboBox QAbstractItemView {
+        selection-background-color: #ff0;
+        border: none;
+        background-color: #222;
+        color: #f1f1f1;
+        margin: 0;
+        }
+
+    QComboBox::down-arrow {
+        image: url(:/rc/branch-open.png);
+        }
+
+    QComboBox::down-arrow:on,
+    QComboBox::down-arrow:hover,
+    QComboBox::down-arrow:focus {
+        image: url(:/rc/branch-open.png);
+        }
+
+QAbstractSpinBox {
+    padding: 4px;
+    border: 1px solid #76797C;
+    background-color: #232629;
+    color: #f1f1f1;
+    border-radius: 3px;
+    min-width: 75px;
+    }
+
+    QAbstractSpinBox:up-button {
+        background-color: transparent;
+        subcontrol-origin: border;
+        subcontrol-position: center right;
+        }
+
+    QAbstractSpinBox:down-button {
+        background-color: transparent;
+        subcontrol-origin: border;
+        subcontrol-position: center left;
+        }
+
+    QAbstractSpinBox::up-arrow,
+    QAbstractSpinBox::up-arrow:disabled,
+    QAbstractSpinBox::up-arrow:off {
+        image: url(:/rc/up_arrow_disabled.png);
+        width: 10px;
+        height: 10px;
+        }
+
+    QAbstractSpinBox::up-arrow:hover {
+        image: url(:/rc/up_arrow.png);
+        }
+
+
+    QAbstractSpinBox::down-arrow,
+    QAbstractSpinBox::down-arrow:disabled,
+    QAbstractSpinBox::down-arrow:off {
+        image: url(:/rc/down_arrow_disabled.png);
+        width: 10px;
+        height: 10px;
+        }
+
+    QAbstractSpinBox::down-arrow:hover {
+        image: url(:/rc/down_arrow.png);
+        }
 
 /**
  * @section QTableWidget

@@ -24,7 +24,7 @@ class Popup(Dialog):
         super(Popup, self).__init__(parent)
 
         self.__close_on_focus_lost = True
-        self.__background_color = QColor(255, 255, 255)
+        self.__background_color = QColor("#2f2f2f")
         # Shadow padding
         self.__padding = 12
         # Caret size

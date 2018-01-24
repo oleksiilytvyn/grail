@@ -538,7 +538,20 @@ class CuelistViewer(Viewer):
 
         entity = item.object()
         new_entity = entity.parent.insert(entity.index + 1, entity)
-        new_entity.name = entity.name + " copy"
+
+        match = re.match('^([\s\w]+)copy(\ ([\d]+))?$', new_entity.name, re.MULTILINE|re.IGNORECASE)
+
+        if match:
+            name = match.group(1)
+
+            if not match.group(3):
+                name += 'copy 2'
+            else:
+                name += 'copy %d' % (int(match.group(3)) + 1)
+
+            new_entity.name = name
+        else:
+            new_entity.name = entity.name + " copy"
 
         self._selected_id = new_entity.id
         self._update()
@@ -552,6 +565,7 @@ class CuelistViewer(Viewer):
         """
 
         entity = item.object()
+        self._selected_id = entity.id
 
         if isinstance(entity, CueEntity) and color in CueEntity.COLORS:
             entity.color = color
@@ -660,6 +674,7 @@ class CuelistViewer(Viewer):
             """Add childs to tree item"""
 
             nonlocal selected_item
+            nonlocal self
 
             for child in dna.childs(parent_id):
                 child_item = create_item(child)
@@ -669,7 +684,7 @@ class CuelistViewer(Viewer):
                 child_item.setExpanded(bool(child.get('expanded', default=False)))
 
                 if child.id == self._selected_id:
-                    selected_item = item
+                    selected_item = child_item
 
         for entity in cuelist.cues():
             item = create_item(entity)

@@ -27,6 +27,8 @@ class ConsoleViewer(Viewer):
     author = 'Grail Team'
     description = 'Python console'
 
+    # todo: Add expression value output
+
     def __init__(self, *args):
         super(ConsoleViewer, self).__init__(*args)
 

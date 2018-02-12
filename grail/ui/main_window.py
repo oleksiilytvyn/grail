@@ -27,6 +27,8 @@ from grail.qt import AboutDialog, MessageDialog, Application, ProgressDialog
 class MainWindow(QMainWindow):
     """Grail application class"""
 
+    # todo: Add ability to change project information
+
     def __init__(self, parent=None):
         super(MainWindow, self).__init__()
 

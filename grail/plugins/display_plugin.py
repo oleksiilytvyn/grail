@@ -243,6 +243,8 @@ class DisplayWindow(Dialog):
 class CompositionTexture(QImage):
     """Display output texture"""
 
+    # todo: Add corner-pin support
+
     def __init__(self):
 
         self._p = CompositionPreferences.instance()
@@ -1494,6 +1496,9 @@ class DisplayPreviewViewer(Viewer):
     author = "Grail Team"
     description = "Preview items from library and cuelists"
 
+    # todo: Add customization options (color, background, font size)
+    # todo: Add more information about cue
+
     def __init__(self, *args, **kwargs):
         super(DisplayPreviewViewer, self).__init__(*args, **kwargs)
 
@@ -1557,6 +1562,8 @@ class DisplayViewer(Viewer):
     name = "Display Output"
     author = "Grail Team"
     description = "View composition output"
+
+    # fixme: Fix bug with wrong aspect ration. This bug appears when output and viewer settings changed frequently
 
     def __init__(self, *args, **kwargs):
         super(DisplayViewer, self).__init__(*args, **kwargs)

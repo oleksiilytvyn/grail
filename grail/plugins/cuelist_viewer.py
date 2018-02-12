@@ -262,6 +262,10 @@ class CuelistsListWidget(QTableWidget):
 class CueDialog(Dialog):
     """Cue editor dialog"""
 
+    # todo: Add color property
+    # todo: Add follow property
+    # todo: Add number
+
     def __init__(self, viewer):
         super(CueDialog, self).__init__()
 
@@ -377,6 +381,8 @@ class CuelistViewer(Viewer):
     name = 'Cuelist'
     author = 'Grail Team'
     description = 'Manage cuelists'
+
+    # fixme: Fix bug with more than one instance opened, as this leads to adding more than one entity from library
 
     def __init__(self, *args):
         super(CuelistViewer, self).__init__(*args)
@@ -802,6 +808,7 @@ class CuelistViewer(Viewer):
         message.add(0)
 
         # new mechanism
+        # todo: Add entity properties (id, type, color)
         bundle = OSCBundle()
 
         for key, value in cue.properties().items():
@@ -827,6 +834,8 @@ class CuelistViewer(Viewer):
 
 class TreeWidget(Tree):
     """Tree widget used in CuelistViewer"""
+
+    # todo: Add custom items with color
 
     def __init__(self, *args):
         super(TreeWidget, self).__init__(*args)

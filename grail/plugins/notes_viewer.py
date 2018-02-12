@@ -24,6 +24,9 @@ class NotesViewer(Viewer):
     author = 'Grail Team'
     description = 'Create text notes'
 
+    # todo: Change color to yellow
+    # todo: Add ability to save notes to project instead of viewer
+
     def __init__(self, *args):
         super(NotesViewer, self).__init__(*args)
 

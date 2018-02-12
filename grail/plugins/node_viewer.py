@@ -34,6 +34,10 @@ class NodeViewer(Viewer):
     author = 'Grail Team'
     description = 'View all nodes in grail file'
 
+    # fixme: Fix toolbar padding from left
+    # fixme: After deleting item selections jumps to first in list
+    # todo: Add colors to show system and user entities
+
     def __init__(self, *args):
         super(NodeViewer, self).__init__(*args)
 

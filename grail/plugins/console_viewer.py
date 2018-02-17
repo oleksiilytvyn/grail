@@ -27,8 +27,6 @@ class ConsoleViewer(Viewer):
     author = 'Grail Team'
     description = 'Python console'
 
-    # todo: Add expression value output
-
     def __init__(self, *args):
         super(ConsoleViewer, self).__init__(*args)
 
@@ -110,7 +108,13 @@ class ConsoleViewer(Viewer):
         try:
             code = str(self._ui_input.toPlainText())
             print('>>', code)
-            exec(code, globals(), self._locals)
+
+            try:
+                value = eval(code, globals(), self._locals)
+
+                print('->', value)
+            except:
+                exec(code, globals(), self._locals)
 
             self._ui_input.setPlainText("")
         except Exception as e:

@@ -151,7 +151,9 @@ class DisplayPlugin(Plugin):
     def _composition_changed(self, size=0):
         """Swap composition texture as QImage can change size after initialization"""
 
+        del self._composition
         self._composition = CompositionTexture()
+
         self.emit('!composition/update')
 
     @classmethod
@@ -559,9 +561,8 @@ class DisplayWidget(QWidget):
         p.fillRect(self.rect(), Qt.black)
 
         # Connect texture if available
-        if not self._plugin:
-            self._plugin = DisplayPlugin.instance()
-            self._texture = self._plugin.composition if self._plugin else None
+        self._plugin = DisplayPlugin.instance()
+        self._texture = self._plugin.composition if self._plugin else None
 
         # draw texture
         if self._texture:
@@ -577,6 +578,11 @@ class DisplayWidget(QWidget):
 
             p.fillRect(QRect(x - 1, y - 1, w + 2, h + 2), Qt.red)
             p.drawImage(QRect(x, y, w, h), self._texture)
+        else:
+            p.setPen(QColor(255, 0, 0))
+            p.drawText(QRect(10, 10, self.width() - 20, self.height() - 20),
+                       Qt.AlignCenter | Qt.TextWordWrap,
+                       "Texture is not available")
 
         p.end()
 
@@ -1081,17 +1087,18 @@ class CompositionDialog(Popup):
     def __ui__(self):
 
         self.ui_width = QSpinBox()
-        self.ui_width.setRange(100, 32000)
+        self.ui_width.setRange(self.composition.width(), 32000)
         self.ui_width.valueChanged.connect(self._value_changed)
 
         self.ui_height = QSpinBox()
-        self.ui_height.setRange(100, 32000)
+        self.ui_height.setRange(self.composition.height(), 32000)
         self.ui_height.valueChanged.connect(self._value_changed)
 
         self.ui_preset = QComboBox()
         self.ui_preset.currentIndexChanged.connect(self._preset_changed)
 
         self._update_list()
+        self.ui_preset.setItemText(0, "Current (%dx%d)" % (self.composition.width(), self.composition.height()))
 
         self.ui_layout = QGridLayout()
         self.ui_layout.setSpacing(8)
@@ -1225,6 +1232,9 @@ class PreferencesDialog(Dialog):
     """Display preferences window"""
 
     updated = pyqtSignal()
+
+    # fixme: On Windows output menu doesn't appear after click on button
+    # fixme: Drop-down menu style looks wrong on Mac
 
     def __init__(self, parent):
         """Initialize PreferencesDialog
@@ -1432,8 +1442,12 @@ class PreferencesDialog(Dialog):
     def composition_updated(self, size):
         """Composition size updated"""
 
-        self.emit('/comp/width', size.width())
-        self.emit('/comp/height', size.height())
+        self._settings.set('/comp/width', size.width())
+        self._settings.set('/comp/height', size.height())
+        self._preferences.parse()
+
+        self._parent.emit('/comp/width', size.width())
+        self._parent.emit('/comp/height', size.height())
 
     def font_action(self):
         """Font action clicked"""
@@ -1495,9 +1509,6 @@ class DisplayPreviewViewer(Viewer):
     name = "Preview"
     author = "Grail Team"
     description = "Preview items from library and cuelists"
-
-    # todo: Add customization options (color, background, font size)
-    # todo: Add more information about cue
 
     def __init__(self, *args, **kwargs):
         super(DisplayPreviewViewer, self).__init__(*args, **kwargs)
@@ -1562,8 +1573,6 @@ class DisplayViewer(Viewer):
     name = "Display Output"
     author = "Grail Team"
     description = "View composition output"
-
-    # fixme: Fix bug with wrong aspect ration. This bug appears when output and viewer settings changed frequently
 
     def __init__(self, *args, **kwargs):
         super(DisplayViewer, self).__init__(*args, **kwargs)

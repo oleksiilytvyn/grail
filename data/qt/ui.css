@@ -38,84 +38,6 @@ QMenuBar {
             }
 
 /**
- * @section QMenu
- */
-
-QMenu {
-    border: none;
-    background: #222;
-    color: #f1f1f1;
-    margin: 0;
-    }
-
-    QMenu::icon {
-        margin: 5px;
-        }
-
-    QMenu::item {
-        padding: 2px 7px;
-        border: 1px solid transparent; /* reserve space for selection border */
-        font-size: 12pt;
-        }
-
-        QMenu::item:selected {
-            background: #2f2f2f;
-            border-bottom: 1px solid #2f2f2f;
-            color: #ffffff;
-            }
-
-    QMenu::separator {
-        height: 1px;
-        background: #2f2f2f;
-        margin: 2px 0;
-        }
-
-    QMenu::indicator {
-        width: 18px;
-        height: 18px;
-        }
-
-    /* non-exclusive indicator = check box style indicator
-       (see QActionGroup::setExclusive) */
-    QMenu::indicator:non-exclusive:unchecked {
-        image: url(:/rc/checkbox_unchecked.png);
-        }
-
-    QMenu::indicator:non-exclusive:unchecked:selected {
-        image: url(:/rc/checkbox_unchecked_disabled.png);
-        }
-
-    QMenu::indicator:non-exclusive:checked {
-        image: url(:/rc/checkbox_checked.png);
-        }
-
-    QMenu::indicator:non-exclusive:checked:selected {
-        image: url(:/rc/checkbox_checked_disabled.png);
-        }
-
-    /* exclusive indicator = radio button style indicator (see QActionGroup::setExclusive) */
-    QMenu::indicator:exclusive:unchecked {
-        image: url(:/rc/radio_unchecked.png);
-        }
-
-    QMenu::indicator:exclusive:unchecked:selected {
-        image: url(:/rc/radio_unchecked_disabled.png);
-        }
-
-    QMenu::indicator:exclusive:checked {
-        image: url(:/rc/radio_checked.png);
-        }
-
-    QMenu::indicator:exclusive:checked:selected {
-        image: url(:/rc/radio_checked_disabled.png);
-        }
-
-    QMenu::right-arrow {
-        margin: 5px;
-        image: url(:/rc/right_arrow.png);
-        }
-
-/**
  * @section QComboBox
  */
 
@@ -942,6 +864,10 @@ CueDialog {
 #NodeViewer {
     }
 
+    #NodeViewer_toolbar {
+        background: #2f2f2f;
+        border-top: 1px solid #2f2f2f;
+        }
 
 /******************************************************************************
  *
@@ -991,15 +917,15 @@ NotesViewer {
     }
 
     #NotesViewer_text {
-        background: #f6f6f4;
-        color: #2d2d32;
+        background: #fff8bb;
+        color: #4e352c;
         padding: 8px;
         border: none;
         }
 
     #NotesViewer_toolbar {
-        color: #2d2d32;
-        background: #f6f6f4;
+        color: #4e352c;
+        background: #fff8bb;
         border-top: 1px solid transparent;
         }
 
@@ -1007,7 +933,7 @@ NotesViewer {
             padding: 8px;
             qproperty-alignment: AlignCenter AlignCenter;
             qproperty-wordWrap: true;
-            color: #2d2d32;
+            color: #4e352c;
             }
 
 

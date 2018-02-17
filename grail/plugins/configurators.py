@@ -5,17 +5,17 @@
 
     Core configurators
 
-    :copyright: (c) 2017 by Grail Team.
+    :copyright: (c) 2018 by Grail Team.
     :license: GNU, see LICENSE for more details.
 """
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
+from PyQt5.QtCore import Qt, QStandardPaths, QSize
+from PyQt5.QtWidgets import QFileDialog, QAction, QWidget, QSizePolicy, QGridLayout
 
-import grailkit.dna as dna
-from grail.qt import *
+from grailkit import dna
 from grailkit.bible import BibleHost, BibleHostError
 
+from grail.qt import Button, VLayout, MessageDialog, ProgressDialog, Spacer, Label, Switch, \
+    List, ListItem, Toolbar, Application, Icon
 from grail.core import Configurator, Plugin, Viewer
 
 
@@ -40,7 +40,7 @@ class GeneralConfigurator(Configurator):
         # Reset
         self.ui_reset_btn = Button("Restore")
         self.ui_reset_btn.clicked.connect(self.restore_action)
-        self.ui_reset_label = QLabel("Restore Grail to it's original state")
+        self.ui_reset_label = Label("Restore Grail to it's original state")
 
         self.ui_layout.addWidget(self.ui_reset_btn, 0, 1, Qt.AlignRight)
         self.ui_layout.addWidget(self.ui_reset_label, 0, 0, Qt.AlignLeft)
@@ -48,7 +48,7 @@ class GeneralConfigurator(Configurator):
         # Import
         self.ui_import_btn = Button("Import library")
         self.ui_import_btn.clicked.connect(self.import_action)
-        self.ui_import_label = QLabel("Add songs from a library file.")
+        self.ui_import_label = Label("Add songs from a library file.")
 
         self.ui_layout.addWidget(self.ui_import_btn, 1, 1, Qt.AlignRight)
         self.ui_layout.addWidget(self.ui_import_label, 1, 0, Qt.AlignLeft)
@@ -56,7 +56,7 @@ class GeneralConfigurator(Configurator):
         # Export
         self.ui_export_btn = Button("Export library")
         self.ui_export_btn.clicked.connect(self.export_action)
-        self.ui_export_label = QLabel("Save my library of songs to file.")
+        self.ui_export_label = Label("Save my library of songs to file.")
 
         self.ui_layout.addWidget(self.ui_export_btn, 2, 1, Qt.AlignRight)
         self.ui_layout.addWidget(self.ui_export_label, 2, 0, Qt.AlignLeft)
@@ -168,11 +168,11 @@ class BibleConfigurator(Configurator):
         self._ui_toolbar_label.setAlignment(Qt.AlignCenter)
         self._ui_toolbar_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
-        self._ui_install_action = QAction(QIcon(':/rc/add.png'), 'Install', self)
+        self._ui_install_action = QAction(Icon(':/rc/add.png'), 'Install', self)
         self._ui_install_action.setIconVisibleInMenu(True)
         self._ui_install_action.triggered.connect(self.install_action)
 
-        self._ui_primary_action = QAction(QIcon(':/rc/save.png'), 'Set as primary', self)
+        self._ui_primary_action = QAction(Icon(':/rc/save.png'), 'Set as primary', self)
         self._ui_primary_action.setIconVisibleInMenu(True)
         self._ui_primary_action.triggered.connect(self.primary_action)
 

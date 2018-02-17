@@ -5,7 +5,7 @@
 
     Extended GApplication class and add some grail specific methods
 
-    :copyright: (c) 2017 by Grail Team.
+    :copyright: (c) 2018 by Grail Team.
     :license: GNU, see LICENSE for more details.
 """
 import io

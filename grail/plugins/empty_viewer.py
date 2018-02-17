@@ -5,14 +5,13 @@
 
     Empty viewer
 
-    :copyright: (c) 2017 by Grail Team.
+    :copyright: (c) 2018 by Grail Team.
     :license: GNU, see LICENSE for more details.
 """
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QSizePolicy
 
 from grail.qt import Label, Button, VLayout
-
 from grail.core import Viewer
 
 

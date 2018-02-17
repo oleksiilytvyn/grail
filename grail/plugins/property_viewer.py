@@ -5,10 +5,10 @@
 
     Node properties viewer
 
-    :copyright: (c) 2017 by Grail Team.
+    :copyright: (c) 2018 by Grail Team.
     :license: GNU, see LICENSE for more details.
 """
-from PyQt5.QtGui import QIcon, QColor
+from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QAction, QToolButton
 
 from grail.qt import Toolbar, Icon, VLayout
@@ -60,21 +60,21 @@ class PropertyViewer(Viewer):
         self._ui_properties.setEntityFollow(True)
 
         # Action
-        self._ui_follow_action = QAction(QIcon(':/rc/at.png'), 'Follow', self)
+        self._ui_follow_action = QAction(Icon(':/rc/at.png'), 'Follow', self)
         self._ui_follow_action.setIconVisibleInMenu(True)
         self._ui_follow_action.triggered.connect(self.follow_action)
 
-        self._ui_add_action = QAction(QIcon(':/rc/add.png'), 'Add property', self)
+        self._ui_add_action = QAction(Icon(':/rc/add.png'), 'Add property', self)
         self._ui_add_action.setIconVisibleInMenu(True)
         self._ui_add_action.triggered.connect(self._ui_properties.addProperty)
 
-        self._ui_remove_action = QAction(QIcon(':/rc/remove-white.png'), 'Remove property', self)
+        self._ui_remove_action = QAction(Icon(':/rc/remove-white.png'), 'Remove property', self)
         self._ui_remove_action.setIconVisibleInMenu(True)
         self._ui_remove_action.triggered.connect(self._ui_properties.removeSelected)
 
         self._ui_view_action = QToolButton()
         self._ui_view_action.setText("View")
-        self._ui_view_action.setIcon(QIcon(':/rc/menu.png'))
+        self._ui_view_action.setIcon(Icon(':/rc/menu.png'))
         self._ui_view_action.clicked.connect(self.view_action)
 
         # Toolbar
@@ -105,7 +105,7 @@ class PropertyViewer(Viewer):
         if self._follow:
             self._ui_follow_action.setIcon(Icon.colored(':/rc/at.png', QColor('#aeca4b'), QColor('#e3e3e3')))
         else:
-            self._ui_follow_action.setIcon(QIcon(':/rc/at.png'))
+            self._ui_follow_action.setIcon(Icon(':/rc/at.png'))
 
         self._ui_properties.setEntityFollow(self._follow)
 

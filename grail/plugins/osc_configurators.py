@@ -5,15 +5,13 @@
 
     Configurators for OSC I/O
 
-    :copyright: (c) 2017 by Grail Team.
+    :copyright: (c) 2018 by Grail Team.
     :license: GNU, see LICENSE for more details.
 """
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QAction, QHeaderView, QSizePolicy, QAbstractItemView, QMenu
 
-from grail.qt import *
-
+from grail.qt import Application, Toolbar, Label, Table, TableItem, VLayout, Icon
 from grail.core import Configurator
 
 
@@ -77,10 +75,10 @@ class OSCInConfigurator(Configurator):
         header.setSectionResizeMode(0, QHeaderView.Stretch)
         header.setSectionResizeMode(1, QHeaderView.Stretch)
 
-        self._ui_clear_action = QAction(QIcon(':/rc/remove-white.png'), 'Clear', self)
+        self._ui_clear_action = QAction(Icon(':/rc/remove-white.png'), 'Clear', self)
         self._ui_clear_action.triggered.connect(self.clear_action)
 
-        self._ui_add_action = QAction(QIcon(':/rc/add.png'), 'Add', self)
+        self._ui_add_action = QAction(Icon(':/rc/add.png'), 'Add', self)
         self._ui_add_action.setIconVisibleInMenu(True)
         self._ui_add_action.triggered.connect(self.add_action)
 
@@ -279,10 +277,10 @@ class OSCOutConfigurator(Configurator):
         header.setSectionResizeMode(0, QHeaderView.Stretch)
         header.setSectionResizeMode(1, QHeaderView.Stretch)
 
-        self._ui_clear_action = QAction(QIcon(':/rc/remove-white.png'), 'Clear', self)
+        self._ui_clear_action = QAction(Icon(':/rc/remove-white.png'), 'Clear', self)
         self._ui_clear_action.triggered.connect(self.clear_action)
 
-        self._ui_add_action = QAction(QIcon(':/rc/add.png'), 'Add', self)
+        self._ui_add_action = QAction(Icon(':/rc/add.png'), 'Add', self)
         self._ui_add_action.setIconVisibleInMenu(True)
         self._ui_add_action.triggered.connect(self.add_action)
 

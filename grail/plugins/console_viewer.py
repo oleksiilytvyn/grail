@@ -5,17 +5,17 @@
 
     View python console output & execute commands
 
-    :copyright: (c) 2017 by Grail Team.
+    :copyright: (c) 2018 by Grail Team.
     :license: GNU, see LICENSE for more details.
 """
 import sys
 import traceback
 
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QColor
+from PyQt5.QtWidgets import QTextEdit, QSizePolicy, QToolButton
 
-from grail.qt import *
+from grail.qt import TextEdit, Splitter, Label, Toolbar, Icon, VLayout
 from grail.core import Viewer
 
 
@@ -71,17 +71,17 @@ class ConsoleViewer(Viewer):
 
         self._ui_view_action = QToolButton()
         self._ui_view_action.setText("View")
-        self._ui_view_action.setIcon(QIcon(':/rc/menu.png'))
+        self._ui_view_action.setIcon(Icon(':/rc/menu.png'))
         self._ui_view_action.clicked.connect(self.view_action)
 
         self._ui_follow_action = QToolButton()
         self._ui_follow_action.setText("Enter")
-        self._ui_follow_action.setIcon(QIcon(':/rc/at.png'))
+        self._ui_follow_action.setIcon(Icon(':/rc/at.png'))
         self._ui_follow_action.clicked.connect(self.follow_action)
 
         self._ui_run_action = QToolButton()
         self._ui_run_action.setText("Run")
-        self._ui_run_action.setIcon(QIcon(':/rc/play.png'))
+        self._ui_run_action.setIcon(Icon(':/rc/play.png'))
         self._ui_run_action.clicked.connect(self.run_action)
 
         self._ui_toolbar = Toolbar()
@@ -134,7 +134,7 @@ class ConsoleViewer(Viewer):
         if self._follow:
             self._ui_follow_action.setIcon(Icon.colored(':/rc/at.png', QColor('#aeca4b'), QColor('#e3e3e3')))
         else:
-            self._ui_follow_action.setIcon(QIcon(':/rc/at.png'))
+            self._ui_follow_action.setIcon(Icon(':/rc/at.png'))
 
     def _changed(self):
         """Console output changed"""

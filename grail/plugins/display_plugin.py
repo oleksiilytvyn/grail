@@ -5,7 +5,7 @@
 
     2d graphics display
 
-    :copyright: (c) 2017 by Grail Team.
+    :copyright: (c) 2018 by Grail Team.
     :license: GNU, see LICENSE for more details.
 """
 import math
@@ -848,13 +848,13 @@ class TransformWidget(QWidget):
         return t
 
 
-class PaddingDialog(Popup):
+class PaddingPopup(Popup):
     """Padding popup dialog"""
 
     updated = pyqtSignal(int, int, int, int)
 
     def __init__(self, padding_left=0, padding_top=0, padding_right=0, padding_bottom=0, parent=None):
-        super(PaddingDialog, self).__init__(parent)
+        super(PaddingPopup, self).__init__(parent)
 
         self._padding = [padding_left, padding_top, padding_right, padding_bottom]
 
@@ -922,13 +922,13 @@ class PaddingDialog(Popup):
         self._padding = [padding_left, padding_top, padding_right, padding_bottom]
 
 
-class AlignDialog(Popup):
+class AlignPopup(Popup):
     """Text align popup dialog"""
 
     updated = pyqtSignal(int, int)
 
     def __init__(self, horizontal, vertical, parent=None):
-        super(AlignDialog, self).__init__(parent)
+        super(AlignPopup, self).__init__(parent)
 
         self.align_horizontal = horizontal
         self.align_vertical = vertical
@@ -997,13 +997,13 @@ class AlignDialog(Popup):
         self.align_vertical = vertical
 
 
-class ShadowDialog(Popup):
+class ShadowPopup(Popup):
     """Shadow popup"""
 
     updated = pyqtSignal("QPoint", "int", "QColor")
 
     def __init__(self, offset, blur, color):
-        super(ShadowDialog, self).__init__(None)
+        super(ShadowPopup, self).__init__(None)
 
         self.offset = offset
         self.blur = blur
@@ -1070,13 +1070,13 @@ class ShadowDialog(Popup):
         self.updated.emit(self.offset, self.blur, self.color)
 
 
-class CompositionDialog(Popup):
+class CompositionPopup(Popup):
     """Composition preferences popup"""
 
     updated = pyqtSignal("QSize")
 
     def __init__(self, size, parent=None):
-        super(CompositionDialog, self).__init__(parent)
+        super(CompositionPopup, self).__init__(parent)
 
         self.composition = size
         self._ignore_update = False
@@ -1116,7 +1116,7 @@ class CompositionDialog(Popup):
 
     def update(self):
         """Update UI"""
-        super(CompositionDialog, self).update()
+        super(CompositionPopup, self).update()
 
         width = self.composition.width()
         height = self.composition.height()
@@ -1179,13 +1179,13 @@ class CompositionDialog(Popup):
         self._ignore_update = False
 
 
-class CaseDialog(Popup):
+class CasePopup(Popup):
     """Popup for selecting text transformation"""
 
     updated = pyqtSignal(int)
 
     def __init__(self, case=0):
-        super(CaseDialog, self).__init__(None)
+        super(CasePopup, self).__init__(None)
 
         self.case = case
 
@@ -1249,19 +1249,19 @@ class PreferencesDialog(Dialog):
         self._preferences = CompositionPreferences.instance()
         p = self._preferences
 
-        self.padding_popup = PaddingDialog(p.padding.left(), p.padding.top(), p.padding.right(), p.padding.bottom())
+        self.padding_popup = PaddingPopup(p.padding.left(), p.padding.top(), p.padding.right(), p.padding.bottom())
         self.padding_popup.updated.connect(self.padding_updated)
 
-        self.align_popup = AlignDialog(p.align_horizontal, p.align_vertical)
+        self.align_popup = AlignPopup(p.align_horizontal, p.align_vertical)
         self.align_popup.updated.connect(self.align_updated)
 
-        self.shadow_popup = ShadowDialog(QPoint(p.shadow_x, p.shadow_y), p.shadow_blur, p.shadow_color)
+        self.shadow_popup = ShadowPopup(QPoint(p.shadow_x, p.shadow_y), p.shadow_blur, p.shadow_color)
         self.shadow_popup.updated.connect(self.shadow_updated)
 
-        self.composition_popup = CompositionDialog(p.composition)
+        self.composition_popup = CompositionPopup(p.composition)
         self.composition_popup.updated.connect(self.composition_updated)
 
-        self.case_popup = CaseDialog(p.style_case_transform)
+        self.case_popup = CasePopup(p.style_case_transform)
         self.case_popup.updated.connect(self.case_updated)
 
         desktop = QApplication.desktop()

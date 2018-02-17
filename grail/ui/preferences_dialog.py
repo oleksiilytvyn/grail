@@ -5,7 +5,7 @@
 
     Global preferences dialog window and all panels displayed inside
 
-    :copyright: (c) 2017 by Grail Team.
+    :copyright: (c) 2018 by Grail Team.
     :license: GNU, see LICENSE for more details.
 """
 from PyQt5.QtCore import Qt
@@ -70,7 +70,6 @@ class PreferencesDialog(Dialog):
 
         self.setLayout(self._ui_layout)
 
-        self.setWindowIcon(Icon(':/icon/32.png'))
         self.setWindowTitle('Preferences')
         self.setGeometry(300, 300, 600, 400)
         self.setMinimumSize(600, 400)

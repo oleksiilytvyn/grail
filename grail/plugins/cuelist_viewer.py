@@ -5,22 +5,23 @@
 
     View and edit cuelists
 
-    :copyright: (c) 2017 by Grail Team.
+    :copyright: (c) 2018 by Grail Team.
     :license: GNU, see LICENSE for more details.
 """
 import re
-import time
 
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
+from PyQt5.QtCore import Qt, pyqtSignal, QVariant, QPoint
+from PyQt5.QtGui import QPainter, QPixmap, QColor, QDoubleValidator
+from PyQt5.QtWidgets import QHeaderView, QAbstractItemView, QWidget, QStackedWidget, QSizePolicy, \
+    QAction, QMenu, QToolButton, QVBoxLayout, QScrollBar, QTreeWidget, QTableWidget, QTableWidgetItem
 
 from grailkit.dna import DNA, CueEntity
 from grailkit.osc import OSCMessage, OSCBundle
 
 from grail.core import Viewer
 from grail.ui import PropertiesView
-from grail.qt import *
+from grail.qt import Popup, Dialog, Icon, Button, VLayout, HLayout, Label, Toolbar, TextEdit, \
+    Tree, TreeItem, MessageDialog, LineEdit, Application, Splitter, Component
 
 
 class CuelistDialog(Popup):
@@ -51,10 +52,10 @@ class CuelistDialog(Popup):
         self._ui_list.cellChanged.connect(self._list_cell_changed)
         self._ui_list.itemSelectionChanged.connect(self._list_item_selected)
 
-        self._ui_edit_action = QAction(QIcon(':/rc/edit.png'), 'Edit', self)
+        self._ui_edit_action = QAction(Icon(':/rc/edit.png'), 'Edit', self)
         self._ui_edit_action.triggered.connect(self.edit_action)
 
-        self._ui_add_action = QAction(QIcon(':/rc/add.png'), 'Add', self)
+        self._ui_add_action = QAction(Icon(':/rc/add.png'), 'Add', self)
         self._ui_add_action.setIconVisibleInMenu(True)
         self._ui_add_action.triggered.connect(self.add_action)
 
@@ -316,7 +317,7 @@ class CueDialog(Dialog):
 
         self._ui_color = Button("")
         self._ui_color.setStyleSheet("background: none; border: none;")
-        self._ui_color.setIcon(QIcon(":/rc/live.png"))
+        self._ui_color.setIcon(Icon(":/rc/live.png"))
         self._ui_color.setMenu(self._ui_color_menu)
 
         self._ui_follow_menu = QMenu(self)
@@ -355,11 +356,11 @@ class CueDialog(Dialog):
         self._ui_properties.setEntityFollow(True)
 
         # Toolbar
-        self._ui_add_action = QAction(QIcon(':/rc/add.png'), 'Add property', self)
+        self._ui_add_action = QAction(Icon(':/rc/add.png'), 'Add property', self)
         self._ui_add_action.setIconVisibleInMenu(True)
         self._ui_add_action.triggered.connect(self._ui_properties.addProperty)
 
-        self._ui_remove_action = QAction(QIcon(':/rc/remove-white.png'), 'Remove property', self)
+        self._ui_remove_action = QAction(Icon(':/rc/remove-white.png'), 'Remove property', self)
         self._ui_remove_action.setIconVisibleInMenu(True)
         self._ui_remove_action.triggered.connect(self._ui_properties.removeSelected)
 
@@ -398,7 +399,6 @@ class CueDialog(Dialog):
         self._ui_layout.addWidget(self._ui_toolbar)
 
         self.setLayout(self._ui_layout)
-        self.setWindowIcon(QIcon(':/icon/32.png'))
         self.setWindowTitle('Cue Inspector')
         self.setMinimumSize(300, 400)
         self.setGeometry(200, 200, 300, 400)
@@ -422,7 +422,7 @@ class CueDialog(Dialog):
         if value:
             self._ui_color.setIcon(Icon.colored(':/rc/live.png', QColor(value), QColor('#e3e3e3')))
         else:
-            self._ui_color.setIcon(QIcon(':/rc/live.png'))
+            self._ui_color.setIcon(Icon(':/rc/live.png'))
 
     def accept_action(self):
         """Accept entity changes"""
@@ -548,7 +548,7 @@ class CuelistViewer(Viewer):
         self._ui_stack.addWidget(self._ui_tree)
         self._ui_stack.setCurrentIndex(0)
 
-        self._ui_label = QLabel("...")
+        self._ui_label = Label("...")
         self._ui_label.setObjectName("CuelistViewer_label")
         self._ui_label.setAlignment(Qt.AlignCenter)
         self._ui_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -557,10 +557,10 @@ class CuelistViewer(Viewer):
 
         self._ui_view_action = QToolButton()
         self._ui_view_action.setText("View")
-        self._ui_view_action.setIcon(QIcon(':/rc/menu.png'))
+        self._ui_view_action.setIcon(Icon(':/rc/menu.png'))
         self._ui_view_action.clicked.connect(self.view_action)
 
-        self._ui_add_action = QAction(QIcon(':/rc/add.png'), 'Add new Cue', self)
+        self._ui_add_action = QAction(Icon(':/rc/add.png'), 'Add new Cue', self)
         self._ui_add_action.setIconVisibleInMenu(True)
         self._ui_add_action.triggered.connect(self.add_action)
 

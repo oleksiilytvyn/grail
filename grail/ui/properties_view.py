@@ -5,7 +5,7 @@
 
     View and edit properties of DNA entity, this widget used in Cue Inspector and Properties Viewer
 
-    :copyright: (c) 2017 by Grail Team.
+    :copyright: (c) 2018 by Grail Team.
     :license: GNU, see LICENSE for more details.
 """
 import json

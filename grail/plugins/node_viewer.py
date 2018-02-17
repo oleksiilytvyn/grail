@@ -11,11 +11,11 @@
 from collections import defaultdict
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QIcon
+from PyQt5.QtGui import QIcon, QBrush, QColor
 from PyQt5.QtWidgets import QAction, QToolButton, QAbstractItemView, QTreeWidget, QMenu
 
-from grail.qt import MessageDialog, Toolbar, Tree, TreeItem, VLayout
-from grailkit.dna import DNA
+from grail.qt import MessageDialog, Toolbar, Tree, TreeItem, VLayout, Icon
+from grailkit.dna import DNA, CueEntity
 
 from grail.core import Viewer
 
@@ -34,16 +34,14 @@ class NodeViewer(Viewer):
     author = 'Grail Team'
     description = 'View all nodes in grail file'
 
-    # fixme: Fix toolbar padding from left
-    # fixme: After deleting item selections jumps to first in list
-    # todo: Add colors to show system and user entities
-
     def __init__(self, *args):
         super(NodeViewer, self).__init__(*args)
 
         self.__ui__()
 
         self._folded = defaultdict(bool)
+        self._selected_id = None
+        self._system_types = (DNA.TYPE_VIEW, DNA.TYPE_PROJECT, DNA.TYPE_LAYOUT, DNA.TYPE_SETTINGS)
 
         self.app.project.entity_changed.connect(self._update)
         self.app.project.entity_removed.connect(self._update)
@@ -77,6 +75,7 @@ class NodeViewer(Viewer):
         self._ui_view_action.clicked.connect(self.view_action)
 
         self._ui_toolbar = Toolbar()
+        self._ui_toolbar.setObjectName("NodeViewer_toolbar")
         self._ui_toolbar.addWidget(self._ui_view_action)
         self._ui_toolbar.addStretch()
         self._ui_toolbar.addAction(self._ui_remove_action)
@@ -92,16 +91,27 @@ class NodeViewer(Viewer):
         """Update nodes tree"""
 
         dna = self.app.project.dna
+        selected_item = None
+        system_icon = Icon.colored(':/rc/unlock.png', QColor('#aeca4b'), QColor('#e3e3e3'))
 
         self._ui_tree.clear()
 
         def add_childs(tree_item, parent_id):
+            nonlocal self
+            nonlocal selected_item
+            nonlocal system_icon
+
             for child in dna.childs(parent_id):
                 child_item = TreeItem(child)
                 child_item.setText(0, child.name)
 
-                add_childs(child_item, child.id)
+                if child.type in self._system_types:
+                    child_item.setIcon(0, system_icon)
 
+                if child.id == self._selected_id:
+                    selected_item = child_item
+
+                add_childs(child_item, child.id)
                 tree_item.addChild(child_item)
 
         for entity in dna.childs(0):
@@ -110,11 +120,21 @@ class NodeViewer(Viewer):
 
             add_childs(item, entity.id)
 
+            if entity.type in self._system_types:
+                item.setIcon(0, system_icon)
+
+            if entity.id == self._selected_id:
+                selected_item = item
+
             self._ui_tree.addTopLevelItem(item)
 
         # expand items
         for item in self._ui_tree.findItems('', Qt.MatchContains | Qt.MatchRecursive):
             item.setExpanded(self._folded[item.object().id])
+
+        if selected_item:
+            index = self._ui_tree.indexFromItem(selected_item)
+            self._ui_tree.setCurrentIndex(index)
 
     def _selection_changed(self, *args):
         """Tree selection changed"""
@@ -173,9 +193,10 @@ class NodeViewer(Viewer):
         """Remove selected entity"""
 
         item = self._ui_tree.currentItem()
+        above = self._ui_tree.itemAbove(item)
         node = item.object()
 
-        if item and node.type in (DNA.TYPE_VIEW, DNA.TYPE_PROJECT, DNA.TYPE_LAYOUT):
+        if item and node.type in self._system_types:
             message = MessageDialog(title="Item can't be removed",
                                     text="Item '%s' can't be removed" % node.name,
                                     icon=MessageDialog.Warning)
@@ -183,14 +204,17 @@ class NodeViewer(Viewer):
 
             return False
 
+        if above:
+            self._selected_id = above.object().id
+
         self.app.project.dna.remove(node.id)
+        self._update()
 
         # select first node
-        self._ui_tree.setCurrentItem(self._ui_tree.itemAt(0, 0))
         item = self._ui_tree.currentItem()
 
         if item:
-            self.emit('!node/selected', item.object().id)
+            self.emit('!node/selected', above)
 
 
 class _TreeWidget(Tree):

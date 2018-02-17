@@ -20,14 +20,12 @@ from grailkit.util import *
 from grailkit.bible import BibleHost, BibleHostError
 
 import grail
-from grail.ui import ActionsDialog, PreferencesDialog, ViewArranger
+from grail.ui import ActionsDialog, PreferencesDialog, ViewArranger, ProjectDialog
 from grail.qt import AboutDialog, MessageDialog, Application, ProgressDialog
 
 
 class MainWindow(QMainWindow):
     """Grail application class"""
-
-    # todo: Add ability to change project information
 
     def __init__(self, parent=None):
         super(MainWindow, self).__init__()
@@ -50,6 +48,8 @@ class MainWindow(QMainWindow):
         self.preferences_dialog = PreferencesDialog()
 
         self.actions_dialog = ActionsDialog()
+
+        self.project_dialog = ProjectDialog()
 
         self._ui_menubar()
 
@@ -93,6 +93,9 @@ class MainWindow(QMainWindow):
         self.ui_preferences_action = QAction('Preferences', self)
         self.ui_preferences_action.triggered.connect(self.preferences_action)
 
+        self.ui_project_action = QAction('Project info', self)
+        self.ui_project_action.triggered.connect(self.project_action)
+
         self.ui_actions_action = QAction('Show actions...', self)
         self.ui_actions_action.triggered.connect(self.open_actions_action)
 
@@ -118,6 +121,7 @@ class MainWindow(QMainWindow):
         self.ui_menu_file.addAction(self.ui_export_action)
         self.ui_menu_file.addSeparator()
         self.ui_menu_file.addAction(self.ui_preferences_action)
+        self.ui_menu_file.addAction(self.ui_project_action)
         self.ui_menu_file.addAction(self.ui_quit_action)
 
         # Action menu
@@ -414,6 +418,12 @@ class MainWindow(QMainWindow):
         """Open a preferences dialog"""
 
         self.preferences_dialog.showWindow()
+
+    def project_action(self):
+        """Open project information dialog"""
+
+        self.project_dialog.showWindow()
+        self.project_dialog.moveCenter()
 
     def closeEvent(self, event):
         """Save project"""

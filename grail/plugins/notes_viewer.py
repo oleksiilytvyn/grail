@@ -24,9 +24,6 @@ class NotesViewer(Viewer):
     author = 'Grail Team'
     description = 'Create text notes'
 
-    # todo: Change color to yellow
-    # todo: Add ability to save notes to project instead of viewer
-
     def __init__(self, *args):
         super(NotesViewer, self).__init__(*args)
 
@@ -52,7 +49,7 @@ class NotesViewer(Viewer):
 
         self._ui_view_action = QToolButton()
         self._ui_view_action.setText("View")
-        self._ui_view_action.setIcon(Icon.colored(':/rc/menu.png', QColor('#2d2d32'), QColor('#e3e3e3')))
+        self._ui_view_action.setIcon(Icon.colored(':/rc/menu.png', QColor('#4e352c'), QColor('#e3e3e3')))
         self._ui_view_action.clicked.connect(self.view_action)
 
         self._ui_toolbar = Toolbar()

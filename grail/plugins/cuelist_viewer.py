@@ -9,6 +9,7 @@
     :license: GNU, see LICENSE for more details.
 """
 import re
+import time
 
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
@@ -262,19 +263,34 @@ class CuelistsListWidget(QTableWidget):
 class CueDialog(Dialog):
     """Cue editor dialog"""
 
-    # todo: Add color property
-    # todo: Add follow property
-    # todo: Add number
-
     def __init__(self, viewer):
         super(CueDialog, self).__init__()
 
         self._viewer = viewer
         self._entity = None
+        self._color = None
+        self._follow = None
+
+        self.follow_options = {
+            "Follow": CueEntity.FOLLOW_ON,
+            "Continue": CueEntity.FOLLOW_CONTINUE,
+            "Don't follow": CueEntity.FOLLOW_OFF
+            }
+
         self.__ui__()
 
     def __ui__(self):
         """Build UI"""
+
+        def color_triggered(menu_action):
+            """Trigger menu action"""
+
+            return lambda: self._color_changed(menu_action.data())
+
+        def follow_triggered(menu_action):
+            """Trigger menu action"""
+
+            return lambda: self._follow_changed(menu_action.data())
 
         # General section
         self._ui_text = TextEdit()
@@ -282,12 +298,57 @@ class CueDialog(Dialog):
         self._ui_text.setAttribute(Qt.WA_MacShowFocusRect, 0)
         self._ui_text.setAcceptRichText(False)
         self._ui_text.sizePolicy().setVerticalStretch(1)
+        self._ui_text.setMinimumHeight(120)
+
+        self._ui_number = LineEdit()
+        self._ui_number.setPlaceholderText("Number")
+        self._ui_number.setValidator(QDoubleValidator(0, 1000, 2, self))
+        self._ui_number.setMaximumWidth(80)
+
+        self._ui_color_menu = QMenu(self)
+
+        for color, name in zip(CueEntity.COLORS, CueEntity.COLOR_NAMES):
+            action = QAction(name, self._ui_color_menu)
+            action.setData(QVariant(color))
+            action.triggered.connect(color_triggered(action))
+
+            self._ui_color_menu.addAction(action)
+
+        self._ui_color = Button("")
+        self._ui_color.setStyleSheet("background: none; border: none;")
+        self._ui_color.setIcon(QIcon(":/rc/live.png"))
+        self._ui_color.setMenu(self._ui_color_menu)
+
+        self._ui_follow_menu = QMenu(self)
+
+        for name, value in self.follow_options.items():
+            action = QAction(name, self._ui_follow_menu)
+            action.setData(QVariant(value))
+            action.triggered.connect(follow_triggered(action))
+
+            self._ui_follow_menu.addAction(action)
+
+        self._ui_follow = Button("Follow")
+        self._ui_follow.setMenu(self._ui_follow_menu)
 
         self._ui_pre_wait = LineEdit()
+        self._ui_pre_wait.setValidator(QDoubleValidator(0, 1000, 2, self))
         self._ui_pre_wait.setPlaceholderText("Pre wait")
+        self._ui_pre_wait.setMaximumWidth(80)
 
         self._ui_post_wait = LineEdit()
+        self._ui_post_wait.setValidator(QDoubleValidator(0, 1000, 2, self))
         self._ui_post_wait.setPlaceholderText("Post wait")
+        self._ui_post_wait.setMaximumWidth(80)
+
+        self._ui_opt_layout = HLayout()
+        self._ui_opt_layout.setSpacing(8)
+        self._ui_opt_layout.addWidget(self._ui_number)
+        self._ui_opt_layout.addWidget(self._ui_pre_wait)
+        self._ui_opt_layout.addWidget(self._ui_post_wait)
+        self._ui_opt_layout.addStretch(1)
+        self._ui_opt_layout.addWidget(self._ui_color)
+        self._ui_opt_layout.addWidget(self._ui_follow)
 
         # Properties
         self._ui_properties = PropertiesView(self)
@@ -316,10 +377,11 @@ class CueDialog(Dialog):
         # Layout
         self._ui_layout = VLayout()
 
-        self._ui_general_layout = GridLayout()
+        self._ui_general_layout = VLayout()
         self._ui_general_layout.setSpacing(8)
         self._ui_general_layout.setContentsMargins(12, 12, 12, 10)
-        self._ui_general_layout.addWidget(self._ui_text, 0, 0)
+        self._ui_general_layout.addWidget(self._ui_text)
+        self._ui_general_layout.addLayout(self._ui_opt_layout)
 
         self._ui_general = Component()
         self._ui_general.setLayout(self._ui_general_layout)
@@ -338,14 +400,43 @@ class CueDialog(Dialog):
         self.setLayout(self._ui_layout)
         self.setWindowIcon(QIcon(':/icon/32.png'))
         self.setWindowTitle('Cue Inspector')
-        self.setMinimumSize(280, 400)
-        self.setGeometry(200, 200, 250, 200)
+        self.setMinimumSize(300, 400)
+        self.setGeometry(200, 200, 300, 400)
         self.setWindowFlags(Qt.WindowCloseButtonHint)
+
+    def _follow_changed(self, value):
+
+        self._follow = value
+
+        self._ui_follow.setText("None")
+
+        for key, _value in self.follow_options.items():
+            if _value == value:
+                self._ui_follow.setText(key)
+                break
+
+    def _color_changed(self, value):
+
+        self._color = value
+
+        if value:
+            self._ui_color.setIcon(Icon.colored(':/rc/live.png', QColor(value), QColor('#e3e3e3')))
+        else:
+            self._ui_color.setIcon(QIcon(':/rc/live.png'))
 
     def accept_action(self):
         """Accept entity changes"""
 
         self._entity.name = str(self._ui_text.toPlainText())
+        self._entity.number = str(self._ui_number.text())
+        self._entity.pre_wait = float(self._ui_pre_wait.text())
+        self._entity.post_wait = float(self._ui_post_wait.text())
+
+        if self._color:
+            self._entity.color = self._color
+
+        if self._follow in CueEntity.FOLLOW_TYPE:
+            self._entity.follow = self._follow
 
         self.accept()
 
@@ -363,6 +454,12 @@ class CueDialog(Dialog):
         # Update UI
         self.setWindowTitle("Cue Inspector - %s" % entity.name.split('\n')[0])
         self._ui_text.setText(entity.name)
+        self._ui_number.setText(str(entity.number))
+        self._ui_pre_wait.setText(str(entity.pre_wait))
+        self._ui_post_wait.setText(str(entity.post_wait))
+
+        self._color_changed(entity.color)
+        self._follow_changed(entity.follow)
 
 
 class CuelistViewer(Viewer):
@@ -382,8 +479,6 @@ class CuelistViewer(Viewer):
     author = 'Grail Team'
     description = 'Manage cuelists'
 
-    # fixme: Fix bug with more than one instance opened, as this leads to adding more than one entity from library
-
     def __init__(self, *args):
         super(CuelistViewer, self).__init__(*args)
 
@@ -393,10 +488,12 @@ class CuelistViewer(Viewer):
         self._dialog.selected.connect(self.cuelist_selected)
         self._cuedialog = CueDialog(self)
         self._selected_id = None
+        self._update_lock = False
 
         # Track project changes
-        self.project.entity_changed.connect(self._update)
-        self.project.entity_removed.connect(self._update)
+        self.project.entity_changed.connect(self._update_changed)
+        self.project.entity_removed.connect(self._update_removed)
+        self.project.property_changed.connect(self._update_property)
 
         # Application signals
         self.connect('/app/close', self._close)
@@ -513,8 +610,13 @@ class CuelistViewer(Viewer):
         if above:
             self._selected_id = above.object().id
 
+        self._update_lock = True
+
         # remove selected item
         item.object().delete()
+
+        self._update_lock = False
+        self._update()
 
     def item_edit(self, item):
         """Edit cue menu_action
@@ -560,7 +662,6 @@ class CuelistViewer(Viewer):
             new_entity.name = entity.name + " copy"
 
         self._selected_id = new_entity.id
-        self._update()
 
     def item_color(self, item, color):
         """Change cue color menu_action
@@ -575,8 +676,6 @@ class CuelistViewer(Viewer):
 
         if isinstance(entity, CueEntity) and color in CueEntity.COLORS:
             entity.color = color
-
-        self._update()
 
     def item_clicked(self, item):
         """Preview cue text
@@ -645,7 +744,7 @@ class CuelistViewer(Viewer):
             cuelist_id (int): cuelist id
         """
 
-        if self.is_destroyed:
+        if self.is_destroyed or self._update_lock:
             return False
 
         self._cuelist_id = cuelist_id
@@ -710,10 +809,35 @@ class CuelistViewer(Viewer):
     def _update(self, *args):
         """Internal update"""
 
-        self.cuelist_selected(self._cuelist_id)
+        if not self._update_lock:
+            self.cuelist_selected(self._cuelist_id)
+
+    def _cue_contains(self, entity_id):
+
+        if entity_id == self._cuelist_id:
+            return True
+
+        return self.project.dna.contains(self._cuelist_id, entity_id)
+
+    def _update_changed(self, entity_id):
+
+        if self._cue_contains(entity_id):
+            self._update()
+
+    def _update_removed(self, entity_id):
+
+        if self._cue_contains(entity_id):
+            self._update()
+
+    def _update_property(self, entity_id, key, value):
+
+        if key == 'color':
+            self._update()
 
     def _add_entity(self, entity):
         """Add entity to cuelist"""
+
+        self._update_lock = True
 
         cuelist_id = self._cuelist_id
         cuelist = self.project.cuelist(cuelist_id)
@@ -730,13 +854,12 @@ class CuelistViewer(Viewer):
 
             for page in pages:
                 new_entity.create(name=page, entity_type=DNA.TYPE_CUE)
-
-            self.cuelist_selected(cuelist_id)
         elif entity.type == DNA.TYPE_VERSE:
             cuelist.create(name="%s\n%s" % (entity.text, entity.reference),
                            entity_type=DNA.TYPE_CUE)
 
-            self.cuelist_selected(cuelist_id)
+        self._update_lock = False
+        self._update()
 
     def _context_menu(self, pos):
         """Context menu on cue item"""
@@ -799,30 +922,28 @@ class CuelistViewer(Viewer):
         QTreeWidget.keyPressEvent(self._ui_tree, event)
 
     def _osc_execute(self, cue):
-        """Execute cue and send OSC bundle"""
+        """Execute cue and send OSC bundle
 
-        # old style message
-        # todo: remove old style message in future
-        message = OSCMessage(address="/grail/message")
-        message.add(bytes(cue.name, "utf-8"))
-        message.add(0)
+        Send bundle with all valid OSC properties + entity info
+        """
 
-        # new mechanism
-        # todo: Add entity properties (id, type, color)
         bundle = OSCBundle()
+        bundle.add(OSCMessage(address='/cue/id', args=[cue.id]))
+        bundle.add(OSCMessage(address='/cue/type', args=[cue.type]))
+        bundle.add(OSCMessage(address='/cue/parent', args=[cue.parent]))
+
+        name = OSCMessage(address='/cue/name')
+        name.add(bytes(cue.name, 'utf-8'))
+        bundle.add(name)
 
         for key, value in cue.properties().items():
             # check if property name is valid OSC address pattern
             if not OSCMessage.is_valid_address(key):
                 continue
 
-            property_message = OSCMessage(address=key)
-            property_message.add(value)
-
-            bundle.add(property_message)
+            bundle.add(OSCMessage(address=key, args=[value]))
 
         osc_out = self.app.osc.output
-        osc_out.send(message)
         osc_out.send(bundle)
 
     def _close(self):
@@ -834,8 +955,6 @@ class CuelistViewer(Viewer):
 
 class TreeWidget(Tree):
     """Tree widget used in CuelistViewer"""
-
-    # todo: Add custom items with color
 
     def __init__(self, *args):
         super(TreeWidget, self).__init__(*args)

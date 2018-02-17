@@ -5,7 +5,7 @@
 
     Arrange viewers in any order you want
 
-    :copyright: (c) 2017 by Grail Team.
+    :copyright: (c) 2018 by Grail Team.
     :license: GNU, see LICENSE for more details.
 """
 from PyQt5.QtCore import *
@@ -194,6 +194,9 @@ class ViewArranger(Component):
 
         if viewer in self._viewers:
             self._viewers.remove(viewer)
+
+        # Try to finally remove widget
+        viewer.close()
 
     def _create(self, name, parent, properties=None):
         """Returns viewer by id or empty viewer"""

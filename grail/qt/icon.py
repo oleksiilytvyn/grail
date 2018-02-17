@@ -5,7 +5,7 @@
 
     QIcon with color changing capabilities
 
-    :copyright: (c) 2017 by Oleksii Lytvyn.
+    :copyright: (c) 2018 by Oleksii Lytvyn.
     :license: GNU, see LICENSE for more details.
 """
 from PyQt5.QtCore import Qt
@@ -52,10 +52,15 @@ class Icon(QIcon):
 
     @staticmethod
     def colored(path, color, original_color=QColor('black')):
+        """Colorize icon and return new instance
+
+        Args:
+            path (str): image location
+            color (QColor): new color
+            original_color (QColor): original color that will be used as mask to fill new color
+        """
 
         icon = Icon(path)
         size = icon.availableSizes()[0]
-        width = size.width()
-        height = size.height()
 
-        return QIcon(icon.coloredPixmap(width, height, color, original_color))
+        return Icon(icon.coloredPixmap(size.width(), size.height(), color, original_color))

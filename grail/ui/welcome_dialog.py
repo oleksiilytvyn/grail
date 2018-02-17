@@ -5,7 +5,7 @@
 
     Welcome dialog that provides options to choose from when Grail is launched
 
-    :copyright: (c) 2017 by Grail Team.
+    :copyright: (c) 2018 by Grail Team.
     :license: GNU, see LICENSE for more details.
 """
 

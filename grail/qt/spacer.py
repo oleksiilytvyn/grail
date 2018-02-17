@@ -5,7 +5,7 @@
 
     Transparent widget that only task to stretch components and fill space
 
-    :copyright: (c) 2017 by Oleksii Lytvyn.
+    :copyright: (c) 2018 by Oleksii Lytvyn.
     :license: GNU, see LICENSE for more details.
 """
 

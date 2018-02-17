@@ -5,18 +5,18 @@
 
     This plugin for developers who want to see whats going on with nodes
 
-    :copyright: (c) 2017 by Grail Team.
+    :copyright: (c) 2018 by Grail Team.
     :license: GNU, see LICENSE for more details.
 """
 from collections import defaultdict
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QIcon, QBrush, QColor
+from PyQt5.QtGui import QIcon, QColor
 from PyQt5.QtWidgets import QAction, QToolButton, QAbstractItemView, QTreeWidget, QMenu
 
-from grail.qt import MessageDialog, Toolbar, Tree, TreeItem, VLayout, Icon
-from grailkit.dna import DNA, CueEntity
+from grailkit.dna import DNA
 
+from grail.qt import MessageDialog, Toolbar, Tree, TreeItem, VLayout, Icon
 from grail.core import Viewer
 
 

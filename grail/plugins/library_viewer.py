@@ -5,19 +5,20 @@
 
     Manage built-in library
 
-    :copyright: (c) 2017 by Grail Team.
+    :copyright: (c) 2018 by Grail Team.
     :license: GNU, see LICENSE for more details.
 """
 import re
 
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
+from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtGui import QColor
+from PyQt5.QtWidgets import QGridLayout, QWidget, QAction, QToolButton, QMenu
 
 from grailkit.bible import Verse
 from grailkit.dna import DNA, SongEntity
-from grail.qt import *
 
+from grail.qt import Icon, Dialog, LineEdit, SearchEdit, Button, TextEdit, Application, HLayout, VLayout, Toolbar, \
+    List, ListItem
 from grail.core import Viewer
 
 
@@ -87,7 +88,6 @@ class SongDialog(Dialog):
         self._ui_layout.addLayout(self._ui_buttons, 8, 0, 1, 2)
 
         self.setLayout(self._ui_layout)
-        self.setWindowIcon(QIcon(':/icon/32.png'))
         self.setWindowTitle('Add song')
         self.setGeometry(300, 300, 300, 400)
         self.setMinimumSize(300, 400)
@@ -211,13 +211,13 @@ class LibraryViewer(Viewer):
         self._ui_list.itemDoubleClicked.connect(self._item_doubleclicked)
         self._ui_list.customContextMenuRequested.connect(self._context_menu)
 
-        self._ui_add_action = QAction(QIcon(':/rc/add.png'), 'Add', self)
+        self._ui_add_action = QAction(Icon(':/rc/add.png'), 'Add', self)
         self._ui_add_action.setIconVisibleInMenu(True)
         self._ui_add_action.triggered.connect(self.add_action)
 
         self._ui_view_action = QToolButton()
         self._ui_view_action.setText("View")
-        self._ui_view_action.setIcon(QIcon(':/rc/menu.png'))
+        self._ui_view_action.setIcon(Icon(':/rc/menu.png'))
         self._ui_view_action.clicked.connect(self.view_action)
 
         self._ui_toolbar = Toolbar()

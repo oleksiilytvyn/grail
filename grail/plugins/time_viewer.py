@@ -5,17 +5,17 @@
 
     View current time
 
-    :copyright: (c) 2017 by Grail Team.
+    :copyright: (c) 2018 by Grail Team.
     :license: GNU, see LICENSE for more details.
 """
 import os
 import datetime
 
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
+from PyQt5.QtCore import Qt, QTimer, QPoint, QStandardPaths
+from PyQt5.QtGui import QPainter, QColor, QPixmap, QFont
+from PyQt5.QtWidgets import QToolButton, QWidget, QGridLayout, QSpinBox, QFontDialog, QFileDialog, QColorDialog
 
-from grail.qt import *
+from grail.qt import Label, Toolbar, VLayout, Icon, Popup, Button, Spacer
 from grail.core import Viewer
 
 
@@ -141,8 +141,8 @@ class TimeViewer(Viewer):
             self._ui_view_action.setIcon(Icon.colored(':/rc/menu.png', color, original))
             self._ui_settings_action.setIcon(Icon.colored(':/rc/edit.png', color, original))
         else:
-            self._ui_view_action.setIcon(QIcon(':/rc/menu.png'))
-            self._ui_settings_action.setIcon(QIcon(':/rc/edit.png'))
+            self._ui_view_action.setIcon(Icon(':/rc/menu.png'))
+            self._ui_settings_action.setIcon(Icon(':/rc/edit.png'))
 
         self.set('background', self.style_background)
         self.set('color', self.style_color)

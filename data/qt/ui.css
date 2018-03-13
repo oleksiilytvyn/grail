@@ -44,7 +44,7 @@ QMenuBar {
 QComboBox {
     selection-background-color: #3daee9;
     min-width: 75px;
-    color: #ffffff;
+    color: #222;
     border-radius: 3px;
     padding: 4px 8px;
     margin: 3px;
@@ -55,7 +55,6 @@ QComboBox {
     QComboBox:on {
         padding-top: 3px;
         padding-left: 4px;
-        color: #ffffff;
         selection-background-color: #4facfe;
         }
 
@@ -80,14 +79,6 @@ QComboBox {
         border-radius: 3px;
         }
 
-    QComboBox QAbstractItemView {
-        selection-background-color: #ff0;
-        border: none;
-        background-color: #222;
-        color: #f1f1f1;
-        margin: 0;
-        }
-
     QComboBox::down-arrow {
         image: url(:/rc/branch-open.png);
         }
@@ -97,6 +88,7 @@ QComboBox {
     QComboBox::down-arrow:focus {
         image: url(:/rc/branch-open.png);
         }
+
 
 QAbstractSpinBox {
     padding: 4px;

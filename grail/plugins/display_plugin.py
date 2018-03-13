@@ -216,13 +216,20 @@ class DisplayWindow(Dialog):
         """Draw image"""
 
         output = event.rect()
+        prefs = self._preferences
+        comp = prefs.composition
 
         painter = QPainter()
         painter.begin(self)
         painter.setRenderHints(QPainter.Antialiasing | QPainter.TextAntialiasing | QPainter.SmoothPixmapTransform)
 
         painter.fillRect(output, Qt.black)
-        painter.drawImage(output, self._plugin.composition)
+
+        t = QTransform()
+        t.scale(output.width()/comp.width(), output.height()/comp.height())
+
+        painter.setTransform(prefs.transform * t)
+        painter.drawImage(QRect(0, 0, comp.width(), comp.height()), self._plugin.composition)
 
         painter.end()
 
@@ -244,8 +251,6 @@ class DisplayWindow(Dialog):
 
 class CompositionTexture(QImage):
     """Display output texture"""
-
-    # todo: Add corner-pin support
 
     def __init__(self):
 
@@ -423,6 +428,7 @@ class CompositionPreferences(object):
     comp/volume float
     comp/pan float
     comp/testcard bool
+    comp/transform float float float float float float float float float
 
     # Clip
 
@@ -520,7 +526,8 @@ class CompositionPreferences(object):
         self.align_horizontal = s.get('/clip/text/align', default=Qt.AlignVCenter)
         self.align_vertical = s.get('/clip/text/valign', default=Qt.AlignHCenter)
 
-        self.transform = QTransform()
+        t = s.get('/comp/transform')
+        self.transform = QTransform(*t) if t and len(t) >= 8 else QTransform()
         self.composition = QSize(s.get('/comp/width', default=800),
                                  s.get('/comp/height', default=600))
         self.disabled = s.get('/display/disabled', default=True)
@@ -600,6 +607,7 @@ class TransformWidget(QWidget):
         self.setContextMenuPolicy(Qt.CustomContextMenu)
 
         screen = QGuiApplication.screens()[0].availableSize()
+
         self.screen = QRectF(0, 0, screen.width(), screen.height())
         self.points = [QPointF(0, 0), QPointF(0, 0), QPointF(0, 0), QPointF(0, 0)]
         self.wholeTransformation()
@@ -826,7 +834,7 @@ class TransformWidget(QWidget):
             rect (QRectF, QRect):
         """
 
-        if not isinstance(rect, QRect) or not isinstance(rect, QRectF):
+        if not (isinstance(rect, QRect) or isinstance(rect, QRectF)):
             raise Exception("Given rect is not of type QRect or QRectF")
 
         self.screen = QRectF(rect.x(), rect.y(), rect.width(), rect.height())
@@ -838,10 +846,9 @@ class TransformWidget(QWidget):
         """Returns QTransform object"""
 
         t = QTransform()
-        p = [QPointF(o.x(), o.y()) for o in self.points]
-        w = self.screen.width()
-        h = self.screen.height()
+        w, h = self.screen.width(), self.screen.height()
         q = [QPointF(0, 0), QPointF(w, 0), QPointF(w, h), QPointF(0, h)]
+        p = [QPointF(o.x(), o.y()) for o in self.points]
 
         QTransform.quadToQuad(QPolygonF(q), QPolygonF(p), t)
 
@@ -1233,9 +1240,6 @@ class PreferencesDialog(Dialog):
 
     updated = pyqtSignal()
 
-    # fixme: On Windows output menu doesn't appear after click on button
-    # fixme: Drop-down menu style looks wrong on Mac
-
     def __init__(self, parent):
         """Initialize PreferencesDialog
 
@@ -1271,6 +1275,9 @@ class PreferencesDialog(Dialog):
 
         self.__ui__()
         self._update_output()
+
+        # Set transform widget size
+        self._ui_transform.setRect(QRect(0, 0, p.composition.width(), p.composition.height()))
 
     def __ui__(self):
         """Build UI"""
@@ -1343,7 +1350,11 @@ class PreferencesDialog(Dialog):
     def _transform_event(self):
         """Called when transformation is changed"""
 
-        pass
+        t = self._ui_transform.getTransform()
+
+        self.emit('/comp/transform', [t.m11(), t.m12(), t.m13(),
+                                      t.m21(), t.m22(), t.m23(),
+                                      t.m31(), t.m32(), t.m33()])
 
     def _update_output(self):
         """Update display output list"""
@@ -1448,6 +1459,9 @@ class PreferencesDialog(Dialog):
 
         self._parent.emit('/comp/width', size.width())
         self._parent.emit('/comp/height', size.height())
+
+        # update transform widget
+        self._ui_transform.setRect(QRect(0, 0, size.width(), size.height()))
 
     def font_action(self):
         """Font action clicked"""

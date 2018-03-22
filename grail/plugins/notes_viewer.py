@@ -8,11 +8,7 @@
     :copyright: (c) 2018 by Grail Team.
     :license: GNU, see LICENSE for more details.
 """
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QColor
-from PyQt5.QtWidgets import QSizePolicy, QToolButton
-
-from grail.qt import VLayout, TextEdit, Label, Toolbar, Icon
+from grail.qt import *
 from grail.core import Viewer
 
 

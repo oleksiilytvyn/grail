@@ -8,14 +8,11 @@
     :copyright: (c) 2018 by Grail Team.
     :license: GNU, see LICENSE for more details.
 """
-from PyQt5.QtCore import Qt, QStandardPaths, QSize
-from PyQt5.QtWidgets import QFileDialog, QAction, QWidget, QSizePolicy, QGridLayout
 
 from grailkit import dna
 from grailkit.bible import BibleHost, BibleHostError
 
-from grail.qt import Button, VLayout, MessageDialog, ProgressDialog, Spacer, Label, Switch, \
-    List, ListItem, Toolbar, Application, Icon
+from grail.qt import *
 from grail.core import Configurator, Plugin, Viewer
 
 

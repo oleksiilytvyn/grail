@@ -8,10 +8,7 @@
     :copyright: (c) 2018 by Grail Team.
     :license: GNU, see LICENSE for more details.
 """
-from PyQt5.QtGui import QColor
-from PyQt5.QtWidgets import QAction, QToolButton
-
-from grail.qt import Toolbar, Icon, VLayout
+from grail.qt import *
 from grail.ui import PropertiesView
 from grail.core import Viewer
 

@@ -10,18 +10,12 @@
 """
 import re
 
-from PyQt5.QtCore import Qt, pyqtSignal, QVariant, QPoint
-from PyQt5.QtGui import QPainter, QPixmap, QColor, QDoubleValidator
-from PyQt5.QtWidgets import QHeaderView, QAbstractItemView, QWidget, QStackedWidget, QSizePolicy, \
-    QAction, QMenu, QToolButton, QVBoxLayout, QScrollBar, QTreeWidget, QTableWidget, QTableWidgetItem
-
 from grailkit.dna import DNA, CueEntity
 from grailkit.osc import OSCMessage, OSCBundle
 
 from grail.core import Viewer
 from grail.ui import PropertiesView
-from grail.qt import Popup, Dialog, Icon, Button, VLayout, HLayout, Label, Toolbar, TextEdit, \
-    Tree, TreeItem, MessageDialog, LineEdit, Application, Splitter, Component
+from grail.qt import *
 
 
 class CuelistDialog(Popup):

@@ -8,14 +8,10 @@
     :copyright: (c) 2018 by Grail Team.
     :license: GNU, see LICENSE for more details.
 """
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
-
 from grailkit.util import default_key
 from grailkit.plug import PluginRegistry
 
-from grail.qt import Component, Application
+from grail.qt import *
 
 
 class _PluginMeta(object):

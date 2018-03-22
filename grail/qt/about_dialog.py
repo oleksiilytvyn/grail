@@ -8,11 +8,7 @@
     :copyright: (c) 2018 by Oleksii Lytvyn.
     :license: GNU, see LICENSE for more details.
 """
-from PyQt5.QtCore import Qt, QUrl
-from PyQt5.QtGui import QPixmap, QIcon, QDesktopServices
-from PyQt5.QtWidgets import QStyle, QApplication, QPlainTextEdit, QBoxLayout
-
-from grail.qt import Dialog, Button, Label, Component
+from grail.qt import *
 
 
 class AboutDialog(Dialog):

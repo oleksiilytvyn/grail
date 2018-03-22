@@ -65,16 +65,19 @@ class ProjectDialog(Dialog):
         self._ui_description.setPlainText(project.description)
 
     def title_changed(self):
+        """Project title changed"""
 
         project = Application.instance().project
         project.name = str(self._ui_title.text())
 
     def author_changed(self):
+        """Project author changed"""
 
         project = Application.instance().project
         project.author = str(self._ui_author.text())
 
     def description_changed(self):
+        """Project description changed"""
 
         project = Application.instance().project
         project.description = str(self._ui_description.toPlainText())

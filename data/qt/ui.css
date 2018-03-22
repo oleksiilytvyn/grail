@@ -165,12 +165,6 @@ QTableView {
             min-height: 20px;
             }
 
-    QTableView QScrollBar::handle:vertical {
-        background: #ddd;
-        min-height: 20px;
-        border-radius: 3px;
-        }
-
     QTableView::item {
         color: #e6e6e6;
         padding: 4px 12px;
@@ -254,21 +248,55 @@ QScrollBar:horizontal {
     background: transparent;
     border: none;
     height: 8px;
-    margin: 4px 4px 4px 0;
+    margin: 4px 4px 0 4px;
     }
-
-    QScrollBar:vertical {
-        background: transparent;
-        border: none;
-        width: 8px;
-        margin: 4px 4px 4px 0;
-        }
 
     QScrollBar::handle:horizontal {
         background: rgba(0, 0, 0, 0.6);
         min-width: 20px;
         border-radius: 3px;
         }
+
+    QScrollBar::add-line:horizontal {
+        background: transparent;
+        border: none;
+        height: 0;
+        width: 0;
+        subcontrol-position: bottom;
+        subcontrol-origin: margin;
+        }
+
+    QScrollBar::sub-line:horizontal {
+        background: transparent;
+        border: none;
+        height: 0;
+        width: 0;
+        subcontrol-position: top;
+        subcontrol-origin: margin;
+        }
+
+    QScrollBar::up-arrow:horizontal,
+    QScrollBar::down-arrow:horizontal {
+        width: 0;
+        height: 0;
+        background: none;
+        border: none;
+        }
+
+    QScrollBar::add-page:horizontal,
+    QScrollBar::sub-page:horizontal {
+        width: 0;
+        height: 0;
+        background: none;
+        border: none;
+        }
+
+QScrollBar:vertical {
+    background: transparent;
+    border: none;
+    width: 8px;
+    margin: 4px 4px 4px 0;
+    }
 
     QScrollBar::handle:vertical {
         background: rgba(0, 0, 0, 0.6);
@@ -294,14 +322,16 @@ QScrollBar:horizontal {
         subcontrol-origin: margin;
         }
 
-    QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical {
+    QScrollBar::up-arrow:vertical,
+    QScrollBar::down-arrow:vertical {
         width: 0;
         height: 0;
         background: none;
         border: none;
         }
 
-    QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+    QScrollBar::add-page:vertical,
+    QScrollBar::sub-page:vertical {
         width: 0;
         height: 0;
         background: none;
@@ -565,7 +595,6 @@ Welcome {
     background: #2f2f2f url(:/rc/welcome_bg.png) scroll no-repeat 0 0;
     }
 
-
 /**
  * @section Actions Dialog
  */
@@ -697,19 +726,6 @@ SongDialog {
         color: #b3b3b3;
         }
 
-    SongDialog QScrollBar:vertical {
-        background: transparent;
-        border: none;
-        width: 8px;
-        margin: 2px 2px 2px 0;
-        }
-
-    SongDialog QScrollBar::handle:vertical {
-        background: #ddd;
-        min-height: 20px;
-        border-radius: 3px;
-        }
-
 
 /******************************************************************************
  *
@@ -766,12 +782,6 @@ SongDialog {
             outline: 0;
             }
 
-            #cuelist_dialog_list QScrollBar::handle:vertical {
-                background: #ddd;
-                min-height: 20px;
-                border-radius: 3px;
-                }
-
             #cuelist_dialog_list::item {
                 color: #e6e6e6;
                 padding: 4px 12px;
@@ -823,19 +833,6 @@ CueDialog {
         background: #212121;
         min-height: 20px;
         color: #b3b3b3;
-        }
-
-    CueDialog QScrollBar:vertical {
-        background: transparent;
-        border: none;
-        width: 8px;
-        margin: 2px 2px 2px 0;
-        }
-
-    CueDialog QScrollBar::handle:vertical {
-        background: #ddd;
-        min-height: 20px;
-        border-radius: 3px;
         }
 
     #CueDialog_toolbar {
@@ -941,7 +938,6 @@ ConsoleViewer {
     #ConsoleViewer_text {
         background: #2f2f2f;
         color: #ffffff;
-        padding: 6px;
         border: none;
         font-family: Consolas, "Andale Mono WT", "Andale Mono", "Lucida Console", "Lucida Sans Typewriter",
             "DejaVu Sans Mono", "Bitstream Vera Sans Mono", "Liberation Mono", "Nimbus Mono L",

@@ -11,11 +11,7 @@
 import os
 import datetime
 
-from PyQt5.QtCore import Qt, QTimer, QPoint, QStandardPaths
-from PyQt5.QtGui import QPainter, QColor, QPixmap, QFont
-from PyQt5.QtWidgets import QToolButton, QWidget, QGridLayout, QSpinBox, QFontDialog, QFileDialog, QColorDialog
-
-from grail.qt import Label, Toolbar, VLayout, Icon, Popup, Button, Spacer
+from grail.qt import *
 from grail.core import Viewer
 
 

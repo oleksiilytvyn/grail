@@ -12,6 +12,7 @@ import io
 import os
 import sys
 import tempfile
+import logging
 
 from PyQt5.QtCore import QFile
 
@@ -25,6 +26,7 @@ import grail.resources
 from grail.qt import Application, MessageDialog
 from grail.ui import MainWindow, WelcomeDialog
 from grail.core import OSCHost
+
 # load internal plugins and viewers
 from grail.plugins import *
 
@@ -47,6 +49,10 @@ class Grail(Application):
         self.setApplicationVersion(grail.__version__)
         self.setOrganizationName(grail.ORGANISATION_NAME)
         self.setOrganizationDomain(grail.ORGANISATION_DOMAIN)
+
+        # Disable logging
+        root_logger = logging.getLogger()
+        root_logger.disabled = not grail.DEBUG
 
         self._plugins = []
         self._actions = []

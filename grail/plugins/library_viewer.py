@@ -10,15 +10,10 @@
 """
 import re
 
-from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtGui import QColor
-from PyQt5.QtWidgets import QGridLayout, QWidget, QAction, QToolButton, QMenu
-
 from grailkit.bible import Verse
 from grailkit.dna import DNA, SongEntity
 
-from grail.qt import Icon, Dialog, LineEdit, SearchEdit, Button, TextEdit, Application, HLayout, VLayout, Toolbar, \
-    List, ListItem
+from grail.qt import *
 from grail.core import Viewer
 
 

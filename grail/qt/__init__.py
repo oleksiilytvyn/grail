@@ -9,6 +9,11 @@
     :license: GNU, see LICENSE for more details.
 """
 
+# Qt
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
+
 # core
 from grail.qt.application import Application
 from grail.qt.layout import VLayout, HLayout, GridLayout

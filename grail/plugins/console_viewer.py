@@ -11,11 +11,7 @@
 import sys
 import traceback
 
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QColor
-from PyQt5.QtWidgets import QTextEdit, QSizePolicy, QToolButton
-
-from grail.qt import TextEdit, Splitter, Label, Toolbar, Icon, VLayout
+from grail.qt import *
 from grail.core import Viewer
 
 

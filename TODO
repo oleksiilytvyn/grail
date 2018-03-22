@@ -1,0 +1,74 @@
+= TO-DO
+
+Here is a list of planned features and things waiting for implementation or fix.
+
+== Core ==
+
+- Vector icons
+- Application theme configuration
+- Ability to save layouts globally, instead of project
+
+
+CuelistViewer:
+
+- fix: viewer collision with more than one instance opened
+- feature: cue execution according to follow type
+- feature: global execution controls, on/off for cuelist
+- feature: protocols for executing custom properties in cue (<protocol>:property-name)
+- feature: cuelist lock
+- feature: custom tree view with correct labeling
+
+
+LibraryViewer:
+
+- re-design song edit dialog, add more options
+
+
+BibleViewer:
+
+- add this plugin
+
+
+== Misc ==
+
+NotesViewer:
+
+- feature: save notes in project not in viewer
+- Change to dark color
+
+
+TimeViewer:
+
+- feature: redesign options panel, make more compact
+- feature: countdown to time
+
+
+== Display ==
+
+DisplayViewer:
+
+- feature: scale factor & scroll
+
+
+PreviewViewer:
+
+- Display more information about cue
+- Add display options
+
+
+== Developer Tools ==
+
+PropertiesViewer:
+
+- feature: custom table view
+- feature: better property value editor
+
+
+NodesViewer:
+
+- fix: re-design, make more consistent
+
+
+ConsoleViewer:
+
+- Python syntax highlighting

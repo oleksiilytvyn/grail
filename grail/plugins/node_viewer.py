@@ -10,13 +10,9 @@
 """
 from collections import defaultdict
 
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QIcon, QColor
-from PyQt5.QtWidgets import QAction, QToolButton, QAbstractItemView, QTreeWidget, QMenu
-
 from grailkit.dna import DNA
 
-from grail.qt import MessageDialog, Toolbar, Tree, TreeItem, VLayout, Icon
+from grail.qt import *
 from grail.core import Viewer
 
 

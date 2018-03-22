@@ -28,7 +28,7 @@ ORGANISATION_DOMAIN = "grailapp.com"
 LIBRARY_PATH = grailkit.PATH_LIBRARY
 SETTINGS_PATH = os.path.join(data_location("grail"), "app.grail")
 
-DEBUG = False
+DEBUG = True
 
 
 def main():

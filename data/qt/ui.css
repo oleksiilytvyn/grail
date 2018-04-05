@@ -227,10 +227,10 @@ Button {
  */
 
 Toolbar {
-    background: #4b5056;
-    border-top: 1px solid #4b5056;
     padding: 5px;
     min-height: 24px;
+    background: #4b5056;
+    border-top: 1px solid #4b5056;
     }
 
     Toolbar QToolButton {
@@ -850,13 +850,9 @@ CueDialog {
  *
  *****************************************************************************/
 
-#NodeViewer {
-    }
+#NodeViewer {}
 
-    #NodeViewer_toolbar {
-        background: #2f2f2f;
-        border-top: 1px solid #2f2f2f;
-        }
+    #NodeViewer_toolbar {}
 
 /******************************************************************************
  *
@@ -864,13 +860,9 @@ CueDialog {
  *
  *****************************************************************************/
 
-#PropertyViewer {
-    }
+#PropertyViewer {}
 
-    #PropertyViewer_toolbar {
-        background: #2f2f2f;
-        border-top: 1px solid #2f2f2f;
-        }
+    #PropertyViewer_toolbar {}
 
 /******************************************************************************
  *
@@ -878,8 +870,7 @@ CueDialog {
  *
  *****************************************************************************/
 
-DisplayPreviewViewer {
-    }
+#DisplayPreviewViewer {}
 
     #DisplayPreviewViewer_label {
         background: #000;
@@ -902,27 +893,26 @@ DisplayPreviewViewer {
  *
  *****************************************************************************/
 
-NotesViewer {
-    }
+#NotesViewer {}
 
     #NotesViewer_text {
-        background: #fff8bb;
-        color: #4e352c;
+        background: #a7a7a7;
+        color: #222222;
         padding: 8px;
         border: none;
         }
 
     #NotesViewer_toolbar {
-        color: #4e352c;
-        background: #fff8bb;
-        border-top: 1px solid transparent;
+        color: #222222;
+        background: #a7a7a7;
+        border-top: 1px solid #a2a2a2;
         }
 
         #NotesViewer_label {
             padding: 8px;
             qproperty-alignment: AlignCenter AlignCenter;
             qproperty-wordWrap: true;
-            color: #4e352c;
+            color: #222222;
             }
 
 
@@ -932,7 +922,7 @@ NotesViewer {
  *
  *****************************************************************************/
 
-ConsoleViewer {
+#ConsoleViewer {
     }
 
     #ConsoleViewer_text {

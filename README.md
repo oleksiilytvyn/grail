@@ -19,7 +19,7 @@ If you want to build from source, you also need:
 
 ## Running from sources ##
 
-Change working directory to grail root and
+Change working directory to grail project root and
 execute following command in terminal:
 
     python grail.py

@@ -35,6 +35,9 @@ class _PluginMeta(object):
     # Do not list this plugin if True
     private = False
 
+    # Do not allow multiple instances
+    single_instance = False
+
     def __init__(self):
         """Initialize plugin"""
 
@@ -326,6 +329,7 @@ class Viewer(Component, _PluginMeta, metaclass=_ComponentPluginRegistry):
         """Returns QMenu with list of viewers, split options and action to remove current viewer"""
 
         menu = QMenu("Viewers", self)
+        active_viewers = [v.name for v in self.app.main_window.view_arranger._viewers]
 
         def triggered(plugin_id):
             """Action callback closure"""
@@ -339,6 +343,9 @@ class Viewer(Component, _PluginMeta, metaclass=_ComponentPluginRegistry):
 
             action = QAction(plug.name, menu)
             action.triggered.connect(triggered(plug.id))
+
+            # don't show plugin if single_instance is True and viewer already exists
+            action.setDisabled((plug.name in active_viewers) and plug.single_instance)
 
             menu.addAction(action)
 

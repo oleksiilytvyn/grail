@@ -29,6 +29,7 @@ class NodeViewer(Viewer):
     name = 'Nodes'
     author = 'Grail Team'
     description = 'View all nodes in grail file'
+    single_instance = True
 
     def __init__(self, *args):
         super(NodeViewer, self).__init__(*args)
@@ -50,7 +51,6 @@ class NodeViewer(Viewer):
         self.setObjectName("NodeViewer")
 
         self._ui_tree = _TreeWidget()
-        self._ui_tree.setObjectName('playlist_tree')
         self._ui_tree.setContextMenuPolicy(Qt.CustomContextMenu)
         self._ui_tree.itemSelectionChanged.connect(self._selection_changed)
         self._ui_tree.itemExpanded.connect(self._item_expanded)

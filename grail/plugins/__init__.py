@@ -15,12 +15,15 @@ from .osc_configurators import *
 
 # viewers
 from .empty_viewer import EmptyViewer
+
 from .library_viewer import LibraryViewer
 from .cuelist_viewer import CuelistViewer
-from .property_viewer import PropertyViewer
-from .node_viewer import NodeViewer
 from .time_viewer import TimeViewer
 from .notes_viewer import NotesViewer
+from .bible_viewer import BibleViewer
+
+from .property_viewer import PropertyViewer
+from .node_viewer import NodeViewer
 from .console_viewer import ConsoleViewer
 
 # plugins

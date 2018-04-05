@@ -472,6 +472,7 @@ class CuelistViewer(Viewer):
     name = 'Cuelist'
     author = 'Grail Team'
     description = 'Manage cuelists'
+    single_instance = True
 
     def __init__(self, *args):
         super(CuelistViewer, self).__init__(*args)

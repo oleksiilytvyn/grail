@@ -30,6 +30,7 @@ class PropertyViewer(Viewer):
     name = 'Properties'
     author = 'Grail Team'
     description = 'View properties of selected entities'
+    single_instance = True
 
     def __init__(self, *args, **kwargs):
         super(PropertyViewer, self).__init__(*args, **kwargs)

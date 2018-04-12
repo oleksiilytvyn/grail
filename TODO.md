@@ -42,7 +42,5 @@ PropertiesViewer
 - feature: better property value editor
 
 NodesViewer
-- N/A
 
 ConsoleViewer
-- feature: Python syntax highlighting

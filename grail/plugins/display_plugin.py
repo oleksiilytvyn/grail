@@ -11,6 +11,7 @@
 import math
 
 from grailkit.dna import DNA
+from grailkit.util import default_key
 
 from grail.qt import *
 from grail.core import Plugin, Viewer
@@ -553,7 +554,53 @@ class DisplayWidget(QWidget):
         self._plugin = None
         self._texture = None
 
+        self._scale = 0
+        self._x = 0
+        self._y = 0
+        self._dx = 0
+        self._dy = 0
+
         parent.connect('!composition/update', self.repaint)
+
+    def fit(self):
+        """Fit texture to widget size"""
+
+        if self._texture:
+            t = self._texture
+            scale = min(self.width() / t.width(), self.height() / t.height()) * 0.9
+
+            w = t.width() * scale
+            h = t.height() * scale
+
+            self._x = self.width() / 2 - w / 2
+            self._y = self.height() / 2 - h / 2
+            self._scale = scale * 100
+        else:
+            self._scale = 100
+
+        self.update()
+
+    @property
+    def scale(self):
+        """Returns scale factor"""
+
+        return self._scale
+
+    @scale.setter
+    def scale(self, value: float):
+        """Set scale factor in percent, 100 means actual texture size"""
+
+        self._scale = value
+        scale = self._scale / 100
+
+        t = self._texture
+        w = t.width() * scale
+        h = t.height() * scale
+
+        self._x = self.width() / 2 - w / 2
+        self._y = self.height() / 2 - h / 2
+
+        self.update()
 
     def paintEvent(self, event):
         """Draw display texture on widget surface"""
@@ -567,17 +614,18 @@ class DisplayWidget(QWidget):
         self._plugin = DisplayPlugin.instance()
         self._texture = self._plugin.composition if self._plugin else None
 
+        if self._texture and self._scale == 0:
+            self.fit()
+
         # draw texture
         if self._texture:
             t = self._texture.size()
-
-            scale = min(self.width() / t.width(), self.height() / t.height()) * 0.9
+            scale = self._scale / 100
 
             w = t.width() * scale
             h = t.height() * scale
-
-            x = self.width() / 2 - w / 2
-            y = self.height() / 2 - h / 2
+            x = self._x
+            y = self._y
 
             p.fillRect(QRect(x - 1, y - 1, w + 2, h + 2), Qt.red)
             p.drawImage(QRect(x, y, w, h), self._texture)
@@ -588,6 +636,40 @@ class DisplayWidget(QWidget):
                        "Texture is not available")
 
         p.end()
+
+    def mouseMoveEvent(self, event):
+        """Track mouse position"""
+
+        if 0 <= event.x() <= self.width():
+            self._x = event.x() - self._dx
+
+        if 0 <= event.y() <= self.height():
+            self._y = event.y() - self._dy
+
+    def mousePressEvent(self, event):
+        """Track mouse clicks"""
+
+        self._dx = event.x() - self._x
+        self._dy = event.y() - self._y
+
+    def mouseReleaseEvent(self, event):
+        """Track mouse clicks"""
+
+        pass
+
+    def resizeEvent(self, event):
+        """Widget is resized"""
+
+        if self._texture:
+            scale = self._scale / 100
+            t = self._texture
+            w = t.width() * scale
+            h = t.height() * scale
+
+            self._x = self.width() / 2 - w / 2
+            self._y = self.height() / 2 - h / 2
+
+        super(DisplayWidget, self).resizeEvent(event)
 
 
 class TransformWidget(QWidget):
@@ -1526,20 +1608,49 @@ class DisplayPreviewViewer(Viewer):
         self.connect('!cue/preview', self._preview)
 
         self.__ui__()
-        self._label.setText(self.get('preview-text', default=""))
+
+        self._ui_text.setText(self.get('preview-text', default=""))
+        self._ui_info_type.setText(self.get('preview-type', default="TYPE_UNKNOWN"))
+        self._ui_info_color.setIcon(Icon.colored(':/rc/live.png',
+                                                 QColor(self.get('preview-color', default="#000")),
+                                                 QColor('#e3e3e3')))
+        self._ui_info_follow.setText(self.get('preview-follow', default="N/A"))
+        self._ui_info_number.setText(self.get('preview-number', default="N/A"))
 
     def __ui__(self):
 
-        self._label = Label()
-        self._label.setAlignment(Qt.AlignCenter | Qt.AlignCenter)
-        self._label.setObjectName("DisplayPreviewViewer_label")
+        self._ui_text = Label()
+        self._ui_text.setAlignment(Qt.AlignCenter | Qt.AlignCenter)
+        self._ui_text.setObjectName("DisplayPreviewViewer_label")
 
-        self._frame = QScrollArea()
-        self._frame.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self._frame.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self._frame.setWidgetResizable(True)
-        self._frame.setStyleSheet("border: none;")
-        self._frame.setWidget(self._label)
+        self._ui_info_color = Button()
+        self._ui_info_color.setStyleSheet("background: none; border: none;")
+        self._ui_info_color.setIcon(Icon(":/rc/live.png"))
+
+        self._ui_info_type = Label("TYPE")
+
+        self._ui_info_follow = Label("Follow: ON")
+
+        self._ui_info_number = Label("1.0.0")
+
+        self._ui_info_layout = HLayout()
+        self._ui_info_layout.setSpacing(8)
+        self._ui_info_layout.setContentsMargins(4, 4, 4, 4)
+        self._ui_info_layout.addWidget(self._ui_info_color, Qt.AlignLeft)
+        self._ui_info_layout.addWidget(self._ui_info_number, Qt.AlignCenter)
+        self._ui_info_layout.addWidget(self._ui_info_type, Qt.AlignCenter)
+        self._ui_info_layout.addWidget(self._ui_info_follow, Qt.AlignCenter)
+
+        self._ui_info = QWidget()
+        self._ui_info.setObjectName("DisplayPreviewViewer_info")
+        self._ui_info.setLayout(self._ui_info_layout)
+
+        self._ui_frame = QScrollArea()
+        self._ui_frame.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self._ui_frame.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self._ui_frame.setWidgetResizable(True)
+        self._ui_frame.setStyleSheet("border: none;")
+        self._ui_frame.setWidget(self._ui_text)
 
         self._ui_view_action = QToolButton()
         self._ui_view_action.setText("View")
@@ -1552,13 +1663,36 @@ class DisplayPreviewViewer(Viewer):
         self._ui_toolbar.addStretch()
 
         self._layout = VLayout()
-        self._layout.addWidget(self._frame)
+        self._layout.addWidget(self._ui_info)
+        self._layout.addWidget(self._ui_frame)
         self._layout.addWidget(self._ui_toolbar)
 
         self.setLayout(self._layout)
 
     def _preview(self, cue):
         """Handle '!cue/preview' signal"""
+
+        dna_types = {
+            0: "TYPE_ABSTRACT",
+            10: "TYPE_BIBLE",
+            11: "TYPE_VERSE",
+            12: "TYPE_BOOK",
+            20: "TYPE_PROJECT",
+            21: "TYPE_SETTINGS",
+            22: "TYPE_CUELIST",
+            23: "TYPE_CUE",
+            24: "TYPE_LIBRARY",
+            25: "TYPE_FILE",
+            26: "TYPE_SONG",
+            31: "TYPE_LAYOUT",
+            32: "TYPE_VIEW"
+            }
+
+        dna_follow = {
+            0: "FOLLOW_OFF",
+            1: "FOLLOW_ON",
+            2: "FOLLOW_CONTINUE"
+            }
 
         if cue.type == DNA.TYPE_SONG:
             text = cue.lyrics
@@ -1567,8 +1701,27 @@ class DisplayPreviewViewer(Viewer):
         else:
             text = cue.name
 
+        info_type = default_key(dna_types, cue.type, "TYPE_UNKNOWN")
+        info_number = "N/A"
+        info_follow = "N/A"
+        info_color = "#000000"
+
+        if cue.type == DNA.TYPE_CUE:
+            info_color = cue.color
+            info_follow = default_key(dna_follow, cue.follow, "N/A")
+            info_number = str(cue.number)
+
         self.set('preview-text', text)
-        self._label.setText(text)
+        self.set('preview-type', info_type)
+        self.set('preview-follow', info_follow)
+        self.set('preview-number', info_number)
+        self.set('preview-color', info_color)
+
+        self._ui_text.setText(text)
+        self._ui_info_type.setText(info_type)
+        self._ui_info_color.setIcon(Icon.colored(':/rc/live.png', QColor(info_color), QColor('#e3e3e3')))
+        self._ui_info_follow.setText(info_follow)
+        self._ui_info_number.setText(info_number)
 
     def view_action(self):
         """Replace current view with something other"""
@@ -1593,6 +1746,16 @@ class DisplayViewer(Viewer):
 
         self._widget = DisplayWidget(self)
 
+        self._ui_fit = Button("fit")
+        self._ui_fit.clicked.connect(self._fit_clicked)
+
+        self._ui_scale_factor = QSpinBox()
+        self._ui_scale_factor.setMinimum(10)
+        self._ui_scale_factor.setMaximum(200)
+        self._ui_scale_factor.setValue(100)
+        self._ui_scale_factor.setMaximumWidth(60)
+        self._ui_scale_factor.valueChanged.connect(self._scale_changed)
+
         self._ui_view_action = QToolButton()
         self._ui_view_action.setText("View")
         self._ui_view_action.setIcon(Icon.colored(':/rc/menu.png', QColor('#555'), QColor('#e3e3e3')))
@@ -1602,6 +1765,8 @@ class DisplayViewer(Viewer):
         self._ui_toolbar.setObjectName("DisplayPreviewViewer_toolbar")
         self._ui_toolbar.addWidget(self._ui_view_action)
         self._ui_toolbar.addStretch()
+        self._ui_toolbar.addWidget(self._ui_fit)
+        self._ui_toolbar.addWidget(self._ui_scale_factor)
 
         self._layout = VLayout()
         self._layout.addWidget(self._widget)
@@ -1613,3 +1778,14 @@ class DisplayViewer(Viewer):
         """Replace current view with something other"""
 
         self.show_menu(self._ui_view_action.pos(), self._ui_toolbar)
+
+    def _fit_clicked(self):
+        """Fit button clicked"""
+
+        self._widget.fit()
+        self._ui_scale_factor.setValue(self._widget.scale)
+
+    def _scale_changed(self, value):
+        """Scale factor changed"""
+
+        self._widget.scale = float(value)

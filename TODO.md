@@ -30,10 +30,12 @@ No tasks
 Helper plugins
 
 ### NotesViewer
-- feature: save notes in project, not in viewer
+
+No tasks
 
 ### TimeViewer
-- feature: countdown to time
+
+No tasks
 
 
 
@@ -42,12 +44,12 @@ Helper plugins
 Display plugin family
 
 ### DisplayViewer
-- feature: scale factor & scroll
+
+No tasks
 
 ### PreviewViewer
-- feature: Display more information about cue (type, follow, color, name, number)
-- feature: Add display options (layout, font size)
 
+No tasks
 
 
 ## Developer Tools

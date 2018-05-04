@@ -36,6 +36,24 @@ class SongDialog(Dialog):
     def __ui__(self):
         """Create UI of this dialog"""
 
+        # header
+        self._ui_head_title = Label("Song title")
+        self._ui_head_title.setObjectName("SongDialog_head_title")
+
+        self._ui_head_subtitle = Label("Artist - Album - year")
+        self._ui_head_subtitle.setObjectName("SongDialog_head_subtitle")
+
+        self._ui_head_layout = VLayout()
+        self._ui_head_layout.setSpacing(2)
+        self._ui_head_layout.setContentsMargins(8, 4, 8, 8)
+        self._ui_head_layout.addWidget(self._ui_head_title)
+        self._ui_head_layout.addWidget(self._ui_head_subtitle)
+
+        self._ui_head = QWidget()
+        self._ui_head.setObjectName("SongDialog_head")
+        self._ui_head.setLayout(self._ui_head_layout)
+
+        # body
         self._ui_title = LineEdit()
         self._ui_title.setPlaceholderText("Song title")
 
@@ -47,6 +65,15 @@ class SongDialog(Dialog):
 
         self._ui_year = LineEdit()
         self._ui_year.setPlaceholderText("Year")
+
+        self._ui_genre = LineEdit()
+        self._ui_genre.setPlaceholderText("Genre")
+
+        self._ui_track = LineEdit()
+        self._ui_track.setPlaceholderText("Track")
+
+        self._ui_language = LineEdit()
+        self._ui_language.setPlaceholderText("Language")
 
         self._ui_lyrics = TextEdit()
         self._ui_lyrics.setPlaceholderText("Lyrics")
@@ -63,26 +90,40 @@ class SongDialog(Dialog):
         self._ui_button_cancel = Button("Cancel")
         self._ui_button_cancel.clicked.connect(self.reject_action)
 
-        self._ui_buttons = HLayout()
-        self._ui_buttons.setSpacing(10)
-        self._ui_buttons.setContentsMargins(0, 0, 0, 0)
-        self._ui_buttons.addStretch()
-        self._ui_buttons.addWidget(self._ui_button_cancel)
-        self._ui_buttons.addWidget(self._ui_button_ok)
+        self._ui_buttons_layout = HLayout()
+        self._ui_buttons_layout.setSpacing(10)
+        self._ui_buttons_layout.setContentsMargins(14, 0, 14, 14)
+        self._ui_buttons_layout.addStretch()
+        self._ui_buttons_layout.addWidget(self._ui_button_cancel)
+        self._ui_buttons_layout.addWidget(self._ui_button_ok)
 
-        self._ui_layout = QGridLayout()
-        self._ui_layout.setSpacing(8)
-        self._ui_layout.setContentsMargins(12, 12, 12, 10)
-        self._ui_layout.setColumnMinimumWidth(0, 200)
+        self._ui_buttons = QWidget()
+        self._ui_buttons.setLayout(self._ui_buttons_layout)
 
-        self._ui_layout.addWidget(self._ui_title, 1, 0, 1, 2)
-        self._ui_layout.addWidget(self._ui_album, 3, 0, 1, 2)
-        self._ui_layout.addWidget(self._ui_artist, 5, 0)
-        self._ui_layout.addWidget(self._ui_year, 5, 1)
-        self._ui_layout.addWidget(self._ui_lyrics, 7, 0, 1, 2)
-        self._ui_layout.addLayout(self._ui_buttons, 8, 0, 1, 2)
+        self._ui_body_layout = QGridLayout()
+        self._ui_body_layout.setSpacing(8)
+        self._ui_body_layout.setContentsMargins(12, 12, 12, 10)
+
+        self._ui_body_layout.addWidget(self._ui_title, 0, 0, 1, 3)
+        self._ui_body_layout.addWidget(self._ui_album, 1, 0, 1, 3)
+        self._ui_body_layout.addWidget(self._ui_artist, 2, 0, 1, 2)
+        self._ui_body_layout.addWidget(self._ui_year, 2, 2)
+        self._ui_body_layout.addWidget(self._ui_genre, 3, 0)
+        self._ui_body_layout.addWidget(self._ui_language, 3, 1)
+        self._ui_body_layout.addWidget(self._ui_track, 3, 2)
+        self._ui_body_layout.addWidget(self._ui_lyrics, 4, 0, 1, 3)
+
+        self._ui_body = Component()
+        self._ui_body.setLayout(self._ui_body_layout)
+
+        # main layout
+        self._ui_layout = VLayout()
+        self._ui_layout.addWidget(self._ui_head)
+        self._ui_layout.addWidget(self._ui_body)
+        self._ui_layout.addWidget(self._ui_buttons)
 
         self.setLayout(self._ui_layout)
+
         self.setWindowTitle('Add song')
         self.setGeometry(300, 300, 300, 400)
         self.setMinimumSize(300, 400)
@@ -108,6 +149,9 @@ class SongDialog(Dialog):
         artist = str(self._ui_artist.text())
         lyrics = str(self._ui_lyrics.toPlainText()).strip()
         year = int(''.join(x for x in self._ui_year.text() if x.isdigit()))
+        genre = str(self._ui_genre.text())
+        track = int(''.join(x for x in self._ui_track.text() if x.isdigit()))
+        language = str(self._ui_language.text())
 
         if self._mode == SongDialog.MODE_CREATE:
             entity = Application.instance().library.create(name=title, entity_type=DNA.TYPE_SONG)
@@ -119,6 +163,9 @@ class SongDialog(Dialog):
         entity.artist = artist
         entity.lyrics = lyrics
         entity.year = year
+        entity.genre = genre
+        entity.track = track
+        entity.language = language
         entity.update()
 
         self.changed.emit()
@@ -132,19 +179,31 @@ class SongDialog(Dialog):
         self.setWindowTitle("Edit song" if entity else "Add song")
 
         if entity:
+            self._ui_head_title.setText(entity.name)
+            self._ui_head_subtitle.setText("%s - %s - %d" % (entity.artist, entity.album, entity.year))
+
             self._ui_title.setText(entity.name)
             self._ui_album.setText(entity.album)
             self._ui_artist.setText(entity.artist)
             self._ui_lyrics.setText(entity.lyrics)
             self._ui_year.setText(str(entity.year))
+            self._ui_track.setText(str(entity.track))
+            self._ui_language.setText(entity.language)
+            self._ui_genre.setText(entity.genre)
 
             self._mode = SongDialog.MODE_UPDATE
         else:
+            self._ui_head_title.setText("Untitled")
+            self._ui_head_subtitle.setText("Unknown")
+
             self._ui_title.setText('')
             self._ui_album.setText('')
             self._ui_artist.setText('')
             self._ui_lyrics.setText('')
             self._ui_year.setText('')
+            self._ui_track.setText('')
+            self._ui_language.setText('')
+            self._ui_genre.setText('')
 
             self._mode = SongDialog.MODE_CREATE
 
@@ -298,7 +357,7 @@ class LibraryViewer(Viewer):
             self.emit('!cue/execute', item.object())
 
         elif event_key == Qt.Key_Z and event.modifiers() & Qt.ControlModifier:
-            # to-do: self.blackoutAction()
+            # todo: self.blackoutAction()
             pass
 
         elif event_key == Qt.Key_Down or event_key == Qt.Key_Up:
@@ -338,13 +397,15 @@ class LibraryViewer(Viewer):
         menu = QMenu("Context Menu", self)
 
         def trigger(m, a):
+            """Wrap action callback"""
+
             return lambda i: m(a)
 
         if isinstance(entity, Verse):
             pass
         else:
             if isinstance(entity, SongEntity):
-                edit_action = QAction('Edit', menu)
+                edit_action = QAction('Song info', menu)
                 edit_action.triggered.connect(trigger(self.edit_item_action, entity))
                 menu.addAction(edit_action)
 

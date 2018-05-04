@@ -168,6 +168,15 @@ class TimeViewer(Viewer):
         self._popup.showAt(QPoint(p.x() + 12, p.y()))
 
 
+class _Button(Button):
+
+    def __init__(self, *args):
+        super(_Button, self).__init__(*args)
+
+        self.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.MinimumExpanding)
+        self.setFixedWidth(90)
+
+
 class _PropertiesPopup(Popup):
 
     def __init__(self, parent=None):
@@ -184,66 +193,70 @@ class _PropertiesPopup(Popup):
         self.setBackgroundColor(QColor("#626364"))
 
         self._ui_layout = QGridLayout()
+        self._ui_layout.setContentsMargins(4, 4, 4, 4)
+        self._ui_layout.setSpacing(8)
+        self._ui_layout.setColumnStretch(1, 1)
 
         # size
         self._ui_size = QSpinBox()
         self._ui_size.setMinimum(12)
         self._ui_size.setMaximum(180)
         self._ui_size.setValue(self._viewer.style_size)
+        self._ui_size.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.MinimumExpanding)
+        self._ui_size.setMaximumWidth(90)
         self._ui_size.valueChanged.connect(self.size_changed)
 
         self._ui_size_label = Label("Text size")
-        self._ui_layout.addWidget(self._ui_size, 0, 1, Qt.AlignRight)
-        self._ui_layout.addWidget(self._ui_size_label, 0, 0, Qt.AlignLeft)
+        self._ui_layout.addWidget(self._ui_size, 0, 0)
+        self._ui_layout.addWidget(self._ui_size_label, 0, 1)
 
         # color
-        self._ui_color = Button()
+        self._ui_color = _Button()
         self._ui_color.setStyleSheet("background: %s;" % self._viewer.style_color)
         self._ui_color.clicked.connect(self.color_action)
 
         self._ui_color_label = Label("Text color")
 
-        self._ui_layout.addWidget(self._ui_color, 1, 1, Qt.AlignRight)
-        self._ui_layout.addWidget(self._ui_color_label, 1, 0, Qt.AlignLeft)
+        self._ui_layout.addWidget(self._ui_color, 1, 0)
+        self._ui_layout.addWidget(self._ui_color_label, 1, 1)
 
         # background
-        self._ui_background = Button()
+        self._ui_background = _Button()
         self._ui_background.setStyleSheet("background: %s;" % self._viewer.style_background)
         self._ui_background.clicked.connect(self.background_action)
 
         self._ui_background_label = Label("Background color")
 
-        self._ui_layout.addWidget(self._ui_background, 2, 1, Qt.AlignRight)
-        self._ui_layout.addWidget(self._ui_background_label, 2, 0, Qt.AlignLeft)
+        self._ui_layout.addWidget(self._ui_background, 2, 0)
+        self._ui_layout.addWidget(self._ui_background_label, 2, 1)
 
         # background image
-        self._ui_background_image = Button("Pick")
+        self._ui_background_image = _Button("Pick")
         self._ui_background_image.clicked.connect(self.background_image_action)
 
         self._ui_background_image_label = Label("Background image")
 
-        self._ui_layout.addWidget(self._ui_background_image, 3, 1, Qt.AlignRight)
-        self._ui_layout.addWidget(self._ui_background_image_label, 3, 0, Qt.AlignLeft)
+        self._ui_layout.addWidget(self._ui_background_image, 3, 0)
+        self._ui_layout.addWidget(self._ui_background_image_label, 3, 1)
 
         # background clear
-        self._ui_background_clear = Button("Clear")
+        self._ui_background_clear = _Button("Clear")
         self._ui_background_clear.clicked.connect(self.background_clear_action)
 
         self._ui_background_clear_label = Label("Clear background")
 
-        self._ui_layout.addWidget(self._ui_background_clear, 4, 1, Qt.AlignRight)
-        self._ui_layout.addWidget(self._ui_background_clear_label, 4, 0, Qt.AlignLeft)
+        self._ui_layout.addWidget(self._ui_background_clear, 4, 0)
+        self._ui_layout.addWidget(self._ui_background_clear_label, 4, 1)
 
         # font
-        self._ui_font = Button("Choose")
+        self._ui_font = _Button("Choose")
         self._ui_font.clicked.connect(self.font_action)
 
         self._ui_font_label = Label("Font")
 
-        self._ui_layout.addWidget(self._ui_font, 5, 1, Qt.AlignRight)
-        self._ui_layout.addWidget(self._ui_font_label, 5, 0, Qt.AlignLeft)
+        self._ui_layout.addWidget(self._ui_font, 5, 0)
+        self._ui_layout.addWidget(self._ui_font_label, 5, 1)
 
-        self._ui_layout.addWidget(Spacer(), 3, 0)
         self.setLayout(self._ui_layout)
         self.setGeometry(0, 0, 120, 170)
 

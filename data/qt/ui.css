@@ -726,6 +726,18 @@ SongDialog {
         color: #b3b3b3;
         }
 
+    #SongDialog_head {
+        background: #31343a;
+        }
+
+        #SongDialog_head_title {
+            font-size: 20pt;
+            color: #f1f1f1;
+            }
+
+        #SongDialog_head_subtitle {
+            color: #8a9fbb;
+            }
 
 /******************************************************************************
  *

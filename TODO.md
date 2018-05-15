@@ -11,8 +11,7 @@ Core plugins & viewers
 ### CuelistViewer
 - feature: cue execution according to follow type
 - feature: global execution controls, on/off for cuelist
-- feature: protocols for executing custom properties in cue (<protocol>:property-name)
-- feature: cuelist lock
+- feature: protocols for executing custom properties in cue (\<protocol>:property-name)
 - feature: custom tree view with correct labeling
 
 ### LibraryViewer

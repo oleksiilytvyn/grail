@@ -47,17 +47,20 @@ class BibleViewer(Viewer):
 
         self._ui_layout = VLayout()
 
-        self._ui_bar = Toolbar()
+        self._ui_search = SearchEdit()
+        self._ui_search.setObjectName("BibleViewer_search")
+        self._ui_search.setPlaceholderText("Search bible...")
+        self._ui_search.textChanged.connect(self._search_event)
+        self._ui_search.keyPressed.connect(self._search_key_event)
+        self._ui_search.focusOut.connect(self._search_focus_out)
 
-        self._ui_book = QComboBox()
-        self._ui_book.currentIndexChanged.connect(self._book_changed)
+        self._ui_search_layout = VLayout()
+        self._ui_search_layout.setContentsMargins(8, 8, 8, 8)
+        self._ui_search_layout.addWidget(self._ui_search)
 
-        self._ui_chapter = QComboBox()
-        self._ui_chapter.currentIndexChanged.connect(self._chapter_changed)
-
-        self._ui_bar.addWidget(self._ui_book)
-        self._ui_bar.addWidget(self._ui_chapter)
-        self._ui_bar.addStretch()
+        self._ui_search_widget = QWidget()
+        self._ui_search_widget.setObjectName("BibleViewer_search_widget")
+        self._ui_search_widget.setLayout(self._ui_search_layout)
 
         self._ui_list = List()
         self._ui_list.setWordWrap(True)
@@ -71,30 +74,22 @@ class BibleViewer(Viewer):
         self._ui_view_action.setIcon(Icon(':/rc/menu.png'))
         self._ui_view_action.clicked.connect(self.view_action)
 
+        self._ui_label = Label("")
+        self._ui_label.setObjectName("BibleViewer_label")
+        self._ui_label.setAlignment(Qt.AlignCenter)
+        self._ui_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+
         self._ui_toolbar = Toolbar()
         self._ui_toolbar.addWidget(self._ui_view_action)
-        self._ui_toolbar.addStretch()
+        self._ui_toolbar.addWidget(self._ui_label)
 
-        self._ui_layout.addWidget(self._ui_bar)
+        self._ui_layout.addWidget(self._ui_search_widget)
         self._ui_layout.addWidget(self._ui_list)
         self._ui_layout.addWidget(self._ui_toolbar)
 
         self.setLayout(self._ui_layout)
 
         self.update_list(self.book, self.chapter)
-        self.update_bar()
-
-    def update_bar(self):
-        """Update book and chapter drop downs"""
-
-        self._ui_book.clear()
-        self._ui_chapter.clear()
-
-        for book in self.bible.books():
-            self._ui_book.addItem(book.name, book.id)
-
-        for chapter in range(1, self.bible.count_chapters(book=self.book) + 1):
-            self._ui_chapter.addItem(str(chapter), chapter)
 
     def update_list(self, book, chapter):
         """Update list"""
@@ -104,7 +99,13 @@ class BibleViewer(Viewer):
 
         self._ui_list.clear()
 
+        flag = True
+
         for verse in self.bible.chapter(book, chapter):
+            if flag:
+                self._ui_label.setText("%s %d" % (verse.book, chapter))
+                flag = False
+
             item = ListItem()
             item.setText("%d. %s" % (verse.verse, verse.text))
             item.setObject(verse)
@@ -159,18 +160,79 @@ class BibleViewer(Viewer):
 
         menu.exec_(self._ui_list.mapToGlobal(pos))
 
-    def _book_changed(self, index):
+    def _search_event(self, keyword):
+        """Triggered when user types something in search field"""
 
-        book_id = self._ui_book.itemData(index)
+        self._ui_list.clear()
+        self._ui_label.setText("")
 
-        self.update_list(book_id, 1)
-        self._ui_chapter.clear()
+        icon_bible = Icon.colored(':/rc/book.png', QColor('#03A9F4'), QColor('#e3e3e3'))
 
-        for chapter in range(1, self.bible.count_chapters(book=book_id) + 1):
-            self._ui_chapter.addItem(str(chapter), chapter)
+        if not keyword:
+            self.update_list(self.book, self.chapter)
 
-    def _chapter_changed(self, index):
+            return
 
-        chapter_id = self._ui_book.itemData(index)
+        # Show bible full text search
+        for verse in self.bible.match_text(keyword, limit=3):
+            striped_keyword = keyword.lstrip().rstrip().lower()
+            striped_text = verse.text.lower()
+            start_index = striped_text.index(striped_keyword)
 
-        self.update_list(self.book, chapter_id)
+            item = ListItem()
+            item.setIcon(icon_bible)
+            item.setText("...%s" % verse.text[start_index:])
+            item.setObject(verse)
+
+            self._ui_list.addItem(item)
+
+        # show bible chapter by reference
+        ref = self.bible.match_reference(keyword, limit=1)
+
+        if ref and len(ref) > 0:
+            ref = ref[0]
+
+            self._ui_label.setText("%s %d" % (ref.book, ref.chapter))
+
+            for verse in self.bible.chapter(ref.book_id, ref.chapter):
+                item = ListItem()
+                item.setText("%d. %s" % (verse.verse, verse.text))
+                item.setObject(verse)
+
+                self._ui_list.addItem(item)
+
+    def _search_key_event(self, event):
+        """Process key evens before search menu_action begins"""
+
+        event_key = event.key()
+
+        if event_key == Qt.Key_Return:
+            item = self._ui_list.item(0)
+
+            if item:
+                self.emit('!cue/execute', item.object())
+
+        elif event_key == Qt.Key_Down or event_key == Qt.Key_Up:
+            # if we have number at the end increment or decrement when Up or Down keys pressed
+            keyword = str(self._ui_search.text())
+
+            def down(match):
+                return str(max(int(match.group(0)) - 1, 1))
+
+            def up(match):
+                return str(int(match.group(0)) + 1)
+
+            keyword = re.sub(r'([0-9]+)$', down if event_key == Qt.Key_Down else up, keyword)
+
+            self._ui_search.setText(keyword)
+
+        elif event_key == Qt.Key_Escape:
+            # clear field on Escape key
+            self._ui_search.setText("")
+
+    def _search_focus_out(self, event):
+        """Focus on first item in list after Tab pressed"""
+
+        if event.reason() == Qt.TabFocusReason and event.lostFocus():
+            self._ui_list.setCurrentRow(0)
+            self._ui_list.setFocus()

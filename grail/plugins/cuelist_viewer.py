@@ -9,6 +9,7 @@
     :license: GNU, see LICENSE for more details.
 """
 import re
+from functools import wraps
 
 from grailkit.dna import DNA, CueEntity
 from grailkit.osc import OSCMessage, OSCBundle
@@ -16,6 +17,21 @@ from grailkit.osc import OSCMessage, OSCBundle
 from grail.core import Viewer
 from grail.ui import PropertiesView
 from grail.qt import *
+
+
+def guard_lock(func):
+    """Prevent cuelist from editing"""
+
+    @wraps(func)
+    def wrapper(self, *args, **kwargs):
+        """Replace original method"""
+
+        if self._locked:
+            return False
+        else:
+            return func(self, *args, **kwargs)
+
+    return wrapper
 
 
 class CuelistDialog(Popup):
@@ -555,6 +571,10 @@ class CuelistViewer(Viewer):
         self._ui_view_action.setIcon(Icon(':/rc/menu.png'))
         self._ui_view_action.clicked.connect(self.view_action)
 
+        self._ui_lock_action = QAction(Icon(':/rc/lock.png'), 'Lock cuelist', self)
+        self._ui_lock_action.setIconVisibleInMenu(True)
+        self._ui_lock_action.triggered.connect(self.lock_action)
+
         self._ui_add_action = QAction(Icon(':/rc/add.png'), 'Add new Cue', self)
         self._ui_add_action.setIconVisibleInMenu(True)
         self._ui_add_action.triggered.connect(self.add_action)
@@ -562,6 +582,7 @@ class CuelistViewer(Viewer):
         self._ui_toolbar = Toolbar()
         self._ui_toolbar.addWidget(self._ui_view_action)
         self._ui_toolbar.addWidget(self._ui_label)
+        self._ui_toolbar.addAction(self._ui_lock_action)
         self._ui_toolbar.addAction(self._ui_add_action)
 
         self._ui_layout.addWidget(self._ui_stack)
@@ -582,7 +603,18 @@ class CuelistViewer(Viewer):
         self._dialog.update_list()
         self._dialog.showAt(self.mapToGlobal(point))
 
-    def add_action(self):
+    def lock_action(self):
+        """Lock & unlock cuelist edit"""
+
+        self._locked = not self._locked
+
+        if self._locked:
+            self._ui_lock_action.setIcon(Icon.colored(':/rc/lock.png', QColor('#aeca4b'), QColor('#e3e3e3')))
+        else:
+            self._ui_lock_action.setIcon(QIcon(':/rc/lock.png'))
+
+    @guard_lock
+    def add_action(self, *args):
         """Add new entity to current cuelist"""
 
         cuelist = self.project.cuelist(self._cuelist_id)
@@ -590,6 +622,7 @@ class CuelistViewer(Viewer):
         if cuelist:
             cuelist.create("Untitled item", entity_type=DNA.TYPE_CUE)
 
+    @guard_lock
     def item_delete(self, item):
         """Remove cue item menu_action
 
@@ -613,6 +646,7 @@ class CuelistViewer(Viewer):
         self._update_lock = False
         self._update()
 
+    @guard_lock
     def item_edit(self, item):
         """Edit cue menu_action
 
@@ -629,6 +663,7 @@ class CuelistViewer(Viewer):
             self._cuedialog.set_entity(entity)
             self._cuedialog.showWindow()
 
+    @guard_lock
     def item_duplicate(self, item):
         """Duplicate cue menu_action
 
@@ -658,6 +693,7 @@ class CuelistViewer(Viewer):
 
         self._selected_id = new_entity.id
 
+    @guard_lock
     def item_color(self, item, color):
         """Change cue color menu_action
 
@@ -829,6 +865,7 @@ class CuelistViewer(Viewer):
         if key == 'color':
             self._update()
 
+    @guard_lock
     def _add_entity(self, entity):
         """Add entity to cuelist"""
 

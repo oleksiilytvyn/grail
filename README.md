@@ -7,9 +7,9 @@ The goal of project to provide beautiful, simple and fast application for christ
 
 ## Dependencies ##
 
-* Python 3
+* Python 3.3+
 * PyQt 5
-* grailkit (https://bitbucket.org/grailapp/grailkit)
+* grailkit (https://bitbucket.org/grailapp/grail-kit)
 
 If you want to build from source, you also need:
 

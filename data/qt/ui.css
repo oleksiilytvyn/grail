@@ -592,7 +592,7 @@ ProgressDialog {
  */
 
 Welcome {
-    background: #2f2f2f url(:/rc/welcome_bg.png) scroll no-repeat 0 0;
+    background: #2f2f2f;
     }
 
 /**
@@ -904,6 +904,40 @@ CueDialog {
         color: #f1f1f1;
         background: #000;
         border-top: 1px solid #000;
+        }
+
+/******************************************************************************
+ *
+ * @section DisplayMediaBinViewer
+ *
+ *****************************************************************************/
+
+#DisplayMediaBinViewer {}
+
+    #DisplayMediaBinViewer_list {
+        border: 0;
+        background: #222;
+        color: #f1f1f1;
+        }
+
+        #DisplayMediaBinViewer_list::item {
+            color: #e6e6e6;
+            margin: 0;
+            padding: 0;
+            border: 1px solid #626364;
+            qproperty-wordWrap: true;
+            }
+
+        #DisplayMediaBinViewer_list::item:selected {
+            background: #8a9fbb;
+            border: 1px solid #8a9fbb;
+            color: #ffffff;
+            }
+
+    #DisplayMediaBinViewer_toolbar {
+        color: #f1f1f1;
+        background: #222;
+        border-top: 1px solid #555;
         }
 
 

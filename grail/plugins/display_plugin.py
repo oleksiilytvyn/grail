@@ -8,12 +8,17 @@
     :copyright: (c) 2018 by Grail Team.
     :license: GNU, see LICENSE for more details.
 """
+import cv2
 import math
+import time
 
 from grailkit.dna import DNA
 from grailkit.util import default_key
 
 from grail.qt import *
+from PyQt5.QtMultimedia import *
+from PyQt5.QtMultimediaWidgets import *
+
 from grail.core import Plugin, Viewer
 
 
@@ -67,6 +72,9 @@ class DisplayPlugin(Plugin):
         self.connect('/comp/width', self._composition_changed)
         self.connect('/comp/height', self._composition_changed)
         self.connect('/display/disabled', self._disable_action)
+        self.connect('/media/play', self._media_play)
+        self.connect('/media/stop', self._media_stop)
+        self.connect('/media/source', self._media_source)
 
         desktop = QApplication.desktop()
         desktop.resized.connect(self._screens_changed)
@@ -74,6 +82,11 @@ class DisplayPlugin(Plugin):
         desktop.workAreaResized.connect(self._screens_changed)
 
         self._composition = CompositionTexture()
+        self.video_surface = CompositionVideoSurface(self)
+
+        self.player = QMediaPlayer(None, QMediaPlayer.VideoSurface)
+        self.player.setVideoOutput(self.video_surface)
+        self.player.stateChanged.connect(lambda x: self.emit('!media/state', x))
 
         # texture update loop
         self._timer = QTimer()
@@ -93,6 +106,7 @@ class DisplayPlugin(Plugin):
 
         # render a composition
         self._composition.render()
+
         # notify others
         self.emit('!composition/update')
 
@@ -153,6 +167,26 @@ class DisplayPlugin(Plugin):
 
         self.emit('!composition/update')
 
+    def _media_source(self, source, play=False, *args):
+
+        self.player.setMedia(QMediaContent(QUrl.fromLocalFile(source)))
+
+        if play:
+            self.player.play()
+
+    def _media_play(self):
+
+        if self.player.state() == QMediaPlayer.PlayingState:
+            self.player.pause()
+        else:
+            self.player.play()
+
+    def _media_stop(self):
+
+        self.player.stop()
+        self._composition.set_image(None)
+        self._composition.render()
+
     @classmethod
     def instance(cls):
         """Get instance of DisplayPlugin"""
@@ -195,7 +229,7 @@ class DisplayWindow(Dialog):
         else:
             self.showNormal()
 
-        # ton the best solution, but it works
+        # not the best solution, but it works
         if p.disabled:
             self.showNormal()
             self.setGeometry(0, 0, 200, 150)
@@ -252,6 +286,7 @@ class CompositionTexture(QImage):
     def __init__(self):
 
         self._p = CompositionPreferences.instance()
+        self._image = None
 
         # create composition
         super(CompositionTexture, self).__init__(self._p.composition, QImage.Format_RGB32)
@@ -261,6 +296,56 @@ class CompositionTexture(QImage):
         signals.connect('/comp/testcard', self._testcard_cb)
         signals.connect('/clip/text/source', self._text_cb)
         signals.connect('!cue/execute', self._execute)
+
+    def render(self):
+        """Render composition"""
+
+        p = QPainter()
+        p.begin(self)
+        p.setRenderHints(QPainter.Antialiasing | QPainter.TextAntialiasing | QPainter.SmoothPixmapTransform)
+
+        p.fillRect(self.rect(), Qt.black)
+
+        if self._p.display_test:
+            p.drawPixmap(self.rect(), CompositionTexture.generate_testcard(self._p.composition.width(),
+                                                                           self._p.composition.height()))
+        else:
+            if self._image:
+                w, h = self._image.width(), self._image.height()
+                cw, ch = self._p.composition.width(), self._p.composition.height()
+                px, py, pw, ph = 0, 0, cw, ch
+
+                aspect = 'fit'
+
+                if aspect == 'stretch':
+                    px, py, pw, ph = 0, 0, cw, ch
+                elif aspect == 'fill':
+                    pix_size = self._image.size()
+                    pix_size.scale(cw, ch, Qt.KeepAspectRatioByExpanding)
+
+                    px, py = cw / 2 - pix_size.width() / 2, ch / 2 - pix_size.height() / 2
+                    pw, ph = pix_size.width(), pix_size.height()
+                elif aspect == 'fit':
+                    pix_size = self._image.size()
+                    pix_size.scale(cw, ch, Qt.KeepAspectRatio)
+
+                    px = cw / 2 - pix_size.width() / 2
+                    py = ch / 2 - pix_size.height() / 2
+                    pw, ph = pix_size.width(), pix_size.height()
+
+                p.drawImage(QRect(px, py, pw, ph), self._image)
+
+            self._draw_text(p)
+
+        p.end()
+
+    def set_image(self, image):
+
+        # This is a really bad thing, but it works
+        if image:
+            self._image = image.copy()
+        else:
+            self._image = None
 
     def _testcard_cb(self, flag=False):
         """Show test card or not"""
@@ -282,23 +367,6 @@ class CompositionTexture(QImage):
 
         self._p.text = text
         self.render()
-
-    def render(self):
-        """Render composition"""
-
-        p = QPainter()
-        p.begin(self)
-        p.setRenderHints(QPainter.Antialiasing | QPainter.TextAntialiasing | QPainter.SmoothPixmapTransform)
-
-        p.fillRect(self.rect(), Qt.black)
-
-        if self._p.display_test:
-            p.drawPixmap(self.rect(), CompositionTexture.generate_testcard(self._p.composition.width(),
-                                                                           self._p.composition.height()))
-        else:
-            self._draw_text(p)
-
-        p.end()
 
     def _draw_text(self, painter):
         """Draw text"""
@@ -395,12 +463,74 @@ class CompositionTexture(QImage):
 
         painter.setPen(Qt.white)
         painter.setFont(QFont("decorative", 24))
-        painter.drawText(box, Qt.AlignCenter | Qt.TextWordWrap,
-                         "Composition %d x %d" % (comp.width(), comp.height()))
+        painter.drawText(box, Qt.AlignCenter | Qt.TextWordWrap, "Composition %d x %d" % (comp.width(), comp.height()))
 
         painter.end()
 
         return image
+
+
+class CompositionVideoSurface(QAbstractVideoSurface):
+
+    def __init__(self, plugin):
+        super(CompositionVideoSurface, self).__init__()
+
+        self._plugin = DisplayPlugin.instance()
+        self._texture = self._plugin.composition
+        self._size = QSize(0, 0)
+        self._format = QImage.Format_Invalid
+        self._count = 0
+
+        self._plugin.connect('/comp/width', self._composition_update)
+        self._plugin.connect('/comp/height', self._composition_update)
+
+    def start(self, _format):
+
+        image_format = QVideoFrame.imageFormatFromPixelFormat(_format.pixelFormat())
+        size = _format.frameSize()
+
+        if image_format != QImage.Format_Invalid and not size.isEmpty():
+            self._format = image_format
+            self._size = size
+
+            QAbstractVideoSurface.start(self, _format)
+
+            return True
+        else:
+            return False
+
+    def present(self, frame):
+
+        self._count += 1
+
+        if frame.map(QAbstractVideoBuffer.ReadOnly):
+            image = QImage(frame.bits(), frame.width(), frame.height(), frame.bytesPerLine(), self._format)
+
+            # FIXME: the weakest point is here, if it fails application crashes.
+            #        problem with QImage sharing.
+            #        Application may crash due to data sharing on Qt side instead of deep copies.
+            self._texture.set_image(image)
+
+            frame.unmap()
+
+        return True
+
+    def supportedPixelFormats(self, handle_type):
+
+        if handle_type == QAbstractVideoBuffer.NoHandle:
+            return [QVideoFrame.Format_RGB32,
+                    QVideoFrame.Format_ARGB32,
+                    QVideoFrame.Format_ARGB32_Premultiplied,
+                    QVideoFrame.Format_RGB565,
+                    QVideoFrame.Format_RGB555]
+        else:
+            return []
+
+    def _composition_update(self, size=0):
+
+        # Connect texture if available
+        self._plugin = DisplayPlugin.instance()
+        self._texture = self._plugin.composition if self._plugin else None
 
 
 class CompositionPreferences(object):
@@ -1224,7 +1354,7 @@ class CompositionPopup(Popup):
 
         presets.extend([
             ("Full HD (1920x1080)", QSize(1920, 1080)),
-            ("HD (1366x768)", QSize(1366, 768)),
+            ("HD (1280x720)", QSize(1366, 768)),
             ("XGA (1024x768)", QSize(1024, 768)),
             ("WXGA (1280x800)", QSize(1280, 800)),
             ("SXGA (1280x1024)", QSize(1280, 1024)),
@@ -1729,6 +1859,214 @@ class DisplayPreviewViewer(Viewer):
         self.show_menu(self._ui_view_action.pos(), self._ui_toolbar)
 
 
+class MediaBinList(QListWidget):
+
+    def __init__(self):
+        super(MediaBinList, self).__init__()
+
+        self._files = []
+
+        size = 128
+
+        self.setDragEnabled(False)
+        self.setIconSize(QSize(size, size))
+        self.setSpacing(0)
+        self.setAcceptDrops(True)
+        self.setDropIndicatorShown(True)
+        self.setWrapping(True)
+        self.setLayoutMode(QListView.Batched)
+        self.setMovement(QListView.Snap)
+        self.setResizeMode(QListView.Adjust)
+        self.setBatchSize(size)
+        self.setGridSize(QSize(size, size))
+        self.setAttribute(Qt.WA_MacShowFocusRect, False)
+        self.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setViewMode(QListView.IconMode)
+        self.setContentsMargins(0, 0, 0, 0)
+
+        original = self.verticalScrollBar()
+
+        self.scrollbar = QScrollBar(Qt.Vertical, self)
+        self.scrollbar.valueChanged.connect(original.setValue)
+
+        original.valueChanged.connect(self.scrollbar.setValue)
+
+        self.update_scrollbar()
+
+    def update_scrollbar(self):
+
+        original = self.verticalScrollBar()
+
+        if original.value() == original.maximum() and original.value() == 0:
+            self.scrollbar.hide()
+        else:
+            self.scrollbar.show()
+
+        self.scrollbar.setPageStep(original.pageStep())
+        self.scrollbar.setRange(original.minimum(), original.maximum())
+        self.scrollbar.resize(8, self.rect().height())
+        self.scrollbar.move(self.rect().width() - 8, 0)
+
+    def addListItem(self, path):
+        """Add file by path to list"""
+
+        ext = path.split('.')[-1]
+
+        if path in self._files:
+            return False
+
+        if ext in ['jpg', 'jpeg', 'png', 'gif']:
+            item_pixmap = QPixmap(path)
+        elif ext in ['mp4', 'm4v', 'avi']:
+            frame = self.video_to_frames(path)
+            image = QImage(frame, frame.shape[1], frame.shape[0], frame.shape[1] * 3, QImage.Format_RGB888)
+            item_pixmap = QPixmap(image)
+        else:
+            return False
+
+        # if size is 0x0 don't load image it can broke view
+        if item_pixmap.size().isEmpty():
+            return False
+
+        item = QListWidgetItem(path.split('/')[-1])
+        item.setIcon(QIcon(item_pixmap))
+        item.setData(Qt.UserRole, path)
+        item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDragEnabled)
+
+        self._files.append(path)
+        self.addItem(item)
+
+    def video_to_frames(self, video_filename):
+        """Extract frames from video"""
+
+        cap = cv2.VideoCapture(video_filename)
+        video_length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT)) - 1
+        image = False
+
+        if cap.isOpened() and video_length > 0:
+            success, image = cap.read()
+
+        cap.release()
+
+        return image
+
+    def paintEvent(self, event):
+
+        QListWidget.paintEvent(self, event)
+        self.update_scrollbar()
+
+    def dragEnterEvent(self, event):
+
+        if event.mimeData().hasUrls():
+            event.acceptProposedAction()
+        else:
+            QListWidget.dragEnterEvent(self, event)
+
+    def dragMoveEvent(self, event):
+
+        if event.mimeData().hasUrls():
+            event.acceptProposedAction()
+        else:
+            QListWidget.dragMoveEvent(self, event)
+
+    def dropEvent(self, event):
+
+        if event.mimeData().hasUrls():
+            urls = event.mimeData().urls()
+
+            if urls:
+                for url in urls:
+                    self.addListItem(url.toLocalFile())
+
+            event.acceptProposedAction()
+
+        QListWidget.dropEvent(self, event)
+
+
+class DisplayMediaBinViewer(Viewer):
+
+    id = "display-mediabin"
+    name = "Media Bin"
+    author = "Grail Team"
+    description = "Manage displayed media"
+
+    def __init__(self, *args, **kwargs):
+        super(DisplayMediaBinViewer, self).__init__(*args, **kwargs)
+
+        self.__ui__()
+
+        self.connect('!media/state', self._media_state_cb)
+
+    def __ui__(self):
+
+        self._ui_list = MediaBinList()
+        self._ui_list.setObjectName("DisplayMediaBinViewer_list")
+
+        self._ui_list.itemDoubleClicked.connect(self.item_doubleclicked)
+
+        self._ui_view_action = QToolButton()
+        self._ui_view_action.setText("View")
+        self._ui_view_action.setIcon(Icon(':/rc/menu.png'))
+        self._ui_view_action.clicked.connect(self.view_action)
+
+        self._ui_play_action = QToolButton()
+        self._ui_play_action.setText("Play/pause")
+        self._ui_play_action.setIcon(Icon(':/rc/play.png'))
+        self._ui_play_action.clicked.connect(self.play_action)
+
+        self._ui_stop_action = QToolButton()
+        self._ui_stop_action.setText("Stop")
+        self._ui_stop_action.setIcon(Icon(':/rc/stop.png'))
+        self._ui_stop_action.clicked.connect(self.stop_action)
+
+        self._ui_toolbar = Toolbar()
+        self._ui_toolbar.setObjectName("DisplayMediaBinViewer_toolbar")
+        self._ui_toolbar.addWidget(self._ui_view_action)
+        self._ui_toolbar.addStretch()
+        self._ui_toolbar.addWidget(self._ui_play_action)
+        self._ui_toolbar.addWidget(self._ui_stop_action)
+
+        self._layout = VLayout()
+        self._layout.addWidget(self._ui_list)
+        self._layout.addWidget(self._ui_toolbar)
+
+        self.setLayout(self._layout)
+
+        self.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.customContextMenuRequested.connect(self.context_menu)
+
+    def view_action(self):
+        """Replace current view with something other"""
+
+        self.show_menu(self._ui_view_action.pos(), self._ui_toolbar)
+
+    def play_action(self):
+
+        self.emit('/media/play')
+
+    def stop_action(self):
+
+        self.emit('/media/stop')
+
+    def context_menu(self, pos):
+
+        item = self._ui_list.itemAt(pos)
+        menu = QMenu("Context Menu", self)
+
+        return menu.exec_(self.mapToGlobal(pos))
+
+    def item_doubleclicked(self, item):
+
+        self.emit('/media/source', item.data(Qt.UserRole), True)
+
+    def _media_state_cb(self, state):
+
+        self._ui_play_action.setIcon(Icon(':/rc/pause.png') if state == QMediaPlayer.PlayingState else
+                                     Icon(':/rc/play.png'))
+
+
 class DisplayViewer(Viewer):
     """View composition output as viewer"""
 
@@ -1740,7 +2078,22 @@ class DisplayViewer(Viewer):
     def __init__(self, *args, **kwargs):
         super(DisplayViewer, self).__init__(*args, **kwargs)
 
+        self._resize_event_counter = 0
+
         self.__ui__()
+
+        # fit when composition size changed
+        self.connect('/comp/width', self._composition_changed)
+        self.connect('/comp/height', self._composition_changed)
+
+    def resizeEvent(self, event):
+
+        if self._resize_event_counter > 0:
+            self._fit_clicked()
+
+        self._resize_event_counter += 1
+
+        super(DisplayViewer, self).resizeEvent(event)
 
     def __ui__(self):
 
@@ -1789,3 +2142,7 @@ class DisplayViewer(Viewer):
         """Scale factor changed"""
 
         self._widget.scale = float(value)
+
+    def _composition_changed(self, size=0):
+
+        self._fit_clicked()

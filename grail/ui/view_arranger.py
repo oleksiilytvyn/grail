@@ -70,15 +70,17 @@ class ViewArranger(Component):
         self._root = self._build(structure)
         self._layout.addWidget(self._root)
 
-    def decompose(self, _root=None):
+    def decompose(self, _root=None, _depth=0):
         """Return structure containing information about views & layouts"""
 
         splitter = _root if _root else self._root
         structure = []
-        vertical = splitter.orientation() == Qt.Vertical
 
         if not splitter:
-            return []
+            return structure
+
+        sizes = splitter.sizes()
+        vertical = splitter.orientation() == Qt.Vertical
 
         structure.append({
             'layout/type': 'layout',
@@ -89,17 +91,13 @@ class ViewArranger(Component):
             'height': splitter.height(),
             })
 
-        sizes = splitter.sizes()
-
         for index in range(len(sizes)):
             widget = splitter.widget(index)
 
             if isinstance(widget, _Splitter):
-
-                structure.append(self.decompose(widget))
+                structure.append(self.decompose(widget, _depth + 1))
 
             elif isinstance(widget, Viewer):
-
                 viewer = widget.properties()
                 viewer['view/id'] = widget.id
                 viewer['x'] = 0

@@ -31,13 +31,17 @@ class WelcomeDialog(Dialog):
     def __ui__(self):
         """Build UI"""
 
-        std_icon = QApplication.style().standardIcon
+        def std_icon(name):
+            # scale standard icon to default size
+
+            return QIcon(QPixmap(QApplication.style().standardIcon(name).pixmap(32, 32)).scaled(48, 48))
+
         grail_icon = QIcon(':/icon/256.png')
 
         create_action = WelcomeAction("Create", "New project", std_icon(QStyle.SP_FileIcon))
         create_action.clicked.connect(self._create)
 
-        open_action = WelcomeAction("Open", "Open project", std_icon(QStyle.SP_DirIcon))
+        open_action = WelcomeAction("Open", "Existing project", std_icon(QStyle.SP_DirIcon))
         open_action.clicked.connect(self._open)
 
         last_project = self.app.settings.get('project/last', default="")

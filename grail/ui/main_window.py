@@ -213,10 +213,12 @@ class MainWindow(QMainWindow):
     def _arranger_updated(self, _structure=None, _root=None):
         """Layout of arranger is changed"""
 
-        structure = _structure if _structure else self.view_arranger.decompose()
-        layout = structure[0]
-        views = structure[1:]
         root = self.project.dna if not _root else _root
+        structure = _structure if _structure else self.view_arranger.decompose()
+        layout = structure[0] if len(structure) > 0 else {}
+        views = structure[1:] if len(structure) > 0 else []
+
+        # todo: check, application may be opened without any viewers
 
         if not _root:
             # remove old layout entity

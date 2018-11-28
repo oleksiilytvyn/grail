@@ -12,6 +12,7 @@ Thumbs.db
 *.db-journal
 
 bin/*
+venv/*
 dist/*.exe
 dist/*.msi
 dist/*.dmg

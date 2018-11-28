@@ -47,8 +47,8 @@ STYLES = {
 
 
 class PythonHighlighter(QSyntaxHighlighter):
-    """Syntax highlighter for the Python language.
-    """
+    """Syntax highlighter for the Python language."""
+
     # Python keywords
     keywords = [
         'and', 'assert', 'break', 'class', 'continue', 'def',

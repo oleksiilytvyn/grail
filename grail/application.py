@@ -11,8 +11,9 @@
 import io
 import os
 import sys
-import tempfile
 import logging
+import tempfile
+import subprocess
 
 from PyQt5.QtCore import QFile
 
@@ -56,8 +57,6 @@ class Grail(Application):
 
         self._plugins = []
         self._actions = []
-        self._relaunch = False
-        self._relaunch_args = []
         self._settings = SettingsFile(grail.SETTINGS_PATH, create=True)
         self._osc_host = OSCHost()
         self._midi_host = None
@@ -65,6 +64,7 @@ class Grail(Application):
         self._library = None
         self._bible = None
         self._signals = Signalable()
+        self._launched = False
 
         self.change_bible(self.settings.get('bible/default', ""))
 
@@ -154,11 +154,15 @@ class Grail(Application):
         """Open a file"""
 
         if not path:
+            message = MessageDialog(title="Can't open file",
+                                    text="File at location %s not exists." % path,
+                                    icon=MessageDialog.Critical)
+            message.exec_()
+
             return False
 
         if self.main_window:
-            self._relaunch = True
-            self._relaunch_args = [path, '-c']
+            self.welcome_dialog.show()  # trick for keeping Qt alive
             self.main_window.close()
 
         self._project = Project(path, create=create)
@@ -169,17 +173,20 @@ class Grail(Application):
         self.main_window = MainWindow(self)
         self.main_window.show()
 
-        self.welcome_dialog.close()
+        self.welcome_dialog.hide()
 
-        self._plugins = []
-        self._actions = []
+        if not self._launched:
+            self._plugins = []
+            self._actions = []
 
-        # launch plugins and store them into list
-        # this code prevents from GC on qt widgets
-        for plug in Plugin.plugins():
-            instance = plug()
+            # launch plugins and store them into list
+            # this code prevents from GC on qt widgets
+            for plug in Plugin.plugins():
+                instance = plug()
 
-            self._plugins.append(instance)
+                self._plugins.append(instance)
+
+        self._launched = True
 
     def _closed(self):
         """Called when all windows closed"""
@@ -192,10 +199,6 @@ class Grail(Application):
 
         if self._settings:
             self._settings.close()
-
-        if self._relaunch:
-            python = sys.executable
-            os.execl(python, python, sys.argv[0], *self._relaunch_args)
 
     def change_bible(self, bible_id):
         """Change bible on the fly

@@ -20,7 +20,7 @@ from PyQt5.QtCore import QFile, QIODevice
 from PyQt5.QtGui import QPixmap, QGuiApplication
 from cx_Freeze import setup, Executable
 
-import grail
+from grail import __version__ as GRAIL_VERSION
 
 
 # os constants
@@ -41,13 +41,13 @@ if '!fix-png' in USER_ARGS:
 def get_revision():
     """try to add revision number to version string"""
 
-    revision = grail.__version__
+    revision = GRAIL_VERSION
 
     try:
         import hgapi
 
         repository = hgapi.Repo(os.path.abspath(os.curdir))
-        revision = "%sb%d" % (grail.__version__, repository['tip'].rev)
+        revision = "%sb%d" % (GRAIL_VERSION, repository['tip'].rev)
     except ImportError:
         print("Failed to get revision number. Install 'hgapi' module.")
     except Exception as error:

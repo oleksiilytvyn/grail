@@ -16,8 +16,6 @@ import sys
 import grailkit
 from grailkit.util import data_location, application_location
 
-from grail.application import Grail
-
 __version__ = '1.0.2'
 
 APPLICATION_NAME = "Grail"
@@ -33,6 +31,8 @@ DEBUG = True
 
 def main():
     """Run Grail application from location of installation"""
+
+    from grail.application import Grail
 
     os.chdir(application_location())
 

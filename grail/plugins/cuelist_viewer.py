@@ -965,7 +965,8 @@ class CuelistViewer(Viewer):
         bundle.add(OSCMessage(address='/cue/parent', args=[cue.parent]))
 
         name = OSCMessage(address='/cue/name')
-        name.add(bytes(cue.name, 'utf-8'))
+        # Blob value cannot be empty, so we replace it with one space
+        name.add(bytes(cue.name if len(cue.name) > 0 else " ", 'utf-8'))
         bundle.add(name)
 
         for key, value in cue.properties().items():

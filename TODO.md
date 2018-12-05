@@ -2,8 +2,6 @@
 
 Here is a list of planned features and things waiting for implementation or fix.
 
-
-
 ## Core
 
 Core plugins & viewers

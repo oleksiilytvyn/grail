@@ -1,4 +1,5 @@
-![grail.png](https://bitbucket.org/repo/xxy864/images/3941624082-grail.png)
+![grail.png](/icon/grail.png)
+
 
 # Grail #
 
@@ -9,7 +10,7 @@ The goal of project to provide beautiful, simple and fast application for christ
 
 * Python 3.3+
 * PyQt 5
-* grailkit (https://bitbucket.org/grailapp/grail-kit)
+* grailkit (https://bitbucket.org/alexlitvin/grailkit)
 
 If you want to build from source, you also need:
 

@@ -178,19 +178,19 @@ BUNDLE_FILE = "%s.app" % (BUNDLE_NAME,)
 BUNDLE_CONTENTS = "build/%s/Contents" % BUNDLE_FILE
 BUNDLE_RESOURCES = "%s/Resources" % BUNDLE_CONTENTS
 
-includes = ["atexit"]
-excludes = ["nt",
+packages = []
+includes = ['atexit', 'PyQt5.QtNetwork']
+excludes = ['nt',
             'pdb',
             '_ssl',
             "Pyrex",
-            "ntpath",
             'doctest',
             "tkinter",
             'pyreadline',
-            "matplotlib",
-            "scipy.linalg",
-            "scipy.special",
-            "numpy.core._dotblas"]
+            'matplotlib',
+            'scipy.linalg',
+            'scipy.special',
+            'numpy']
 
 files = [('LICENSE', 'LICENSE'),
          ('build/.version', '.version')]
@@ -251,7 +251,9 @@ setup(
             "include_files": files,
             "include_msvcr": True,
             "excludes": excludes,
-            "silent": True
+            "silent": True,
+            "packages": packages,
+            'zip_include_packages': 'PyQt5'
             },
         "bdist_msi": {
             "add_to_path": True,
@@ -260,7 +262,8 @@ setup(
         "bdist_mac": {
             "bundle_name": BUNDLE_NAME,
             "custom_info_plist": "data/dist/Info.plist",
-            "iconfile": "data/icon/grail.icns"
+            "iconfile": "data/icon/grail.icns",
+            "packages": packages
             },
         "bdist_dmg": {
             "volume_label": TITLE,

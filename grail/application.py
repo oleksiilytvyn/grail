@@ -175,16 +175,23 @@ class Grail(Application):
 
         self.welcome_dialog.hide()
 
-        if not self._launched:
-            self._plugins = []
-            self._actions = []
+        if self._launched:
+            for action in self._actions:
+                del action
 
-            # launch plugins and store them into list
-            # this code prevents from GC on qt widgets
-            for plug in Plugin.plugins():
-                instance = plug()
+            for plug in self._plugins:
+                plug.unloaded()
+                del plug
 
-                self._plugins.append(instance)
+        self._plugins = []
+        self._actions = []
+
+        # launch plugins and store them into list
+        # this code prevents from GC on qt widgets
+        for plug in Plugin.plugins():
+            instance = plug()
+
+            self._plugins.append(instance)
 
         self._launched = True
 

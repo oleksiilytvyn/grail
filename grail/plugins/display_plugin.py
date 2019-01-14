@@ -8,12 +8,11 @@
     :copyright: (c) 2018 by Grail Team.
     :license: GNU, see LICENSE for more details.
 """
-import cv2
 import math
-import time
 
 from grailkit.dna import DNA
 from grailkit.util import default_key
+from grailkit.core import Signal
 
 from grail.qt import *
 from PyQt5.QtMultimedia import *
@@ -1859,12 +1858,99 @@ class DisplayPreviewViewer(Viewer):
         self.show_menu(self._ui_view_action.pos(), self._ui_toolbar)
 
 
+class GrabberVideoSurface(QAbstractVideoSurface):
+
+    def __init__(self, parent):
+        super(GrabberVideoSurface, self).__init__()
+
+        self._size = QSize(0, 0)
+        self._format = QImage.Format_Invalid
+        self._count = 0
+        self._parent = parent
+        self.image = None
+
+    def start(self, _format):
+
+        image_format = QVideoFrame.imageFormatFromPixelFormat(_format.pixelFormat())
+        size = _format.frameSize()
+
+        if image_format != QImage.Format_Invalid and not size.isEmpty():
+            self._format = image_format
+            self._size = size
+
+            QAbstractVideoSurface.start(self, _format)
+
+            return True
+        else:
+            return False
+
+    def present(self, frame):
+
+        self._count += 1
+
+        if frame.map(QAbstractVideoBuffer.ReadOnly):
+            self.image = QImage(frame.bits(), frame.width(), frame.height(), frame.bytesPerLine(), self._format)
+
+            self._parent.updated.emit()
+
+            frame.unmap()
+
+        return True
+
+    def supportedPixelFormats(self, handle_type):
+
+        if handle_type == QAbstractVideoBuffer.NoHandle:
+            return [QVideoFrame.Format_RGB32,
+                    QVideoFrame.Format_ARGB32,
+                    QVideoFrame.Format_ARGB32_Premultiplied,
+                    QVideoFrame.Format_RGB565,
+                    QVideoFrame.Format_RGB555]
+        else:
+            return []
+
+
+class FrameGrabber:
+
+    _instance = None
+
+    def __init__(self):
+
+        self.video_surface = GrabberVideoSurface(self)
+
+        self.player = QMediaPlayer(None, QMediaPlayer.VideoSurface)
+        self.player.setVideoOutput(self.video_surface)
+        self.player.setPlaybackRate(0.33)
+        self.player.setMuted(True)
+
+        self.updated = Signal()
+
+    def load(self, path):
+
+        self.player.setMedia(QMediaContent(QUrl.fromLocalFile(path)))
+        self.player.play()
+        self.player.setPosition(500)
+        self.player.pause()
+
+    def grab(self):
+        """Returns QImage, a random frame from video"""
+
+        return self.video_surface.image
+
+    @classmethod
+    def instance(cls):
+        if not cls._instance:
+            cls._instance = cls()
+
+        return cls._instance
+
+
 class MediaBinList(QListWidget):
 
     def __init__(self):
         super(MediaBinList, self).__init__()
 
         self._files = []
+        self._files_stack = []
 
         size = 128
 
@@ -1893,6 +1979,9 @@ class MediaBinList(QListWidget):
 
         original.valueChanged.connect(self.scrollbar.setValue)
 
+        self.grabber = FrameGrabber.instance()
+        self.grabber.updated.connect(lambda: self._frame_received())
+
         self.update_scrollbar()
 
     def update_scrollbar(self):
@@ -1908,49 +1997,6 @@ class MediaBinList(QListWidget):
         self.scrollbar.setRange(original.minimum(), original.maximum())
         self.scrollbar.resize(8, self.rect().height())
         self.scrollbar.move(self.rect().width() - 8, 0)
-
-    def addListItem(self, path):
-        """Add file by path to list"""
-
-        ext = path.split('.')[-1]
-
-        if path in self._files:
-            return False
-
-        if ext in ['jpg', 'jpeg', 'png', 'gif']:
-            item_pixmap = QPixmap(path)
-        elif ext in ['mp4', 'm4v', 'avi']:
-            frame = self.video_to_frames(path)
-            image = QImage(frame, frame.shape[1], frame.shape[0], frame.shape[1] * 3, QImage.Format_RGB888)
-            item_pixmap = QPixmap(image)
-        else:
-            return False
-
-        # if size is 0x0 don't load image it can broke view
-        if item_pixmap.size().isEmpty():
-            return False
-
-        item = QListWidgetItem(path.split('/')[-1])
-        item.setIcon(QIcon(item_pixmap))
-        item.setData(Qt.UserRole, path)
-        item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDragEnabled)
-
-        self._files.append(path)
-        self.addItem(item)
-
-    def video_to_frames(self, video_filename):
-        """Extract frames from video"""
-
-        cap = cv2.VideoCapture(video_filename)
-        video_length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT)) - 1
-        image = False
-
-        if cap.isOpened() and video_length > 0:
-            success, image = cap.read()
-
-        cap.release()
-
-        return image
 
     def paintEvent(self, event):
 
@@ -1971,18 +2017,65 @@ class MediaBinList(QListWidget):
         else:
             QListWidget.dragMoveEvent(self, event)
 
+    def add_item_with_pixmap(self, path, pixmap):
+
+        # if size is 0x0 don't load image it can broke view
+        if pixmap.size().isEmpty():
+            return False
+
+        item = QListWidgetItem(path.split('/')[-1])
+        item.setIcon(QIcon(pixmap))
+        item.setData(Qt.UserRole, path)
+        item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDragEnabled)
+
+        self._files.append(path)
+        self.addItem(item)
+
+    def _process_files(self):
+
+        if len(self._files_stack) == 0:
+            return False
+
+        path = self._files_stack[0]
+        ext = path.split('.')[-1]
+
+        if ext in ['jpg', 'jpeg', 'png', 'gif']:
+            pixmap = QPixmap(path)
+            path = self._files_stack.pop(0)
+
+            self.add_item_with_pixmap(path, pixmap)
+            self._process_files()
+        elif ext in ['mp4', 'm4v', 'avi']:
+            self.grabber.load(path)
+
+    def _frame_received(self):
+
+        pixmap = QPixmap(self.grabber.grab())
+        path = self._files_stack.pop(0)
+
+        self.add_item_with_pixmap(path, pixmap)
+        self._process_files()
+
     def dropEvent(self, event):
 
         if event.mimeData().hasUrls():
-            urls = event.mimeData().urls()
 
-            if urls:
-                for url in urls:
-                    self.addListItem(url.toLocalFile())
+            for url in event.mimeData().urls():
+                path = str(url.toLocalFile())
+
+                # skip already added files
+                if path in self._files:
+                    continue
+
+                self._files.append(path)
+
+                # add files for later processing
+                self._files_stack.append(path)
 
             event.acceptProposedAction()
 
         QListWidget.dropEvent(self, event)
+        self._process_files()
 
 
 class DisplayMediaBinViewer(Viewer):

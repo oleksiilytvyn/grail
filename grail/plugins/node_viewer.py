@@ -5,7 +5,7 @@
 
     This plugin for developers who want to see whats going on with nodes
 
-    :copyright: (c) 2018 by Grail Team.
+    :copyright: (c) 2016-2019 by Alex Litvin.
     :license: GNU, see LICENSE for more details.
 """
 from collections import defaultdict
@@ -70,14 +70,14 @@ class NodeViewer(Viewer):
         self._ui_view_action.setIcon(QIcon(':/rc/menu.png'))
         self._ui_view_action.clicked.connect(self.view_action)
 
-        self._ui_toolbar = Toolbar()
+        self._ui_toolbar = QToolBar()
         self._ui_toolbar.setObjectName("NodeViewer_toolbar")
         self._ui_toolbar.addWidget(self._ui_view_action)
         self._ui_toolbar.addStretch()
         self._ui_toolbar.addAction(self._ui_remove_action)
         self._ui_toolbar.addAction(self._ui_add_action)
 
-        self._ui_layout = VLayout()
+        self._ui_layout = QVBoxLayout()
         self._ui_layout.addWidget(self._ui_tree)
         self._ui_layout.addWidget(self._ui_toolbar)
 
@@ -98,7 +98,7 @@ class NodeViewer(Viewer):
             nonlocal system_icon
 
             for child in dna.childs(parent_id):
-                child_item = TreeItem(child)
+                child_item = QTreeWidgetItem(child)
                 child_item.setText(0, child.name)
 
                 if child.type in self._system_types:
@@ -111,7 +111,7 @@ class NodeViewer(Viewer):
                 tree_item.addChild(child_item)
 
         for entity in dna.childs(0):
-            item = TreeItem(entity)
+            item = QTreeWidgetItem(entity)
             item.setText(0, entity.name)
 
             add_childs(item, entity.id)
@@ -213,7 +213,7 @@ class NodeViewer(Viewer):
             self.emit('!node/selected', above)
 
 
-class _TreeWidget(Tree):
+class _TreeWidget(QTreeWidget):
 
     def __init__(self, *args):
         super(_TreeWidget, self).__init__(*args)

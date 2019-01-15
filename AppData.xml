@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Copyright 2017 Oleksii Lytvyn <programer95@gmail.com> -->
+<!-- Copyright 2017 Alex Litvin <programer95@gmail.com> -->
 <component type="desktop">
     <id>com.bitbucket.grailapp.grail.desktop</id>
     <metadata_license>CC0</metadata_license>
@@ -11,7 +11,7 @@
         The goal of project to provide beautiful, simple and fast application for christian community.</p>
     </description>
 
-    <developer_name>Oleksii Lytvyn</developer_name>
+    <developer_name>Alex Litvin</developer_name>
     <url type="homepage">http://grailapp.com/</url>
 
     <custom>

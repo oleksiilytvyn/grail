@@ -5,7 +5,7 @@
 
     Node properties viewer
 
-    :copyright: (c) 2018 by Grail Team.
+    :copyright: (c) 2016-2019 by Alex Litvin.
     :license: GNU, see LICENSE for more details.
 """
 from grail.qt import *
@@ -76,7 +76,7 @@ class PropertyViewer(Viewer):
         self._ui_view_action.clicked.connect(self.view_action)
 
         # Toolbar
-        self._ui_toolbar = Toolbar()
+        self._ui_toolbar = QToolBar()
         self._ui_toolbar.setObjectName("PropertyViewer_toolbar")
         self._ui_toolbar.addWidget(self._ui_view_action)
         self._ui_toolbar.addStretch()
@@ -85,7 +85,7 @@ class PropertyViewer(Viewer):
         self._ui_toolbar.addAction(self._ui_add_action)
 
         # Layout
-        self._ui_layout = VLayout()
+        self._ui_layout = QVBoxLayout()
 
         self._ui_layout.addWidget(self._ui_properties)
         self._ui_layout.addWidget(self._ui_toolbar)

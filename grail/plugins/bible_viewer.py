@@ -5,7 +5,7 @@
 
     View and search bible
 
-    :copyright: (c) 2018 by Grail Team.
+    :copyright: (c) 2016-2019 by Alex Litvin.
     :license: GNU, see LICENSE for more details.
 """
 import re
@@ -45,16 +45,16 @@ class BibleViewer(Viewer):
 
         self.setObjectName("BibleViewer")
 
-        self._ui_layout = VLayout()
+        self._ui_layout = QVBoxLayout()
 
-        self._ui_search = SearchEdit()
+        self._ui_search = QSearchEdit()
         self._ui_search.setObjectName("BibleViewer_search")
         self._ui_search.setPlaceholderText("Search bible...")
         self._ui_search.textChanged.connect(self._search_event)
         self._ui_search.keyPressed.connect(self._search_key_event)
         self._ui_search.focusOut.connect(self._search_focus_out)
 
-        self._ui_search_layout = VLayout()
+        self._ui_search_layout = QVBoxLayout()
         self._ui_search_layout.setContentsMargins(8, 8, 8, 8)
         self._ui_search_layout.addWidget(self._ui_search)
 
@@ -62,7 +62,7 @@ class BibleViewer(Viewer):
         self._ui_search_widget.setObjectName("BibleViewer_search_widget")
         self._ui_search_widget.setLayout(self._ui_search_layout)
 
-        self._ui_list = List()
+        self._ui_list = QListWidget()
         self._ui_list.setWordWrap(True)
         self._ui_list.setContextMenuPolicy(Qt.CustomContextMenu)
         self._ui_list.currentItemChanged.connect(self._item_clicked)
@@ -74,12 +74,12 @@ class BibleViewer(Viewer):
         self._ui_view_action.setIcon(Icon(':/rc/menu.png'))
         self._ui_view_action.clicked.connect(self.view_action)
 
-        self._ui_label = Label("")
+        self._ui_label = QLabel("")
         self._ui_label.setObjectName("BibleViewer_label")
         self._ui_label.setAlignment(Qt.AlignCenter)
         self._ui_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
-        self._ui_toolbar = Toolbar()
+        self._ui_toolbar = QToolBar()
         self._ui_toolbar.addWidget(self._ui_view_action)
         self._ui_toolbar.addWidget(self._ui_label)
 
@@ -106,7 +106,7 @@ class BibleViewer(Viewer):
                 self._ui_label.setText("%s %d" % (verse.book, chapter))
                 flag = False
 
-            item = ListItem()
+            item = QListWidgetItem()
             item.setText("%d. %s" % (verse.verse, verse.text))
             item.setObject(verse)
 
@@ -179,7 +179,7 @@ class BibleViewer(Viewer):
             striped_text = verse.text.lower()
             start_index = striped_text.index(striped_keyword)
 
-            item = ListItem()
+            item = QListWidgetItem()
             item.setIcon(icon_bible)
             item.setText("...%s" % verse.text[start_index:])
             item.setObject(verse)
@@ -195,7 +195,7 @@ class BibleViewer(Viewer):
             self._ui_label.setText("%s %d" % (ref.book, ref.chapter))
 
             for verse in self.bible.chapter(ref.book_id, ref.chapter):
-                item = ListItem()
+                item = QListWidgetItem()
                 item.setText("%d. %s" % (verse.verse, verse.text))
                 item.setObject(verse)
 

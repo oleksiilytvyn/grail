@@ -5,23 +5,18 @@
 
     Main window of Grail application
 
-    :copyright: (c) 2018 by Grail Team.
+    :copyright: (c) 2016-2019 by Alex Litvin.
     :license: GNU, see LICENSE for more details.
 """
-
 import json
-
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
 
 from grailkit.dna import DNA, DNAError, Library
 from grailkit.util import *
 from grailkit.bible import BibleHost, BibleHostError
 
 import grail
-from grail.ui import ActionsDialog, PreferencesDialog, ViewArranger, ProjectDialog
-from grail.qt import AboutDialog, MessageDialog, Application, ProgressDialog
+from grail.qt import *
+from grail.ui import ActionsDialog, PreferencesDialog, ViewArranger, ProjectDialog, AboutDialog
 
 
 class MainWindow(QMainWindow):

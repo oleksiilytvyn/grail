@@ -5,7 +5,7 @@
 
     View and edit cuelists
 
-    :copyright: (c) 2018 by Grail Team.
+    :copyright: (c) 2016-2019 by Alex Litvin.
     :license: GNU, see LICENSE for more details.
 """
 import re
@@ -34,7 +34,7 @@ def guard_lock(func):
     return wrapper
 
 
-class CuelistDialog(Popup):
+class CuelistDialog(QPopup):
     """Displays list of Cuelist's"""
 
     selected = pyqtSignal(int)
@@ -69,7 +69,7 @@ class CuelistDialog(Popup):
         self._ui_add_action.setIconVisibleInMenu(True)
         self._ui_add_action.triggered.connect(self.add_action)
 
-        self._ui_toolbar = Toolbar()
+        self._ui_toolbar = QToolBar()
         self._ui_toolbar.setObjectName("cuelist_dialog_toolbar")
         self._ui_toolbar.addAction(self._ui_edit_action)
         self._ui_toolbar.addStretch()
@@ -271,7 +271,7 @@ class CuelistsListWidget(QTableWidget):
         self.scrollToItem(self.item(x, 0))
 
 
-class CueDialog(Dialog):
+class CueDialog(QDialog):
     """Cue editor dialog"""
 
     def __init__(self, viewer):
@@ -304,14 +304,14 @@ class CueDialog(Dialog):
             return lambda: self._follow_changed(menu_action.data())
 
         # General section
-        self._ui_text = TextEdit()
+        self._ui_text = QTextEdit()
         self._ui_text.setPlaceholderText("Name")
         self._ui_text.setAttribute(Qt.WA_MacShowFocusRect, 0)
         self._ui_text.setAcceptRichText(False)
         self._ui_text.sizePolicy().setVerticalStretch(1)
         self._ui_text.setMinimumHeight(120)
 
-        self._ui_number = LineEdit()
+        self._ui_number = QLineEdit()
         self._ui_number.setPlaceholderText("Number")
         self._ui_number.setValidator(QDoubleValidator(0, 1000, 2, self))
         self._ui_number.setMaximumWidth(80)
@@ -325,7 +325,7 @@ class CueDialog(Dialog):
 
             self._ui_color_menu.addAction(action)
 
-        self._ui_color = Button("")
+        self._ui_color = QPushButton("")
         self._ui_color.setStyleSheet("background: none; border: none;")
         self._ui_color.setIcon(Icon(":/rc/live.png"))
         self._ui_color.setMenu(self._ui_color_menu)
@@ -339,20 +339,20 @@ class CueDialog(Dialog):
 
             self._ui_follow_menu.addAction(action)
 
-        self._ui_follow = Button("Follow")
+        self._ui_follow = QPushButton("Follow")
         self._ui_follow.setMenu(self._ui_follow_menu)
 
-        self._ui_pre_wait = LineEdit()
+        self._ui_pre_wait = QLineEdit()
         self._ui_pre_wait.setValidator(QDoubleValidator(0, 1000, 2, self))
         self._ui_pre_wait.setPlaceholderText("Pre wait")
         self._ui_pre_wait.setMaximumWidth(80)
 
-        self._ui_post_wait = LineEdit()
+        self._ui_post_wait = QLineEdit()
         self._ui_post_wait.setValidator(QDoubleValidator(0, 1000, 2, self))
         self._ui_post_wait.setPlaceholderText("Post wait")
         self._ui_post_wait.setMaximumWidth(80)
 
-        self._ui_opt_layout = HLayout()
+        self._ui_opt_layout = QHBoxLayout()
         self._ui_opt_layout.setSpacing(8)
         self._ui_opt_layout.addWidget(self._ui_number)
         self._ui_opt_layout.addWidget(self._ui_pre_wait)
@@ -374,10 +374,10 @@ class CueDialog(Dialog):
         self._ui_remove_action.setIconVisibleInMenu(True)
         self._ui_remove_action.triggered.connect(self._ui_properties.removeSelected)
 
-        self._ui_done_action = Button('Done', self)
+        self._ui_done_action = QPushButton('Done', self)
         self._ui_done_action.clicked.connect(self.accept_action)
 
-        self._ui_toolbar = Toolbar()
+        self._ui_toolbar = QToolBar()
         self._ui_toolbar.setObjectName("CueDialog_toolbar")
         self._ui_toolbar.setMinimumHeight(40)
         self._ui_toolbar.addAction(self._ui_remove_action)
@@ -386,18 +386,18 @@ class CueDialog(Dialog):
         self._ui_toolbar.addWidget(self._ui_done_action)
 
         # Layout
-        self._ui_layout = VLayout()
+        self._ui_layout = QVBoxLayout()
 
-        self._ui_general_layout = VLayout()
+        self._ui_general_layout = QVBoxLayout()
         self._ui_general_layout.setSpacing(8)
         self._ui_general_layout.setContentsMargins(12, 12, 12, 10)
         self._ui_general_layout.addWidget(self._ui_text)
         self._ui_general_layout.addLayout(self._ui_opt_layout)
 
-        self._ui_general = Component()
+        self._ui_general = QWidget()
         self._ui_general.setLayout(self._ui_general_layout)
 
-        self._ui_splitter = Splitter(Qt.Vertical)
+        self._ui_splitter = QSplitter(Qt.Vertical)
         self._ui_splitter.setHandleWidth(2)
         self._ui_splitter.addWidget(self._ui_general)
         self._ui_splitter.addWidget(self._ui_properties)
@@ -535,14 +535,14 @@ class CuelistViewer(Viewer):
         self._ui_tree.keyPressEvent = self._key_event
 
         # Empty
-        self._ui_empty_title = Label("No Cuelist")
+        self._ui_empty_title = QLabel("No Cuelist")
         self._ui_empty_title.setObjectName('CuelistViewer_empty_title')
 
-        self._ui_empty_info = Label("Cuelist not selected or there are no cuelist.")
+        self._ui_empty_info = QLabel("Cuelist not selected or there are no cuelist.")
         self._ui_empty_info.setObjectName('CuelistViewer_empty_info')
         self._ui_empty_info.setWordWrap(True)
 
-        self._ui_empty_layout = VLayout()
+        self._ui_empty_layout = QVBoxLayout()
         self._ui_empty_layout.setContentsMargins(12, 12, 12, 12)
         self._ui_empty_layout.setAlignment(Qt.AlignHCenter)
         self._ui_empty_layout.addStretch()
@@ -559,7 +559,7 @@ class CuelistViewer(Viewer):
         self._ui_stack.addWidget(self._ui_tree)
         self._ui_stack.setCurrentIndex(0)
 
-        self._ui_label = Label("...")
+        self._ui_label = QLabel("...")
         self._ui_label.setObjectName("CuelistViewer_label")
         self._ui_label.setAlignment(Qt.AlignCenter)
         self._ui_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -579,7 +579,7 @@ class CuelistViewer(Viewer):
         self._ui_add_action.setIconVisibleInMenu(True)
         self._ui_add_action.triggered.connect(self.add_action)
 
-        self._ui_toolbar = Toolbar()
+        self._ui_toolbar = QToolBar()
         self._ui_toolbar.addWidget(self._ui_view_action)
         self._ui_toolbar.addWidget(self._ui_label)
         self._ui_toolbar.addAction(self._ui_lock_action)
@@ -627,7 +627,7 @@ class CuelistViewer(Viewer):
         """Remove cue item menu_action
 
         Args:
-            item (TreeItem): tree item
+            item (QTreeWidgetItem): tree item
         """
 
         if not item:
@@ -651,7 +651,7 @@ class CuelistViewer(Viewer):
         """Edit cue menu_action
 
         Args:
-            item (TreeItem): tree item
+            item (QTreeWidgetItem): tree item
         """
 
         if not item:
@@ -668,7 +668,7 @@ class CuelistViewer(Viewer):
         """Duplicate cue menu_action
 
         Args:
-            item (TreeItem): tree item
+            item (QTreeWidgetItem): tree item
         """
 
         if not item:
@@ -698,7 +698,7 @@ class CuelistViewer(Viewer):
         """Change cue color menu_action
 
         Args:
-            item (TreeItem): tree item
+            item (QTreeWidgetItem): tree item
             color (int): cue color constant
         """
 
@@ -712,7 +712,7 @@ class CuelistViewer(Viewer):
         """Preview cue text
 
         Args:
-            item (TreeItem): tree item
+            item (QTreeWidgetItem): tree item
         """
 
         if not item:
@@ -727,7 +727,7 @@ class CuelistViewer(Viewer):
         """Send cue text
 
         Args:
-            item (TreeItem): tree item
+            item (QTreeWidgetItem): tree item
         """
 
         if not item:
@@ -741,7 +741,7 @@ class CuelistViewer(Viewer):
         """Tree item expanded
 
         Args:
-            item (TreeItem): tree item
+            item (QTreeWidgetItem): tree item
         """
 
         self.item_toggle(item, True)
@@ -750,7 +750,7 @@ class CuelistViewer(Viewer):
         """Tree item collapsed
 
         Args:
-            item (TreeItem): tree item
+            item (QTreeWidgetItem): tree item
         """
 
         self.item_toggle(item, False)
@@ -759,7 +759,7 @@ class CuelistViewer(Viewer):
         """Change item collapsed/expanded state
 
         Args:
-            item (TreeItem): tree item
+            item (QTreeWidgetItem): tree item
             flag (bool): True if expanded
         """
 
@@ -798,7 +798,7 @@ class CuelistViewer(Viewer):
         def create_item(_entity):
             """Create tree item from entity"""
 
-            _item = TreeItem(_entity)
+            _item = QTreeWidgetItem(_entity)
             _item.setText(0, _entity.name)
 
             if isinstance(_entity, CueEntity) and _entity.color != CueEntity.COLOR_DEFAULT:
@@ -986,7 +986,7 @@ class CuelistViewer(Viewer):
         self._dialog.close()
 
 
-class TreeWidget(Tree):
+class TreeWidget(QTreeWidget):
     """Tree widget used in CuelistViewer"""
 
     def __init__(self, *args):

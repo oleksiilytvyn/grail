@@ -5,26 +5,24 @@
 
     Arrange viewers in any order you want
 
-    :copyright: (c) 2018 by Grail Team.
+    :copyright: (c) 2016-2019 by Alex Litvin.
     :license: GNU, see LICENSE for more details.
 """
-from PyQt5.QtCore import *
-
 from grailkit.core import Signal
-from grail.qt import Component, HLayout, Splitter
 
+from grail.qt import *
 from grail.core import Viewer
 from grail.plugins import EmptyViewer
 
 
-class ViewArranger(Component):
+class ViewArranger(QWidget):
     """Widget that manages grail layout and visual representation of plugins"""
 
     def __init__(self, parent=None):
         super(ViewArranger, self).__init__(parent)
 
         self._viewers = []
-        self._layout = HLayout()
+        self._layout = QHBoxLayout()
         self._root = None
         self._timer = QTimer()
         self._timer.timeout.connect(self._timeout)
@@ -229,7 +227,7 @@ class ViewArranger(Component):
         self._update()
 
 
-class _Splitter(Splitter):
+class _Splitter(QSplitter):
     """Customized splitter for ViewArranger"""
 
     def __init__(self, orientation):

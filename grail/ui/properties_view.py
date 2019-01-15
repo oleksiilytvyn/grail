@@ -5,21 +5,16 @@
 
     View and edit properties of DNA entity, this widget used in Cue Inspector and Properties Viewer
 
-    :copyright: (c) 2018 by Grail Team.
+    :copyright: (c) 2016-2019 by Alex Litvin.
     :license: GNU, see LICENSE for more details.
 """
 import json
 import random
 
-from PyQt5.QtCore import Qt, QSize
-from PyQt5.QtGui import QIcon, QColor
-from PyQt5.QtWidgets import QAbstractItemView, QHeaderView, QAction, QWidget, QStackedWidget, QToolButton, \
-    QStyledItemDelegate, QLineEdit, QStyle, QMenu
-
-from grail.qt import Icon, Label, VLayout, Table, TableItem, Application, Component
+from grail.qt import *
 
 
-class PropertiesView(Component):
+class PropertiesView(QWidget):
     """View for editing entity properties"""
 
     def __init__(self, parent=None):
@@ -32,7 +27,7 @@ class PropertiesView(Component):
         self._follow = False
 
         # Properties
-        self._ui_properties = Table(self)
+        self._ui_properties = QTableWidget(self)
         self._ui_properties.setShowGrid(False)
         self._ui_properties.setColumnCount(2)
         self._ui_properties.setAlternatingRowColors(True)
@@ -55,14 +50,14 @@ class PropertiesView(Component):
         header.setSectionResizeMode(QHeaderView.Interactive)
 
         # Empty
-        self._ui_empty_title = Label("No properties")
+        self._ui_empty_title = QLabel("No properties")
         self._ui_empty_title.setObjectName('PropertiesView_empty_title')
 
-        self._ui_empty_info = Label("Node not selected or don't have properties.")
+        self._ui_empty_info = QLabel("Node not selected or don't have properties.")
         self._ui_empty_info.setObjectName('PropertiesView_empty_info')
         self._ui_empty_info.setWordWrap(True)
 
-        self._ui_empty_layout = VLayout()
+        self._ui_empty_layout = QVBoxLayout()
         self._ui_empty_layout.setContentsMargins(12, 12, 12, 12)
         self._ui_empty_layout.setAlignment(Qt.AlignHCenter)
         self._ui_empty_layout.addStretch()
@@ -79,7 +74,7 @@ class PropertiesView(Component):
         self._ui_stack.addWidget(self._ui_properties)
         self._ui_stack.setCurrentIndex(0)
 
-        self._ui_layout = VLayout()
+        self._ui_layout = QVBoxLayout()
         self._ui_layout.addWidget(self._ui_stack)
 
         self.setLayout(self._ui_layout)
@@ -237,11 +232,11 @@ class PropertiesView(Component):
             key = item[0]
             value = item[1]
 
-            item_key = TableItem(key)
+            item_key = QTableWidgetItem(key)
             item_key.entity_id = self._entity_id
             item_key.entity_key = key
 
-            item_value = TableItem(str(value))
+            item_value = QTableWidgetItem(str(value))
             item_value.setData(Qt.UserRole, value)
             item_value.entity_id = self._entity_id
             item_value.entity_key = key

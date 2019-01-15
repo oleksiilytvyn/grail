@@ -5,7 +5,7 @@
 
     Manage built-in library
 
-    :copyright: (c) 2018 by Grail Team.
+    :copyright: (c) 2016-2019 by Alex Litvin.
     :license: GNU, see LICENSE for more details.
 """
 import re
@@ -17,7 +17,7 @@ from grail.qt import *
 from grail.core import Viewer
 
 
-class SongDialog(Dialog):
+class SongDialog(QDialog):
     """Song edit dialog"""
 
     MODE_CREATE = 0
@@ -37,13 +37,13 @@ class SongDialog(Dialog):
         """Create UI of this dialog"""
 
         # header
-        self._ui_head_title = Label("Song title")
+        self._ui_head_title = QLabel("Song title")
         self._ui_head_title.setObjectName("SongDialog_head_title")
 
-        self._ui_head_subtitle = Label("Artist - Album - year")
+        self._ui_head_subtitle = QLabel("Artist - Album - year")
         self._ui_head_subtitle.setObjectName("SongDialog_head_subtitle")
 
-        self._ui_head_layout = VLayout()
+        self._ui_head_layout = QVBoxLayout()
         self._ui_head_layout.setSpacing(2)
         self._ui_head_layout.setContentsMargins(8, 4, 8, 8)
         self._ui_head_layout.addWidget(self._ui_head_title)
@@ -54,28 +54,28 @@ class SongDialog(Dialog):
         self._ui_head.setLayout(self._ui_head_layout)
 
         # body
-        self._ui_title = LineEdit()
+        self._ui_title = QLineEdit()
         self._ui_title.setPlaceholderText("Song title")
 
-        self._ui_artist = LineEdit()
+        self._ui_artist = QLineEdit()
         self._ui_artist.setPlaceholderText("Artist name")
 
-        self._ui_album = LineEdit()
+        self._ui_album = QLineEdit()
         self._ui_album.setPlaceholderText("Album")
 
-        self._ui_year = LineEdit()
+        self._ui_year = QLineEdit()
         self._ui_year.setPlaceholderText("Year")
 
-        self._ui_genre = LineEdit()
+        self._ui_genre = QLineEdit()
         self._ui_genre.setPlaceholderText("Genre")
 
-        self._ui_track = LineEdit()
+        self._ui_track = QLineEdit()
         self._ui_track.setPlaceholderText("Track")
 
-        self._ui_language = LineEdit()
+        self._ui_language = QLineEdit()
         self._ui_language.setPlaceholderText("Language")
 
-        self._ui_lyrics = TextEdit()
+        self._ui_lyrics = QTextEdit()
         self._ui_lyrics.setPlaceholderText("Lyrics")
         self._ui_lyrics.setAcceptRichText(False)
 
@@ -84,13 +84,13 @@ class SongDialog(Dialog):
 
         self._ui_lyrics.setSizePolicy(policy)
 
-        self._ui_button_ok = Button("Ok")
+        self._ui_button_ok = QPushButton("Ok")
         self._ui_button_ok.clicked.connect(self.accept_action)
 
-        self._ui_button_cancel = Button("Cancel")
+        self._ui_button_cancel = QPushButton("Cancel")
         self._ui_button_cancel.clicked.connect(self.reject_action)
 
-        self._ui_buttons_layout = HLayout()
+        self._ui_buttons_layout = QHBoxLayout()
         self._ui_buttons_layout.setSpacing(10)
         self._ui_buttons_layout.setContentsMargins(14, 0, 14, 14)
         self._ui_buttons_layout.addStretch()
@@ -113,11 +113,11 @@ class SongDialog(Dialog):
         self._ui_body_layout.addWidget(self._ui_track, 3, 2)
         self._ui_body_layout.addWidget(self._ui_lyrics, 4, 0, 1, 3)
 
-        self._ui_body = Component()
+        self._ui_body = QWidget()
         self._ui_body.setLayout(self._ui_body_layout)
 
         # main layout
-        self._ui_layout = VLayout()
+        self._ui_layout = QVBoxLayout()
         self._ui_layout.addWidget(self._ui_head)
         self._ui_layout.addWidget(self._ui_body)
         self._ui_layout.addWidget(self._ui_buttons)
@@ -242,16 +242,16 @@ class LibraryViewer(Viewer):
 
         self.setObjectName("LibraryViewer")
 
-        self._ui_layout = VLayout()
+        self._ui_layout = QVBoxLayout()
 
-        self._ui_search = SearchEdit()
+        self._ui_search = QSearchEdit()
         self._ui_search.setObjectName("LibraryViewer_search")
         self._ui_search.setPlaceholderText("Search library...")
         self._ui_search.textChanged.connect(self._search_event)
         self._ui_search.keyPressed.connect(self._search_key_event)
         self._ui_search.focusOut.connect(self._search_focus_out)
 
-        self._ui_search_layout = VLayout()
+        self._ui_search_layout = QVBoxLayout()
         self._ui_search_layout.setContentsMargins(8, 8, 8, 8)
         self._ui_search_layout.addWidget(self._ui_search)
 
@@ -259,7 +259,7 @@ class LibraryViewer(Viewer):
         self._ui_search_widget.setObjectName("LibraryViewer_search_widget")
         self._ui_search_widget.setLayout(self._ui_search_layout)
 
-        self._ui_list = List()
+        self._ui_list = QListWidget()
         self._ui_list.setContextMenuPolicy(Qt.CustomContextMenu)
         self._ui_list.currentItemChanged.connect(self._item_clicked)
         self._ui_list.itemDoubleClicked.connect(self._item_doubleclicked)
@@ -274,7 +274,7 @@ class LibraryViewer(Viewer):
         self._ui_view_action.setIcon(Icon(':/rc/menu.png'))
         self._ui_view_action.clicked.connect(self.view_action)
 
-        self._ui_toolbar = Toolbar()
+        self._ui_toolbar = QToolBar()
         self._ui_toolbar.addWidget(self._ui_view_action)
         self._ui_toolbar.addStretch()
         self._ui_toolbar.addAction(self._ui_add_action)
@@ -305,7 +305,7 @@ class LibraryViewer(Viewer):
 
             # show songs from library
             for song in self.library.items(filter_type=DNA.TYPE_SONG):
-                item = ListItem()
+                item = QListWidgetItem()
                 item.setText("%s" % (song.name,))
                 item.setObject(song)
 
@@ -315,7 +315,7 @@ class LibraryViewer(Viewer):
 
         # show bible references (limit to 3)
         for verse in self.bible.match_reference(keyword):
-            item = ListItem()
+            item = QListWidgetItem()
             item.setIcon(icon_bible)
             item.setText("%s" % (verse.reference,))
             item.setObject(verse)
@@ -328,7 +328,7 @@ class LibraryViewer(Viewer):
             striped_text = verse.text.lower()
             start_index = striped_text.index(striped_keyword)
 
-            item = ListItem()
+            item = QListWidgetItem()
             item.setIcon(icon_bible)
             item.setText("...%s" % verse.text[start_index:])
             item.setObject(verse)
@@ -338,7 +338,7 @@ class LibraryViewer(Viewer):
         # show songs from library (limit to 9)
         for song in self.library.items(filter_keyword=keyword, filter_type=DNA.TYPE_SONG,
                                        sort="name", reverse=True, limit=9):
-            item = ListItem()
+            item = QListWidgetItem()
             item.setIcon(icon_song)
             item.setText("%s" % (song.name,))
             item.setObject(song)

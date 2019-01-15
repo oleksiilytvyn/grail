@@ -5,7 +5,7 @@
 
     Configurators for OSC I/O
 
-    :copyright: (c) 2018 by Grail Team.
+    :copyright: (c) 2016-2019 by Alex Litvin.
     :license: GNU, see LICENSE for more details.
 """
 from grail.qt import *
@@ -55,7 +55,7 @@ class OSCInConfigurator(Configurator):
 
         self.setObjectName("OSCInConfigurator")
 
-        self._ui_list = Table()
+        self._ui_list = QTableWidget()
         self._ui_list.setObjectName("OSCInConfigurator_list")
         self._ui_list.setShowGrid(False)
         self._ui_list.setColumnCount(2)
@@ -79,18 +79,18 @@ class OSCInConfigurator(Configurator):
         self._ui_add_action.setIconVisibleInMenu(True)
         self._ui_add_action.triggered.connect(self.add_action)
 
-        self._ui_toolbar_label = Label("0 Inputs")
+        self._ui_toolbar_label = QLabel("0 Inputs")
         self._ui_toolbar_label.setObjectName("OSCInConfigurator_label")
         self._ui_toolbar_label.setAlignment(Qt.AlignCenter)
         self._ui_toolbar_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
-        self._ui_toolbar = Toolbar()
+        self._ui_toolbar = QToolBar()
         self._ui_toolbar.setObjectName("OSCInConfigurator_toolbar")
         self._ui_toolbar.addAction(self._ui_clear_action)
         self._ui_toolbar.addWidget(self._ui_toolbar_label)
         self._ui_toolbar.addAction(self._ui_add_action)
 
-        self._ui_layout = VLayout()
+        self._ui_layout = QVBoxLayout()
         self._ui_layout.setObjectName("OSCInConfigurator_layout")
         self._ui_layout.addWidget(self._ui_list)
         self._ui_layout.addWidget(self._ui_toolbar)
@@ -112,8 +112,8 @@ class OSCInConfigurator(Configurator):
         for index, client in enumerate(clients):
             host, port = client
 
-            host_item = TableItem(host)
-            port_item = TableItem(str(port))
+            host_item = QTableWidgetItem(host)
+            port_item = QTableWidgetItem(str(port))
 
             self._ui_list.setItem(index, 0, host_item)
             self._ui_list.setItem(index, 1, port_item)
@@ -257,7 +257,7 @@ class OSCOutConfigurator(Configurator):
 
         self.setObjectName("OSCOutConfigurator")
 
-        self._ui_list = Table()
+        self._ui_list = QTableWidget()
         self._ui_list.setObjectName("OSCOutConfigurator_list")
         self._ui_list.setShowGrid(False)
         self._ui_list.setColumnCount(2)
@@ -281,18 +281,18 @@ class OSCOutConfigurator(Configurator):
         self._ui_add_action.setIconVisibleInMenu(True)
         self._ui_add_action.triggered.connect(self.add_action)
 
-        self._ui_toolbar_label = Label("0 sources")
+        self._ui_toolbar_label = QLabel("0 sources")
         self._ui_toolbar_label.setObjectName("OSCOutConfigurator_label")
         self._ui_toolbar_label.setAlignment(Qt.AlignCenter)
         self._ui_toolbar_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
-        self._ui_toolbar = Toolbar()
+        self._ui_toolbar = QToolBar()
         self._ui_toolbar.setObjectName("OSCOutConfigurator_toolbar")
         self._ui_toolbar.addAction(self._ui_clear_action)
         self._ui_toolbar.addWidget(self._ui_toolbar_label)
         self._ui_toolbar.addAction(self._ui_add_action)
 
-        self._ui_layout = VLayout()
+        self._ui_layout = QVBoxLayout()
         self._ui_layout.setObjectName("OSCOutConfigurator_layout")
         self._ui_layout.addWidget(self._ui_list)
         self._ui_layout.addWidget(self._ui_toolbar)
@@ -310,8 +310,8 @@ class OSCOutConfigurator(Configurator):
         for index, client in enumerate(clients):
             host, port = client
 
-            host_item = TableItem(host)
-            port_item = TableItem(str(port))
+            host_item = QTableWidgetItem(host)
+            port_item = QTableWidgetItem(str(port))
 
             self._ui_list.setItem(index, 0, host_item)
             self._ui_list.setItem(index, 1, port_item)

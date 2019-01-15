@@ -5,7 +5,7 @@
 
     Plugin mechanism
 
-    :copyright: (c) 2018 by Grail Team.
+    :copyright: (c) 2016-2019 by Alex Litvin.
     :license: GNU, see LICENSE for more details.
 """
 from grailkit.util import default_key
@@ -268,7 +268,7 @@ class Plugin(_PluginMeta, metaclass=PluginRegistry):
             self.__create_action(action_target, location_tokens[1:], new_action, before_tokens[1:])
 
 
-class _ComponentPluginRegistry(type(Component), PluginRegistry):
+class _ComponentPluginRegistry(type(QWidget), PluginRegistry):
     """Meta class for visual plugins
     Combines properties of grailkit.qt.Component and grailkit.plug.PluginRegistry"""
 
@@ -280,18 +280,18 @@ class _ComponentPluginRegistry(type(Component), PluginRegistry):
             bases (tuple): class parents
             attrs (dict): attributes
         """
-        type(Component).__init__(cls, name, bases, attrs)
+        type(QWidget).__init__(cls, name, bases, attrs)
         PluginRegistry.__init__(cls, name, bases, attrs)
 
 
-class Viewer(Component, _PluginMeta, metaclass=_ComponentPluginRegistry):
+class Viewer(QWidget, _PluginMeta, metaclass=_ComponentPluginRegistry):
     """Visual component plugin that will be available in view arranger
 
     Viewer class can only create self and listen/emit global events
     """
 
     def __init__(self, parent=None, properties=None):
-        Component.__init__(self, parent)
+        QWidget.__init__(self, parent)
 
         # viewer properties
         if properties and isinstance(properties, dict):
@@ -398,13 +398,13 @@ class Viewer(Component, _PluginMeta, metaclass=_ComponentPluginRegistry):
         return self.__properties
 
 
-class Configurator(Component, _PluginMeta, metaclass=_ComponentPluginRegistry):
+class Configurator(QWidget, _PluginMeta, metaclass=_ComponentPluginRegistry):
     """Visual plugin that will be shown in settings dialog as page"""
 
     index = 0
 
     def __init__(self, parent=None):
-        Component.__init__(self, parent)
+        QWidget.__init__(self, parent)
 
     def __ui__(self):
         """Please define UI code here and call from `__init__` method"""

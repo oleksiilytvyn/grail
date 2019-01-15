@@ -105,6 +105,7 @@ def compile_resources(source=None, destination=None, exclude=None):
 
     try:
         print("\nBuilding resource file")
+        print("pyrcc5 -o %s %s" % (destination, source_file))
         os.system("pyrcc5 -o %s %s" % (destination, source_file))
     except Exception as error:
         print("Failed to build resource file, following error occurred:\n %s" % error)
@@ -213,7 +214,7 @@ setup(
     version=VERSION,
     url='http://grailapp.com/',
 
-    author='Oleksii Lytvyn',
+    author='Alex Litvin',
     author_email='programer95@gmail.com',
     description="Simple and fast lyrics application.",
     long_description="Simple and powerful media software for churches",

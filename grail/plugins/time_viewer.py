@@ -5,7 +5,7 @@
 
     View current time
 
-    :copyright: (c) 2018 by Grail Team.
+    :copyright: (c) 2016-2019 by Alex Litvin.
     :license: GNU, see LICENSE for more details.
 """
 import os
@@ -47,7 +47,7 @@ class TimeViewer(Viewer):
     def __ui__(self):
         """Build UI"""
 
-        self._label = Label('00:00:00')
+        self._label = QLabel('00:00:00')
         self._label.setObjectName("TimeViewer_label")
 
         self._ui_view_action = QToolButton()
@@ -58,13 +58,13 @@ class TimeViewer(Viewer):
         self._ui_settings_action.setText("Settings")
         self._ui_settings_action.clicked.connect(self.settings_action)
 
-        self._ui_toolbar = Toolbar()
+        self._ui_toolbar = QToolBar()
         self._ui_toolbar.setObjectName("TimeViewer_toolbar")
         self._ui_toolbar.addWidget(self._ui_view_action)
         self._ui_toolbar.addStretch()
         self._ui_toolbar.addWidget(self._ui_settings_action)
 
-        self._layout = VLayout()
+        self._layout = QVBoxLayout()
         self._layout.addWidget(self._label)
         self._layout.addWidget(self._ui_toolbar)
 
@@ -124,7 +124,7 @@ class TimeViewer(Viewer):
                    self.style_font))
 
         self._ui_toolbar.setStyleSheet("""
-            Toolbar {
+            QToolBar {
                 background: %s;
                 border-top: none;
                 }
@@ -168,7 +168,7 @@ class TimeViewer(Viewer):
         self._popup.showAt(QPoint(p.x() + 12, p.y()))
 
 
-class _Button(Button):
+class _Button(QPushButton):
 
     def __init__(self, *args):
         super(_Button, self).__init__(*args)
@@ -177,7 +177,7 @@ class _Button(Button):
         self.setFixedWidth(90)
 
 
-class _PropertiesPopup(Popup):
+class _PropertiesPopup(QPopup):
 
     def __init__(self, parent=None):
         super(_PropertiesPopup, self).__init__()
@@ -206,7 +206,7 @@ class _PropertiesPopup(Popup):
         self._ui_size.setMaximumWidth(90)
         self._ui_size.valueChanged.connect(self.size_changed)
 
-        self._ui_size_label = Label("Text size")
+        self._ui_size_label = QLabel("Text size")
         self._ui_layout.addWidget(self._ui_size, 0, 0)
         self._ui_layout.addWidget(self._ui_size_label, 0, 1)
 
@@ -215,7 +215,7 @@ class _PropertiesPopup(Popup):
         self._ui_color.setStyleSheet("background: %s;" % self._viewer.style_color)
         self._ui_color.clicked.connect(self.color_action)
 
-        self._ui_color_label = Label("Text color")
+        self._ui_color_label = QLabel("Text color")
 
         self._ui_layout.addWidget(self._ui_color, 1, 0)
         self._ui_layout.addWidget(self._ui_color_label, 1, 1)
@@ -225,7 +225,7 @@ class _PropertiesPopup(Popup):
         self._ui_background.setStyleSheet("background: %s;" % self._viewer.style_background)
         self._ui_background.clicked.connect(self.background_action)
 
-        self._ui_background_label = Label("Background color")
+        self._ui_background_label = QLabel("Background color")
 
         self._ui_layout.addWidget(self._ui_background, 2, 0)
         self._ui_layout.addWidget(self._ui_background_label, 2, 1)
@@ -234,7 +234,7 @@ class _PropertiesPopup(Popup):
         self._ui_background_image = _Button("Pick")
         self._ui_background_image.clicked.connect(self.background_image_action)
 
-        self._ui_background_image_label = Label("Background image")
+        self._ui_background_image_label = QLabel("Background image")
 
         self._ui_layout.addWidget(self._ui_background_image, 3, 0)
         self._ui_layout.addWidget(self._ui_background_image_label, 3, 1)
@@ -243,7 +243,7 @@ class _PropertiesPopup(Popup):
         self._ui_background_clear = _Button("Clear")
         self._ui_background_clear.clicked.connect(self.background_clear_action)
 
-        self._ui_background_clear_label = Label("Clear background")
+        self._ui_background_clear_label = QLabel("Clear background")
 
         self._ui_layout.addWidget(self._ui_background_clear, 4, 0)
         self._ui_layout.addWidget(self._ui_background_clear_label, 4, 1)
@@ -252,7 +252,7 @@ class _PropertiesPopup(Popup):
         self._ui_font = _Button("Choose")
         self._ui_font.clicked.connect(self.font_action)
 
-        self._ui_font_label = Label("Font")
+        self._ui_font_label = QLabel("Font")
 
         self._ui_layout.addWidget(self._ui_font, 5, 0)
         self._ui_layout.addWidget(self._ui_font_label, 5, 1)

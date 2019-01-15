@@ -5,7 +5,7 @@
 
     Empty viewer
 
-    :copyright: (c) 2018 by Grail Team.
+    :copyright: (c) 2016-2019 by Alex Litvin.
     :license: GNU, see LICENSE for more details.
 """
 from grail.qt import *
@@ -31,19 +31,19 @@ class EmptyViewer(Viewer):
 
         self.setObjectName("EmptyViewer")
 
-        self._ui_title_label = Label("No view")
+        self._ui_title_label = QLabel("No view")
         self._ui_title_label.setObjectName('EmptyViewer_title')
 
-        self._ui_info_label = Label("Viewer not loaded, click on button and pick one")
+        self._ui_info_label = QLabel("Viewer not loaded, click on button and pick one")
         self._ui_info_label.setObjectName('EmptyViewer_info')
         self._ui_info_label.setWordWrap(True)
 
-        self._ui_button = Button('View')
+        self._ui_button = QPushButton('View')
         self._ui_button.clicked.connect(self.menu_action)
         self._ui_button.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
         self._ui_button.setMaximumWidth(80)
 
-        self._ui_layout = VLayout()
+        self._ui_layout = QVBoxLayout()
         self._ui_layout.setContentsMargins(12, 12, 12, 12)
         self._ui_layout.setAlignment(Qt.AlignHCenter)
 

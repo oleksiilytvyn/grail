@@ -5,18 +5,13 @@
 
     Dialog for displaying any progress
 
-    :copyright: (c) 2018 by Oleksii Lytvyn.
+    :copyright: (c) 2016-2019 by Alex Litvin.
     :license: GNU, see LICENSE for more details.
 """
-
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
-
-from grail.qt import Dialog
+from grail.qt import *
 
 
-class ProgressDialog(Dialog):
+class ProgressDialog(QDialog):
     """Progress dialog with cancel button, title and description text"""
 
     def __init__(self, parent=None,

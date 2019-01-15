@@ -5,17 +5,13 @@
 
     Actions dialog
 
-    :copyright: (c) 2018 by Grail Team.
+    :copyright: (c) 2016-2019 by Alex Litvin.
     :license: GNU, see LICENSE for more details.
 """
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
-
-from grail.qt import Dialog, VLayout, List, ListItem, Label, Application, Toolbar, SearchEdit
+from grail.qt import *
 
 
-class ActionsDialog(Dialog):
+class ActionsDialog(QDialog):
     """Display actions registered by plugins"""
 
     def __init__(self, parent=None):
@@ -32,12 +28,12 @@ class ActionsDialog(Dialog):
 
     def __ui__(self):
 
-        self._ui_list = List()
+        self._ui_list = QListWidget()
         self._ui_list.setContextMenuPolicy(Qt.CustomContextMenu)
         self._ui_list.itemDoubleClicked.connect(self.run_action)
         self._ui_list.customContextMenuRequested.connect(self._context_menu)
 
-        self._ui_label = Label("0 Actions")
+        self._ui_label = QLabel("0 Actions")
         self._ui_label.setAlignment(Qt.AlignCenter)
         self._ui_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
@@ -45,11 +41,11 @@ class ActionsDialog(Dialog):
         self._ui_go_action.setIconVisibleInMenu(True)
         self._ui_go_action.triggered.connect(self.run_action)
 
-        self._ui_search = SearchEdit()
+        self._ui_search = QSearchEdit()
         self._ui_search.setPlaceholderText("Search actions...")
         self._ui_search.textChanged.connect(self._search_event)
 
-        self._ui_search_layout = VLayout()
+        self._ui_search_layout = QVBoxLayout()
         self._ui_search_layout.setContentsMargins(8, 8, 8, 8)
         self._ui_search_layout.addWidget(self._ui_search)
 
@@ -57,11 +53,11 @@ class ActionsDialog(Dialog):
         self._ui_search_widget.setObjectName("ActionsDialog_search_widget")
         self._ui_search_widget.setLayout(self._ui_search_layout)
 
-        self._ui_toolbar = Toolbar()
+        self._ui_toolbar = QToolBar()
         self._ui_toolbar.addWidget(self._ui_label)
         self._ui_toolbar.addAction(self._ui_go_action)
 
-        self._ui_layout = VLayout()
+        self._ui_layout = QVBoxLayout()
         self._ui_layout.addWidget(self._ui_search_widget)
         self._ui_layout.addWidget(self._ui_list)
         self._ui_layout.addWidget(self._ui_toolbar)
@@ -84,7 +80,7 @@ class ActionsDialog(Dialog):
             if len(self._keyword) > 0 and (self._keyword not in action.plugin.name + " " + action.name):
                 continue
 
-            item = ListItem("%s → %s" % (action.plugin.name, action.name))
+            item = QListWidgetItem("%s → %s" % (action.plugin.name, action.name))
             item.action = action
 
             self._ui_list.addItem(item)

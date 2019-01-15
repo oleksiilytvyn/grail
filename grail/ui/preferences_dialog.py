@@ -5,18 +5,14 @@
 
     Global preferences dialog window and all panels displayed inside
 
-    :copyright: (c) 2018 by Grail Team.
+    :copyright: (c) 2016-2019 by Alex Litvin.
     :license: GNU, see LICENSE for more details.
 """
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QStackedWidget
-
-from grail.qt import Dialog, List, ListItem, Splitter, VLayout, Component, Icon
-
+from grail.qt import *
 from grail.core import Configurator
 
 
-class PreferencesDialog(Dialog):
+class PreferencesDialog(QDialog):
     """Application preferences dialog"""
 
     def __init__(self):
@@ -27,12 +23,12 @@ class PreferencesDialog(Dialog):
     def __ui__(self):
         """Build UI"""
 
-        self._ui_sidebar_layout = VLayout()
+        self._ui_sidebar_layout = QVBoxLayout()
 
-        self._ui_sidebar_list = List()
+        self._ui_sidebar_list = QListWidget()
         self._ui_sidebar_list.itemClicked.connect(self.page_clicked)
 
-        self._ui_sidebar = Component()
+        self._ui_sidebar = QWidget()
         self._ui_sidebar.setLayout(self._ui_sidebar_layout)
         self._ui_sidebar_layout.addWidget(self._ui_sidebar_list)
 
@@ -43,14 +39,14 @@ class PreferencesDialog(Dialog):
         for index, plug in enumerate(plugins):
             panel = plug()
 
-            item = ListItem(plug.name)
+            item = QListWidgetItem(plug.name)
             item.index = index
 
             self._ui_sidebar_list.addItem(item)
             self._ui_panel.addWidget(panel)
 
         # splitter
-        self._ui_splitter = Splitter()
+        self._ui_splitter = QSplitter()
 
         self._ui_splitter.addWidget(self._ui_sidebar)
         self._ui_splitter.addWidget(self._ui_panel)
@@ -65,7 +61,7 @@ class PreferencesDialog(Dialog):
         self._ui_splitter.setStretchFactor(0, 0)
         self._ui_splitter.setStretchFactor(1, 1)
 
-        self._ui_layout = VLayout()
+        self._ui_layout = QVBoxLayout()
         self._ui_layout.addWidget(self._ui_splitter)
 
         self.setLayout(self._ui_layout)

@@ -5,7 +5,7 @@
 
     Create text notes
 
-    :copyright: (c) 2018 by Grail Team.
+    :copyright: (c) 2016-2019 by Alex Litvin.
     :license: GNU, see LICENSE for more details.
 """
 from grail.qt import *
@@ -32,13 +32,13 @@ class NotesViewer(Viewer):
 
         self.setObjectName('NotesViewer')
 
-        self._ui_notes = TextEdit()
+        self._ui_notes = QTextEdit()
         self._ui_notes.setObjectName('NotesViewer_text')
         self._ui_notes.setPlainText(text)
         self._ui_notes.setAcceptRichText(False)
         self._ui_notes.textChanged.connect(self._text_changed)
 
-        self._ui_label = Label("Notes")
+        self._ui_label = QLabel("Notes")
         self._ui_label.setObjectName('NotesViewer_label')
         self._ui_label.setAlignment(Qt.AlignCenter)
         self._ui_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -48,12 +48,12 @@ class NotesViewer(Viewer):
         self._ui_view_action.setIcon(Icon.colored(':/rc/menu.png', QColor('#222222'), QColor('#e3e3e3')))
         self._ui_view_action.clicked.connect(self.view_action)
 
-        self._ui_toolbar = Toolbar()
+        self._ui_toolbar = QToolBar()
         self._ui_toolbar.setObjectName("NotesViewer_toolbar")
         self._ui_toolbar.addWidget(self._ui_view_action)
         self._ui_toolbar.addWidget(self._ui_label)
 
-        self._ui_layout = VLayout()
+        self._ui_layout = QVBoxLayout()
         self._ui_layout.addWidget(self._ui_notes)
         self._ui_layout.addWidget(self._ui_toolbar)
 

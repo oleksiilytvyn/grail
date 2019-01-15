@@ -5,7 +5,7 @@
 
     2d graphics display
 
-    :copyright: (c) 2018 by Grail Team.
+    :copyright: (c) 2016-2019 by Alex Litvin.
     :license: GNU, see LICENSE for more details.
 """
 import math
@@ -193,7 +193,7 @@ class DisplayPlugin(Plugin):
         return cls._instance
 
 
-class DisplayWindow(Dialog):
+class DisplayWindow(QDialog):
     """Window that displays 2d graphics"""
 
     def __init__(self, parent):
@@ -1062,7 +1062,7 @@ class TransformWidget(QWidget):
         return t
 
 
-class PaddingPopup(Popup):
+class PaddingPopup(QPopup):
     """Padding popup dialog"""
 
     updated = pyqtSignal(int, int, int, int)
@@ -1100,16 +1100,16 @@ class PaddingPopup(Popup):
         self.ui_layout.setSpacing(8)
         self.ui_layout.setContentsMargins(12, 12, 12, 12)
 
-        self.ui_layout.addWidget(Label('Left'), 0, 0)
+        self.ui_layout.addWidget(QLabel('Left'), 0, 0)
         self.ui_layout.addWidget(self.ui_left, 1, 0)
 
-        self.ui_layout.addWidget(Label('Right'), 0, 1)
+        self.ui_layout.addWidget(QLabel('Right'), 0, 1)
         self.ui_layout.addWidget(self.ui_right, 1, 1)
 
-        self.ui_layout.addWidget(Label('Top'), 2, 0)
+        self.ui_layout.addWidget(QLabel('Top'), 2, 0)
         self.ui_layout.addWidget(self.ui_top, 3, 0)
 
-        self.ui_layout.addWidget(Label('Bottom'), 2, 1)
+        self.ui_layout.addWidget(QLabel('Bottom'), 2, 1)
         self.ui_layout.addWidget(self.ui_bottom, 3, 1)
 
         self.setLayout(self.ui_layout)
@@ -1136,7 +1136,7 @@ class PaddingPopup(Popup):
         self._padding = [padding_left, padding_top, padding_right, padding_bottom]
 
 
-class AlignPopup(Popup):
+class AlignPopup(QPopup):
     """Text align popup dialog"""
 
     updated = pyqtSignal(int, int)
@@ -1181,10 +1181,10 @@ class AlignPopup(Popup):
         self.ui_layout.setSpacing(8)
         self.ui_layout.setContentsMargins(12, 12, 12, 12)
 
-        self.ui_layout.addWidget(Label('Horizontal'), 0, 0)
+        self.ui_layout.addWidget(QLabel('Horizontal'), 0, 0)
         self.ui_layout.addWidget(self.ui_horizontal, 1, 0)
 
-        self.ui_layout.addWidget(Label('Vertical'), 2, 0)
+        self.ui_layout.addWidget(QLabel('Vertical'), 2, 0)
         self.ui_layout.addWidget(self.ui_vertical, 3, 0)
 
         self.setWindowTitle('Align')
@@ -1211,7 +1211,7 @@ class AlignPopup(Popup):
         self.align_vertical = vertical
 
 
-class ShadowPopup(Popup):
+class ShadowPopup(QPopup):
     """Shadow popup"""
 
     updated = pyqtSignal("QPoint", "int", "QColor")
@@ -1224,7 +1224,7 @@ class ShadowPopup(Popup):
         self.color = color
 
         # initialize ui components
-        self.ui_color_button = Button("Set Color")
+        self.ui_color_button = QPushButton("Set Color")
         self.ui_color_button.clicked.connect(self._color_action)
 
         self.ui_top = QSpinBox()
@@ -1237,17 +1237,17 @@ class ShadowPopup(Popup):
         self.ui_left.setValue(self.offset.x())
         self.ui_left.valueChanged.connect(self._value_changed)
 
-        self.ui_layout = VLayout()
+        self.ui_layout = QVBoxLayout()
 
-        self.ui_controls_layout = GridLayout()
+        self.ui_controls_layout = QGridLayout()
         self.ui_controls_layout.setSpacing(8)
         self.ui_controls_layout.setContentsMargins(12, 12, 12, 0)
-        self.ui_controls_layout.addWidget(Label('Top'), 0, 0)
+        self.ui_controls_layout.addWidget(QLabel('Top'), 0, 0)
         self.ui_controls_layout.addWidget(self.ui_top, 1, 0)
-        self.ui_controls_layout.addWidget(Label('Left'), 0, 1)
+        self.ui_controls_layout.addWidget(QLabel('Left'), 0, 1)
         self.ui_controls_layout.addWidget(self.ui_left, 1, 1)
 
-        self.ui_button_layout = VLayout()
+        self.ui_button_layout = QVBoxLayout()
         self.ui_button_layout.setSpacing(8)
         self.ui_button_layout.setContentsMargins(12, 12, 12, 12)
         self.ui_button_layout.addWidget(self.ui_color_button)
@@ -1284,7 +1284,7 @@ class ShadowPopup(Popup):
         self.updated.emit(self.offset, self.blur, self.color)
 
 
-class CompositionPopup(Popup):
+class CompositionPopup(QPopup):
     """Composition preferences popup"""
 
     updated = pyqtSignal("QSize")
@@ -1393,7 +1393,7 @@ class CompositionPopup(Popup):
         self._ignore_update = False
 
 
-class CasePopup(Popup):
+class CasePopup(QPopup):
     """Popup for selecting text transformation"""
 
     updated = pyqtSignal(int)
@@ -1423,7 +1423,7 @@ class CasePopup(Popup):
         self.ui_layout.setSpacing(8)
         self.ui_layout.setContentsMargins(12, 12, 12, 12)
 
-        self.ui_layout.addWidget(Label('Text Case'), 0, 0)
+        self.ui_layout.addWidget(QLabel('Text Case'), 0, 0)
         self.ui_layout.addWidget(self.ui_case, 1, 0)
 
         self.setLayout(self.ui_layout)
@@ -1442,7 +1442,7 @@ class CasePopup(Popup):
         self.case = case
 
 
-class PreferencesDialog(Dialog):
+class PreferencesDialog(QDialog):
     """Display preferences window"""
 
     updated = pyqtSignal()
@@ -1495,7 +1495,7 @@ class PreferencesDialog(Dialog):
         # toolbar actions
         self._ui_output_menu = QMenu(self)
 
-        self._ui_output_action = Button("Disabled", self)
+        self._ui_output_action = QPushButton("Disabled", self)
         self._ui_output_action.setMenu(self._ui_output_menu)
 
         self._ui_font_action = QToolButton(self)
@@ -1532,7 +1532,7 @@ class PreferencesDialog(Dialog):
         self._ui_testcard_action.setChecked(self._preferences.display_test)
         self._ui_testcard_action.clicked.connect(self.testcard_action)
 
-        self._ui_toolbar = Toolbar()
+        self._ui_toolbar = QToolBar()
         self._ui_toolbar.addWidget(self._ui_font_action)
         self._ui_toolbar.addWidget(self._ui_shadow_action)
         self._ui_toolbar.addWidget(self._ui_align_action)
@@ -1544,7 +1544,7 @@ class PreferencesDialog(Dialog):
         self._ui_toolbar.addStretch()
         self._ui_toolbar.addWidget(self._ui_output_action)
 
-        self._ui_layout = VLayout()
+        self._ui_layout = QVBoxLayout()
         self._ui_layout.addWidget(self._ui_transform)
         self._ui_layout.addWidget(self._ui_toolbar)
 
@@ -1748,21 +1748,21 @@ class DisplayPreviewViewer(Viewer):
 
     def __ui__(self):
 
-        self._ui_text = Label()
+        self._ui_text = QLabel()
         self._ui_text.setAlignment(Qt.AlignCenter | Qt.AlignCenter)
         self._ui_text.setObjectName("DisplayPreviewViewer_label")
 
-        self._ui_info_color = Button()
+        self._ui_info_color = QPushButton()
         self._ui_info_color.setStyleSheet("background: none; border: none;")
         self._ui_info_color.setIcon(Icon(":/rc/live.png"))
 
-        self._ui_info_type = Label("TYPE")
+        self._ui_info_type = QLabel("TYPE")
 
-        self._ui_info_follow = Label("Follow: ON")
+        self._ui_info_follow = QLabel("Follow: ON")
 
-        self._ui_info_number = Label("1.0.0")
+        self._ui_info_number = QLabel("1.0.0")
 
-        self._ui_info_layout = HLayout()
+        self._ui_info_layout = QHBoxLayout()
         self._ui_info_layout.setSpacing(8)
         self._ui_info_layout.setContentsMargins(4, 4, 4, 4)
         self._ui_info_layout.addWidget(self._ui_info_color, Qt.AlignLeft)
@@ -1786,12 +1786,12 @@ class DisplayPreviewViewer(Viewer):
         self._ui_view_action.setIcon(Icon.colored(':/rc/menu.png', QColor('#555'), QColor('#e3e3e3')))
         self._ui_view_action.clicked.connect(self.view_action)
 
-        self._ui_toolbar = Toolbar()
+        self._ui_toolbar = QToolBar()
         self._ui_toolbar.setObjectName("DisplayPreviewViewer_toolbar")
         self._ui_toolbar.addWidget(self._ui_view_action)
         self._ui_toolbar.addStretch()
 
-        self._layout = VLayout()
+        self._layout = QVBoxLayout()
         self._layout.addWidget(self._ui_info)
         self._layout.addWidget(self._ui_frame)
         self._layout.addWidget(self._ui_toolbar)
@@ -2114,14 +2114,14 @@ class DisplayMediaBinViewer(Viewer):
         self._ui_stop_action.setIcon(Icon(':/rc/stop.png'))
         self._ui_stop_action.clicked.connect(self.stop_action)
 
-        self._ui_toolbar = Toolbar()
+        self._ui_toolbar = QToolBar()
         self._ui_toolbar.setObjectName("DisplayMediaBinViewer_toolbar")
         self._ui_toolbar.addWidget(self._ui_view_action)
         self._ui_toolbar.addStretch()
         self._ui_toolbar.addWidget(self._ui_play_action)
         self._ui_toolbar.addWidget(self._ui_stop_action)
 
-        self._layout = VLayout()
+        self._layout = QVBoxLayout()
         self._layout.addWidget(self._ui_list)
         self._layout.addWidget(self._ui_toolbar)
 
@@ -2192,7 +2192,7 @@ class DisplayViewer(Viewer):
 
         self._widget = DisplayWidget(self)
 
-        self._ui_fit = Button("fit")
+        self._ui_fit = QPushButton("fit")
         self._ui_fit.clicked.connect(self._fit_clicked)
 
         self._ui_scale_factor = QSpinBox()
@@ -2207,14 +2207,14 @@ class DisplayViewer(Viewer):
         self._ui_view_action.setIcon(Icon.colored(':/rc/menu.png', QColor('#555'), QColor('#e3e3e3')))
         self._ui_view_action.clicked.connect(self.view_action)
 
-        self._ui_toolbar = Toolbar()
+        self._ui_toolbar = QToolBar()
         self._ui_toolbar.setObjectName("DisplayPreviewViewer_toolbar")
         self._ui_toolbar.addWidget(self._ui_view_action)
         self._ui_toolbar.addStretch()
         self._ui_toolbar.addWidget(self._ui_fit)
         self._ui_toolbar.addWidget(self._ui_scale_factor)
 
-        self._layout = VLayout()
+        self._layout = QVBoxLayout()
         self._layout.addWidget(self._widget)
         self._layout.addWidget(self._ui_toolbar)
 

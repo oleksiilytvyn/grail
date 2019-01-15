@@ -5,19 +5,14 @@
 
     Replacement for default OS message dialog
 
-    :copyright: (c) 2018 by Oleksii Lytvyn.
+    :copyright: (c) 2016-2019 by Alex Litvin.
     :license: GNU, see LICENSE for more details.
 """
-
-from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
-
-from grail.qt import Dialog, Label, Button
+from grail.qt import *
 from grailkit.util import OS_MAC
 
 
-class MessageDialog(Dialog):
+class MessageDialog(QDialog):
     """Message dialog, replacement of a default dialog"""
 
     # default icons
@@ -124,16 +119,16 @@ class MessageDialog(Dialog):
     def __ui__(self):
         """Create UI components"""
 
-        self._ui_icon = Label(self)
+        self._ui_icon = QLabel(self)
         self._ui_icon.setAlignment(Qt.AlignCenter)
         self._ui_icon.setGeometry(20, 18, 64, 64)
 
-        self._ui_title = Label(self._title)
+        self._ui_title = QLabel(self._title)
         self._ui_title.setObjectName("g_message_title")
         self._ui_title.setWordWrap(True)
         self._ui_title.setIndent(88)
 
-        self._ui_text = Label(self._text)
+        self._ui_text = QLabel(self._text)
         self._ui_text.setObjectName("g_message_text")
         self._ui_text.setWordWrap(True)
         self._ui_text.setIndent(88)
@@ -280,7 +275,7 @@ class MessageDialog(Dialog):
 
             return lambda flag: _self.button_clicked(_btn)
 
-        btn = button if isinstance(button, Button) else Button(name)
+        btn = button if isinstance(button, QPushButton) else QPushButton(name)
         btn.role = role
         btn.clicked.connect(triggered(self, btn))
 

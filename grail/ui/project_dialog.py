@@ -5,17 +5,13 @@
 
     Change project information
 
-    :copyright: (c) 2018 by Grail Team.
+    :copyright: (c) 2016-2019 by Alex Litvin.
     :license: GNU, see LICENSE for more details.
 """
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
-
-from grail.qt import Dialog, VLayout, HLayout, Application, LineEdit
+from grail.qt import *
 
 
-class ProjectDialog(Dialog):
+class ProjectDialog(QDialog):
     """Project information"""
 
     def __init__(self, parent=None):
@@ -28,11 +24,11 @@ class ProjectDialog(Dialog):
 
     def __ui__(self):
 
-        self._ui_title = LineEdit()
+        self._ui_title = QLineEdit()
         self._ui_title.setPlaceholderText("Project title")
         self._ui_title.textChanged.connect(self.title_changed)
 
-        self._ui_author = LineEdit()
+        self._ui_author = QLineEdit()
         self._ui_author.setPlaceholderText("Project author")
         self._ui_author.setMaximumWidth(160)
         self._ui_author.textChanged.connect(self.author_changed)
@@ -41,14 +37,14 @@ class ProjectDialog(Dialog):
         self._ui_description.setPlaceholderText("Description")
         self._ui_description.textChanged.connect(self.description_changed)
 
-        self._ui_title_layout = HLayout()
+        self._ui_title_layout = QHBoxLayout()
         self._ui_title_layout.setSpacing(8)
         self._ui_title_layout.setContentsMargins(8, 8, 8, 8)
 
         self._ui_title_layout.addWidget(self._ui_title)
         self._ui_title_layout.addWidget(self._ui_author)
 
-        self._ui_layout = VLayout()
+        self._ui_layout = QVBoxLayout()
         self._ui_layout.addLayout(self._ui_title_layout)
         self._ui_layout.addWidget(self._ui_description)
 

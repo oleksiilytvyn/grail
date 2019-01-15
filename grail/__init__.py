@@ -5,7 +5,7 @@
 
     Bootstrap and run Grail
 
-    :copyright: (c) 2018 by Grail Team.
+    :copyright: (c) 2016-2019 by Alex Litvin.
     :license: GNU, see LICENSE for more details.
 """
 
@@ -16,7 +16,7 @@ import sys
 import grailkit
 from grailkit.util import data_location, application_location
 
-__version__ = '1.0.3'
+__version__ = '1.0.4'
 
 APPLICATION_NAME = "Grail"
 APPLICATION_WEB = "http://grailapp.com/"

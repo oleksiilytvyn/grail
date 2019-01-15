@@ -5,7 +5,7 @@
 
     Core configurators
 
-    :copyright: (c) 2018 by Grail Team.
+    :copyright: (c) 2016-2019 by Alex Litvin.
     :license: GNU, see LICENSE for more details.
 """
 
@@ -35,39 +35,40 @@ class GeneralConfigurator(Configurator):
         self.ui_layout = QGridLayout()
 
         # Reset
-        self.ui_reset_btn = Button("Restore")
+        self.ui_reset_btn = QPushButton("Restore")
         self.ui_reset_btn.clicked.connect(self.restore_action)
-        self.ui_reset_label = Label("Restore Grail to it's original state")
+        self.ui_reset_label = QLabel("Restore Grail to it's original state")
 
         self.ui_layout.addWidget(self.ui_reset_btn, 0, 1, Qt.AlignRight)
         self.ui_layout.addWidget(self.ui_reset_label, 0, 0, Qt.AlignLeft)
 
         # Import
-        self.ui_import_btn = Button("Import library")
+        self.ui_import_btn = QPushButton("Import library")
         self.ui_import_btn.clicked.connect(self.import_action)
-        self.ui_import_label = Label("Add songs from a library file.")
+        self.ui_import_label = QLabel("Add songs from a library file.")
 
         self.ui_layout.addWidget(self.ui_import_btn, 1, 1, Qt.AlignRight)
         self.ui_layout.addWidget(self.ui_import_label, 1, 0, Qt.AlignLeft)
 
         # Export
-        self.ui_export_btn = Button("Export library")
+        self.ui_export_btn = QPushButton("Export library")
         self.ui_export_btn.clicked.connect(self.export_action)
-        self.ui_export_label = Label("Save my library of songs to file.")
+        self.ui_export_label = QLabel("Save my library of songs to file.")
 
         self.ui_layout.addWidget(self.ui_export_btn, 2, 1, Qt.AlignRight)
         self.ui_layout.addWidget(self.ui_export_label, 2, 0, Qt.AlignLeft)
 
         # Continue last project
-        self.ui_continue = Switch()
-        self.ui_continue.setValue(self.app.settings.get('project/continue', default=False))
-        self.ui_continue.changed.connect(self.continue_action)
-        self.ui_continue_label = Label("Continue last project on startup")
+        cont_flag = self.app.settings.get('project/continue', default=False)
+        self.ui_continue = QPushButton("On" if cont_flag else "Off")
+        self.ui_continue._toggle = cont_flag
+        self.ui_continue.clicked.connect(self.continue_action)
+        self.ui_continue_label = QLabel("Continue last project on startup")
 
         self.ui_layout.addWidget(self.ui_continue, 3, 1, Qt.AlignRight)
         self.ui_layout.addWidget(self.ui_continue_label, 3, 0, Qt.AlignLeft)
 
-        self.ui_layout.addWidget(Spacer(), 4, 0)
+        self.ui_layout.addWidget(QSpacer(), 4, 0)
         self.ui_layout.setColumnStretch(0, 1)
         self.ui_layout.setVerticalSpacing(24)
 
@@ -131,9 +132,11 @@ class GeneralConfigurator(Configurator):
 
         self.app.library.save_copy(path, create=True)
 
-    def continue_action(self, flag):
+    def continue_action(self):
         """Continue last project"""
+        flag = not self.ui_continue._toggle
 
+        self.ui_continue.setText("On" if flag else "Off")
         self.app.settings.set('project/continue', flag)
 
 
@@ -157,11 +160,11 @@ class BibleConfigurator(Configurator):
 
         self.setObjectName("BibleConfigurator")
 
-        self._ui_layout = VLayout()
-        self._ui_list = List()
+        self._ui_layout = QVBoxLayout()
+        self._ui_list = QListWidget()
         self._ui_list.setObjectName("BibleConfigurator_list")
 
-        self._ui_toolbar_label = Label("0 installed")
+        self._ui_toolbar_label = QLabel("0 installed")
         self._ui_toolbar_label.setAlignment(Qt.AlignCenter)
         self._ui_toolbar_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
@@ -173,7 +176,7 @@ class BibleConfigurator(Configurator):
         self._ui_primary_action.setIconVisibleInMenu(True)
         self._ui_primary_action.triggered.connect(self.primary_action)
 
-        self._ui_toolbar = Toolbar()
+        self._ui_toolbar = QToolBar()
         self._ui_toolbar.addAction(self._ui_install_action)
         self._ui_toolbar.addWidget(self._ui_toolbar_label)
         self._ui_toolbar.addAction(self._ui_primary_action)
@@ -228,7 +231,7 @@ class BibleConfigurator(Configurator):
 
             bible = bibles[key]
 
-            item = ListItem()
+            item = QListWidgetItem()
             item.bible_id = bible.identifier
             item.setText("%s (%s)%s" % (bible.title, bible.identifier,
                                         " - selected" if bible_selected_id == bible.identifier else ""))
@@ -255,10 +258,10 @@ class PluginsConfigurator(Configurator):
 
         self.setObjectName("PluginsConfigurator")
 
-        self._ui_list = List()
+        self._ui_list = QListWidget()
         self._ui_list.setObjectName("PluginsConfigurator_list")
 
-        self._ui_layout = VLayout()
+        self._ui_layout = QVBoxLayout()
         self._ui_layout.addWidget(self._ui_list)
 
         self.setLayout(self._ui_layout)
@@ -270,7 +273,7 @@ class PluginsConfigurator(Configurator):
 
         for plug in Plugin.plugins() + Viewer.plugins() + Configurator.plugins():
             text = "<small>by %s</small><br/>%s" % (plug.author, plug.description)
-            item = ListItem()
+            item = QListWidgetItem()
 
             custom = _PluginItem(self._ui_list, plug.name, text)
 
@@ -286,13 +289,13 @@ class _PluginItem(QWidget):
 
         self._parent = parent
 
-        self._title = Label(title)
+        self._title = QLabel(title)
         self._title.setStyleSheet("font-weight: bold;margin: 0 0 4px 0;")
 
-        self._text = Label(text)
+        self._text = QLabel(text)
         self._text.setStyleSheet("color: #bbb;margin: 0 2px 0 2px;")
 
-        self._layout = VLayout()
+        self._layout = QVBoxLayout()
         self._layout.addWidget(self._title)
         self._layout.addWidget(self._text)
 

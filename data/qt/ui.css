@@ -3,11 +3,10 @@
 */
 
 /**
- * @section Component, Dialog
+ * @section QWidget, QDialog
  */
 
-Component,
-Dialog {
+QDialog {
     background-color: #4b5056;
     }
 
@@ -181,26 +180,27 @@ QTableView {
 
 
 /***
- * @section Splitter
+ * @section QSplitter
  */
 
-Splitter::handle {
+QSplitter::handle {
     background-color: #343434;
     }
 
 /**
- * @section Label
+ * @section QLabel
  */
 
-Label {
+QLabel {
     color: #f1f1f1;
     }
 
 /**
- * @section Button
+ * @section QPushButton
  */
 
-Button {
+QPushButton,
+QToolButton {
     color: #31343a;
     border-radius: 3px;
     padding: 4px 8px;
@@ -209,12 +209,13 @@ Button {
     border: 1px solid #2c71ae;
     }
 
-    Button:hover {
+    QPushButton:hover {
         color: #31343a;
         background: #6bbaff;
         }
 
-    Button::menu-indicator {
+    QPushButton::menu-indicator,
+    QToolButton::menu-indicator {
         image: url(:/rc/branch-open.png);
         subcontrol-position: right center;
         subcontrol-origin: padding;
@@ -223,17 +224,17 @@ Button {
         }
 
 /**
- * @section Toolbar
+ * @section QToolBar
  */
 
-Toolbar {
+QToolBar {
     padding: 5px;
     min-height: 24px;
     background: #4b5056;
     border-top: 1px solid #4b5056;
     }
 
-    Toolbar QToolButton {
+    QToolBar QToolButton {
         border: 1px solid transparent;
         background: none;
         border-radius: 3px;
@@ -339,11 +340,11 @@ QScrollBar:vertical {
         }
 
 /**
- * @section LineEdit
+ * @section QLineEdit
  */
 
-LineEdit,
-SearchEdit {
+QLineEdit,
+QSearchEdit {
     border: none;
     border-radius: 6px;
     padding: 1px 8px;
@@ -354,14 +355,14 @@ SearchEdit {
     }
 
 /**
- * @section SearchEdit
+ * @section QSearchEdit
  */
 
-SearchEdit {
+QSearchEdit {
     border-radius: 6px;
     }
 
-    SearchEdit QToolButton {
+    QSearchEdit QToolButton {
         border: none;
         margin: 0;
         padding: 0;
@@ -369,10 +370,10 @@ SearchEdit {
         }
 
 /**
- * @section List
+ * @section QListWidget
  */
 
-List {
+QListWidget {
     border: none;
     background-color: #626364;
     alternate-background-color: #676869;
@@ -380,7 +381,7 @@ List {
     outline: 0;
     }
 
-    List::item {
+    QListWidget::item {
         color: #e6e6e6;
         margin: 0;
         padding: 4px 12px;
@@ -388,17 +389,17 @@ List {
         qproperty-wordWrap: true;
         }
 
-    List::item:selected {
+    QListWidget::item:selected {
         background: #8a9fbb;
         border-bottom: 1px solid #8a9fbb;
         color: #ffffff;
         }
 
 /**
- * @section Tree
+ * @section QTreeWidget
  */
 
-Tree {
+QTreeWidget {
     border: none;
     show-decoration-selected: 1;
     padding: 0;
@@ -407,7 +408,7 @@ Tree {
     outline: 0;
     }
 
-    Tree::item {
+    QTreeWidget::item {
         color: #e6e6e6;
         padding: 4px 0;
         margin: 0;
@@ -417,13 +418,13 @@ Tree {
         qproperty-wordWrap: true;
         }
 
-    Tree::item:selected {
+    QTreeWidget::item:selected {
         background: #8a9fbb;
         border-bottom: 1px solid #8a9fbb;
         color: #ffffff;
         }
 
-    Tree::branch {
+    QTreeWidget::branch {
         margin: 0;
         padding: 0;
         background: transparent;
@@ -431,23 +432,23 @@ Tree {
         border-bottom: 1px solid #626364;
         }
 
-    Tree::branch:selected {
+    QTreeWidget::branch:selected {
         background: #8a9fbb;
         border-bottom: 1px solid #8a9fbb;
         }
 
-    Tree::branch:has-children:!has-siblings:closed,
-    Tree::branch:closed:has-children:has-siblings,
-    Tree::branch:has-children:!has-siblings:closed:selected,
-    Tree::branch:closed:has-children:has-siblings:selected {
+    QTreeWidget::branch:has-children:!has-siblings:closed,
+    QTreeWidget::branch:closed:has-children:has-siblings,
+    QTreeWidget::branch:has-children:!has-siblings:closed:selected,
+    QTreeWidget::branch:closed:has-children:has-siblings:selected {
         border-image: none;
         image: url(:/rc/branch-closed-white.png);
         }
 
-    Tree::branch:open:has-children:!has-siblings,
-    Tree::branch:open:has-children:has-siblings,
-    Tree::branch:open:has-children:!has-siblings:selected,
-    Tree::branch:open:has-children:has-siblings:selected {
+    QTreeWidget::branch:open:has-children:!has-siblings,
+    QTreeWidget::branch:open:has-children:has-siblings,
+    QTreeWidget::branch:open:has-children:!has-siblings:selected,
+    QTreeWidget::branch:open:has-children:has-siblings:selected {
         border-image: none;
         image: url(:/rc/branch-open-white.png);
         }
@@ -525,10 +526,10 @@ AboutDialog {
         }
 
 /**
- * @section Popup
+ * @section QPopup
  */
 
-Popup {
+QPopup {
     background: #eee;
     }
 

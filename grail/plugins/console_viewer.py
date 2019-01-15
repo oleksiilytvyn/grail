@@ -5,7 +5,7 @@
 
     View python console output & execute commands
 
-    :copyright: (c) 2018 by Grail Team.
+    :copyright: (c) 2016-2019 by Alex Litvin.
     :license: GNU, see LICENSE for more details.
 """
 import sys
@@ -210,7 +210,7 @@ class ConsoleViewer(Viewer):
     def __ui__(self):
         """Build UI"""
 
-        self._ui_output = TextEdit()
+        self._ui_output = QTextEdit()
         self._ui_output.setObjectName("ConsoleViewer_text")
         self._ui_output.setAcceptRichText(False)
         self._ui_output.setReadOnly(True)
@@ -222,7 +222,7 @@ class ConsoleViewer(Viewer):
         font.setFixedPitch(True)
         font.setPointSize(10)
 
-        self._ui_input = TextEdit()
+        self._ui_input = QTextEdit()
         self._ui_input.setPlaceholderText("Enter Python code")
         self._ui_input.setObjectName("ConsoleViewer_text")
         self._ui_input.setFont(font)
@@ -232,7 +232,7 @@ class ConsoleViewer(Viewer):
 
         self._ui_input_highlight = PythonHighlighter(self._ui_input.document())
 
-        self._ui_splitter = Splitter(Qt.Vertical)
+        self._ui_splitter = QSplitter(Qt.Vertical)
         self._ui_splitter.setHandleWidth(2)
         self._ui_splitter.addWidget(self._ui_output)
         self._ui_splitter.addWidget(self._ui_input)
@@ -241,7 +241,7 @@ class ConsoleViewer(Viewer):
         self._ui_splitter.setSizes([size * 0.8, size * 0.2])
         self._ui_splitter.setCollapsible(0, False)
 
-        self._ui_label = Label("Console")
+        self._ui_label = QLabel("Console")
         self._ui_label.setObjectName("ConsoleViewer_label")
         self._ui_label.setAlignment(Qt.AlignCenter)
         self._ui_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -261,14 +261,14 @@ class ConsoleViewer(Viewer):
         self._ui_run_action.setIcon(Icon(':/rc/play.png'))
         self._ui_run_action.clicked.connect(self.run_action)
 
-        self._ui_toolbar = Toolbar()
+        self._ui_toolbar = QToolBar()
         self._ui_toolbar.setObjectName("ConsoleViewer_toolbar")
         self._ui_toolbar.addWidget(self._ui_view_action)
         self._ui_toolbar.addWidget(self._ui_label)
         self._ui_toolbar.addWidget(self._ui_follow_action)
         self._ui_toolbar.addWidget(self._ui_run_action)
 
-        self._ui_layout = VLayout()
+        self._ui_layout = QVBoxLayout()
         self._ui_layout.addWidget(self._ui_splitter)
         self._ui_layout.addWidget(self._ui_toolbar)
 

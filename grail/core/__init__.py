@@ -3,7 +3,7 @@
     grail.core
     ~~~~~~~~~~
 
-    :copyright: (c) 2018 by Grail Team.
+    :copyright: (c) 2016-2019 by Alex Litvin.
     :license: GNU, see LICENSE for more details.
 """
 

@@ -10,6 +10,7 @@
 """
 import os
 
+import grail
 from grail.qt import *
 
 
@@ -34,8 +35,6 @@ class Welcome(QWidget):
     def __ui__(self):
         """Create ui"""
 
-        # fix stylesheet issues
-        self.setStyleSheet(QCoreApplication.instance().stylesheet())
         self.setMinimumWidth(300)
 
         self._ui_icon = QLabel(self)
@@ -296,8 +295,8 @@ class WelcomeDialog(QDialog):
         last_project_continue = last_project and os.path.isfile(last_project)
 
         widget = Welcome()
-        widget.setTitle("Welcome to Grail")
-        widget.setDescription("Choose menu_action below")
+        widget.setTitle("Grail %s" % grail.__version__)
+        widget.setDescription("Choose action below")
         widget.setIcon(grail_icon)
         widget.setIconVisible(True)
 

@@ -17,7 +17,46 @@
 		<file alias="icon\grail.ico">icon\grail.ico</file>
 
 		<!-- ./qt/ -->
-		<file alias="qt\ui.css">qt\ui.css</file>
+		<file alias="qt\branch_closed-on.png">qt\branch_closed-on.png</file>
+		<file alias="qt\branch_closed.png">qt\branch_closed.png</file>
+		<file alias="qt\branch_open-on.png">qt\branch_open-on.png</file>
+		<file alias="qt\branch_open.png">qt\branch_open.png</file>
+		<file alias="qt\checkbox_checked.png">qt\checkbox_checked.png</file>
+		<file alias="qt\checkbox_checked_disabled.png">qt\checkbox_checked_disabled.png</file>
+		<file alias="qt\checkbox_checked_focus.png">qt\checkbox_checked_focus.png</file>
+		<file alias="qt\checkbox_indeterminate.png">qt\checkbox_indeterminate.png</file>
+		<file alias="qt\checkbox_indeterminate_disabled.png">qt\checkbox_indeterminate_disabled.png</file>
+		<file alias="qt\checkbox_indeterminate_focus.png">qt\checkbox_indeterminate_focus.png</file>
+		<file alias="qt\checkbox_unchecked.png">qt\checkbox_unchecked.png</file>
+		<file alias="qt\checkbox_unchecked_disabled.png">qt\checkbox_unchecked_disabled.png</file>
+		<file alias="qt\checkbox_unchecked_focus.png">qt\checkbox_unchecked_focus.png</file>
+		<file alias="qt\close-hover.png">qt\close-hover.png</file>
+		<file alias="qt\close-pressed.png">qt\close-pressed.png</file>
+		<file alias="qt\close.png">qt\close.png</file>
+		<file alias="qt\down_arrow.png">qt\down_arrow.png</file>
+		<file alias="qt\down_arrow_disabled.png">qt\down_arrow_disabled.png</file>
+		<file alias="qt\left_arrow.png">qt\left_arrow.png</file>
+		<file alias="qt\left_arrow_disabled.png">qt\left_arrow_disabled.png</file>
+		<file alias="qt\radio_checked.png">qt\radio_checked.png</file>
+		<file alias="qt\radio_checked_disabled.png">qt\radio_checked_disabled.png</file>
+		<file alias="qt\radio_checked_focus.png">qt\radio_checked_focus.png</file>
+		<file alias="qt\radio_unchecked.png">qt\radio_unchecked.png</file>
+		<file alias="qt\radio_unchecked_disabled.png">qt\radio_unchecked_disabled.png</file>
+		<file alias="qt\radio_unchecked_focus.png">qt\radio_unchecked_focus.png</file>
+		<file alias="qt\right_arrow.png">qt\right_arrow.png</file>
+		<file alias="qt\right_arrow_disabled.png">qt\right_arrow_disabled.png</file>
+		<file alias="qt\sizegrip.png">qt\sizegrip.png</file>
+		<file alias="qt\stylesheet-branch-end.png">qt\stylesheet-branch-end.png</file>
+		<file alias="qt\stylesheet-branch-more.png">qt\stylesheet-branch-more.png</file>
+		<file alias="qt\stylesheet-vline.png">qt\stylesheet-vline.png</file>
+		<file alias="qt\toolbar-h-move.png">qt\toolbar-h-move.png</file>
+		<file alias="qt\toolbar-h-separator.png">qt\toolbar-h-separator.png</file>
+		<file alias="qt\toolbar-v-move.png">qt\toolbar-v-move.png</file>
+		<file alias="qt\toolbar-v-separator.png">qt\toolbar-v-separator.png</file>
+		<file alias="qt\transparent.png">qt\transparent.png</file>
+		<file alias="qt\undock.png">qt\undock.png</file>
+		<file alias="qt\up_arrow.png">qt\up_arrow.png</file>
+		<file alias="qt\up_arrow_disabled.png">qt\up_arrow_disabled.png</file>
 
 		<!-- ./rc/ -->
 		<file alias="rc\add.png">rc\add.png</file>
@@ -49,6 +88,7 @@
 		<file alias="rc\stop.png">rc\stop.png</file>
 		<file alias="rc\testcard.png">rc\testcard.png</file>
 		<file alias="rc\text-padding-box.png">rc\text-padding-box.png</file>
+		<file alias="rc\theme.qss">rc\theme.qss</file>
 		<file alias="rc\txt.png">rc\txt.png</file>
 		<file alias="rc\unlock.png">rc\unlock.png</file>
 		<file alias="rc\up_arrow.png">rc\up_arrow.png</file>

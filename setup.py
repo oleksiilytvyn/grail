@@ -12,6 +12,7 @@
 """
 
 import os
+import re
 import sys
 import shutil
 import platform
@@ -21,6 +22,7 @@ from PyQt5.QtGui import QPixmap, QGuiApplication
 from cx_Freeze import setup, Executable
 
 from grail import __version__ as GRAIL_VERSION
+from scripts.css_preprocessor import CSSPreprocessor
 
 
 # os constants
@@ -29,6 +31,33 @@ OS_WIN = OS_SYSTEM == "Windows"
 OS_MAC = OS_SYSTEM == "Darwin"
 OS_UNIX = OS_SYSTEM == "Linux"
 
+# Constants
+VERSION = GRAIL_VERSION
+VERSION_PATH = "build/.version"
+TITLE = "Grail"
+FILE = "grail.py"
+BUNDLE_NAME = "%s-%s" % (TITLE, VERSION)
+BUNDLE_FILE = "%s.app" % (BUNDLE_NAME,)
+BUNDLE_CONTENTS = "build/%s/Contents" % BUNDLE_FILE
+BUNDLE_RESOURCES = "%s/Resources" % BUNDLE_CONTENTS
+
+packages = []
+includes = ['atexit', 'PyQt5.QtNetwork']
+excludes = ['nt',
+            'pdb',
+            '_ssl',
+            "Pyrex",
+            'doctest',
+            "tkinter",
+            'pyreadline',
+            'matplotlib',
+            'scipy.linalg',
+            'scipy.special',
+            'numpy']
+
+files = [('LICENSE', 'LICENSE'),
+         ('build/.version', '.version')]
+
 # Add support for custom arguments
 USER_ARGS = [arg for arg in sys.argv if arg.startswith('!')]
 sys.argv = [arg for arg in sys.argv if not arg.startswith('!')]
@@ -36,6 +65,11 @@ sys.argv = [arg for arg in sys.argv if not arg.startswith('!')]
 # used for png utility
 if '!fix-png' in USER_ARGS:
     app = QGuiApplication(sys.argv)
+
+
+def print_step(title, *args):
+    delimiter = '~~' * 30
+    print("\n~%s\n~ Section: %s\n~%s" % (delimiter, title, delimiter))
 
 
 def get_revision():
@@ -55,6 +89,9 @@ def get_revision():
         print(error)
 
     return revision
+
+
+VERSION = get_revision()
 
 
 def compile_resources(source=None, destination=None, exclude=None):
@@ -147,7 +184,7 @@ def fix_png_profile(path, recursive=False, _main=True):
         return False
 
     if _main:
-        print("\nFixing PNG warnings:")
+        print_step("Conforming PNG files")
 
     for name in os.listdir(path):
         link = os.path.join(path, name)
@@ -169,45 +206,41 @@ def fix_png_profile(path, recursive=False, _main=True):
             fix_png_profile(link, recursive, False)
 
 
-# Constants
-VERSION = get_revision()
-VERSION_PATH = "build/.version"
-TITLE = "Grail"
-FILE = "grail.py"
-BUNDLE_NAME = "%s-%s" % (TITLE, VERSION)
-BUNDLE_FILE = "%s.app" % (BUNDLE_NAME,)
-BUNDLE_CONTENTS = "build/%s/Contents" % BUNDLE_FILE
-BUNDLE_RESOURCES = "%s/Resources" % BUNDLE_CONTENTS
+def generate_stylesheet():
 
-packages = []
-includes = ['atexit', 'PyQt5.QtNetwork']
-excludes = ['nt',
-            'pdb',
-            '_ssl',
-            "Pyrex",
-            'doctest',
-            "tkinter",
-            'pyreadline',
-            'matplotlib',
-            'scipy.linalg',
-            'scipy.special',
-            'numpy']
+    try:
+        source = open('./data/dist/theme.qss', 'r')
+        code = source.read()
+        source.close()
 
-files = [('LICENSE', 'LICENSE'),
-         ('build/.version', '.version')]
+        destination = open('./data/rc/theme.qss', 'w+')
+        destination.write(CSSPreprocessor(code).compile())
+        destination.close()
+
+        print("Successfully generated theme")
+    except Exception as error:
+        print("Failed to generate theme.qss")
+        print(error)
+
 
 # fix png warnings
 if '!fix-png' in USER_ARGS:
     fix_png_profile('./data', recursive=True)
 
+# Generate stylesheet
+print_step("Compiling theme.qss")
+generate_stylesheet()
+
 # compile Qt resources
+print_step("Compiling Qt resource")
 compile_resources(source='./data', destination='./grail/resources.py', exclude=['./dist', '.'])
 
 # Create new version file
+print_step("Creating .version file")
 create_version_file(VERSION_PATH, VERSION)
 
 # Building executable
-print("\n%s\n" % ('- ' * 30))
+print_step("Building executable")
 
 setup(
     name=TITLE,
@@ -221,7 +254,7 @@ setup(
     keywords='open source osc church lyrics projection song bible display',
     license='GNU General Public License v3',
 
-    requires=['grailkit', 'PyQt5', 'hgapi'],
+    requires=['grailkit', 'PyQt5'],
 
     classifiers=[
         'Development Status :: 4 - Beta',
@@ -279,6 +312,7 @@ setup(
 
 # fix Mac OS app file
 if OS_MAC and os.path.exists(BUNDLE_RESOURCES):
+    print_step("Copying qt.conf to Bundle")
     shutil.copyfile("data/dist/qt.conf", BUNDLE_RESOURCES + '/qt.conf')
 
 # Exit script as it uses Qt Application instance

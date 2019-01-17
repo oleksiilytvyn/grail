@@ -38,10 +38,8 @@ class Grail(QApplication):
 
         self._shared_memory = None
         self._sys_exception_handler = sys.excepthook
-        self._stylesheet_file = None
-        self._stylesheet = ""
-
         self.lastWindowClosed.connect(self.quit)
+        self.stylesheet = ""
 
         # set a exception handler
         sys.excepthook = self.unhandledException
@@ -55,7 +53,7 @@ class Grail(QApplication):
             if "gtk" in style.lower():
                 self.setStyle(QStyleFactory.create("gtk"))
 
-        self.setStyleSheet(self.stylesheet())
+        self._bind_stylesheet()
 
         # prevent from running more than one instance
         if not self.moreThanOneInstanceAllowed() and self.isAlreadyRunning():
@@ -158,7 +156,7 @@ class Grail(QApplication):
 
         return Console.instance()
 
-    def stylesheet(self):
+    def _bind_stylesheet(self):
         """Get the application stylesheet
 
         Returns: stylesheet string
@@ -183,25 +181,9 @@ class Grail(QApplication):
 
             return re.sub(r'(\\n)|(\\r)|(\\t)', '', data)[2:-1]
 
-        self._stylesheet = read_stylesheet(":/qt/ui.css")
-        self._stylesheet += read_stylesheet(self._stylesheet_file)
+        self.stylesheet = read_stylesheet(":/rc/theme.qss")
 
-        return self._stylesheet
-
-    def setStyleSheetFile(self, file_path):
-        """Set a global style from a file
-
-        Args:
-            file_path (str): path to stylesheet file
-        """
-
-        self._stylesheet_file = file_path
-        self.setStyleSheet(self.stylesheet())
-
-    def getStyleSheet(self):
-        """Returns application stylesheet"""
-
-        return self._stylesheet
+        self.setStyleSheet(self.stylesheet)
 
     def quit(self):
         """Quit application and close all connections"""
@@ -231,15 +213,6 @@ class Grail(QApplication):
             self._shared_memory.create(1)
 
         return False
-
-    @classmethod
-    def instance(cls):
-        """Get instance of Application
-
-        Returns: instance of QCoreApplication or Application
-        """
-
-        return QCoreApplication.instance()
 
     def moreThanOneInstanceAllowed(self):
         """Do not allow multiple instances"""
@@ -271,6 +244,7 @@ class Grail(QApplication):
             self.welcome_dialog.show()  # trick for keeping Qt alive
             self.main_window.close()
 
+        # todo: Project may fail due to file error
         self._project = Project(path, create=create)
         self._library = Library(grail.LIBRARY_PATH, create=True)
 
@@ -385,6 +359,15 @@ class Grail(QApplication):
         """Get list of actions"""
 
         return self._actions
+
+    @classmethod
+    def instance(cls):
+        """Get instance of Application
+
+        Returns: instance of QCoreApplication or Application
+        """
+
+        return QCoreApplication.instance()
 
 
 class _ConsoleOutput(io.StringIO):

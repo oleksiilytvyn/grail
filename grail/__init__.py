@@ -16,7 +16,7 @@ import sys
 import grailkit
 from grailkit.util import data_location, application_location
 
-__version__ = '1.0.4'
+__version__ = '1.0.5'
 
 APPLICATION_NAME = "Grail"
 APPLICATION_WEB = "http://grailapp.com/"
@@ -26,7 +26,7 @@ ORGANISATION_DOMAIN = "grailapp.com"
 LIBRARY_PATH = grailkit.PATH_LIBRARY
 SETTINGS_PATH = os.path.join(data_location("grail"), "app.grail")
 
-DEBUG = True
+DEBUG = False
 
 
 def main():

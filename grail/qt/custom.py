@@ -15,11 +15,12 @@ from PyQt5.QtWidgets import *
 
 from grailkit.util import OS_MAC
 
-
+# References to original classes
 QT_QTREEWIDGET = QTreeWidget
 QT_QLISTWIDGET = QListWidget
 QT_QTABLEWIDGET = QTableWidget
 QT_QTEXTEDIT = QTextEdit
+QT_QLINEEDIT = QLineEdit
 
 
 class Icon(QIcon):
@@ -333,7 +334,7 @@ class _QVBoxLayout(QVBoxLayout):
         self.setSpacing(0)
 
 
-class _QSplitter(QSplitter, QWidget):
+class _QSplitter(QSplitter, _QWidget):
     """Splitter component"""
 
     def __init__(self, *args):
@@ -342,16 +343,16 @@ class _QSplitter(QSplitter, QWidget):
         self.setHandleWidth(1)
 
 
-class _QLineEdit(QLineEdit, QWidget):
+class QLineEdit(QLineEdit, _QWidget):
     """Line edit widget"""
 
     def __init__(self, *args, **kwargs):
-        super(_QLineEdit, self).__init__(*args, **kwargs)
+        super(QLineEdit, self).__init__(*args, **kwargs)
 
         self.setAttribute(Qt.WA_MacShowFocusRect, False)
 
 
-class QSearchEdit(QLineEdit):
+class QSearchEdit(QT_QLINEEDIT):
     """Basic edit input for search with clear button"""
 
     keyPressed = pyqtSignal('QKeyEvent')
@@ -375,19 +376,17 @@ class QSearchEdit(QLineEdit):
 
         frame_width = self.style().pixelMetric(QStyle.PM_DefaultFrameWidth)
 
-        self.setStyleSheet("""
-                QLineEdit {
-                    background-color: #e9e9e9;
-                    padding-right: %spx;
-                    }
-                """ % str(self._ui_clear.sizeHint().width() / 2 + frame_width + 1))
-
         size_hint = self.minimumSizeHint()
         btn_size_hint = self._ui_clear.sizeHint()
 
         self.setMinimumSize(
             max(size_hint.width(), btn_size_hint.height() + frame_width * 2 + 2),
             max(size_hint.height(), btn_size_hint.height() + frame_width * 2 + 2))
+
+    def className(self):
+        """Returns widget name that used in stylesheet."""
+
+        return "QSearchEdit"
 
     def resizeEvent(self, event):
         """Redraw some elements"""
@@ -623,7 +622,6 @@ QVBoxLayout = _QVBoxLayout
 
 QSplitter = _QSplitter
 QTextEdit = _QTextEdit
-QLineEdit = _QLineEdit
 QToolBar = _QToolBar
 
 QTableWidget = _QTableWidget

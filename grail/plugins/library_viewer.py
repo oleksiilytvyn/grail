@@ -221,7 +221,7 @@ class LibraryViewer(Viewer):
 
     id = 'library'
     name = 'Library'
-    author = 'Grail Team'
+    author = 'Alex Litvin'
     description = 'Manage grail library'
 
     def __init__(self, *args):

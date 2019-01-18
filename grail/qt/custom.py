@@ -615,7 +615,7 @@ class QPopup(_QDialog):
 
 # Replacing default widgets
 Application = QCoreApplication
-QWidget = _QWidget
+QWidget.className = _QWidget.className
 
 QHBoxLayout = _QHBoxLayout
 QVBoxLayout = _QVBoxLayout

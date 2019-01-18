@@ -486,7 +486,7 @@ class CuelistViewer(Viewer):
 
     id = 'cuelist'
     name = 'Cuelist'
-    author = 'Grail Team'
+    author = 'Alex Litvin'
     description = 'Manage cuelists'
     single_instance = True
 

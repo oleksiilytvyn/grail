@@ -17,7 +17,7 @@ class NotesViewer(Viewer):
 
     id = 'notes'
     name = 'Notes'
-    author = 'Grail Team'
+    author = 'Alex Litvin'
     description = 'Create text notes'
 
     def __init__(self, *args):
@@ -45,7 +45,7 @@ class NotesViewer(Viewer):
 
         self._ui_view_action = QToolButton()
         self._ui_view_action.setText("View")
-        self._ui_view_action.setIcon(Icon.colored(':/rc/menu.png', QColor('#222222'), QColor('#e3e3e3')))
+        self._ui_view_action.setIcon(Icon(':/rc/menu.png'))
         self._ui_view_action.clicked.connect(self.view_action)
 
         self._ui_toolbar = QToolBar()

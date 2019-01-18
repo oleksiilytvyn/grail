@@ -20,7 +20,7 @@ class TimeViewer(Viewer):
 
     id = 'time'
     name = 'Time'
-    author = 'Grail Team'
+    author = 'Alex Litvin'
     description = 'Display current time'
 
     def __init__(self, *args):

@@ -17,7 +17,7 @@ class EmptyViewer(Viewer):
 
     id = 'empty'
     name = 'Empty'
-    author = 'Grail Team'
+    author = 'Alex Litvin'
     description = 'This viewer created after split or if viewer not found'
     private = True
 

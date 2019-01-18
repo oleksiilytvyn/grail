@@ -27,7 +27,7 @@ class _PluginMeta(object):
     name = 'Default plugin'
 
     # Plugin author string
-    author = 'Grail Team'
+    author = 'Unnamed Developer'
 
     # Plugin description string
     description = 'Dummy plugin that doesn\'t do anything useful'

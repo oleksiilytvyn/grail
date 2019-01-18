@@ -28,7 +28,7 @@ class PropertyViewer(Viewer):
 
     id = 'property'
     name = 'Properties'
-    author = 'Grail Team'
+    author = 'Alex Litvin'
     description = 'View properties of selected entities'
     single_instance = True
 

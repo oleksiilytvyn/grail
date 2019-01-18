@@ -887,7 +887,7 @@ QPushButton {
     border: 1px solid $widget;
     color: $widget-text;
     border-radius: $radius;
-    padding: 3px 5px;
+    padding: 5px 5px;
     outline: none;
     font-weight: bold;
     }
@@ -921,7 +921,7 @@ QPushButton {
     QPushButton::menu-indicator {
         subcontrol-origin: padding;
         subcontrol-position: bottom right;
-        bottom: 4px;
+        bottom: 5px;
         }
     
     QPushButton:pressed {
@@ -954,7 +954,7 @@ QDialogButtonBox QPushButton:disabled {
 QToolButton {
     background-color: transparent;
     margin: 0px;
-    padding: 2px;
+    padding: 4px;
     border: 1px solid transparent;
     }
 
@@ -1042,10 +1042,7 @@ QComboBox {
     background-color: $widget;
     border-radius: $radius;
     selection-background-color: $widget-alt;
-    padding-top: 2px;     /* This fix  #103, #111*/
-    padding-bottom: 2px;  /* This fix  #103, #111*/
-    padding-left: 4px;
-    padding-right: 4px;
+    padding: 4px;
     outline: none;
     }
     
@@ -1664,22 +1661,21 @@ QHeaderView {
         }
 
     QHeaderView::section {
-        background-color: $base;
-        color: $base-text;
-        padding: 2px;
+        background-color: $container-alt;
+        color: $container-text;
+        padding: 4px;
         border-radius: 0px;
         text-align: left;
-        border: 1px solid $base;
+        border: none;
+        border-right: 1px solid $base-alt;
+        border-top: 1px solid $base-alt;
+        border-bottom: 1px solid $base-alt;
         }
 
         QHeaderView::section:checked {
-            color: $widget-active-text;
-            background-color: $widget-active;
             }
 
         QHeaderView::section:checked:disabled {
-            color: $container;
-            background-color: $container-alt;
             }
 
     QHeaderView::down-arrow {
@@ -1827,6 +1823,12 @@ QDateEdit {
         }
 
 
+/******************************************************************************
+*
+*  @section Custom Qt Components
+*
+******************************************************************************/
+
 /** @section QPopup *******************************************************/
 
 QPopup {
@@ -1840,7 +1842,8 @@ Welcome {
     background-color: $base;
     }
 
-    Welcome QLabel {
+    Welcome QLabel,
+    Welcome QWidget {
         background-color: $base;
         }
 
@@ -1859,7 +1862,7 @@ Welcome {
         margin: 0 0 24px 0;
         }
 
-    WelcomeAction {
+    Welcome WelcomeAction {
         border: 2px solid $widget;
         background-color: $widget;
         border-radius: $radius;
@@ -1896,12 +1899,16 @@ AboutDialog {
     background-color: $base;
     }
 
+    AboutDialog QWidget {
+        background: transparent;
+        }
+
     AboutDialog QLabel,
     AboutDialog QPlainTextEdit,
     AboutDialog QPlainTextEdit:hover {
         background-color: $base;
         border: 0;
-        color: $container;
+        color: $container-text;
         }
 
     AboutDialog QPushButton {
@@ -1938,6 +1945,7 @@ MessageDialog {
             margin: 0 0 0 12px;
             }
 
+
 /** @section ProgressDialog *******************************************************/
 
 ProgressDialog {
@@ -1960,3 +1968,396 @@ ProgressDialog {
             padding: 0;
             background: none;
             }
+
+
+/******************************************************************************
+*
+*  @section Grail Application Components/Plugins
+*
+******************************************************************************/
+
+/**
+ * @section Actions Dialog
+ */
+
+ActionsDialog {}
+
+    #ActionsDialog_search_widget {
+        background: #676869;
+        }
+
+
+/** @section PropertiesViewer ************************************************/
+
+#PropertiesView_empty {
+    background-color: #2f2f2f;
+    }
+
+    #PropertiesView_empty_title {
+        qproperty-alignment: AlignCenter AlignCenter;
+        text-align: center;
+        font-size: 22px;
+        margin: 0 0 6px 0;
+        color: #f1f1f1;
+        }
+
+    #PropertiesView_empty_info {
+        text-align: center;
+        font-size: 13px;
+        qproperty-alignment: AlignCenter AlignCenter;
+        font-weight: 300;
+        color: #929292;
+        margin: 0 0 16px 0;
+        }
+
+
+/** @section EmptyViewer *****************************************************/
+
+#EmptyViewer {
+    background-color: $base-alt;
+    }
+
+    #EmptyViewer QLabel {
+        background-color: transparent;
+        color: $base-text;
+        }
+
+    #EmptyViewer QPushButton {
+        border: 1px solid $widget-active;
+        color: $widget-active-text;
+        background-color: $widget-active;
+        padding: 4px 7px;
+        }
+
+    #EmptyViewer_title {
+        qproperty-alignment: AlignCenter AlignCenter;
+        text-align: center;
+        font-size: 22px;
+        margin: 0 0 6px 0;
+        }
+
+    #EmptyViewer_info {
+        text-align: center;
+        font-size: 13px;
+        qproperty-alignment: AlignCenter AlignCenter;
+        font-weight: 100;
+        margin: 0 0 16px 0;
+        color: $base-text-alt;
+        }
+
+
+/** @section TimeViewer ******************************************************/
+
+#TimeViewer {
+    }
+
+    #TimeViewer_toolbar {
+        }
+
+    #TimeViewer_label {
+        text-align: center;
+        font-size: 48px;
+        qproperty-alignment: AlignCenter AlignCenter;
+        }
+
+
+/** @section LibraryViewer ***************************************************/
+
+#LibraryViewer {
+    background: $container;
+    padding: 0;
+    margin: 0;
+    }
+
+
+/** @section SongDialog ***************************************************/
+
+SongDialog {
+    background: $container;
+    }
+
+    SongDialog QLabel {
+        color: #959595;
+        margin: 0;
+        background: none;
+        }
+
+    SongDialog QLineEdit,
+    SongDialog QTextEdit {
+        border: 1px solid #1a1a1a;
+        border-radius: 2px;
+        padding: 2px;
+        margin: 0;
+        background: #212121;
+        min-height: 20px;
+        color: #b3b3b3;
+        }
+
+    #SongDialog_head {
+        background: $base-alt;
+        }
+
+        #SongDialog_head_title {
+            font-size: 20pt;
+            }
+
+        #SongDialog_head_subtitle {
+            }
+
+/******************************************************************************
+ *
+ * @section CuelistViewer
+ *
+ *****************************************************************************/
+
+#CuelistViewer {
+    padding: 0;
+    margin: 0;
+    }
+
+    #CuelistViewer_empty {
+        }
+
+        #CuelistViewer_empty_title {
+            qproperty-alignment: AlignCenter AlignCenter;
+            text-align: center;
+            font-size: 22px;
+            margin: 0 0 6px 0;
+            color: #f1f1f1;
+            }
+
+        #CuelistViewer_empty_info {
+            text-align: center;
+            font-size: 13px;
+            qproperty-alignment: AlignCenter AlignCenter;
+            font-weight: 300;
+            color: #929292;
+            margin: 0 0 16px 0;
+            }
+
+    #CuelistViewer_label {
+        qproperty-alignment: AlignCenter AlignCenter;
+        color: #e0e0e1;
+        margin: 3px;
+        }
+
+    /**
+     * @section cuelist panel
+     */
+
+    #cuelist_dialog {
+        }
+
+        #cuelist_dialog_toolbar {
+            background: $base;
+            border: none;
+            padding: 0;
+            margin: 0;
+            min-height: 24px;
+            }
+
+            #cuelist_dialog_toolbar QToolButton {
+                border: 1px solid transparent;
+                background: none;
+                border-radius: 3px;
+                padding: 4px 4px;
+                }
+
+/**
+ * @section cue dialog
+ */
+
+CueDialog {
+    }
+
+    CueDialog QLabel {
+        margin: 0;
+        }
+
+    CueDialog QLineEdit,
+    CueDialog QTextEdit {
+        border-radius: 2px;
+        padding: 2px;
+        margin: 0;
+        min-height: 20px;
+        }
+
+    #CueDialog_toolbar {
+        border: none;
+        padding: 0 4px;
+        margin: 0;
+        min-height: 30px;
+        }
+
+
+/******************************************************************************
+ *
+ * @section NodeViewer
+ *
+ *****************************************************************************/
+
+#NodeViewer {}
+
+    #NodeViewer_toolbar {}
+
+/******************************************************************************
+ *
+ * @section PropertyViewer
+ *
+ *****************************************************************************/
+
+#PropertyViewer {}
+
+    #PropertyViewer_toolbar {}
+
+/******************************************************************************
+ *
+ * @section DisplayPreviewViewer
+ *
+ *****************************************************************************/
+
+#DisplayPreviewViewer {
+    margin: 0;
+    padding: 0;
+    }
+
+    #DisplayPreviewViewer_frame {
+        padding: 0;
+        margin: 0;
+        }
+
+    #DisplayPreviewViewer_info {
+        background: $base;
+        }
+
+        #DisplayPreviewViewer_info QLabel {
+            background-color: $base;
+            }
+
+    #DisplayPreviewViewer_label {
+        margin: 0;
+        padding: 12px;
+        border: none;
+        background: $base;
+        qproperty-alignment: AlignCenter AlignCenter;
+        qproperty-wordWrap: true;
+        }
+
+    #DisplayPreviewViewer_toolbar {
+        background: $base;
+        }
+
+/******************************************************************************
+ *
+ * @section DisplayMediaBinViewer
+ *
+ *****************************************************************************/
+
+#DisplayMediaBinViewer {}
+
+    #DisplayMediaBinViewer_list {
+        }
+
+    #DisplayMediaBinViewer_toolbar {
+        }
+
+
+/******************************************************************************
+ *
+ * @section NotesViewer
+ *
+ *****************************************************************************/
+
+#NotesViewer {}
+
+    #NotesViewer_text {}
+
+    #NotesViewer_toolbar {}
+
+        #NotesViewer_label {}
+
+
+/******************************************************************************
+ *
+ * @section ConsoleViewer
+ *
+ *****************************************************************************/
+
+#ConsoleViewer {
+    }
+
+    #ConsoleViewer_text {
+        background: #2f2f2f;
+        color: $base-text;
+        border: none;
+        font-family: Consolas, "Andale Mono WT", "Andale Mono", "Lucida Console", "Lucida Sans Typewriter",
+            "DejaVu Sans Mono", "Bitstream Vera Sans Mono", "Liberation Mono", "Nimbus Mono L",
+            Monaco, "Courier New", Courier, monospace;
+        }
+
+    #ConsoleViewer_toolbar {
+        color: $base-text;
+        }
+
+        #ConsoleViewer_label {
+            qproperty-alignment: AlignCenter AlignCenter;
+            qproperty-wordWrap: true;
+            }
+
+
+/******************************************************************************
+ *
+ * @section ConsoleViewer
+ *
+ *****************************************************************************/
+
+#BibleViewer_label {
+    qproperty-alignment: AlignCenter AlignCenter;
+    margin: 3px;
+    }
+
+
+/******************************************************************************
+ *
+ * @section PreferencesDialog
+ *
+ *****************************************************************************/
+
+PreferencesDialog {
+    }
+
+    /**
+     * @section GeneralConfigurator
+     */
+
+    #GeneralConfigurator {}
+
+    /**
+     * @section BibleConfigurator
+     */
+
+    #BibleConfigurator_list {}
+
+    /**
+     * @section PluginsConfigurator
+     */
+
+    #PluginsConfigurator_list {}
+
+        #PluginsConfigurator_list {}
+
+    /**
+     * @section OSCOutConfigurator
+     */
+
+    #OSCOutConfigurator {}
+
+        #OSCOutConfigurator_list {}
+
+    /**
+     * @section OSCInConfigurator
+     */
+
+    #OSCInConfigurator {}
+
+        #OSCInConfigurator_list {}

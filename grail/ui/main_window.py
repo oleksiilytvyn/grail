@@ -35,7 +35,7 @@ class MainWindow(QMainWindow):
 
         # about dialog
         self.about_dialog = AboutDialog(None, "Grail %s" % (grail.__version__,),
-                                        "Copyright © 2014-2018 Alex Litvin.\nAll rights reserved.\n\n\nalexlitvin.name",
+                                        "Copyright © 2016-2019 Alex Litvin.\nAll rights reserved.\n\n\nalexlitvin.name",
                                         QIcon(':/icon/256.png'))
         self.about_dialog.url_report = "http://grailapp.com/"
         self.about_dialog.url_help = "http://grailapp.com/help"

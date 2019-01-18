@@ -49,6 +49,7 @@
 		<file alias="qt\stylesheet-branch-end.png">qt\stylesheet-branch-end.png</file>
 		<file alias="qt\stylesheet-branch-more.png">qt\stylesheet-branch-more.png</file>
 		<file alias="qt\stylesheet-vline.png">qt\stylesheet-vline.png</file>
+		<file alias="qt\theme.qss">qt\theme.qss</file>
 		<file alias="qt\toolbar-h-move.png">qt\toolbar-h-move.png</file>
 		<file alias="qt\toolbar-h-separator.png">qt\toolbar-h-separator.png</file>
 		<file alias="qt\toolbar-v-move.png">qt\toolbar-v-move.png</file>
@@ -88,7 +89,6 @@
 		<file alias="rc\stop.png">rc\stop.png</file>
 		<file alias="rc\testcard.png">rc\testcard.png</file>
 		<file alias="rc\text-padding-box.png">rc\text-padding-box.png</file>
-		<file alias="rc\theme.qss">rc\theme.qss</file>
 		<file alias="rc\txt.png">rc\txt.png</file>
 		<file alias="rc\unlock.png">rc\unlock.png</file>
 		<file alias="rc\up_arrow.png">rc\up_arrow.png</file>

@@ -27,7 +27,7 @@ class NodeViewer(Viewer):
 
     id = 'node'
     name = 'Nodes'
-    author = 'Grail Team'
+    author = 'Alex Litvin'
     description = 'View all nodes in grail file'
     single_instance = True
 

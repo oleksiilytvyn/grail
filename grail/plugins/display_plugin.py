@@ -33,7 +33,7 @@ class DisplayPlugin(Plugin):
 
     id = 'display'
     name = 'Display'
-    author = 'Grail Team'
+    author = 'Alex Litvin'
     description = 'Display 2d graphics in window or in fullscreen mode'
 
     _instance = None
@@ -1775,15 +1775,15 @@ class DisplayPreviewViewer(Viewer):
         self._ui_info.setLayout(self._ui_info_layout)
 
         self._ui_frame = QScrollArea()
+        self._ui_frame.setObjectName("DisplayPreviewViewer_frame")
         self._ui_frame.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self._ui_frame.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self._ui_frame.setWidgetResizable(True)
-        self._ui_frame.setStyleSheet("border: none;")
         self._ui_frame.setWidget(self._ui_text)
 
         self._ui_view_action = QToolButton()
         self._ui_view_action.setText("View")
-        self._ui_view_action.setIcon(Icon.colored(':/rc/menu.png', QColor('#555'), QColor('#e3e3e3')))
+        self._ui_view_action.setIcon(Icon(':/rc/menu.png'))
         self._ui_view_action.clicked.connect(self.view_action)
 
         self._ui_toolbar = QToolBar()
@@ -2204,7 +2204,7 @@ class DisplayViewer(Viewer):
 
         self._ui_view_action = QToolButton()
         self._ui_view_action.setText("View")
-        self._ui_view_action.setIcon(Icon.colored(':/rc/menu.png', QColor('#555'), QColor('#e3e3e3')))
+        self._ui_view_action.setIcon(Icon(':/rc/menu.png'))
         self._ui_view_action.clicked.connect(self.view_action)
 
         self._ui_toolbar = QToolBar()

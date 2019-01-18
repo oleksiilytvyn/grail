@@ -181,7 +181,7 @@ class Grail(QApplication):
 
             return re.sub(r'(\\n)|(\\r)|(\\t)', '', data)[2:-1]
 
-        self.stylesheet = read_stylesheet(":/rc/theme.qss")
+        self.stylesheet = read_stylesheet(":/qt/theme.qss")
 
         self.setStyleSheet(self.stylesheet)
 

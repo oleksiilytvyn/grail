@@ -10,29 +10,18 @@
     Additional build arguments:
         !fix-png: fix PNG color profile errors
 """
-
-import os
-import re
 import sys
 import shutil
-import platform
 
-from PyQt5.QtCore import QFile, QIODevice
-from PyQt5.QtGui import QPixmap, QGuiApplication
 from cx_Freeze import setup, Executable
+from PyQt5.QtGui import QGuiApplication
 
-from grail import __version__ as GRAIL_VERSION
-from scripts.css_preprocessor import CSSPreprocessor
-
-
-# os constants
-OS_SYSTEM = platform.system()
-OS_WIN = OS_SYSTEM == "Windows"
-OS_MAC = OS_SYSTEM == "Darwin"
-OS_UNIX = OS_SYSTEM == "Linux"
+from scripts.util import *
+from grailkit.util import *
 
 # Constants
-VERSION = GRAIL_VERSION
+CMD_FIXPNG = '!fix-png'
+VERSION = get_revision()
 VERSION_PATH = "build/.version"
 TITLE = "Grail"
 FILE = "grail.py"
@@ -40,10 +29,9 @@ BUNDLE_NAME = "%s-%s" % (TITLE, VERSION)
 BUNDLE_FILE = "%s.app" % (BUNDLE_NAME,)
 BUNDLE_CONTENTS = "build/%s/Contents" % BUNDLE_FILE
 BUNDLE_RESOURCES = "%s/Resources" % BUNDLE_CONTENTS
-
-packages = []
-includes = ['atexit', 'PyQt5.QtNetwork']
-excludes = ['nt',
+PACKAGES = []
+INCLUDES = ['atexit', 'PyQt5.QtNetwork']
+EXCLUDES = ['nt',
             'pdb',
             '_ssl',
             "Pyrex",
@@ -55,176 +43,16 @@ excludes = ['nt',
             'scipy.special',
             'numpy']
 
-files = [('LICENSE', 'LICENSE'),
-         ('build/.version', '.version')]
+INCLUDE_FILES = [('LICENSE', 'LICENSE'),
+                 ('build/.version', '.version')]
 
 # Add support for custom arguments
 USER_ARGS = [arg for arg in sys.argv if arg.startswith('!')]
 sys.argv = [arg for arg in sys.argv if not arg.startswith('!')]
 
 # used for png utility
-if '!fix-png' in USER_ARGS:
+if CMD_FIXPNG in USER_ARGS:
     app = QGuiApplication(sys.argv)
-
-
-def print_step(title, *args):
-    delimiter = '~~' * 30
-    print("\n~%s\n~ Section: %s\n~%s" % (delimiter, title, delimiter))
-
-
-def get_revision():
-    """try to add revision number to version string"""
-
-    revision = GRAIL_VERSION
-
-    try:
-        import hgapi
-
-        repository = hgapi.Repo(os.path.abspath(os.curdir))
-        revision = "%sb%d" % (GRAIL_VERSION, repository['tip'].rev)
-    except ImportError:
-        print("Failed to get revision number. Install 'hgapi' module.")
-    except Exception as error:
-        print("Unable to get revision number, following error occurred:")
-        print(error)
-
-    return revision
-
-
-VERSION = get_revision()
-
-
-def compile_resources(source=None, destination=None, exclude=None):
-    """try to build resources file
-
-    Args:
-        source (str): path to folder with resources
-        destination (str): path to python resource file
-        exclude (list): list of excluded files and folders relative to given source
-    """
-
-    data_path = './data'
-    source_file = os.path.join(source, 'resources.qrc')
-    qrc_source = '''<!DOCTYPE RCC>\n<RCC version="1.0">\n\t<qresource>\n'''
-
-    if not exclude:
-        exclude = []
-
-    for index, path in enumerate(exclude):
-        exclude[index] = os.path.abspath(os.path.join(data_path, path))
-
-    print("\nGenerating QRC file:")
-    print(" - source: %s" % source)
-    print(" - destination: %s" % destination)
-    print(" - qrc file: %s" % source_file)
-
-    for directory, directories, file_names in os.walk("./data"):
-
-        # exclude directories
-        if os.path.abspath(directory) in exclude:
-            continue
-
-        qrc_source += '\n\t\t<!-- ./%s/ -->\n' % directory[len(data_path) + 1:]
-
-        for name in file_names:
-            # skip system files
-            if name.startswith('.'):
-                continue
-
-            file_path = os.path.join(directory, name)[len(data_path)+1:]
-            qrc_source += '\t\t<file alias="%s">%s</file>\n' % (file_path, file_path)
-
-    qrc_source += '\t</qresource>\n</RCC>'
-
-    qrc_file = open(source_file, 'w')
-    qrc_file.write(qrc_source)
-    qrc_file.close()
-
-    try:
-        print("\nBuilding resource file")
-        print("pyrcc5 -o %s %s" % (destination, source_file))
-        os.system("pyrcc5 -o %s %s" % (destination, source_file))
-    except Exception as error:
-        print("Failed to build resource file, following error occurred:\n %s" % error)
-
-
-def create_version_file(path, revision):
-    """Create .version file inside app directory"""
-
-    directory = os.path.dirname(os.path.realpath(path))
-
-    if not os.path.exists(directory):
-        os.makedirs(directory)
-
-    # add version file to build
-    try:
-        f = open(path, "w+")
-        f.write(revision)
-        f.close()
-
-        print("\nVersion file created at %s" % path)
-    except Exception as error:
-        print("\nFailed to create a version file, following error occurred:")
-        print(error)
-
-
-def fix_png_profile(path, recursive=False, _main=True):
-    """Fix annoying `libpng warning: iCCP: known incorrect sRGB profile`
-    warning for files in given directory
-
-    Args:
-        path (str): path to directory
-        recursive (bool): include sub-folders or not
-        _main (bool): True if this is first non-recursive call
-    """
-
-    path = os.path.abspath(path)
-
-    if not os.path.exists(path):
-        return False
-
-    if _main:
-        print_step("Conforming PNG files")
-
-    for name in os.listdir(path):
-        link = os.path.join(path, name)
-
-        if os.path.isfile(link) and link.endswith('.png'):
-            try:
-                pixmap = QPixmap()
-                pixmap.load(link)
-
-                file = QFile(link)
-                file.open(QIODevice.WriteOnly)
-
-                pixmap.save(link, "PNG")
-                print('- %s' % link)
-            except Exception as error:
-                print(error)
-
-        elif os.path.isdir(link):
-            fix_png_profile(link, recursive, False)
-
-
-def generate_stylesheet():
-
-    try:
-        source = open('./data/dist/theme.qss', 'r')
-        code = source.read()
-        source.close()
-
-        destination = open('./data/rc/theme.qss', 'w+')
-        destination.write(CSSPreprocessor(code).compile())
-        destination.close()
-
-        print("Successfully generated theme")
-    except Exception as error:
-        print("Failed to generate theme.qss")
-        print(error)
-
-
-# fix png warnings
-if '!fix-png' in USER_ARGS:
     fix_png_profile('./data', recursive=True)
 
 # Generate stylesheet
@@ -242,6 +70,7 @@ create_version_file(VERSION_PATH, VERSION)
 # Building executable
 print_step("Building executable")
 
+
 setup(
     name=TITLE,
     version=VERSION,
@@ -254,7 +83,7 @@ setup(
     keywords='open source osc church lyrics projection song bible display',
     license='GNU General Public License v3',
 
-    requires=['grailkit', 'PyQt5'],
+    requires=['grailkit', 'PyQt5', 'cx_Freeze'],
 
     classifiers=[
         'Development Status :: 4 - Beta',
@@ -281,12 +110,12 @@ setup(
 
     options={
         "build_exe": {
-            "includes": includes,
-            "include_files": files,
+            "includes": INCLUDES,
+            "include_files": INCLUDE_FILES,
             "include_msvcr": True,
-            "excludes": excludes,
+            "excludes": EXCLUDES,
             "silent": True,
-            "packages": packages,
+            "packages": PACKAGES,
             'zip_include_packages': 'PyQt5'
             },
         "bdist_msi": {
@@ -297,7 +126,7 @@ setup(
             "bundle_name": BUNDLE_NAME,
             "custom_info_plist": "data/dist/Info.plist",
             "iconfile": "data/icon/grail.icns",
-            "packages": packages
+            "packages": PACKAGES
             },
         "bdist_dmg": {
             "volume_label": TITLE,

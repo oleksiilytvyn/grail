@@ -18,7 +18,7 @@ class OSCInConfigurator(Configurator):
     id = 'osc-in-configurator'
     name = 'OSC Input'
     index = 10
-    author = 'Grail Team'
+    author = 'Alex Litvin'
     description = 'Manage OSC input'
 
     def __init__(self, parent=None):
@@ -220,7 +220,7 @@ class OSCOutConfigurator(Configurator):
     id = 'osc-out-configurator'
     name = 'OSC Output'
     index = 11
-    author = 'Grail Team'
+    author = 'Alex Litvin'
     description = 'Manage OSC output'
 
     def __init__(self, parent=None):

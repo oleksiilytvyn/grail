@@ -22,7 +22,7 @@ class GeneralConfigurator(Configurator):
     id = 'general-configurator'
     name = 'General'
     index = -100
-    author = 'Grail Team'
+    author = 'Alex Litvin'
     description = 'General configuration page'
 
     def __init__(self, parent=None):
@@ -146,7 +146,7 @@ class BibleConfigurator(Configurator):
     id = 'bible-configurator'
     name = 'Bible'
     index = -98
-    author = 'Grail Team'
+    author = 'Alex Litvin'
     description = 'Configuration page for bibles'
 
     def __init__(self, parent=None):
@@ -245,7 +245,7 @@ class PluginsConfigurator(Configurator):
     id = 'plugins-configurator'
     name = 'Plugins'
     index = -99
-    author = 'Grail Team'
+    author = 'Alex Litvin'
     description = 'View and configure plugins'
 
     def __init__(self, parent=None):

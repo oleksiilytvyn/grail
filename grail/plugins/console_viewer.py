@@ -191,7 +191,7 @@ class ConsoleViewer(Viewer):
 
     id = 'console'
     name = 'Console'
-    author = 'Grail Team'
+    author = 'Alex Litvin'
     description = 'Python console'
 
     def __init__(self, *args):

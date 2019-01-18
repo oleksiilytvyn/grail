@@ -30,7 +30,7 @@ class BibleViewer(Viewer):
 
     id = 'bible'
     name = 'Bible'
-    author = 'Grail Team'
+    author = 'Alex Litvin'
     description = 'View and search bible'
 
     def __init__(self, *args):

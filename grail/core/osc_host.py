@@ -95,6 +95,7 @@ class _OSCServer:
     def handle(self, address, message, date):
         """Handle incoming osc messages"""
 
+        # todo: pipe it to application
         print("OSC received from %s:%d by %s" % (address[0], address[1], self), date, message.address, *message.args)
 
 

@@ -92,6 +92,8 @@ class MainWindow(QMainWindow):
         self.ui_project_action.triggered.connect(self.project_action)
 
         self.ui_actions_action = QAction('Show actions...', self)
+        self.ui_actions_action.setShortcut("Ctrl+Alt+A")
+        self.ui_actions_action.setShortcutContext(Qt.ApplicationShortcut)
         self.ui_actions_action.triggered.connect(self.open_actions_action)
 
         # Help

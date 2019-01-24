@@ -55,15 +55,19 @@ class SongDialog(QDialog):
 
         # body
         self._ui_title = QLineEdit()
+        self._ui_title.textChanged.connect(self._text_changed)
         self._ui_title.setPlaceholderText("Song title")
 
         self._ui_artist = QLineEdit()
+        self._ui_artist.textChanged.connect(self._text_changed)
         self._ui_artist.setPlaceholderText("Artist name")
 
         self._ui_album = QLineEdit()
+        self._ui_album.textChanged.connect(self._text_changed)
         self._ui_album.setPlaceholderText("Album")
 
         self._ui_year = QLineEdit()
+        self._ui_year.textChanged.connect(self._text_changed)
         self._ui_year.setPlaceholderText("Year")
 
         self._ui_genre = QLineEdit()
@@ -148,10 +152,11 @@ class SongDialog(QDialog):
         album = str(self._ui_album.text())
         artist = str(self._ui_artist.text())
         lyrics = str(self._ui_lyrics.toPlainText()).strip()
-        year = int(''.join(x for x in self._ui_year.text() if x.isdigit()))
         genre = str(self._ui_genre.text())
-        track = int(''.join(x for x in self._ui_track.text() if x.isdigit()))
         language = str(self._ui_language.text())
+
+        year = self.__parse_int(self._ui_year.text())
+        track = self.__parse_int(self._ui_track.text())
 
         if self._mode == SongDialog.MODE_CREATE:
             entity = Application.instance().library.create(name=title, entity_type=DNA.TYPE_SONG)
@@ -207,6 +212,32 @@ class SongDialog(QDialog):
 
             self._mode = SongDialog.MODE_CREATE
 
+    def _text_changed(self, *args):
+        """This method called when title, year, artist or album is changed
+            So we can update window title and header bar"""
+
+        self._ui_head_title.setText(self.__strip_default(self._ui_title.text(), "No Title"))
+        self._ui_head_subtitle.setText("%s - %s - %s" %
+                                       (self.__strip_default(self._ui_artist.text(), "Unknown"),
+                                        self.__strip_default(self._ui_album.text(), "Unknown"),
+                                        self.__strip_default(self._ui_year.text(), "-")))
+
+    def __strip_default(self, value, default=""):
+
+        title = str(value).lstrip().rstrip()
+
+        if len(title) == 0:
+            return default
+
+        return value
+
+    def __parse_int(self, value, default=0):
+
+        try:
+            return int(re.sub(r'[^0-9]', '', str(value)))
+        except:
+            return default
+
 
 class LibraryViewer(Viewer):
     """Library viewer
@@ -260,6 +291,7 @@ class LibraryViewer(Viewer):
         self._ui_search_widget.setLayout(self._ui_search_layout)
 
         self._ui_list = QListWidget()
+        self._ui_list.setWordWrap(True)
         self._ui_list.setContextMenuPolicy(Qt.CustomContextMenu)
         self._ui_list.currentItemChanged.connect(self._item_clicked)
         self._ui_list.itemDoubleClicked.connect(self._item_doubleclicked)
@@ -323,14 +355,10 @@ class LibraryViewer(Viewer):
             self._ui_list.addItem(item)
 
         # Show bible full text search
-        for verse in self.bible.match_text(keyword, limit=2):
-            striped_keyword = keyword.lstrip().rstrip().lower()
-            striped_text = verse.text.lower()
-            start_index = striped_text.index(striped_keyword)
-
+        for verse in self.bible.match_text(keyword, limit=3):
             item = QListWidgetItem()
             item.setIcon(icon_bible)
-            item.setText("...%s" % verse.text[start_index:])
+            item.setText(verse.text)
             item.setObject(verse)
 
             self._ui_list.addItem(item)

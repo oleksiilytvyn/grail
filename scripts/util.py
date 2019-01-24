@@ -190,7 +190,7 @@ def update_stylesheet(watcher, app, path=""):
 
         # setup stylesheet
         app.setStyleSheet(stylesheet)
-    except PermissionError:
+    except Exception:
         print("Retry in 0.5 sec")
         QTimer.singleShot(500, lambda: update_stylesheet(watcher, app, path))
 

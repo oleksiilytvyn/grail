@@ -15,6 +15,7 @@ from grailkit.util import default_key
 from grailkit.core import Signal
 
 from grail.qt import *
+from grail.qt import colors as qt_colors
 from PyQt5.QtMultimedia import *
 from PyQt5.QtMultimediaWidgets import *
 
@@ -50,6 +51,10 @@ class DisplayPlugin(Plugin):
                                                shortcut="Ctrl+D",
                                                checkable=True,
                                                checked=True)
+        self.register_menu("Display->Clear Text", self.clear_text_action,
+                           shortcut="Ctrl+Z")
+        self.register_menu("Display->Clear Output", self.clear_output_action,
+                           shortcut="Ctrl+Shift+Z")
         self.register_menu('Display->---')
         self.menu_testcard = self.register_menu("Display->Show Test Card", self.testcard_action,
                                                 shortcut="Ctrl+Shift+T",
@@ -61,6 +66,9 @@ class DisplayPlugin(Plugin):
         self.register_action("Disable output", self.disable_action)
         self.register_action("Toggle test card", self.testcard_action)
         self.register_action("Advanced preferences...", self.preferences_action)
+
+        self.register_action("Clear Text", self.clear_output_action)
+        self.register_action("Clear Output", self.clear_text_action)
 
         self.window = DisplayWindow(self)
         self.preferences_dialog = PreferencesDialog(self)
@@ -141,6 +149,22 @@ class DisplayPlugin(Plugin):
         self.window.updateWindowGeometry()
 
         self.emit('/display/disabled', action.isChecked())
+
+    def clear_output_action(self, action=None):
+        """Clear display output"""
+
+        # Clear Text
+        CompositionPreferences.instance().text = ""
+
+        # Stop media playback
+        self.player.stop()
+        self._composition.set_image(None)
+        self._composition.render()
+
+    def clear_text_action(self, action=None):
+        """Clear display text"""
+
+        CompositionPreferences.instance().text = ""
 
     def close(self):
         """Close display and friends on application exit"""
@@ -915,7 +939,7 @@ class TransformWidget(QWidget):
         painter.begin(self)
         painter.setRenderHints(QPainter.Antialiasing | QPainter.TextAntialiasing)
 
-        painter.fillRect(event.rect(), QColor("#626364"))
+        painter.fillRect(event.rect(), QColor(qt_colors.CONTAINER))
 
         rect = event.rect()
         scale = min(rect.width() / self.screen.width(), rect.height() / self.screen.height()) * 0.9
@@ -932,8 +956,8 @@ class TransformWidget(QWidget):
 
         painter.fillRect(QRect(x, y, w, h), QColor("#000000"))
 
-        painter.setPen(QColor("#d6d6d6"))
-        painter.setBrush(QColor("#111111"))
+        painter.setPen(QColor(qt_colors.CONTAINER_ALT))
+        painter.setBrush(QColor(qt_colors.BASE))
 
         points = []
 
@@ -942,13 +966,13 @@ class TransformWidget(QWidget):
 
         painter.drawPolygon(QPolygonF(points))
 
-        painter.setPen(QColor("#8a9fbb"))
-        painter.setBrush(QColor("#8a9fbb"))
+        painter.setPen(QColor(qt_colors.WIDGET_ACTIVE))
+        painter.setBrush(QColor(qt_colors.WIDGET_ACTIVE))
 
         for point in points:
             painter.drawEllipse(point, 4, 4)
 
-        painter.setPen(QColor("#e6e6e6"))
+        painter.setPen(QColor(qt_colors.WIDGET_TEXT))
         painter.setFont(self.font)
         painter.drawText(event.rect(), Qt.AlignCenter | Qt.TextWordWrap, self.text)
 
@@ -2049,6 +2073,10 @@ class MediaBinList(QListWidget):
             self.grabber.load(path)
 
     def _frame_received(self):
+
+        # Prevent from processing non-existent files
+        if len(self._files_stack) <= 0:
+            return False
 
         pixmap = QPixmap(self.grabber.grab())
         path = self._files_stack.pop(0)

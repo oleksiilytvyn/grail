@@ -16,7 +16,7 @@ import sys
 import grailkit
 from grailkit.util import data_location, application_location
 
-__version__ = '1.0.6'
+__version__ = '1.0.7'
 
 APPLICATION_NAME = "Grail"
 APPLICATION_WEB = "http://grailapp.com/"

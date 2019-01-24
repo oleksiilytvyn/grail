@@ -5,7 +5,7 @@
  *
  *****************************************************************************/
 
-@define radius 0
+@define radius 3px
 @define link-color #4fc3f7
 
 @define base #202020
@@ -21,14 +21,18 @@
 
 @define widget #353535
 @define widget-alt #3c3c3c
-@define widget-text #b5b2b1
+@define widget-text #f1f1f1
 @define widget-active #ffc907
 @define widget-active-text #202020
 
 
 /** @section QWidget *********************************************************/
 
-QWidget {
+QColorDialog,
+QFileDialog,
+QFontDialog,
+QMainWindow,
+QDialog {
     background-color: $container;
     border: 0px solid transparent;
     padding: 0px;
@@ -36,13 +40,6 @@ QWidget {
     selection-background-color: $container-alt;
     selection-color: $container-text;
     }
-
-    QWidget:disabled {
-        background-color: $container;
-        color: $widget-text;
-        selection-background-color: $widget;
-        selection-color: $widget-text;
-        }
 
 
 /** @section QMainWindow *****************************************************/
@@ -84,26 +81,21 @@ QSplitter {
     margin: 0;
     }
 
-    QSplitter::separator {
-        background-color: $container;
-        border: 0 solid $base;
-        spacing: 0;
-        padding: 1px;
-        margin: 0;
+    QSplitter::handle {
+        background-color: $base;
         }
 
-    QSplitter::separator:hover {
-        background-color: $base-alt;
+    QSplitter::handle:active,
+    QSplitter::handle:pressed {
+        background-color: $widget-active;
         }
 
-    QSplitter::separator:horizontal {
-        width: 5px;
-        image: url(:/qt/toolbar-v-separator.png);
+    QSplitter::handle:horizontal {
+        width: 2px;
         }
 
-    QSplitter::separator:vertical {
-        height: 5px;
-        image: url(:/qt/toolbar-h-separator.png);
+    QSplitter::handle:vertical {
+        height: 2px;
         }
 
 
@@ -362,6 +354,7 @@ QMenuBar {
 
 /** @section QWidget *********************************************************/
 
+@if WINDOWS
 QMenu {
     border: 0px solid $container;
     background-color: $base;
@@ -390,6 +383,11 @@ QMenu {
         }
     
     QMenu::item:selected {
+        color: $widget-text;
+        background-color: $base-alt;
+        }
+
+    QMenu::item:disabled {
         color: $base-text;
         }
 
@@ -398,9 +396,7 @@ QMenu {
         height: 12px;
         padding-left: 6px;
         }
-    
-    /* non-exclusive indicator = check box style indicator (see QActionGroup::setExclusive) */
-    
+
     QMenu::indicator:non-exclusive:unchecked {
         image: url(:/qt/checkbox_unchecked.png);
         }
@@ -416,9 +412,7 @@ QMenu {
     QMenu::indicator:non-exclusive:checked:selected {
         image: url(:/qt/checkbox_checked_disabled.png);
         }
-    
-    /* exclusive indicator = radio button style indicator (see QActionGroup::setExclusive) */
-    
+
     QMenu::indicator:exclusive:unchecked {
         image: url(:/qt/radio_unchecked.png);
         }
@@ -439,6 +433,7 @@ QMenu {
         margin: 5px;
         image: url(:/qt/right_arrow.png)
         }
+@end
 
 
 /** @section QAbstractItemView ***********************************************/
@@ -447,7 +442,6 @@ QAbstractItemView {
     alternate-background-color: $container;
     color: $container-text;
     border: 0px solid $container;
-    border-radius: $radius;
     }
     
     QAbstractItemView QLineEdit {
@@ -460,7 +454,6 @@ QAbstractItemView {
 QAbstractScrollArea {
     background-color: $container;
     border: 0px solid $container;
-    border-radius: $radius;
     padding: 4px;
     color: $container-text;
     }
@@ -472,9 +465,21 @@ QAbstractScrollArea {
 
 /** @section QScrollArea *****************************************************/
 
-QScrollArea QWidget QWidget:disabled {
-    background-color: $container-alt;
+QScrollArea {
+    background: $container;
     }
+
+    QScrollArea QWidget QWidget {
+        background-color: $container;
+        }
+
+    QScrollArea:disabled {
+        background: $container-alt;
+        }
+
+    QScrollArea QWidget QWidget:disabled {
+        background-color: $container-alt;
+        }
 
 
 /** @section QScrollBar *********************************************************/
@@ -654,11 +659,12 @@ QToolBar {
     
     QToolBar QToolButton {
         background-color: $base;
+        color: $base-text;
         }
 
     QToolBar QLabel {
         background-color: $base;
-        color: $base-color;
+        color: $base-text;
         border: 0px solid transparent;
         outline: none;
         }
@@ -766,7 +772,8 @@ QLabel {
     border: 0px solid $container;
     padding: 0px;
     margin: 0px;
-    color: $container-text
+    color: $container-text;
+    background-color: transparent;
     }
     
     QLabel::disabled {
@@ -1041,9 +1048,10 @@ QComboBox {
     border: 1px solid $widget;
     background-color: $widget;
     border-radius: $radius;
-    selection-background-color: $widget-alt;
+    selection-background-color: $widget;
     padding: 4px;
     outline: none;
+    color: $widget-text;
     }
     
     QComboBox:disabled {
@@ -1059,6 +1067,7 @@ QComboBox {
     
     QComboBox:on {
         selection-background-color: $base;
+        color: $widget-active-text;
         }
     
     QComboBox QAbstractItemView {
@@ -1067,6 +1076,7 @@ QComboBox {
         border: 1px solid $base;
         outline: none;
         padding: 0;
+        margin: 0;
         selection-color: $widget-text;
         selection-background-color: $widget;
         }
@@ -1074,6 +1084,15 @@ QComboBox {
         QComboBox QAbstractItemView:hover {
             background-color: $base;
             }
+
+    QComboBox:editable {
+        background: $widget;
+        }
+
+    QComboBox:editable:hover {
+        background: $widget;
+        color: $widget-text;
+        }
 
     QComboBox::drop-down {
         subcontrol-origin: padding;
@@ -1204,7 +1223,7 @@ QLineEdit {
     
     QLineEdit:selected {
         background: $base;
-        color: $base-color;
+        color: $base;
         }
 
 
@@ -1216,12 +1235,20 @@ QSearchEdit {
     padding-top: 2px;
     padding-bottom: 2px;
     padding-left: 4px;
-    padding-right: 4px;
+    padding-right: 18px;
     border-style: solid;
     border: 1px solid $base;
     border-radius: $radius;
     color: $base-text;
     }
+
+    QSearchEdit QToolButton {
+        border: none;
+        background: none;
+        padding: 0;
+        margin: 0;
+        margin-top: 2px;
+        }
 
     QSearchEdit:disabled {
         background-color: $base;
@@ -1235,7 +1262,7 @@ QSearchEdit {
 
     QSearchEdit:selected {
         background: $base;
-        color: $base-color;
+        color: $base;
         }
 
 
@@ -1376,12 +1403,19 @@ QDockWidget {
     border-radius: $radius;
     titlebar-close-icon: url(:/qt/close.png);
     titlebar-normal-icon: url(:/qt/undock.png);
+    color: $base-text;
+    font-weight: bold;
     }
+
+    QDockWidget > QWidget {
+        background-color: $container;
+        }
 
     QDockWidget::title {
         padding: 6px;
         border: none;
         background-color: $base;
+        color: $base-text;
         }
 
     QDockWidget::close-button {
@@ -1408,7 +1442,6 @@ QDockWidget {
     QDockWidget::float-button:pressed {
         margin: 0;
         padding: 0;
-        /* todo: use hovered version of icon*/
         }
 
     QDockWidget QTabBar {
@@ -1557,6 +1590,7 @@ QColumnView {
     QTableView::item,
     QColumnView::item {
         padding: 0;
+        color: $widget-text;
         }
 
     QTreeView::item {padding: 3px;}
@@ -1619,7 +1653,12 @@ QColumnView {
     QTreeView::item QLabel,
     QTableView::item QLabel,
     QColumnView::item QLabel {
+        color: $widget-text;
         background-color: transparent;
+        }
+
+    QListView::item QLabel {
+        color: $widget-active-text;
         }
 
 QTableCornerButton::section {
@@ -1766,12 +1805,10 @@ QToolBox {
 /** @section QFrame **********************************************************/
 
 QFrame {
-    border-radius: $radius;
     border: 0px solid $container;
     }
 
     QFrame[frameShape="0"] {
-        border-radius: $radius;
         border: 0px solid $container;
         }
 
@@ -1860,6 +1897,7 @@ Welcome {
         qproperty-alignment: AlignCenter AlignCenter;
         font-weight: 300;
         margin: 0 0 24px 0;
+        color: $container-alt;
         }
 
     Welcome WelcomeAction {
@@ -1870,7 +1908,7 @@ Welcome {
 
         WelcomeAction QLabel {
             background-color: $widget;
-            color: $widget-color;
+            color: $widget-text;
             margin-right: 4px;
             }
 
@@ -1938,7 +1976,7 @@ MessageDialog {
 
     MessageDialog #g_message_text {
         border: none;
-        color: $container-color;
+        color: $container;
         }
 
         MessageDialog QPushButton {
@@ -2051,7 +2089,8 @@ ActionsDialog {}
 #TimeViewer {
     }
 
-    #TimeViewer_toolbar {
+    #TimeViewer_toolbar QToolButton {
+        background: none;
         }
 
     #TimeViewer_label {
@@ -2194,21 +2233,23 @@ CueDialog {
  *
  * @section NodeViewer
  *
- *****************************************************************************/
+ ****************************************************************************
 
 #NodeViewer {}
 
     #NodeViewer_toolbar {}
+ */
 
 /******************************************************************************
  *
  * @section PropertyViewer
  *
- *****************************************************************************/
+ ****************************************************************************
 
 #PropertyViewer {}
 
     #PropertyViewer_toolbar {}
+ */
 
 /******************************************************************************
  *
@@ -2241,17 +2282,20 @@ CueDialog {
         background: $base;
         qproperty-alignment: AlignCenter AlignCenter;
         qproperty-wordWrap: true;
+        font-weight: bold;
+        font-size: 10pt;
         }
 
     #DisplayPreviewViewer_toolbar {
         background: $base;
+        border-top: none;
         }
 
 /******************************************************************************
  *
  * @section DisplayMediaBinViewer
  *
- *****************************************************************************/
+ ****************************************************************************
 
 #DisplayMediaBinViewer {}
 
@@ -2260,13 +2304,14 @@ CueDialog {
 
     #DisplayMediaBinViewer_toolbar {
         }
+ */
 
 
 /******************************************************************************
  *
  * @section NotesViewer
  *
- *****************************************************************************/
+ ****************************************************************************
 
 #NotesViewer {}
 
@@ -2275,6 +2320,7 @@ CueDialog {
     #NotesViewer_toolbar {}
 
         #NotesViewer_label {}
+ */
 
 
 /******************************************************************************
@@ -2290,8 +2336,10 @@ CueDialog {
         background: #2f2f2f;
         color: $base-text;
         border: none;
-        font-family: Consolas, "Andale Mono WT", "Andale Mono", "Lucida Console", "Lucida Sans Typewriter",
-            "DejaVu Sans Mono", "Bitstream Vera Sans Mono", "Liberation Mono", "Nimbus Mono L",
+        font-family: Consolas, "Andale Mono WT", "Andale Mono",
+            "Lucida Console", "Lucida Sans Typewriter",
+            "DejaVu Sans Mono", "Bitstream Vera Sans Mono",
+            "Liberation Mono", "Nimbus Mono L",
             Monaco, "Courier New", Courier, monospace;
         }
 
@@ -2311,6 +2359,10 @@ CueDialog {
  *
  *****************************************************************************/
 
+#BibleViewer_search_widget {
+    background: $base-alt;
+    }
+
 #BibleViewer_label {
     qproperty-alignment: AlignCenter AlignCenter;
     margin: 3px;
@@ -2321,43 +2373,44 @@ CueDialog {
  *
  * @section PreferencesDialog
  *
- *****************************************************************************/
+ ****************************************************************************
 
 PreferencesDialog {
     }
+ */
 
     /**
      * @section GeneralConfigurator
-     */
 
     #GeneralConfigurator {}
+     */
 
     /**
      * @section BibleConfigurator
-     */
 
     #BibleConfigurator_list {}
+     */
 
     /**
      * @section PluginsConfigurator
-     */
 
     #PluginsConfigurator_list {}
 
         #PluginsConfigurator_list {}
+     */
 
     /**
      * @section OSCOutConfigurator
-     */
 
     #OSCOutConfigurator {}
 
         #OSCOutConfigurator_list {}
+     */
 
     /**
      * @section OSCInConfigurator
-     */
 
     #OSCInConfigurator {}
 
         #OSCInConfigurator_list {}
+     */

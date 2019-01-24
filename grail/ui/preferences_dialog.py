@@ -18,6 +18,9 @@ class PreferencesDialog(QDialog):
     def __init__(self):
         super(PreferencesDialog, self).__init__()
 
+        self.app = Application.instance()
+        self.app.signals.connect('/app/close', self.close)
+
         self.__ui__()
 
     def __ui__(self):

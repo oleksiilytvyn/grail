@@ -172,12 +172,17 @@ class BibleConfigurator(Configurator):
         self._ui_install_action.setIconVisibleInMenu(True)
         self._ui_install_action.triggered.connect(self.install_action)
 
+        self._ui_uninstall_action = QAction(Icon(':/rc/remove.png'), 'Uninstall', self)
+        self._ui_uninstall_action.setIconVisibleInMenu(True)
+        self._ui_uninstall_action.triggered.connect(self.uninstall_action)
+
         self._ui_primary_action = QAction(Icon(':/rc/save.png'), 'Set as primary', self)
         self._ui_primary_action.setIconVisibleInMenu(True)
         self._ui_primary_action.triggered.connect(self.primary_action)
 
         self._ui_toolbar = QToolBar()
         self._ui_toolbar.addAction(self._ui_install_action)
+        self._ui_toolbar.addAction(self._ui_uninstall_action)
         self._ui_toolbar.addWidget(self._ui_toolbar_label)
         self._ui_toolbar.addAction(self._ui_primary_action)
 
@@ -203,6 +208,23 @@ class BibleConfigurator(Configurator):
 
         self._update_list()
 
+    def uninstall_action(self):
+        """Remove previously added bible"""
+
+        items = self._ui_list.selectedItems()
+
+        if len(items) > 0:
+            bible_id = items[0].bible_id
+            current_id = self.app.settings.set('bible/default', bible_id)
+
+            BibleHost.uninstall(bible_id)
+
+            if bible_id == current_id:
+                new_id = BibleHost.list()[0]
+                self.app.settings.set('bible/default', new_id.identifier)
+
+        self._update_list()
+
     def primary_action(self):
         """Make installed bible primary in grail"""
 
@@ -222,7 +244,7 @@ class BibleConfigurator(Configurator):
         """Update list of installed bibles"""
 
         bibles = BibleHost.list()
-        bible_selected_id = Application.instance().settings.get('bible/default', None)
+        bible_selected_id = self.app.settings.get('bible/default', None)
 
         self._ui_list.clear()
         self._ui_toolbar_label.setText("%d installed" % len(bibles))
@@ -237,74 +259,3 @@ class BibleConfigurator(Configurator):
                                         " - selected" if bible_selected_id == bible.identifier else ""))
 
             self._ui_list.addItem(item)
-
-
-class PluginsConfigurator(Configurator):
-    """Configure general preferences"""
-
-    id = 'plugins-configurator'
-    name = 'Plugins'
-    index = -99
-    author = 'Alex Litvin'
-    description = 'View and configure plugins'
-
-    def __init__(self, parent=None):
-        super(PluginsConfigurator, self).__init__(parent)
-
-        self.__ui__()
-        self.clicked()
-
-    def __ui__(self):
-
-        self.setObjectName("PluginsConfigurator")
-
-        self._ui_list = QListWidget()
-        self._ui_list.setObjectName("PluginsConfigurator_list")
-
-        self._ui_layout = QVBoxLayout()
-        self._ui_layout.addWidget(self._ui_list)
-
-        self.setLayout(self._ui_layout)
-
-    def clicked(self):
-        """Update list of plugins"""
-
-        self._ui_list.clear()
-
-        for plug in Plugin.plugins() + Viewer.plugins() + Configurator.plugins():
-            text = "<small>by %s</small><br/>%s" % (plug.author, plug.description)
-            item = QListWidgetItem()
-
-            custom = _PluginItem(self._ui_list, plug.name, text)
-
-            self._ui_list.addItem(item)
-            self._ui_list.setItemWidget(item, custom)
-            item.setSizeHint(custom.sizeHint())
-
-
-class _PluginItem(QWidget):
-
-    def __init__(self, parent, title, text):
-        super(_PluginItem, self).__init__()
-
-        self._parent = parent
-
-        self._title = QLabel(title)
-        self._title.setStyleSheet("font-weight: bold;margin: 0 0 4px 0;")
-
-        self._text = QLabel(text)
-        self._text.setStyleSheet("color: #bbb;margin: 0 2px 0 2px;")
-
-        self._layout = QVBoxLayout()
-        self._layout.addWidget(self._title)
-        self._layout.addWidget(self._text)
-
-        self.setLayout(self._layout)
-
-    def minimumSizeHint(self):
-
-        return QSize(0, QWidget.minimumSizeHint(self).height() + 10)
-
-    def sizeHint(self):
-
-        return QSize(0, QWidget.sizeHint(self).height() + 10)

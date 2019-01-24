@@ -26,6 +26,9 @@ class AboutDialog(QDialog):
         self.url_report = ""
         self.url_help = ""
 
+        self.app = Application.instance()
+        self.app.signals.connect('/app/close', self.close)
+
         self.__ui__()
         self.setIcon(icon)
 

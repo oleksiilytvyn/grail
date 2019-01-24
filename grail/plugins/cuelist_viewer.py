@@ -571,7 +571,7 @@ class CuelistViewer(Viewer):
         self._ui_view_action.setIcon(Icon(':/rc/menu.png'))
         self._ui_view_action.clicked.connect(self.view_action)
 
-        self._ui_lock_action = QAction(Icon(':/rc/lock.png'), 'Lock cuelist', self)
+        self._ui_lock_action = QAction(Icon(':/rc/unlock.png'), 'Lock cuelist', self)
         self._ui_lock_action.setIconVisibleInMenu(True)
         self._ui_lock_action.triggered.connect(self.lock_action)
 
@@ -611,7 +611,7 @@ class CuelistViewer(Viewer):
         if self._locked:
             self._ui_lock_action.setIcon(Icon.colored(':/rc/lock.png', QColor('#aeca4b'), QColor('#e3e3e3')))
         else:
-            self._ui_lock_action.setIcon(QIcon(':/rc/lock.png'))
+            self._ui_lock_action.setIcon(QIcon(':/rc/unlock.png'))
 
     @guard_lock
     def add_action(self, *args):

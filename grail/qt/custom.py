@@ -13,6 +13,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
+from grail.qt import colors as qt_colors
 from grailkit.util import OS_MAC
 
 # References to original classes
@@ -370,7 +371,6 @@ class QSearchEdit(QT_QLINEEDIT):
         self._ui_clear.setIconSize(QSize(14, 14))
         self._ui_clear.setIcon(QIcon(':/rc/search-clear.png'))
         self._ui_clear.setCursor(Qt.ArrowCursor)
-        self._ui_clear.setStyleSheet("QToolButton {background: none;}")
         self._ui_clear.hide()
         self._ui_clear.clicked.connect(self.clear)
 
@@ -383,6 +383,8 @@ class QSearchEdit(QT_QLINEEDIT):
             max(size_hint.width(), btn_size_hint.height() + frame_width * 2 + 2),
             max(size_hint.height(), btn_size_hint.height() + frame_width * 2 + 2))
 
+        self._adjust_button()
+
     def className(self):
         """Returns widget name that used in stylesheet."""
 
@@ -391,12 +393,7 @@ class QSearchEdit(QT_QLINEEDIT):
     def resizeEvent(self, event):
         """Redraw some elements"""
 
-        size = self.rect()
-        btn_size = self._ui_clear.sizeHint()
-        frame_width = self.style().pixelMetric(QStyle.PM_DefaultFrameWidth)
-
-        self._ui_clear.move(size.width() - btn_size.width() - frame_width * 2,
-                            size.height() / 2 - btn_size.height() / 2 + frame_width * 2)
+        self._adjust_button()
 
     def keyPressEvent(self, event):
         """Implements keyPressed signal"""
@@ -416,6 +413,16 @@ class QSearchEdit(QT_QLINEEDIT):
         """Process text changed event"""
 
         self._ui_clear.setVisible(len(text) > 0)
+        self._adjust_button()
+
+    def _adjust_button(self):
+
+        size = self.rect()
+        btn_size = self._ui_clear.sizeHint()
+        frame_width = self.style().pixelMetric(QStyle.PM_DefaultFrameWidth)
+
+        self._ui_clear.move(size.width() - btn_size.width() - (frame_width * 2),
+                            (size.height() / 2) - (btn_size.height() / 2))
 
 
 class _QTextEdit(QTextEdit, _QWidget):
@@ -490,7 +497,7 @@ class QPopup(_QDialog):
         super(QPopup, self).__init__(parent)
 
         self.__close_on_focus_lost = True
-        self.__background_color = QColor("#2f2f2f")
+        self.__background_color = QColor(qt_colors.CONTAINER)
         # Shadow padding
         self.__padding = 12
         # Caret size
@@ -620,7 +627,7 @@ QWidget.className = _QWidget.className
 QHBoxLayout = _QHBoxLayout
 QVBoxLayout = _QVBoxLayout
 
-QSplitter = _QSplitter
+# QSplitter = _QSplitter
 QTextEdit = _QTextEdit
 QToolBar = _QToolBar
 

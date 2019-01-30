@@ -48,6 +48,9 @@ class Grail(QApplication):
         if hasattr(Qt, 'AA_UseHighDpiPixmaps'):
             self.setAttribute(Qt.AA_UseHighDpiPixmaps)
 
+        # fix styles
+        self.setStyle(_ProxyStyle())
+
         # use GTK style if available
         for style in QStyleFactory.keys():
             if "gtk" in style.lower():
@@ -368,6 +371,17 @@ class Grail(QApplication):
         """
 
         return QCoreApplication.instance()
+
+
+class _ProxyStyle(QProxyStyle):
+    """Fix stylesheet issues with custom style"""
+
+    def styleHint(self, hint, option=None, widget=None, returnData=None):
+
+        if QStyle.SH_ComboBox_Popup == hint:
+            return 0
+
+        return QProxyStyle.styleHint(self, hint, option, widget, returnData)
 
 
 class _ConsoleOutput(io.StringIO):

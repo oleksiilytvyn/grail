@@ -438,12 +438,18 @@ QMenu {
 
 /** @section QAbstractItemView ***********************************************/
 
+
 QAbstractItemView {
-    alternate-background-color: $container;
+    background: $container;
+    alternate-background-color: $container-alt;
     color: $container-text;
-    border: 0px solid $container;
+    border: 1px solid $container;
     }
-    
+
+    QAbstractItemView::item {
+        background: transparent;
+        }
+
     QAbstractItemView QLineEdit {
         padding: 2px;
         }
@@ -896,7 +902,7 @@ QPushButton {
     border-radius: $radius;
     padding: 5px 5px;
     outline: none;
-    font-weight: bold;
+    font-weight: normal;
     }
     
     QPushButton:disabled {
@@ -930,7 +936,14 @@ QPushButton {
         subcontrol-position: bottom right;
         bottom: 5px;
         }
-    
+
+@if MAC
+    QPushButton::menu-indicator {
+        bottom: 10px;
+        right: 2px;
+        }
+@end
+
     QPushButton:pressed {
         background-color: $widget-active;
         border: 1px solid $widget-active;
@@ -1059,36 +1072,16 @@ QComboBox {
         color: $widget;
         }
     
-    QComboBox:hover {
-        border: 1px solid $widget-active;
-        background-color: $widget-active;
-        color: $widget-active-text;
-        }
-    
+    QComboBox:hover,
     QComboBox:on {
-        selection-background-color: $base;
+        border: 1px solid $widget-active;
+        background: $widget-active;
+        selection-background-color: $widget-active;
+        selection-color: $widget-active-text;
         color: $widget-active-text;
         }
-    
-    QComboBox QAbstractItemView {
-        background-color: $base;
-        border-radius: $radius;
-        border: 1px solid $base;
-        outline: none;
-        padding: 0;
-        margin: 0;
-        selection-color: $widget-text;
-        selection-background-color: $widget;
-        }
 
-        QComboBox QAbstractItemView:hover {
-            background-color: $base;
-            }
-
-    QComboBox:editable {
-        background: $widget;
-        }
-
+    QComboBox:editable,
     QComboBox:editable:hover {
         background: $widget;
         color: $widget-text;
@@ -1110,7 +1103,15 @@ QComboBox {
     QComboBox::down-arrow:on,
     QComboBox::down-arrow:hover,
     QComboBox::down-arrow:focus {
-        image: url(:/qt/down_arrow.png);
+        image: url(:/qt/down_arrow_disabled.png);
+        }
+
+    QComboBox QAbstractItemView {
+        padding: 0px;
+        background: $widget;
+        color: $widget-text;
+        selection-background-color: $widget-active;
+        selection-color: $widget-active-text;
         }
 
 
@@ -1589,8 +1590,10 @@ QColumnView {
     QTreeView::item,
     QTableView::item,
     QColumnView::item {
-        padding: 0;
+        padding: 0px;
+        margin: 0px;
         color: $widget-text;
+        border: 1px solid transparent;
         }
 
     QTreeView::item {padding: 3px;}
@@ -1683,6 +1686,7 @@ QTreeView::item {
     QTreeView::item:selected:hover {background: $widget-active;color: $widget-active-text;}
     QTreeView::item:!selected:hover {background: transparent;color: $widget-text;}
 
+
 /** @section QHeaderView *****************************************************/
 
 QHeaderView {
@@ -1710,6 +1714,12 @@ QHeaderView {
         border-top: 1px solid $base-alt;
         border-bottom: 1px solid $base-alt;
         }
+
+@if MAC
+    QHeaderView::section {
+        padding: 0px;
+        }
+@end
 
         QHeaderView::section:checked {
             }
@@ -1956,6 +1966,13 @@ AboutDialog {
         padding: 5px 10px;
         margin: 4px;
         }
+
+@if MAC
+    AboutDialog QPushButton {
+        padding: 5px 10px;
+        min-height: 12px;
+        }
+@end
 
     AboutDialog #g_about_title {
         font-size: 20pt;

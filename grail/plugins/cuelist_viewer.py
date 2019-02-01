@@ -326,7 +326,7 @@ class CueDialog(QDialog):
             self._ui_color_menu.addAction(action)
 
         self._ui_color = QPushButton("")
-        self._ui_color.setStyleSheet("background: none; border: none;")
+        self._ui_color.setObjectName("CueDialog_color_btn")
         self._ui_color.setIcon(Icon(":/rc/live.png"))
         self._ui_color.setMenu(self._ui_color_menu)
 
@@ -340,6 +340,7 @@ class CueDialog(QDialog):
             self._ui_follow_menu.addAction(action)
 
         self._ui_follow = QPushButton("Follow")
+        self._ui_follow.setObjectName("CueDialog_follow_btn")
         self._ui_follow.setMenu(self._ui_follow_menu)
 
         self._ui_pre_wait = QLineEdit()
@@ -352,14 +353,24 @@ class CueDialog(QDialog):
         self._ui_post_wait.setPlaceholderText("Post wait")
         self._ui_post_wait.setMaximumWidth(80)
 
-        self._ui_opt_layout = QHBoxLayout()
-        self._ui_opt_layout.setSpacing(8)
-        self._ui_opt_layout.addWidget(self._ui_number)
-        self._ui_opt_layout.addWidget(self._ui_pre_wait)
-        self._ui_opt_layout.addWidget(self._ui_post_wait)
-        self._ui_opt_layout.addStretch(1)
-        self._ui_opt_layout.addWidget(self._ui_color)
-        self._ui_opt_layout.addWidget(self._ui_follow)
+        self._ui_opt_layout = QGridLayout()
+        self._ui_opt_layout.setSpacing(6)
+        self._ui_opt_layout.setContentsMargins(0, 0, 0, 0)
+        self._ui_opt_layout.addWidget(self._ui_number, 1, 0)
+        self._ui_opt_layout.addWidget(QLabel("Number"), 0, 0, Qt.AlignHCenter)
+        self._ui_opt_layout.addWidget(self._ui_pre_wait, 1, 1)
+        self._ui_opt_layout.addWidget(QLabel("Pre"), 0, 1, Qt.AlignHCenter)
+        self._ui_opt_layout.addWidget(self._ui_post_wait, 1, 2)
+        self._ui_opt_layout.addWidget(QLabel("Post"), 0, 2, Qt.AlignHCenter)
+        self._ui_opt_layout.setColumnStretch(3, 1)
+        self._ui_opt_layout.addWidget(self._ui_color, 1, 4)
+        self._ui_opt_layout.addWidget(QLabel("Color"), 0, 4, Qt.AlignHCenter)
+        self._ui_opt_layout.addWidget(self._ui_follow, 1, 5)
+        self._ui_opt_layout.addWidget(QLabel("Execution"), 0, 5, Qt.AlignHCenter)
+
+        self._ui_opt_widget = QWidget()
+        self._ui_opt_widget.setObjectName("CueDialog_options")
+        self._ui_opt_widget.setLayout(self._ui_opt_layout)
 
         # Properties
         self._ui_properties = PropertiesView(self)
@@ -392,9 +403,10 @@ class CueDialog(QDialog):
         self._ui_general_layout.setSpacing(8)
         self._ui_general_layout.setContentsMargins(12, 12, 12, 10)
         self._ui_general_layout.addWidget(self._ui_text)
-        self._ui_general_layout.addLayout(self._ui_opt_layout)
+        self._ui_general_layout.addWidget(self._ui_opt_widget)
 
         self._ui_general = QWidget()
+        self._ui_general.setObjectName("CueDialog_layout")
         self._ui_general.setLayout(self._ui_general_layout)
 
         self._ui_splitter = QSplitter(Qt.Vertical)
@@ -480,7 +492,6 @@ class CuelistViewer(Viewer):
         '/cuelist/add'
 
     Emits:
-        !cue/execute <message:DNAEntity>
         !cue/preview <message:DNAEntity>
     """
 
@@ -501,6 +512,10 @@ class CuelistViewer(Viewer):
         self._selected_id = None
         self._update_lock = False
 
+        self._cue_timer = QTimer()
+        self._cue_timer.setSingleShot(True)
+        self._cue_timer.timeout.connect(self._cue_timer_execute)
+
         # Track project changes
         self.project.entity_changed.connect(self._update_changed)
         self.project.entity_removed.connect(self._update_removed)
@@ -509,7 +524,6 @@ class CuelistViewer(Viewer):
         # Application signals
         self.connect('/app/close', self._close)
         self.connect('/cuelist/add', self._add_entity)
-        self.connect('!cue/execute', self._osc_execute)
 
         self.__ui__()
         self.cuelist_selected(self._cuelist_id)
@@ -525,6 +539,10 @@ class CuelistViewer(Viewer):
 
         self._ui_tree = TreeWidget()
         self._ui_tree.setObjectName('CuelistViewer_tree')
+
+        self._ui_tree.setHeaderHidden(True)
+        self._ui_tree.setHeaderLabels(['Number', 'Name'])
+
         self._ui_tree.setContextMenuPolicy(Qt.CustomContextMenu)
         self._ui_tree.customContextMenuRequested.connect(self._context_menu)
         self._ui_tree.itemExpanded.connect(self.item_expanded)
@@ -612,6 +630,8 @@ class CuelistViewer(Viewer):
             self._ui_lock_action.setIcon(Icon.colored(':/rc/lock.png', QColor('#aeca4b'), QColor('#e3e3e3')))
         else:
             self._ui_lock_action.setIcon(QIcon(':/rc/unlock.png'))
+
+        self._ui_tree.setDragEnabled(not self._locked)
 
     @guard_lock
     def add_action(self, *args):
@@ -735,7 +755,7 @@ class CuelistViewer(Viewer):
 
         self._selected_id = item.object().id
 
-        self.emit('!cue/execute', item.object())
+        self._cue_execute(item.object())
 
     def item_expanded(self, item):
         """Tree item expanded
@@ -799,10 +819,26 @@ class CuelistViewer(Viewer):
             """Create tree item from entity"""
 
             _item = QTreeWidgetItem(_entity)
-            _item.setText(0, _entity.name)
 
-            if isinstance(_entity, CueEntity) and _entity.color != CueEntity.COLOR_DEFAULT:
-                _item.setIcon(0, Icon.colored(':/rc/live.png', QColor(_entity.color), QColor('#e3e3e3')))
+            _item.setText(0, str(_entity.number))
+            _item.setText(1, _entity.name)
+
+            if isinstance(_entity, CueEntity):
+                if _entity.color != CueEntity.COLOR_DEFAULT:
+                    bg = QBrush(QColor(_entity.color))
+                    fg = QBrush(QColor("#222" if _entity.color == CueEntity.COLOR_YELLOW else "#fff"))
+
+                    _item.setBackground(0, bg)
+                    _item.setForeground(0, fg)
+                    _item.setBackground(1, bg)
+                    _item.setForeground(1, fg)
+
+                if _entity.follow == CueEntity.FOLLOW_OFF:
+                    _item.setIcon(0, Icon(':/rc/follow-off.png'))
+                elif _entity.follow == CueEntity.FOLLOW_ON:
+                    _item.setIcon(0, Icon(':/rc/follow-on.png'))
+                elif _entity.follow == CueEntity.FOLLOW_CONTINUE:
+                    _item.setIcon(0, Icon(':/rc/follow-cont.png'))
 
             return _item
 
@@ -861,8 +897,9 @@ class CuelistViewer(Viewer):
             self._update()
 
     def _update_property(self, entity_id, key, value):
+        """Update list when cue's properties changed"""
 
-        if key == 'color':
+        if key == 'color' or key == 'follow':
             self._update()
 
     @guard_lock
@@ -952,6 +989,66 @@ class CuelistViewer(Viewer):
 
         # call default event handler
         QTreeWidget.keyPressEvent(self._ui_tree, event)
+
+    def _cue_timer_execute(self):
+
+        cue = self._cue_timer.cue
+
+        self.emit('!cue/execute', cue)
+        self._osc_execute(cue)
+
+        # Do not execute next cue
+        if cue.follow == CueEntity.FOLLOW_OFF:
+            return False
+
+        next_cue = None
+
+        # go inside cue
+        if cue.has_childs():
+            next_cue = cue.childs()[0]
+        # find cue beside or in parents
+        else:
+            traverse_cond = True
+            traverse_cue = cue
+
+            while traverse_cond:
+                parent_cues = self.project.dna.childs(traverse_cue.parent_id)
+                index = 0
+
+                # find next cue in parent list
+                for item in parent_cues:
+                    index += 1
+
+                    if item.id == traverse_cue.id and index < len(parent_cues):
+                        next_cue = parent_cues[index]
+                        traverse_cond = False
+
+                        break
+
+                # find in parent list
+                if index == len(parent_cues):
+                    traverse_cue = traverse_cue.parent
+
+        # Execute next cue
+        if next_cue and cue.follow == CueEntity.FOLLOW_CONTINUE:
+            # post wait
+            self._cue_execute(next_cue, cue.post_wait)
+
+    def _cue_execute(self, cue=None, wait=0):
+        """Execute cue"""
+
+        if not cue:
+            return False
+
+        self._selected_id = cue.id
+
+        # pre wait
+        self._cue_timer.cue = cue
+        self._cue_timer.stop()
+        self._cue_timer.start((cue.pre_wait + wait) * 1000)
+
+        # update list show what is currently running
+        self._update()
 
     def _osc_execute(self, cue):
         """Execute cue and send OSC bundle

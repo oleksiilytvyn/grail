@@ -170,7 +170,10 @@ class ViewArranger(QWidget):
         orientation = Qt.Horizontal if direction == 'h' else Qt.Vertical
 
         if splitter.orientation() == orientation:
-            splitter.addWidget(view)
+
+            splitter.insertWidget(index + 1, view)
+
+        # Replace view with new splitter
         else:
             viewer.setParent(None)
 

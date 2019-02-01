@@ -438,7 +438,6 @@ QMenu {
 
 /** @section QAbstractItemView ***********************************************/
 
-
 QAbstractItemView {
     background: $container;
     alternate-background-color: $container-alt;
@@ -447,13 +446,12 @@ QAbstractItemView {
     }
 
     QAbstractItemView::item {
-        background: transparent;
         }
 
     QAbstractItemView QLineEdit {
         padding: 2px;
         }
-    
+
 
 /** @section QAbstractScrollArea *********************************************/
 
@@ -1592,8 +1590,6 @@ QColumnView {
     QColumnView::item {
         padding: 0px;
         margin: 0px;
-        color: $widget-text;
-        border: 1px solid transparent;
         }
 
     QTreeView::item {padding: 3px;}
@@ -1611,15 +1607,8 @@ QColumnView {
         QTableView::item:!selected:hover,
         QColumnView::item:!selected:hover {
             color: $widget-text;
-            background-color: transparent;
-            }
-
-        QListView::item:selected:hover,
-        QTreeView::item:selected:hover,
-        QTableView::item:selected:hover,
-        QColumnView::item:selected:hover {
-            color: $widget-text;
-            background-color: $base;
+            background: transparent;
+            /* todo: fix this line, as it disables background from QTreeWidgetItem.setBackground(color) */
             }
 
     QListView::item:pressed,
@@ -2226,6 +2215,19 @@ SongDialog {
 CueDialog {
     }
 
+    #CueDialog_layout,
+    #CueDialog_options {
+        background: $widget-alt;
+        }
+
+    #CueDialog_follow_btn {
+        padding: 5px 5px 6px 5px;
+        }
+
+    #CueDialog_color_btn {
+        padding: 4px 6px 4px 0px;
+        }
+
     CueDialog QLabel {
         margin: 0;
         }
@@ -2377,7 +2379,7 @@ CueDialog {
  *****************************************************************************/
 
 #BibleViewer_search_widget {
-    background: $base-alt;
+    background: $container;
     }
 
 #BibleViewer_label {

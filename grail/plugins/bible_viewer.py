@@ -174,7 +174,7 @@ class BibleViewer(Viewer):
             return
 
         # Show bible full text search
-        for verse in self.bible.match_text(keyword, limit=3):
+        for verse in self.bible.match_text(keyword, limit=10):
             striped_keyword = keyword.lstrip().rstrip().lower()
             striped_text = verse.text.lower()
             start_index = striped_text.index(striped_keyword)

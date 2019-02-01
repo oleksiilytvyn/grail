@@ -74,6 +74,9 @@
 		<file alias="rc\down_arrow.png">rc\down_arrow.png</file>
 		<file alias="rc\down_arrow_disabled.png">rc\down_arrow_disabled.png</file>
 		<file alias="rc\edit.png">rc\edit.png</file>
+		<file alias="rc\follow-cont.png">rc\follow-cont.png</file>
+		<file alias="rc\follow-off.png">rc\follow-off.png</file>
+		<file alias="rc\follow-on.png">rc\follow-on.png</file>
 		<file alias="rc\font.png">rc\font.png</file>
 		<file alias="rc\live.png">rc\live.png</file>
 		<file alias="rc\lock.png">rc\lock.png</file>

@@ -49,10 +49,7 @@ class MainWindow(QMainWindow):
         self._ui_menubar()
 
         self.view_arranger = ViewArranger()
-        self.view_arranger.updated.connect(self._arranger_updated)
         self.view_arranger.compose(self._compose())
-        # save new structure to project
-        self._arranger_updated()
 
         self.setCentralWidget(self.view_arranger)
         self.setWindowIcon(QIcon(':/icon/256.png'))

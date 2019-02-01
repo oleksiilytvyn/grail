@@ -439,15 +439,19 @@ QMenu {
 /** @section QAbstractItemView ***********************************************/
 
 QAbstractItemView {
-    alternate-background-color: #505050;
+    background: #505050;
+    alternate-background-color: #5a5a5a;
     color: #b5b2b1;
-    border: 0px solid #505050;
+    border: 1px solid #505050;
     }
-    
+
+    QAbstractItemView::item {
+        }
+
     QAbstractItemView QLineEdit {
         padding: 2px;
         }
-    
+
 
 /** @section QAbstractScrollArea *********************************************/
 
@@ -896,7 +900,7 @@ QPushButton {
     border-radius: 3px;
     padding: 5px 5px;
     outline: none;
-    font-weight: bold;
+    font-weight: normal;
     }
     
     QPushButton:disabled {
@@ -930,7 +934,9 @@ QPushButton {
         subcontrol-position: bottom right;
         bottom: 5px;
         }
-    
+
+
+
     QPushButton:pressed {
         background-color: #ffc907;
         border: 1px solid #ffc907;
@@ -1059,36 +1065,16 @@ QComboBox {
         color: #353535;
         }
     
-    QComboBox:hover {
-        border: 1px solid #ffc907;
-        background-color: #ffc907;
-        color: #202020;
-        }
-    
+    QComboBox:hover,
     QComboBox:on {
-        selection-background-color: #202020;
+        border: 1px solid #ffc907;
+        background: #ffc907;
+        selection-background-color: #ffc907;
+        selection-color: #202020;
         color: #202020;
         }
-    
-    QComboBox QAbstractItemView {
-        background-color: #202020;
-        border-radius: 3px;
-        border: 1px solid #202020;
-        outline: none;
-        padding: 0;
-        margin: 0;
-        selection-color: #f1f1f1;
-        selection-background-color: #353535;
-        }
 
-        QComboBox QAbstractItemView:hover {
-            background-color: #202020;
-            }
-
-    QComboBox:editable {
-        background: #353535;
-        }
-
+    QComboBox:editable,
     QComboBox:editable:hover {
         background: #353535;
         color: #f1f1f1;
@@ -1110,7 +1096,15 @@ QComboBox {
     QComboBox::down-arrow:on,
     QComboBox::down-arrow:hover,
     QComboBox::down-arrow:focus {
-        image: url(:/qt/down_arrow.png);
+        image: url(:/qt/down_arrow_disabled.png);
+        }
+
+    QComboBox QAbstractItemView {
+        padding: 0px;
+        background: #353535;
+        color: #f1f1f1;
+        selection-background-color: #ffc907;
+        selection-color: #202020;
         }
 
 
@@ -1247,6 +1241,7 @@ QSearchEdit {
         background: none;
         padding: 0;
         margin: 0;
+        margin-top: 2px;
         }
 
     QSearchEdit:disabled {
@@ -1588,8 +1583,8 @@ QColumnView {
     QTreeView::item,
     QTableView::item,
     QColumnView::item {
-        padding: 0;
-        color: #f1f1f1;
+        padding: 0px;
+        margin: 0px;
         }
 
     QTreeView::item {padding: 3px;}
@@ -1607,15 +1602,8 @@ QColumnView {
         QTableView::item:!selected:hover,
         QColumnView::item:!selected:hover {
             color: #f1f1f1;
-            background-color: transparent;
-            }
-
-        QListView::item:selected:hover,
-        QTreeView::item:selected:hover,
-        QTableView::item:selected:hover,
-        QColumnView::item:selected:hover {
-            color: #f1f1f1;
-            background-color: #202020;
+            background: transparent;
+            /* todo: fix this line, as it disables background from QTreeWidgetItem.setBackground(color) */
             }
 
     QListView::item:pressed,
@@ -1682,6 +1670,7 @@ QTreeView::item {
     QTreeView::item:selected:hover {background: #ffc907;color: #202020;}
     QTreeView::item:!selected:hover {background: transparent;color: #f1f1f1;}
 
+
 /** @section QHeaderView *****************************************************/
 
 QHeaderView {
@@ -1709,6 +1698,8 @@ QHeaderView {
         border-top: 1px solid #353535;
         border-bottom: 1px solid #353535;
         }
+
+
 
         QHeaderView::section:checked {
             }
@@ -1955,6 +1946,8 @@ AboutDialog {
         padding: 5px 10px;
         margin: 4px;
         }
+
+
 
     AboutDialog #g_about_title {
         font-size: 20pt;
@@ -2208,6 +2201,19 @@ SongDialog {
 CueDialog {
     }
 
+    #CueDialog_layout,
+    #CueDialog_options {
+        background: #3c3c3c;
+        }
+
+    #CueDialog_follow_btn {
+        padding: 5px 5px 6px 5px;
+        }
+
+    #CueDialog_color_btn {
+        padding: 4px 6px 4px 0px;
+        }
+
     CueDialog QLabel {
         margin: 0;
         }
@@ -2357,6 +2363,10 @@ CueDialog {
  * @section ConsoleViewer
  *
  *****************************************************************************/
+
+#BibleViewer_search_widget {
+    background: #505050;
+    }
 
 #BibleViewer_label {
     qproperty-alignment: AlignCenter AlignCenter;

@@ -8,6 +8,7 @@
     :copyright: (c) 2016-2019 by Alex Litvin.
     :license: GNU, see LICENSE for more details.
 """
+import os
 import math
 
 from grailkit.dna import DNA
@@ -192,10 +193,17 @@ class DisplayPlugin(Plugin):
 
     def _media_source(self, source, play=False, *args):
 
-        self.player.setMedia(QMediaContent(QUrl.fromLocalFile(source)))
+        self.player.stop()
 
-        if play:
-            self.player.play()
+        name, ext = os.path.splitext(source)
+
+        if ext in ['.jpg', '.jpeg', '.png', '.tif']:
+            self._composition.set_image(QImage(source))
+        elif ext in ['.mp4', '.flv', '.mov', '.gif', '.mp3', '.wav']:
+            self.player.setMedia(QMediaContent(QUrl.fromLocalFile(source)))
+
+            if play:
+                self.player.play()
 
     def _media_play(self):
 

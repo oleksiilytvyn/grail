@@ -6,16 +6,16 @@ Here is a list of planned features and things waiting for implementation or fix.
 
 Core plugins & viewers
 
+**General:**
+
+    - fix: Popup not closing on Ubuntu
+
 **CuelistViewer:**
 
-    - feature: cue execution according to follow type
-    - feature: global execution controls, on/off for cuelist
-    - feature: protocols for executing custom properties in cue (\<protocol>:property-name)
-    - feature: custom tree view with correct labeling
-
+    No tasks
 **LibraryViewer:**
 
-No tasks
+    No tasks
 
 **BibleViewer:**
 
@@ -43,7 +43,8 @@ Display plugin family
 
 **DisplayPlugin:**
 
-    No tasks
+    feature: Crossfade
+    feature: Text fade In/Out
 
 **DisplayViewer:**
 
@@ -53,6 +54,9 @@ Display plugin family
 
     No tasks
 
+**MediaBinViewer:**
+
+    feature: Custom view
 
 
 ## Developer Tools

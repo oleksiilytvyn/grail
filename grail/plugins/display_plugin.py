@@ -1976,45 +1976,186 @@ class FrameGrabber:
         return cls._instance
 
 
-class MediaBinList(QListWidget):
+class MediaBinItem:
 
-    def __init__(self):
-        super(MediaBinList, self).__init__()
+    def __init__(self, path, pixmap):
+        self.path = path
+        self.pixmap = pixmap
 
+
+class MediaBinWidget(QWidget):
+
+    def __init__(self, parent=None):
+        super(MediaBinWidget, self).__init__(parent)
+
+        self._items = []
+        self._selected = -1
+        self._rows = 0
+        self._columns = 0
+        self._size = 180
+        self.size = 180
+
+        self.COLOR_NORMAL = QColor("#353535")
+        self.COLOR_ACTIVE = QColor("#ffc907")
+        self.COLOR_TEXT = QColor("#e3e3e3")
+        self.COLOR_TEXT_ACTIVE = QColor("#202020")
+
+        # self.setMouseTracking(True)
+
+    def paintEvent(self, event):
+
+        painter = QPainter(self)
+        painter.setBrush(self.COLOR_NORMAL)
+        painter.setPen(Qt.NoPen)
+        painter.drawRect(self.rect())
+
+        # todo: make it more scalable/flexible
+        batch_size = self._size
+        width = self.width()
+        height = self.height()
+
+        length = len(self._items)
+        columns = self._columns
+        rows = self._rows
+        row = 0
+        column = -1
+        text_height = 20
+
+        for index, item in enumerate(self._items):
+            column += 1
+            selected = self._selected == index
+
+            if column >= columns:
+                column = 0
+                row += 1
+
+            bo = 3
+            bx, by, bw, bh = column * batch_size, row * batch_size, batch_size, batch_size
+            size = item.pixmap.size().scaled(QSize(bw, bh - text_height), Qt.KeepAspectRatio)
+            ox = bw / 2 - size.width() / 2
+            oy = (bh - text_height) / 2 - size.height() / 2
+            text_box = QRect(bx + bo, by + bo + bh - text_height, bw - bo * 2, text_height - bo * 2)
+            label = item.path.split("/")[-1]
+
+            painter.setPen(Qt.NoPen)
+            painter.setBrush(QBrush(self.COLOR_TEXT_ACTIVE if not selected else self.COLOR_ACTIVE, Qt.SolidPattern))
+
+            # Frame
+            painter.drawRect(bx, by, bw, bh)
+
+            # Image
+            painter.setBrush(QBrush(self.COLOR_NORMAL, Qt.SolidPattern))
+            painter.drawRect(bx + bo, by + bo, bw - bo * 2, bh - bo * 2)
+            painter.drawPixmap(bx + bo + ox, by + bo + oy, size.width() - bo * 2, size.height() - bo * 2, item.pixmap)
+
+            # Text label
+            painter.setBrush(QBrush(self.COLOR_ACTIVE if selected else self.COLOR_TEXT_ACTIVE, Qt.SolidPattern))
+            painter.drawRect(text_box)
+            painter.setPen(QPen(self.COLOR_TEXT_ACTIVE if selected else self.COLOR_TEXT, 0, Qt.SolidLine, Qt.SquareCap))
+            painter.drawText(text_box, Qt.AlignLeft | Qt.AlignVCenter, label)
+
+    def update(self):
+        super(MediaBinWidget, self).update()
+
+        self._size = self.size
+        width = self.width()
+
+        if self._size > width:
+            self._size = width
+
+        length = len(self._items)
+        self._columns = math.floor(width / self._size)
+        self._rows = math.ceil(length / self._columns)
+
+        if self._columns * self._size < width:
+            self._size = math.floor(width / self._columns)
+
+        self.setMinimumHeight(self._rows * self._size)
+        self.repaint()
+
+    def resizeEvent(self, event):
+        super(MediaBinWidget, self).resizeEvent(event)
+
+        self.update()
+
+    def mousePressEvent(self, event):
+
+        self._selected = self.itemIndexAt(event.pos())
+        self.repaint()
+
+        QWidget.mousePressEvent(self, event)
+
+    def addItem(self, item):
+        """Add item to list"""
+
+        self._items.append(item)
+        self.update()
+
+    def item(self, index):
+        """Returns item at index, items distributed from top to bottom, left to right"""
+
+        return self._items[index] if index < len(self._items) else None
+
+    def itemIndexAt(self, pos):
+
+        x, y = pos.x(), pos.y()
+        s = self._size
+        ax, ay = x % s, y % s
+        c, r = math.floor((x - ax) / s), math.floor((y - ay) / s)
+        index = c + r * self._columns
+
+        return index if index < len(self._items) else None
+
+    def itemAt(self, pos):
+        """Returns item at given position"""
+
+        x, y = pos.x(), pos.y()
+        s = self._size
+        ax, ay = x % s, y % s
+        c, r = math.floor((x - ax) / s), math.floor((y - ay) / s)
+        index = c + r * self._columns
+
+        return self.item(index) if index < len(self._items) else None
+
+    def setBatchSize(self, size: int):
+        """Resize items batch size"""
+
+        self.size = size
+
+
+class MediaBinList(QScrollArea):
+
+    itemDoubleClicked = pyqtSignal(object)
+    itemClicked = pyqtSignal(object)
+
+    def __init__(self, parent=None):
+        super(MediaBinList, self).__init__(parent)
+
+        self._widget = MediaBinWidget()
         self._files = []
         self._files_stack = []
 
-        size = 128
-
-        self.setDragEnabled(False)
-        self.setIconSize(QSize(size, size))
-        self.setSpacing(0)
         self.setAcceptDrops(True)
-        self.setDropIndicatorShown(True)
-        self.setWrapping(True)
-        self.setLayoutMode(QListView.Batched)
-        self.setMovement(QListView.Snap)
-        self.setResizeMode(QListView.Adjust)
-        self.setBatchSize(size)
-        self.setGridSize(QSize(size, size))
         self.setAttribute(Qt.WA_MacShowFocusRect, False)
-        self.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.setViewMode(QListView.IconMode)
         self.setContentsMargins(0, 0, 0, 0)
+        self.setFrameShape(QFrame.NoFrame)
+        # fix inside padding
+        self.setStyleSheet("QScrollArea { margin: 0; padding: 0; }")
 
         original = self.verticalScrollBar()
-
         self.scrollbar = QScrollBar(Qt.Vertical, self)
         self.scrollbar.valueChanged.connect(original.setValue)
-
         original.valueChanged.connect(self.scrollbar.setValue)
 
         self.grabber = FrameGrabber.instance()
         self.grabber.updated.connect(lambda: self._frame_received())
 
         self.update_scrollbar()
+
+        self.setWidget(self._widget)
+        self.setWidgetResizable(True)
 
     def update_scrollbar(self):
 
@@ -2032,22 +2173,18 @@ class MediaBinList(QListWidget):
 
     def paintEvent(self, event):
 
-        QListWidget.paintEvent(self, event)
+        QScrollArea.paintEvent(self, event)
         self.update_scrollbar()
 
     def dragEnterEvent(self, event):
 
         if event.mimeData().hasUrls():
             event.acceptProposedAction()
-        else:
-            QListWidget.dragEnterEvent(self, event)
 
     def dragMoveEvent(self, event):
 
         if event.mimeData().hasUrls():
             event.acceptProposedAction()
-        else:
-            QListWidget.dragMoveEvent(self, event)
 
     def add_item_with_pixmap(self, path, pixmap):
 
@@ -2055,13 +2192,8 @@ class MediaBinList(QListWidget):
         if pixmap.size().isEmpty():
             return False
 
-        item = QListWidgetItem(path.split('/')[-1])
-        item.setIcon(QIcon(pixmap))
-        item.setData(Qt.UserRole, path)
-        item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDragEnabled)
-
         self._files.append(path)
-        self.addItem(item)
+        self._widget.addItem(MediaBinItem(path, pixmap))
 
     def _process_files(self):
 
@@ -2110,8 +2242,23 @@ class MediaBinList(QListWidget):
 
             event.acceptProposedAction()
 
-        QListWidget.dropEvent(self, event)
         self._process_files()
+
+    def mouseDoubleClickEvent(self, event):
+
+        position = self._widget.mapFromParent(event.pos())
+        item = self._widget.itemAt(position)
+
+        if item:
+            self.itemDoubleClicked.emit(item)
+
+    def mousePressEvent(self, event):
+
+        position = self._widget.mapFromParent(event.pos())
+        item = self._widget.itemAt(position)
+
+        if item:
+            self.itemClicked.emit(item)
 
 
 class DisplayMediaBinViewer(Viewer):
@@ -2131,8 +2278,6 @@ class DisplayMediaBinViewer(Viewer):
     def __ui__(self):
 
         self._ui_list = MediaBinList()
-        self._ui_list.setObjectName("DisplayMediaBinViewer_list")
-
         self._ui_list.itemDoubleClicked.connect(self.item_doubleclicked)
 
         self._ui_view_action = QToolButton()
@@ -2180,15 +2325,17 @@ class DisplayMediaBinViewer(Viewer):
         self.emit('/media/stop')
 
     def context_menu(self, pos):
-
+        """
         item = self._ui_list.itemAt(pos)
         menu = QMenu("Context Menu", self)
 
         return menu.exec_(self.mapToGlobal(pos))
+        """
+        pass
 
     def item_doubleclicked(self, item):
 
-        self.emit('/media/source', item.data(Qt.UserRole), True)
+        self.emit('/media/source', item.path)
 
     def _media_state_cb(self, state):
 

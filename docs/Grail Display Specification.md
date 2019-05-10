@@ -1,8 +1,13 @@
-# Grail display specification
+# Grail OSC communication
+
+This document explains how Grail OSC works.
+
+
+## Grail display specification
 
 Following document describes how Grail compatible display should work.
 
-## How it works
+### How it works
 
 > Display refers to any implementation of Grail Display compatible server.
 
@@ -14,77 +19,78 @@ Display can be remote (separate application), and as Grail plugin (works in same
 Display is a state machine, when message is received state must be saved.
 Animation
 
-## Media Server
+### Media Server
 
-> todo: add description of Media Server
+Media is a program that can receive OSC messages from Grail and render video output.  
+Below messages that Grail sends.
 
-## OSC Specification
+### OSC Specification
 
-### Data types
+#### Data types
 
 	int - OSC int
 	str - OSC ASCII string
 	bool - OSC boolean
 	float - OSC float
 
-> todo: add OSC types
+#### Display
 
-### Display
+Configure render output window
 
-Control display window
+	display/size <width:int> <height:int>
+	display/pos <x:int> <y:int>
+	display/fullscreen <flag:bool>
+	display/output <display_name:str>
+	display/disabled <flag:bool>
 
-	display/width int
-	display/height int
-	display/x int
-	display/y int
-	display/fullscreen bool
-	display/output str # name of display to output in fullscreen
-	display/disabled bool
 
-### Composition
+#### Composition
 
-Composition control
+Virtual composition
 
-	comp/width int
-	comp/height int
-	comp/opacity float
-	comp/transition float # seconds
-	comp/volume float
-	comp/pan float
-	comp/testcard bool
+	comp/size <width:int> <height:int>
+	comp/opacity <opacity:float>
+	comp/transition <seconds:float>
+	comp/volume <level:float>
+	comp/testcard <flag:bool>
 
-### Clip
 
-	clip/width float
-	clip/height float
-	clip/position float float
-	clip/ratate float
-	clip/opacity float
-	clip/scale float
-	clip/anchor float float float
+#### Cue text
 
-	clip/audio/volume float
-	clip/audio/pan float # -1 left, 1 right, 0 center
+Cue Information, not used in rendering but may be used for debugging.
 
-	clip/text/source str
-	clip/text/color str
-	clip/text/padding float float float float # left, top, right, bottom
-	clip/text/align int # 0 - Left, 1 - Center, 2 - Right
-	clip/text/valign int # 0 - Top, 1 - Center, 2 - Bottom
-	clip/text/shadow/x int
-	clip/text/shadow/y int
-	clip/text/shadow/color str
-	clip/text/shadow/blur int
-	clip/text/transform int # 0 - Normal, 1 - Title, 2 - Upper, 3 - Lower, 4 - Capitalize
-	clip/text/font/name
-	clip/text/font/size
-	clip/text/font/style
+    cue/type <type:str>
+    cue/name <name:str>
+    cue/color <hex:str>
+    cue/number <number:str>
 
-	clip/playback/source str
-	clip/playback/direction bool # playback direction True for forward, False for backwards
+
+#### Clip
+
+Media Playback Control
+
+	clip/size <width:int> <height:int>
+	clip/pos <x:float> <y:float>
+	clip/ratate <angle:float>
+	clip/opacity <opacity:float>
+	clip/scale <scale:float>
+
+	clip/text/source <text:str>
+	clip/text/color <hex:str>
+	clip/text/padding <left:float> <top:float> <right:float> <bottom:float>
+	clip/text/align <position:str values("left", "center", "right")>
+	clip/text/valign <position:str values("top", "middle", "bottom")>
+	clip/text/shadow/pos <x:int> <y:int>
+	clip/text/shadow/color <hex:str>
+	clip/text/shadow/blur <blurinness:int>
+	clip/text/transform <type:str values("normal", "title", "upper", "lower", "capitalize")>
+	clip/text/font/name <family:str>
+	clip/text/font/size <pt:float>
+	clip/text/font/style <style:str>
+
+	clip/playback/source <path:str>
 	clip/playback/play
 	clip/playback/pause
 	clip/playback/stop
-	clip/playback/transport int # 0 - loop, 1 - bounce, 2 - stop in the end, 3 - pause in the end
-	clip/playback/start float # seocnds
-	clip/playback/stop float # seconds
+	clip/playback/pos <position:float>
+	clip/playback/transport <type:str values("loop", "bounce", "stop", "pause")>

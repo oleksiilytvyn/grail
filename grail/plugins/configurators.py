@@ -61,7 +61,6 @@ class GeneralConfigurator(Configurator):
         # Continue last project
         cont_flag = self.app.settings.get('project/continue', default=False)
         self.ui_continue = QPushButton("On" if cont_flag else "Off")
-        self.ui_continue._toggle = cont_flag
         self.ui_continue.clicked.connect(self.continue_action)
         self.ui_continue_label = QLabel("Continue last project on startup")
 
@@ -134,7 +133,7 @@ class GeneralConfigurator(Configurator):
 
     def continue_action(self):
         """Continue last project"""
-        flag = not self.ui_continue._toggle
+        flag = not self.app.settings.get('project/continue', default=False)
 
         self.ui_continue.setText("On" if flag else "Off")
         self.app.settings.set('project/continue', flag)

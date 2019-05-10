@@ -5,7 +5,7 @@
  *
  *****************************************************************************/
 
-@define radius 3px
+@define radius 0px
 @define link-color #4fc3f7
 
 @define base #202020
@@ -363,12 +363,11 @@ QMenu {
     }
     
     QMenu::separator {
-        height: 2px;
+        height: 1px;
         background-color: $base-alt;
         color: $container-text;
-        padding-left: 4px;
-        margin-left: 2px;
-        margin-right: 2px;
+        padding: 0;
+        margin: 0;
         }
     
     QMenu::icon {
@@ -394,7 +393,12 @@ QMenu {
     QMenu::indicator {
         width: 12px;
         height: 12px;
-        padding-left: 6px;
+        padding: 6px;
+        }
+
+    QMenu::item:checked,
+    QMenu::item:unchecked {
+        padding-left: 0;
         }
 
     QMenu::indicator:non-exclusive:unchecked {
@@ -898,7 +902,7 @@ QPushButton {
     border: 1px solid $widget;
     color: $widget-text;
     border-radius: $radius;
-    padding: 5px 5px;
+    padding: 3px 5px 4px 5px;
     outline: none;
     font-weight: normal;
     }
@@ -1948,25 +1952,10 @@ AboutDialog {
         color: $container-text;
         }
 
-    AboutDialog QPushButton {
-        background-color: $widget-active;
-        color: $widget-active-text;
-        border: 1px solid $widget-active;
-        padding: 5px 10px;
-        margin: 4px;
-        }
-
-@if MAC
-    AboutDialog QPushButton {
-        padding: 5px 10px;
-        min-height: 12px;
-        }
-@end
-
     AboutDialog #g_about_title {
-        font-size: 20pt;
+        font-size: 22pt;
         padding: 0px;
-        color: $base-text;
+        color: $widget-text;
         }
 
 /** @section MessageDialog *******************************************************/

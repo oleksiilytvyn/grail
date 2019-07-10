@@ -157,7 +157,13 @@ class NodeViewer(Viewer):
             point (QPoint): point where context menu requested
         """
 
-        if not self._ui_tree.itemAt(point):
+        item = self._ui_tree.itemAt(point)
+
+        if not item:
+            return False
+
+        # Don't show context menu on items that can't be modified
+        if item.object().type in self._system_types:
             return False
 
         menu = QMenu("Context menu", self)

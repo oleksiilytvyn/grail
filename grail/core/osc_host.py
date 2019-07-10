@@ -65,7 +65,6 @@ class _OSCServer:
             address (str): ip address
             port (int): port
         """
-
         self._clients.append((address, port))
 
         if port not in self._ports:
@@ -103,8 +102,6 @@ class _OSCServer:
 
         # todo: pipe it to application
         if isinstance(message, OSCBundle):
-            # signals.emit_bundle(((m.address, m.args) for m in message))
-            # pass bundle signal
             for item in message:
                 signals.emit(item.address, *item.args)
                 logging.info('--', date, item.address, *item.args)
@@ -112,6 +109,9 @@ class _OSCServer:
             # pass single message signal
             signals.emit(message.address, *message.args)
             logging.info('--', date, message.address, *message.args)
+
+            if message.address == "/grail/message":
+                signals.emit("/clip/text/source", str(message.args[0], "utf-8"))
 
 
 class _OSCListener(OSCServer, socketserver.ThreadingMixIn):
@@ -141,7 +141,7 @@ class _ListenerThread(QThread):
 
         try:
             self.listener = _OSCListener(port, self)
-        except OSError:
+        except OSError as e:
             self.terminate()
 
     def handle(self, address, message, date):

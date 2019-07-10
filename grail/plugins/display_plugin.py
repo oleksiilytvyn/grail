@@ -680,7 +680,9 @@ class CompositionPreferences(object):
         self.shadow_blur = s.get('/clip/text/shadow/blur', default=0)
         self.shadow_color = QColor(s.get('/clip/text/shadow/color', default='#000000'))
 
-        self.padding = QMargins(*s.get('/clip/text/padding', default=[0, 0, 0, 0]))
+        pad = s.get('/clip/text/padding', default=[0, 0, 0, 0])
+
+        self.padding = QMargins(*pad if pad else [0, 0, 0, 0])
         self.align_horizontal = s.get('/clip/text/align', default=Qt.AlignVCenter)
         self.align_vertical = s.get('/clip/text/valign', default=Qt.AlignHCenter)
 
@@ -2064,7 +2066,8 @@ class MediaBinWidget(QWidget):
             self._size = width
 
         length = len(self._items)
-        self._columns = math.floor(width / self._size)
+
+        self._columns = math.floor(width / self._size)  # todo: division by zero
         self._rows = math.ceil(length / self._columns)
 
         if self._columns * self._size < width:

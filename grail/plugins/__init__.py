@@ -27,4 +27,4 @@ from .node_viewer import NodeViewer
 from .console_viewer import ConsoleViewer
 
 # plugins
-from .display_plugin import DisplayPlugin
+from .display import *

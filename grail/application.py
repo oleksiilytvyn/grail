@@ -220,6 +220,8 @@ class Grail(QApplication):
     def moreThanOneInstanceAllowed(self):
         """Do not allow multiple instances"""
 
+        # todo: Modify logic  https://stackoverflow.com/questions/12712360/qtsingleapplication-for-pyside-or-pyqt?rq=1
+
         return False
 
     def anotherInstanceStarted(self):

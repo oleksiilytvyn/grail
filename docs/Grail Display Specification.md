@@ -69,28 +69,28 @@ Cue Information, not used in rendering but may be used for debugging.
 
 Media Playback Control
 
-	clip/size <width:int> <height:int>
-	clip/pos <x:float> <y:float>
-	clip/ratate <angle:float>
-	clip/opacity <opacity:float>
-	clip/scale <scale:float>
+Text control
 
-	clip/text/source <text:str>
+	clip/text <text:str>
 	clip/text/color <hex:str>
 	clip/text/padding <left:float> <top:float> <right:float> <bottom:float>
-	clip/text/align <position:str values("left", "center", "right")>
-	clip/text/valign <position:str values("top", "middle", "bottom")>
-	clip/text/shadow/pos <x:int> <y:int>
-	clip/text/shadow/color <hex:str>
-	clip/text/shadow/blur <blurinness:int>
+	clip/text/align <horizontal:str values("left", "center", "right")> <vertical:str values("top", "middle", "bottom")>
+	clip/text/shadow <x:int> <y:int> <blurinness:int> <hex:str>
 	clip/text/transform <type:str values("normal", "title", "upper", "lower", "capitalize")>
-	clip/text/font/name <family:str>
-	clip/text/font/size <pt:float>
-	clip/text/font/style <style:str>
+	clip/text/font <size_pt:float> <family:str> <style:str>
 
-	clip/playback/source <path:str>
-	clip/playback/play
-	clip/playback/pause
-	clip/playback/stop
-	clip/playback/pos <position:float>
-	clip/playback/transport <type:str values("loop", "bounce", "stop", "pause")>
+Clip control, <N> is number of clip layer starting from 1
+
+	clip/<N>/size <width:int> <height:int>
+	clip/<N>/pos <x:float> <y:float>
+	clip/<N>/rotate <angle:float>
+	clip/<N>/opacity <opacity:float>
+	clip/<N>/volume <value:float>
+	clip/<N>/scale <scale:float>
+
+	clip/<N>/playback/source <path:str>
+	clip/<N>/playback/play
+	clip/<N>/playback/pause
+	clip/<N>/playback/stop
+	clip/<N>/playback/position <position:float>
+	clip/<N>/playback/transport <type:str values("loop", "stop", "pause")>

@@ -181,13 +181,10 @@ class _QListWidgetItem(QListWidgetItem):
 
 
 class _QToolBar(QToolBar, _QWidget):
-    """Toolbar component"""
-
     def __init__(self, parent=None):
         super(_QToolBar, self).__init__(parent)
 
-        self.setMaximumHeight(36)
-        self.setMinimumHeight(36)
+        self.setFixedHeight(30)
         self.setIconSize(QSize(16, 16))
 
     def addStretch(self):
@@ -204,6 +201,8 @@ class _QToolBar(QToolBar, _QWidget):
         painter = QPainter(self)
 
         self.style().drawPrimitive(QStyle.PE_Widget, option, painter, self)
+
+    """Toolbar component"""
 
 
 class _QTreeWidget(QTreeWidget, _QWidget):

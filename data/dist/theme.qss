@@ -698,7 +698,7 @@ QToolBar {
         }
     
     QToolButton#qt_toolbar_ext_button {
-        background: $container;
+        background: $base;
         border: 0px;
         color: $container-text;
         image: url(:/qt/right_arrow.png);
@@ -816,26 +816,17 @@ QTextBrowser {
 /** @section QGraphicsView ***************************************************/
 
 QGraphicsView {
-    background-color: $base;
-    border: 1px solid $container;
+    background: $base;
+    border: none;
     color: $container-text;
-    border-radius: $radius;
+    border-radius: 0;
+    padding: 0;
+    margin: 0px;
     }
     
     QGraphicsView:disabled {
-        background-color: $base;
-        border: 1px solid $container;
-        color: $widget-text;
-        border-radius: $radius;
+        background: $base;
         }
-    
-    QGraphicsView:hover,
-    QGraphicsView:!hover,
-    QGraphicsView::selected,
-    QGraphicsView::pressed {
-        border: 1px solid $container;
-        }
-
 
 
 /** @section QCalendarWidget *************************************************/
@@ -920,7 +911,6 @@ QPushButton {
         border: 1px solid $widget-active;
         color: $widget-active-text;
         border-radius: $radius;
-        padding: 3px;
         outline: none;
         }
     
@@ -1157,7 +1147,7 @@ QSlider::handle:horizontal {
     width: 8px;
     height: 8px;
     margin: -3px 0;
-    border-radius: 4px;
+    border-radius: $radius;
     }
 
 QSlider::handle:horizontal:hover {
@@ -1191,7 +1181,7 @@ QSlider::handle:vertical {
     width: 8px;
     height: 8px;
     margin: 0 -3px;
-    border-radius: 4px;
+    border-radius: $radius;
     }
 
 QSlider::handle:vertical:hover {

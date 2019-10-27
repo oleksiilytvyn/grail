@@ -14,7 +14,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
 from grail.qt import colors as qt_colors
-from grailkit.util import OS_MAC
+from grailkit.util import OS_MAC, OS_LINUX
 
 # References to original classes
 QT_QTREEWIDGET = QTreeWidget
@@ -343,11 +343,11 @@ class _QSplitter(QSplitter, _QWidget):
         self.setHandleWidth(1)
 
 
-class QLineEdit(QLineEdit, _QWidget):
+class _QLineEdit(QT_QLINEEDIT, _QWidget):
     """Line edit widget"""
 
     def __init__(self, *args, **kwargs):
-        super(QLineEdit, self).__init__(*args, **kwargs)
+        super(_QLineEdit, self).__init__(*args, **kwargs)
 
         self.setAttribute(Qt.WA_MacShowFocusRect, False)
 
@@ -506,7 +506,7 @@ class QPopup(_QDialog):
         # Corner roundness
         self.__roundness = 5
 
-        self.setWindowFlags(Qt.Widget | Qt.FramelessWindowHint | Qt.X11BypassWindowManagerHint)
+        self.setWindowFlags(Qt.Widget | Qt.FramelessWindowHint)
         self.setAttribute(Qt.WA_NoSystemBackground, True)
         self.setAttribute(Qt.WA_TranslucentBackground, True)
         self.autoFillBackground = True
@@ -564,10 +564,17 @@ class QPopup(_QDialog):
     def eventFilter(self, target, event):
         """Close dialog when focus is lost"""
 
-        if self.__close_on_focus_lost and event.type() == QEvent.WindowDeactivate:
+        flag = self.__close_on_focus_lost
+        type_ = event.type()
+
+        if flag and type_ == QEvent.WindowDeactivate:
             self.hide()
 
-        return QObject.eventFilter(self, target, event)
+        # Workaround for linux
+        if flag and type_ == QEvent.Leave and OS_LINUX:
+            self.hide()
+
+        return _QDialog.eventFilter(self, target, event)
 
     def sizeHint(self):
         """Default minimum size"""
@@ -626,7 +633,8 @@ QWidget.className = _QWidget.className
 QHBoxLayout = _QHBoxLayout
 QVBoxLayout = _QVBoxLayout
 
-# QSplitter = _QSplitter
+QSplitter = _QSplitter
+QLineEdit = _QLineEdit
 QTextEdit = _QTextEdit
 QToolBar = _QToolBar
 
@@ -635,5 +643,4 @@ QTreeWidget = _QTreeWidget
 QTreeWidgetItem = _QTreeWidgetItem
 QListWidget = _QListWidget
 QListWidgetItem = _QListWidgetItem
-
 QDialog = _QDialog

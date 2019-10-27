@@ -97,7 +97,6 @@ class DisplayPlugin(Plugin):
         # todo: restore from settings
 
         self._preferences_dialog = DisplayPreferencesDialog(self)
-        self._preferences_dialog.show()
 
         # Notify other plugins and viewers that DisplayPlugin is loaded
         self.emit("!display/instance")

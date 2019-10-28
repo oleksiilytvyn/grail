@@ -522,6 +522,7 @@ class DisplayLayerViewer(Viewer):
     name = "Display Layer"
     author = "Grail Team"
     description = "Manage Layers"
+    single_instance = True
 
     def __init__(self, *args, **kwargs):
         super(DisplayLayerViewer, self).__init__(*args, **kwargs)
@@ -634,16 +635,17 @@ class DisplayLayerViewer(Viewer):
 
         layer = self._layer_id
 
+        self.emit(f"/clip/{layer}/playback/source", item.path)
+        self.emit(f"/clip/{layer}/playback/position", 0)
+        self.emit(f"/clip/{layer}/playback/transport", item.transport)
+
         self.emit(f"/clip/{layer}/size", item.width, item.height)
         self.emit(f"/clip/{layer}/pos", item.x, item.y)
         self.emit(f"/clip/{layer}/rotate", item.angle)
         self.emit(f"/clip/{layer}/opacity", item.opacity)
         self.emit(f"/clip/{layer}/volume", item.volume)
         self.emit(f"/clip/{layer}/scale", item.scale)
-        self.emit(f"/clip/{layer}/playback/source", item.path)
 
-        self.emit(f"/clip/{layer}/playback/position", 0)
-        self.emit(f"/clip/{layer}/playback/transport", item.transport)
         self.emit(f"/clip/{layer}/playback/play")
 
     def item_add(self, item=None):

@@ -237,7 +237,7 @@ class Grail(QApplication):
     def open(self, path, create=False):
         """Open a file"""
 
-        if not path:
+        if not path or len(path) == 0:
             message = MessageDialog(title="Can't open file",
                                     text="File at location %s not exists." % path,
                                     icon=MessageDialog.Critical)

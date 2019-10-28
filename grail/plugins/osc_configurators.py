@@ -113,7 +113,8 @@ class OSCInConfigurator(Configurator):
             host, port = client
 
             host_item = QTableWidgetItem(host)
-            port_item = QTableWidgetItem(str(port))
+            port_item = QTableWidgetItem()
+            port_item.setData(Qt.EditRole, int(port))
 
             self._ui_list.setItem(index, 0, host_item)
             self._ui_list.setItem(index, 1, port_item)
@@ -311,7 +312,8 @@ class OSCOutConfigurator(Configurator):
             host, port = client
 
             host_item = QTableWidgetItem(host)
-            port_item = QTableWidgetItem(str(port))
+            port_item = QTableWidgetItem()
+            port_item.setData(Qt.EditRole, port)
 
             self._ui_list.setItem(index, 0, host_item)
             self._ui_list.setItem(index, 1, port_item)

@@ -138,8 +138,8 @@ class ClipWidget(QWidget):
         self._selected = -1
         self._rows = 0
         self._columns = 0
-        self._size = 180
-        self.size = 180
+        self._size = 90
+        self.size = self._size
 
         self.COLOR_NORMAL = QColor(qt_colors.BASE_ALT)
         self.COLOR_ACTIVE = QColor(qt_colors.WIDGET_ACTIVE)
@@ -181,7 +181,7 @@ class ClipWidget(QWidget):
             ox = bw / 2 - size.width() / 2
             oy = (bh - text_height) / 2 - size.height() / 2
             text_box = QRect(bx + bo, by + bo + bh - text_height, bw - bo * 2, text_height - bo * 2)
-            label = item.path.split("/")[-1]
+            label = os.path.basename(item.path)
 
             painter.setPen(Qt.NoPen)
             painter.setBrush(QBrush(self.COLOR_TEXT_ACTIVE if not selected else self.COLOR_ACTIVE, Qt.SolidPattern))
@@ -374,6 +374,10 @@ class ClipList(QScrollArea):
         if item:
             self.itemClicked.emit(item)
 
+    def setBatchSize(self, size):
+
+        self._widget.setBatchSize(size)
+
     def itemAt(self, position):
 
         return self._widget.itemAt(position)
@@ -459,61 +463,220 @@ class ClipList(QScrollArea):
         self._process_files()
 
 
+class DisplayLayerInspectorPreview(QWidget):
+
+    def __init__(self, parent=None):
+        super(DisplayLayerInspectorPreview, self).__init__(parent)
+
+        self._pixmap = None
+
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.setMinimumSize(200, 200)
+
+    def setPixmap(self, pixmap):
+
+        self._pixmap = pixmap
+        self.repaint()
+
+    def paintEvent(self, event):
+
+        painter = QPainter()
+        painter.begin(self)
+        painter.fillRect(self.rect(), QColor(qt_colors.BASE))
+
+        if self._pixmap:
+            pw, ph = self._pixmap.width(), self._pixmap.height()
+            sw, sh = self.width(), self.height()
+
+            f = (sh / ph if sw / sh > pw / ph else sw / pw) * 0.9
+            w, h = pw * f,  ph * f
+
+            painter.drawPixmap(sw / 2 - w / 2, sh / 2 - h / 2, w, h, self._pixmap)
+
+        painter.end()
+
+
 class DisplayLayerInspector(QDialog):
 
     def __init__(self, parent=None):
-        super(DisplayLayerInspector, self).__init__(parent)
+        super(DisplayLayerInspector, self).__init__(None)
+
+        self._layer_viewer = parent
+        self._item = None
+        self._param_row = 0
 
         self.__ui__()
 
     def __ui__(self):
 
+        self.setObjectName("DisplayLayerInspector")
+
+        self._ui_pixmap = DisplayLayerInspectorPreview()
+
         self._ui_label = QLabel("No item")
+        self._ui_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
         self._ui_label.setWordWrap(True)
 
+        self._ui_open_location = QPushButton("Open")
+        self._ui_open_location.clicked.connect(self._open_location)
+
+        self._ui_file_layout = QHBoxLayout()
+        self._ui_file_layout.setContentsMargins(12, 12, 12, 12)
+        self._ui_file_layout.addWidget(self._ui_label)
+        self._ui_file_layout.addWidget(self._ui_open_location)
+
+        self._ui_file_widget = QWidget()
+        self._ui_file_widget.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Preferred)
+        self._ui_file_widget.setObjectName("DisplayLayerInspector_file")
+        self._ui_file_widget.setLayout(self._ui_file_layout)
+
+        self._ui_grid_layout = QGridLayout()
+        self._ui_grid_layout.setContentsMargins(12, 12, 12, 12)
+        self._ui_grid_layout.setSpacing(4)
+
+        self._ui_x = self._add_parameter("X", -2048, 2048, 0)
+        self._ui_x.valueChanged.connect(self._x_cb)
+        self._ui_y = self._add_parameter("Y", -2048, 2048, 0)
+        self._ui_y.valueChanged.connect(self._y_cb)
+        self._ui_width = self._add_parameter("Width", 1, 4096, 100)
+        self._ui_width.valueChanged.connect(self._width_cb)
+        self._ui_height = self._add_parameter("Height", 1, 4096, 100)
+        self._ui_height.valueChanged.connect(self._height_cb)
+        self._ui_scale = self._add_parameter("Scale", 0, 500, 100)
+        self._ui_scale.valueChanged.connect(self._scale_cb)
+        self._ui_angle = self._add_parameter("Angle", 0, 360, 0)
+        self._ui_angle.valueChanged.connect(self._angle_cb)
+        self._ui_opacity = self._add_parameter("Opacity", 0, 100, 100)
+        self._ui_opacity.valueChanged.connect(self._opacity_cb)
+        self._ui_volume = self._add_parameter("Volume", 0, 100, 100)
+        self._ui_volume.valueChanged.connect(self._volume_cb)
+
         self._ui_layout = QVBoxLayout()
-        self._ui_layout.addWidget(self._ui_label)
+        self._ui_layout.addWidget(self._ui_pixmap)
+        self._ui_layout.addWidget(self._ui_file_widget)
+        self._ui_layout.addLayout(self._ui_grid_layout)
 
         self.setLayout(self._ui_layout)
+        self.setMinimumWidth(200)
 
     def setItem(self, item):
+
+        self._item = item
 
         if item is None:
             self._ui_label.setText("No item")
 
-        self._ui_label.setText(item.path)
+        self._ui_pixmap.setPixmap(item.pixmap)
+        self._ui_label.setText(item.path.replace("\\", "\\ "))
 
+        self._ui_scale.setValue(item.scale * 100)
+        self._ui_volume.setValue(item.volume * 100)
+        self._ui_angle.setValue(item.angle)
+        self._ui_width.setValue(item.width)
+        self._ui_height.setValue(item.height)
+        self._ui_x.setValue(item.x)
+        self._ui_y.setValue(item.y)
+        self._ui_opacity.setValue(item.opacity * 100)
 
-class DisplayLayerTransportWidget(QWidget):
+    def _open_location(self):
 
-    def __init__(self, parent=None):
-        super(DisplayLayerTransportWidget, self).__init__(parent)
+        if self._item is None:
+            return
 
-        self.__ui__()
+        QDesktopServices.openUrl(QUrl("file:///" + QFileInfo(self._item.path).absolutePath()))
 
-    def __ui__(self):
+    def _x_cb(self, value):
 
-        self._ui_label = QLabel("Item name")
-        self._ui_label.setWordWrap(True)
-        self._ui_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
+        if self._item is None:
+            return
 
-        self._ui_pixmap = QLabel()
+        self._item.x = value
+        self.emit(f"/clip/{self.layer()}/pos", value, self._ui_y.value())
 
-        self._ui_layout = QHBoxLayout()
-        self._ui_layout.setSpacing(6)
-        self._ui_layout.addWidget(self._ui_pixmap)
-        self._ui_layout.addWidget(self._ui_label)
+    def _y_cb(self, value):
 
-        self.setLayout(self._ui_layout)
+        if self._item is None:
+            return
 
-    def setItem(self, item):
+        self._item.y = value
+        self.emit(f"/clip/{self.layer()}/pos", self._ui_x.value(), value)
 
-        if item is None:
-            self._ui_label.setText("Item not selected")
-            self._ui_pixmap.setPixmap(None)
-        else:
-            self._ui_label.setText(item.path)
-            self._ui_pixmap.setPixmap(item.pixmap.scaled(100, 100, Qt.KeepAspectRatio))
+    def _width_cb(self, value):
+
+        if self._item is None:
+            return
+
+        self._item.width = value
+        self.emit(f"/clip/{self.layer()}/size", value, self._ui_height.value())
+
+    def _height_cb(self, value):
+
+        if self._item is None:
+            return
+
+        self._item.height = value
+        self.emit(f"/clip/{self.layer()}/size", self._ui_width.value(), value)
+
+    def _volume_cb(self, value):
+
+        if self._item is None:
+            return
+
+        self._item.volume = value / 100
+        self.emit(f"/clip/{self.layer()}/volume", value / 100)
+
+    def _opacity_cb(self, value):
+
+        if self._item is None:
+            return
+
+        self._item.opacity = value / 100
+        self.emit(f"/clip/{self.layer()}/opacity", value / 100)
+
+    def _angle_cb(self, value):
+
+        if self._item is None:
+            return
+
+        self._item.angle = value
+        self.emit(f"/clip/{self.layer()}/rotate", value)
+
+    def _scale_cb(self, value):
+
+        if self._item is None:
+            return
+
+        self._item.scale = value / 100
+        self.emit(f"/clip/{self.layer()}/scale", value / 100)
+
+    def emit(self, message, *args):
+
+        self._layer_viewer.emit(message, *args)
+
+    def layer(self):
+
+        return self._layer_viewer._layer_id
+
+    def _add_parameter(self, name: str, minimum: float, maximum: float, value: float):
+
+        slider = QSlider(Qt.Horizontal)
+        slider.setRange(minimum, maximum)
+        slider.setTickPosition(QSlider.NoTicks)
+        slider.setValue(value)
+        slider.valueChanged.connect(lambda v: spin.setValue(v))
+
+        spin = QSpinBox()
+        spin.setReadOnly(True)
+        spin.setValue(value)
+        spin.setRange(minimum, maximum)
+        # spin.valueChanged.connect(lambda v: slider.setValue(v))
+
+        self._ui_grid_layout.addWidget(QLabel(name), self._param_row, 0)
+        self._ui_grid_layout.addWidget(slider, self._param_row, 1)
+        self._ui_grid_layout.addWidget(spin, self._param_row, 2)
+        self._param_row += 1
+
+        return slider
 
 
 class DisplayLayerViewer(Viewer):
@@ -540,9 +703,7 @@ class DisplayLayerViewer(Viewer):
         self._ui_list.itemDoubleClicked.connect(self.item_doubleclicked)
         self.customContextMenuRequested.connect(self.context_menu)
 
-        self._inspector = DisplayLayerInspector()
-
-        self._ui_transport = DisplayLayerTransportWidget()
+        self._inspector = DisplayLayerInspector(self)
 
         self._ui_view_action = QToolButton()
         self._ui_view_action.setText("View")
@@ -571,7 +732,6 @@ class DisplayLayerViewer(Viewer):
 
         self._layout = QVBoxLayout()
         self._layout.addWidget(self._ui_list)
-        self._layout.addWidget(self._ui_transport)
         self._layout.addWidget(self._ui_toolbar)
 
         self.setLayout(self._layout)
@@ -629,7 +789,7 @@ class DisplayLayerViewer(Viewer):
 
     def item_clicked(self, item):
 
-        self._ui_transport.setItem(item)
+        self._inspector.setItem(item)
 
     def item_doubleclicked(self, item):
 

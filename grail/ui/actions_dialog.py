@@ -46,7 +46,7 @@ class ActionsDialog(QDialog):
         self._ui_search.textChanged.connect(self._search_event)
 
         self._ui_search_layout = QVBoxLayout()
-        self._ui_search_layout.setContentsMargins(8, 8, 8, 8)
+        self._ui_search_layout.setContentsMargins(4, 4, 4, 4)
         self._ui_search_layout.addWidget(self._ui_search)
 
         self._ui_search_widget = QWidget()

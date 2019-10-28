@@ -423,10 +423,19 @@ class TransformWidget(QWidget):
 
         return t
 
-    def points(self):
+    def points(self, raw=False):
         """Returns points mapped to given rectangle"""
 
-        return [QPointF(p.x(), p.y()) for p in self._points]
+        if raw:
+            l = []
+
+            for p in self._points:
+                l.append(p.x())
+                l.append(p.y())
+
+            return l
+        else:
+            return [QPointF(p.x(), p.y()) for p in self._points]
 
     def _toggle_affine_action(self):
 
@@ -878,11 +887,6 @@ class DisplayPreferencesDialog(QDialog):
         self._ui_display_menu = QMenu(self)
         self._ui_display_menu.addAction(action)
 
-        self._ui_display_source_action = QPushButton("Source", self)
-        self._ui_display_source_action.setCheckable(True)
-        self._ui_display_source_action.setChecked(False)
-        self._ui_display_source_action.clicked.connect(self.source_action)
-
         self._ui_display_dest_action = QPushButton("Destination", self)
         self._ui_display_dest_action.setCheckable(True)
         self._ui_display_dest_action.setChecked(True)
@@ -896,7 +900,6 @@ class DisplayPreferencesDialog(QDialog):
         self._ui_display_transform.updated.connect(self.transform_updated)
 
         self._ui_display_toolbar = QToolBar()
-        # self._ui_display_toolbar.addWidget(self._ui_display_source_action)
         self._ui_display_toolbar.addWidget(self._ui_display_dest_action)
         self._ui_display_toolbar.addStretch()
         self._ui_display_toolbar.addWidget(self._ui_display_output_action)
@@ -979,6 +982,7 @@ class DisplayPreferencesDialog(QDialog):
         # Outputs
         self._ui_list = QListWidget()
         self._ui_list.itemClicked.connect(self.item_clicked)
+        self._ui_list.itemChanged.connect(self._item_changed)
 
         self._ui_add_action = QToolButton(self)
         self._ui_add_action.setIcon(QIcon(':/rc/add.png'))
@@ -1127,19 +1131,15 @@ class DisplayPreferencesDialog(QDialog):
     def transform_updated(self):
 
         index = self._ui_list.currentRow()
-        t = self._ui_display_transform.transformation()
+        t = self._ui_display_transform
 
         if index > 0:
-            self._ui_list.item(index).output.setTransform(t)
-
-    def source_action(self):
-
-        self._ui_display_source_action.setChecked(True)
-        self._ui_display_dest_action.setChecked(False)
+            output = self._ui_list.item(index).output
+            output.setTransform(t.transformation())
+            output.setTransformationPoints(t.points(True))
 
     def dest_action(self):
 
-        self._ui_display_source_action.setChecked(False)
         self._ui_display_dest_action.setChecked(True)
 
     def add_action(self):
@@ -1170,15 +1170,14 @@ class DisplayPreferencesDialog(QDialog):
         self._ui_list.clear()
 
         # Add composition item
-        item = QListWidgetItem("Composition")
-
-        self._ui_list.addItem(item)
+        self._ui_list.addItem(QListWidgetItem("Composition"))
 
         # Add outputs items
         index = 1
 
         for output in self._plugin.outputs:
             item = QListWidgetItem(f"Output {index}")
+            item.setFlags(item.flags() | Qt.ItemIsEditable)
             item.output = output
 
             self._ui_list.addItem(item)
@@ -1192,7 +1191,15 @@ class DisplayPreferencesDialog(QDialog):
         self._ui_list.setCurrentRow(index)
         self._ui_stack.setCurrentIndex(0 if index == 0 else 1)
 
-        # todo: restore output settings
+        # restore output settings
+        if index > 0:
+            output = self._ui_list.item(index).output  # DisplayWindow
+            points = output.points()
+
+            self._ui_display_transform.setRect(output.rect())
+
+            if points:
+                self._ui_display_transform.setPoints(*points)
 
     def item_clicked(self, item=None):
         """Output list item clicked"""
@@ -1200,6 +1207,12 @@ class DisplayPreferencesDialog(QDialog):
         index = self._ui_list.currentRow()
 
         self._select_item(index)
+
+    def _item_changed(self, item=None):
+        """Output name changed"""
+
+        if item:
+            item.output.setName(item.text())
 
     def padding_updated(self, left_padding, top_padding, right_padding, bottom_padding):
         """Text padding updated"""

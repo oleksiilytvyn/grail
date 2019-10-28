@@ -88,9 +88,6 @@ class DisplaySceneLayer:
         self._scale = 1.0
         self._angle = 0
 
-        self._image_item = QGraphicsPixmapItem()
-        self._image_item.setPos(0, 0)
-
         self._video_item = QGraphicsVideoItem()
         self._video_item.setSize(QSizeF(640, 480))
 
@@ -98,9 +95,6 @@ class DisplaySceneLayer:
         self._video_player.setVideoOutput(self._video_item)
 
         self._scene.addItem(self._video_item)
-        self._scene.addItem(self._image_item)
-
-        self._video_item.hide()
 
     def set_volume(self, value: float):
 
@@ -168,9 +162,6 @@ class DisplaySceneLayer:
 
     def set_source(self, path: str):
 
-        # todo: check content type
-        # self._image_item.setPixmap(QPixmap(path))
-        # self._image_item.show()
         self._video_player.setMedia(QMediaContent(QUrl.fromLocalFile(path)))
         self._video_item.show()
 
@@ -195,10 +186,25 @@ class DisplaySceneLayer:
         sw, sh = self._scene.width(), self._scene.height()
         w, h = self._width, self._height
 
+        """
+        mode = 'stretch'
+        # fit
+        if mode == 'fit':
+            f = sh / h if sw / sh > w / h else sw / w
+            w, h = w * f,  h * f
+        # cover
+        if mode == 'cover':
+            f = sh / h if h < sh else sw / w
+            w, h = w * f, h * f
+        # stretch
+        if mode == 'stretch':
+            w, h = sw, sh
+        """
+
         self._video_item.setPos(sw / 2 - w / 2 + self._x, sh / 2 - h / 2 + self._y)
         self._video_item.setScale(self._scale)
         self._video_item.setRotation(self._angle)
-        self._video_item.setSize(QSizeF(self._width, self._height))
+        self._video_item.setSize(QSizeF(w, h))
 
 
 class DisplaySceneTextItem(QGraphicsItem):
@@ -341,7 +347,7 @@ class DisplayScene(QGraphicsScene):
         self._transition = 0
 
         # Internal
-        self._text_item = DisplaySceneTextItem("Hello World!")
+        self._text_item = DisplaySceneTextItem("")
         self._testcard_pixmap = TestCardTexture(self._width, self._height)
         self._testcard_item = QGraphicsPixmapItem(self._testcard_pixmap)
         self._background_item = QGraphicsRectItem()
@@ -651,19 +657,14 @@ class DisplayWindow(QDialog):
         self._scene = self._plugin.scene
         self._position = QPoint(0, 0)
         self._transformation = QTransform()
+        self._transformation_points = None
 
         self._scene.changed.connect(lambda _: self.repaint())
         self._scene.sceneRectChanged.connect(lambda rect: self.repaint())
-        # todo: repaint on cue change
 
         self.setGeometry(0, 0, 800, 600)
         self.setWindowTitle("Display Output")
-        self.setWindowFlags(Qt.Window |
-                            Qt.FramelessWindowHint |
-                            Qt.WindowSystemMenuHint |
-                            Qt.WindowStaysOnTopHint |
-                            Qt.NoDropShadowWindowHint |
-                            Qt.X11BypassWindowManagerHint)
+        self.setFrameless(False)
 
     def paintEvent(self, event):
 
@@ -712,14 +713,12 @@ class DisplayWindow(QDialog):
                                 Qt.FramelessWindowHint |
                                 Qt.WindowSystemMenuHint |
                                 Qt.WindowStaysOnTopHint |
-                                Qt.NoDropShadowWindowHint |
-                                Qt.X11BypassWindowManagerHint)
+                                Qt.NoDropShadowWindowHint)
         else:
             self.setWindowFlags(Qt.Window |
                                 Qt.WindowSystemMenuHint |
                                 Qt.WindowStaysOnTopHint |
                                 Qt.NoDropShadowWindowHint |
-                                Qt.X11BypassWindowManagerHint |
                                 Qt.WindowTitleHint |
                                 Qt.WindowCloseButtonHint)
 
@@ -728,3 +727,15 @@ class DisplayWindow(QDialog):
         # todo: implement clipping
 
         self.repaint()
+
+    def setName(self, name: str):
+
+        self.setWindowTitle("Output: %s" % name)
+
+    def setTransformationPoints(self, points):
+
+        self._transformation_points = points
+
+    def points(self):
+
+        return self._transformation_points

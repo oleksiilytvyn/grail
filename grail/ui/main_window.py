@@ -261,7 +261,8 @@ class MainWindow(QMainWindow):
 
         path, ext = QFileDialog.getSaveFileName(self, "New project", location, "*.grail")
 
-        self.app.open(path, create=True)
+        if path and len(path) != 0:
+            self.app.open(path, create=True)
 
     def open_project(self):
         """Open an existing file"""
@@ -270,7 +271,8 @@ class MainWindow(QMainWindow):
                                          QStandardPaths.LocateDirectory)
         path, ext = QFileDialog.getOpenFileName(self, "Open File...", location, "*.grail")
 
-        self.app.open(path, create=False)
+        if path and len(path) != 0:
+            self.app.open(path, create=False)
 
     def save_project(self):
         """Save current project"""
@@ -409,6 +411,7 @@ class MainWindow(QMainWindow):
         """About dialog menu_action"""
 
         self.about_dialog.showWindow()
+        self.about_dialog.moveCenter()
 
     def preferences_action(self):
         """Open a preferences dialog"""

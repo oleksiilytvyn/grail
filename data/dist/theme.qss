@@ -2412,3 +2412,22 @@ PreferencesDialog {
 
         #OSCInConfigurator_list {}
      */
+
+
+/******************************************************************************
+ *
+ * @section DisplayLayerInspector
+ *
+ ****************************************************************************/
+
+#DisplayLayerInspector {
+    }
+
+    #DisplayLayerInspector_file {
+        background: $widget-active;
+        color: $base;
+        }
+
+        #DisplayLayerInspector_file QLabel {
+            color: $base;
+            }

@@ -55,7 +55,7 @@ class BibleViewer(Viewer):
         self._ui_search.focusOut.connect(self._search_focus_out)
 
         self._ui_search_layout = QVBoxLayout()
-        self._ui_search_layout.setContentsMargins(8, 8, 8, 8)
+        self._ui_search_layout.setContentsMargins(4, 4, 4, 4)
         self._ui_search_layout.addWidget(self._ui_search)
 
         self._ui_search_widget = QWidget()

@@ -14,6 +14,19 @@ from grail.qt import *
 from grail.qt import colors as qt_colors
 
 
+class OutputConfiguration:
+
+    def __init__(self, name: str, x: int, y: int, width: int, height: int,
+                 disabled: bool = False, frameless: bool = True):
+        self.name = name
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.disabled = disabled
+        self.frameless = frameless
+
+
 class TransformWidget(QWidget):
     """Corner-pin transformation with composition display"""
 
@@ -109,7 +122,7 @@ class TransformWidget(QWidget):
             [points[1], points[2]],
             [points[2], points[3]],
             [points[3], points[0]]
-            ]
+        ]
 
         for pair in pairs:
             px, py = (pair[0][0] + pair[1][0]) / 2, (pair[0][1] + pair[1][1]) / 2
@@ -253,7 +266,7 @@ class TransformWidget(QWidget):
             [points[1], points[2]],
             [points[2], points[3]],
             [points[3], points[0]]
-            ]
+        ]
 
         for pair in pairs:
             p = QPointF((pair[0].x() + pair[1].x()) / 2, (pair[0].y() + pair[1].y()) / 2)
@@ -316,28 +329,28 @@ class TransformWidget(QWidget):
 
         w, h = self._rect.width(), self._rect.height()
 
-        self.setPoints(0, 0, w/2, 0, w/2, h, 0, h)
+        self.setPoints(0, 0, w / 2, 0, w / 2, h, 0, h)
 
     def right(self):
         """Transform to fill right side of screen"""
 
         w, h = self._rect.width(), self._rect.height()
 
-        self.setPoints(w/2, 0, w, 0, w, h, w/2, h)
+        self.setPoints(w / 2, 0, w, 0, w, h, w / 2, h)
 
     def top(self):
         """Transform to fill top half of screen"""
 
         w, h = self._rect.width(), self._rect.height()
 
-        self.setPoints(0, 0, w, 0, w, h/2, 0, h/2)
+        self.setPoints(0, 0, w, 0, w, h / 2, 0, h / 2)
 
     def bottom(self):
         """Transform to fill bottom half of screen"""
 
         w, h = self._rect.width(), self._rect.height()
 
-        self.setPoints(0, h/2, w, h/2, w, h, 0, h)
+        self.setPoints(0, h / 2, w, h / 2, w, h, 0, h)
 
     def setPoints(self, x1, y1, x2, y2, x3, y3, x4, y4):
         """Set transformation points"""
@@ -451,7 +464,6 @@ class PaddingPopup(QPopup):
         self.__ui__()
 
     def __ui__(self):
-
         self.ui_left = QSpinBox()
         self.ui_left.setRange(0, 1000)
         self.ui_left.setValue(self._padding[0])
@@ -782,7 +794,6 @@ class CasePopup(QPopup):
         self.__ui__()
 
     def __ui__(self):
-
         self.ui_case = QComboBox()
         self.ui_case.activated.connect(self.valueChanged)
 
@@ -808,13 +819,11 @@ class CasePopup(QPopup):
         self.setGeometry(100, 300, 120, 80)
 
     def valueChanged(self, i):
-
         self.case = self.ui_case.currentData()
 
         self.updated.emit(self.case)
 
     def setCase(self, case):
-
         self.case = case
 
 
@@ -859,21 +868,24 @@ class DisplayPreferencesDialog(QDialog):
 
         self._fit_view()
         self._update_output_list()
+        self._update_outputs()
 
     def __ui__(self):
         """Build UI"""
 
         # Display output
+        action = QAction("Disabled", self)
         self._ui_display_menu = QMenu(self)
+        self._ui_display_menu.addAction(action)
 
         self._ui_display_source_action = QPushButton("Source", self)
         self._ui_display_source_action.setCheckable(True)
-        self._ui_display_source_action.setChecked(True)
+        self._ui_display_source_action.setChecked(False)
         self._ui_display_source_action.clicked.connect(self.source_action)
 
         self._ui_display_dest_action = QPushButton("Destination", self)
         self._ui_display_dest_action.setCheckable(True)
-        self._ui_display_dest_action.setChecked(False)
+        self._ui_display_dest_action.setChecked(True)
         self._ui_display_dest_action.clicked.connect(self.dest_action)
 
         self._ui_display_output_action = QPushButton("Disabled", self)
@@ -884,7 +896,7 @@ class DisplayPreferencesDialog(QDialog):
         self._ui_display_transform.updated.connect(self.transform_updated)
 
         self._ui_display_toolbar = QToolBar()
-        self._ui_display_toolbar.addWidget(self._ui_display_source_action)
+        # self._ui_display_toolbar.addWidget(self._ui_display_source_action)
         self._ui_display_toolbar.addWidget(self._ui_display_dest_action)
         self._ui_display_toolbar.addStretch()
         self._ui_display_toolbar.addWidget(self._ui_display_output_action)
@@ -1006,7 +1018,7 @@ class DisplayPreferencesDialog(QDialog):
 
         # Set default view
         self._ui_list.addItem(QListWidgetItem("Composition"))
-        self._ui_list.setCurrentRow(0)
+        self._select_item(0)
 
         self.setLayout(self._ui_layout)
         self.setWindowTitle("Display Preferences")
@@ -1026,7 +1038,7 @@ class DisplayPreferencesDialog(QDialog):
             return
 
         scene = self._plugin.scene
-        factor = min(self._ui_view.width()/scene.width(), self._ui_view.height()/scene.height()) * 0.9
+        factor = min(self._ui_view.width() / scene.width(), self._ui_view.height() / scene.height()) * 0.9
 
         t = self._ui_view.transform()
         t.reset()
@@ -1034,8 +1046,78 @@ class DisplayPreferencesDialog(QDialog):
 
         self._ui_view.setTransform(t)
 
+    def _update_outputs(self):
+
+        modes = [OutputConfiguration("Disabled", 0, 0, 800, 600, disabled=True), None]
+
+        for screen in QGuiApplication.screens():
+            rect = screen.geometry()
+            name = screen.name()
+
+            # Fix name on Windows
+            if name.startswith("\\\\.\\"):
+                name = name[4:]
+
+            modes.append(OutputConfiguration(
+                "%s (%dx%d)" % (name, screen.size().width(), screen.size().height()),
+                rect.x(), rect.y(), rect.width(), rect.height(),
+                frameless=True))
+
+        modes.append(None)
+
+        display = QDesktopWidget().geometry()
+
+        for (w, h) in [(1280, 720), (800, 600), (480, 320)]:
+            modes.append(OutputConfiguration("Windowed (%dx%d)" % (w, h),
+                                             (display.x() + display.width()) / 2 - w / 2,
+                                             (display.y() + display.height()) / 2 - h / 2,
+                                             w, h,
+                                             frameless=False))
+
+        self._ui_display_menu.clear()
+
+        modes.reverse()
+
+        def triggered(menu_action):
+            return lambda item=menu_action: self._update_output_window(menu_action)
+
+        for mode in modes:
+            if mode is None:
+                self._ui_display_menu.addSeparator()
+                continue
+
+            action = QAction(mode.name, self)
+            action.setProperty('mode', QVariant(mode))
+            action.triggered.connect(triggered(action))
+
+            self._ui_display_menu.addAction(action)
+
     def _screens_changed(self):
-        pass
+
+        self._update_outputs()
+
+    def _update_output_window(self, action):
+
+        index = self._ui_list.currentRow()
+
+        if index <= 0:
+            return
+
+        output = self._ui_list.item(index).output
+        mode = action.property('mode')
+
+        self._ui_display_output_action.setText(mode.name)
+
+        if mode.disabled:
+            output.close()
+
+            return
+
+        output.setFrameless(mode.frameless)
+        output.setGeometry(mode.x, mode.y, mode.width, mode.height)
+        output.show()
+
+        self._ui_display_transform.setRect(QRectF(0, 0, mode.width, mode.height))
 
     def emit(self, message, *args, **kwargs):
         """Emit messages to plugin"""
@@ -1066,10 +1148,8 @@ class DisplayPreferencesDialog(QDialog):
         output = self._plugin.add_output()
         self._update_output_list()
 
-        print("Output added:", output)
-
         # select last item
-        self._ui_list.setCurrentRow(self._ui_list.count() - 1)
+        self._select_item(self._ui_list.count() - 1)
 
     def remove_action(self):
         """Remove output action"""
@@ -1080,10 +1160,9 @@ class DisplayPreferencesDialog(QDialog):
             self._ui_list.takeItem(index)
 
             output = self._plugin.outputs.pop(index - 1)
-            print("Removed output", output)
 
         # select previous item
-        self._ui_list.setCurrentRow(max(0, index - 1))
+        self._select_item(max(0, index - 1))
 
     def _update_output_list(self):
         """Update list of outputs"""
@@ -1106,14 +1185,21 @@ class DisplayPreferencesDialog(QDialog):
 
             index += 1
 
+        self._select_item(0)
+
+    def _select_item(self, index: int):
+
+        self._ui_list.setCurrentRow(index)
+        self._ui_stack.setCurrentIndex(0 if index == 0 else 1)
+
+        # todo: restore output settings
+
     def item_clicked(self, item=None):
         """Output list item clicked"""
 
         index = self._ui_list.currentRow()
 
-        self._ui_stack.setCurrentIndex(0 if index == 0 else 1)
-
-        # todo: load selected window settings
+        self._select_item(index)
 
     def padding_updated(self, left_padding, top_padding, right_padding, bottom_padding):
         """Text padding updated"""

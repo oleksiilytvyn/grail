@@ -23,6 +23,7 @@ class DisplayViewer(Viewer):
     name = "Display Output"
     author = "Grail Team"
     description = "View composition output"
+    single_instance = True
 
     def __init__(self, *args, **kwargs):
         super(DisplayViewer, self).__init__(*args, **kwargs)

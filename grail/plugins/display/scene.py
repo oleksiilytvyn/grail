@@ -89,6 +89,7 @@ class DisplaySceneLayer:
         self._angle = 0
 
         self._image_item = QGraphicsPixmapItem()
+        self._image_item.setPos(0, 0)
 
         self._video_item = QGraphicsVideoItem()
         self._video_item.setSize(QSizeF(640, 480))
@@ -98,6 +99,8 @@ class DisplaySceneLayer:
 
         self._scene.addItem(self._video_item)
         self._scene.addItem(self._image_item)
+
+        self._video_item.hide()
 
     def set_volume(self, value: float):
 
@@ -124,8 +127,7 @@ class DisplaySceneLayer:
         self._width = width
         self._height = height
 
-        self._video_item.setSize(QSizeF(width, height))
-        self._image_item.setSize(QSizeF(width, height))
+        self._resize()
 
     @property
     def size(self):
@@ -137,6 +139,8 @@ class DisplaySceneLayer:
         self._x = x
         self._y = y
 
+        self._resize()
+
     @property
     def position(self):
         return self._x, self._y
@@ -144,6 +148,8 @@ class DisplaySceneLayer:
     def set_rotate(self, angle: float):
 
         self._angle = angle
+
+        self._resize()
 
     @property
     def angle(self):
@@ -154,13 +160,19 @@ class DisplaySceneLayer:
 
         self._scale = scale
 
+        self._resize()
+
     @property
     def scale(self):
         return self._scale
 
     def set_source(self, path: str):
 
+        # todo: check content type
+        # self._image_item.setPixmap(QPixmap(path))
+        # self._image_item.show()
         self._video_player.setMedia(QMediaContent(QUrl.fromLocalFile(path)))
+        self._video_item.show()
 
     def play(self):
 
@@ -177,6 +189,16 @@ class DisplaySceneLayer:
     def set_playback_position(self, position: float): pass
 
     def set_transport(self, value: str): pass
+
+    def _resize(self):
+
+        sw, sh = self._scene.width(), self._scene.height()
+        w, h = self._width, self._height
+
+        self._video_item.setPos(sw / 2 - w / 2 + self._x, sh / 2 - h / 2 + self._y)
+        self._video_item.setScale(self._scale)
+        self._video_item.setRotation(self._angle)
+        self._video_item.setSize(QSizeF(self._width, self._height))
 
 
 class DisplaySceneTextItem(QGraphicsItem):
@@ -319,7 +341,6 @@ class DisplayScene(QGraphicsScene):
         self._transition = 0
 
         # Internal
-        self._layers = [DisplaySceneLayer(self), DisplaySceneLayer(self)]
         self._text_item = DisplaySceneTextItem("Hello World!")
         self._testcard_pixmap = TestCardTexture(self._width, self._height)
         self._testcard_item = QGraphicsPixmapItem(self._testcard_pixmap)
@@ -328,8 +349,11 @@ class DisplayScene(QGraphicsScene):
         self._background_item.setRect(QRectF(0, 0, self.width(), self.height()))
 
         self.addItem(self._background_item)
+        self._layers = [DisplaySceneLayer(self)]
         self.addItem(self._text_item)
         self.addItem(self._testcard_item)
+
+        self.set_testcard(False)
 
     # Global Controls
 
@@ -413,7 +437,7 @@ class DisplayScene(QGraphicsScene):
 
         layer = layer - 1
 
-        if layer in self._layers:
+        if 0 <= layer < len(self._layers):
             return self._layers[layer]
 
         return None
@@ -628,6 +652,10 @@ class DisplayWindow(QDialog):
         self._position = QPoint(0, 0)
         self._transformation = QTransform()
 
+        self._scene.changed.connect(lambda _: self.repaint())
+        self._scene.sceneRectChanged.connect(lambda rect: self.repaint())
+        # todo: repaint on cue change
+
         self.setGeometry(0, 0, 800, 600)
         self.setWindowTitle("Display Output")
         self.setWindowFlags(Qt.Window |
@@ -658,11 +686,10 @@ class DisplayWindow(QDialog):
 
         painter.end()
 
-    def setTransform(self, transform: QTransform):
+    def setGeometry(self, x, y, width, height):
 
-        self._transformation = transform
-
-        self.repaint()
+        super(DisplayWindow, self).setGeometry(x, y, width, height)
+        self.setFixedSize(width, height)
 
     def resizeEvent(self, event):
 
@@ -671,3 +698,33 @@ class DisplayWindow(QDialog):
     def hideEvent(self, event):
 
         event.ignore()
+
+    def setTransform(self, transform: QTransform):
+
+        self._transformation = transform
+
+        self.repaint()
+
+    def setFrameless(self, flag: bool = True):
+
+        if flag:
+            self.setWindowFlags(Qt.Window |
+                                Qt.FramelessWindowHint |
+                                Qt.WindowSystemMenuHint |
+                                Qt.WindowStaysOnTopHint |
+                                Qt.NoDropShadowWindowHint |
+                                Qt.X11BypassWindowManagerHint)
+        else:
+            self.setWindowFlags(Qt.Window |
+                                Qt.WindowSystemMenuHint |
+                                Qt.WindowStaysOnTopHint |
+                                Qt.NoDropShadowWindowHint |
+                                Qt.X11BypassWindowManagerHint |
+                                Qt.WindowTitleHint |
+                                Qt.WindowCloseButtonHint)
+
+    def setClippingRect(self, rect: QRect):
+
+        # todo: implement clipping
+
+        self.repaint()

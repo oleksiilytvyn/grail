@@ -76,14 +76,27 @@ class DisplayPlugin(Plugin):
         self.connect('/comp/transition', self._comp_transition_cb)
         self.connect('/comp/volume', self._comp_volume_cb)
 
+        # Text layer signals
         self.connect('/clip/text', self._text_cb)
         self.connect('/clip/text/font', self._text_font_cb)
-
         self.connect('/clip/text/color', self._text_color_cb)
         self.connect('/clip/text/padding', self._text_padding_cb)
         self.connect('/clip/text/align', self._text_align_cb)
         self.connect('/clip/text/shadow', self._text_shadow_cb)
         self.connect('/clip/text/transform', self._text_transform_cb)
+
+        # Media clip signals
+        for layer in range(1, 2):
+            self.connect(f"/clip/{layer}/size", lambda w, h: self._clip_size_cb(layer, w, h))
+            self.connect(f"/clip/{layer}/pos", lambda x, y: self._clip_pos_cb(layer, x, y))
+            self.connect(f"/clip/{layer}/rotate", lambda angle: self._clip_angle_cb(layer, angle))
+            self.connect(f"/clip/{layer}/opacity", lambda opacity: self._clip_opacity_cb(layer, opacity))
+            self.connect(f"/clip/{layer}/volume", lambda volume: self._clip_volume_cb(layer, volume))
+            self.connect(f"/clip/{layer}/scale", lambda scale: self._clip_scale_cb(layer, scale))
+            self.connect(f"/clip/{layer}/playback/source", lambda source: self._clip_source_cb(layer, source))
+            self.connect(f"/clip/{layer}/playback/position", lambda pos: self._clip_position_cb(layer, pos))
+            self.connect(f"/clip/{layer}/playback/transport", lambda tr: self._clip_transport_cb(layer, tr))
+            self.connect(f"/clip/{layer}/playback/play", lambda: self._clip_play_cb(layer))
 
         desktop = QApplication.desktop()
         desktop.resized.connect(self._screens_changed)
@@ -105,57 +118,86 @@ class DisplayPlugin(Plugin):
 
         self.scene.set_text(cue.name)
 
-    @debug
+    def _clip_angle_cb(self, layer, angle):
+
+        self._scene.clip_rotate(layer, angle)
+
+    def _clip_opacity_cb(self, layer, opacity):
+
+        self._scene.clip_opacity(layer, opacity)
+
+    def _clip_volume_cb(self, layer, volume):
+
+        self._scene.clip_volume(layer, volume)
+
+    def _clip_scale_cb(self, layer, scale):
+
+        self._scene.clip_scale(layer, scale)
+
+    def _clip_source_cb(self, layer, source):
+
+        self._scene.clip_playback_source(layer, source)
+
+    def _clip_position_cb(self, layer, pos):
+
+        self._scene.clip_playback_position(layer, pos)
+
+    def _clip_transport_cb(self, layer, tr):
+
+        self._scene.clip_playback_transport(layer, tr)
+
+    def _clip_play_cb(self, layer):
+
+        self._scene.clip_playback_play(layer)
+
+    def _clip_size_cb(self, layer, width, height):
+
+        self._scene.clip_size(layer, width, height)
+
+    def _clip_pos_cb(self, layer, x, y):
+
+        self._scene.clip_position(layer, x, y)
+
     def _comp_size_cb(self, width: int, height: int):
 
         self._scene.set_size(width, height)
 
-    @debug
     def _comp_opacity_cb(self, opacity: float):
 
         self._scene.set_opacity(opacity)
 
-    @debug
     def _comp_transition_cb(self, seconds: float):
 
         self._scene.set_transition(seconds)
 
-    @debug
     def _comp_volume_cb(self, volume: float):
 
         self._scene.set_volume(volume)
 
-    @debug
     def _text_cb(self, text):
 
         self._scene.set_text(text)
 
-    @debug
     def _text_font_cb(self, size, name, style):
 
         self._scene.set_text_font(size, name, style)
 
-    @debug
     def _text_color_cb(self, color):
 
         self._scene.set_text_color(color)
 
-    @debug
     def _text_padding_cb(self, l, t, r, b):
 
         self._scene.set_text_padding(l, t, r, b)
 
-    @debug
     def _text_align_cb(self, h, v):
 
         self._scene.set_text_align(h, v)
 
-    @debug
     def _text_shadow_cb(self, x, y, blur, color):
 
         self._scene.set_text_shadow(x, y, blur, color)
 
-    @debug
     def _text_transform_cb(self, transform):
 
         self._scene.set_text_transform(transform)
@@ -219,7 +261,6 @@ class DisplayPlugin(Plugin):
         """Add new output"""
 
         output = DisplayWindow(self)
-        output.show()
 
         self._outputs.append(output)
 

@@ -36,7 +36,7 @@ def get_revision():
         import hgapi
 
         repository = hgapi.Repo(os.path.abspath(os.curdir))
-        revision = "%sb%d" % (grail.__version__, repository['tip'].rev)
+        revision = "%s.%d" % (grail.__version__, repository['tip'].rev)
     except ImportError:
         print("Failed to get revision number. Install 'hgapi' module.")
     except Exception as error:

@@ -93,16 +93,15 @@ class Grail(QApplication):
         self.change_bible(self.settings.get('bible/default', ""))
 
         self.main_window = None
-
         self.welcome_dialog = WelcomeDialog(self)
-        self.welcome_dialog.show()
 
         # open last project instantly
-        if self.settings.get('project/continue', default=False):
-            path = self.settings.get('project/last', default='')
+        path = self.settings.get('project/last', default='')
 
-            if os.path.isfile(path):
-                self.open(path, create=False)
+        if self.settings.get('project/continue', default=False) and os.path.isfile(path):
+            self.open(path, create=False)
+        else:
+            self.welcome_dialog.show()
 
         # console args
         create = '-c' in argv

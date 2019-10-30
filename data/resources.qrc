@@ -88,6 +88,7 @@
 		<file alias="rc\save.png">rc\save.png</file>
 		<file alias="rc\search-clear.png">rc\search-clear.png</file>
 		<file alias="rc\selection-select.png">rc\selection-select.png</file>
+		<file alias="rc\settings.png">rc\settings.png</file>
 		<file alias="rc\shadow.png">rc\shadow.png</file>
 		<file alias="rc\stop.png">rc\stop.png</file>
 		<file alias="rc\testcard.png">rc\testcard.png</file>

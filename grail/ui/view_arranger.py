@@ -24,9 +24,10 @@ class ViewArranger(QWidget):
         self._viewers = []
         self._layout = QHBoxLayout()
         self._root = None
+        self._lock = False
         self._timer = QTimer()
         self._timer.timeout.connect(self._timeout)
-        self._timer.setInterval(1000)
+        self._timer.setInterval(500)
 
         self.updated = Signal()
 
@@ -65,13 +66,15 @@ class ViewArranger(QWidget):
         Args:
             structure: list that represents layout
         """
+        self._lock = True
         self._root = self._build(structure)
         self._layout.addWidget(self._root)
+        self._lock = False
 
     def decompose(self, _root=None, _depth=0):
         """Return structure containing information about views & layouts"""
 
-        splitter = _root if _root else self._root
+        splitter = _root if _root is not None else self._root
         structure = []
 
         if not splitter:
@@ -209,11 +212,15 @@ class ViewArranger(QWidget):
 
         ref = viewer(parent, properties)
         self._viewers.append(ref)
+        self._update()
 
         return ref
 
     def _update(self):
         """Called when layout changed or view replaced, also on splitter resize"""
+
+        if self._lock:
+            return False
 
         self.updated.emit()
 

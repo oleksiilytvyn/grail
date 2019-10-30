@@ -387,7 +387,7 @@ QMenu {
         }
 
     QMenu::item:disabled {
-        color: $base-text;
+        color: $widget-alt;
         }
 
     QMenu::indicator {

@@ -387,7 +387,7 @@ QMenu {
         }
 
     QMenu::item:disabled {
-        color: #b5b2b1;
+        color: #3c3c3c;
         }
 
     QMenu::indicator {

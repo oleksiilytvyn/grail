@@ -11,7 +11,7 @@
 import logging
 import socketserver
 
-from PyQt5.QtCore import QThread, pyqtSignal, QCoreApplication
+from grail.qt import QThread, pyqtSignal, QCoreApplication
 
 from grailkit.osc import *
 
@@ -100,16 +100,15 @@ class _OSCServer:
 
         signals = QCoreApplication.instance().signals
 
-        # todo: pipe it to application
+        # forward messages to application
         if isinstance(message, OSCBundle):
             for item in message:
                 signals.emit(item.address, *item.args)
-                logging.info('--', date, item.address, *item.args)
         else:
             # pass single message signal
             signals.emit(message.address, *message.args)
-            logging.info('--', date, message.address, *message.args)
 
+            # fix: accept old style messages
             if message.address == "/grail/message":
                 signals.emit("/clip/text/source", str(message.args[0], "utf-8"))
 

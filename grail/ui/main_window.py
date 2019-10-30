@@ -34,30 +34,40 @@ class MainWindow(QMainWindow):
         """Initialize UI"""
 
         # about dialog
+        self.preferences_dialog = PreferencesDialog()
+        self.actions_dialog = ActionsDialog()
+        self.project_dialog = ProjectDialog()
         self.about_dialog = AboutDialog(None, "Grail %s" % (grail.__version__,),
                                         "Copyright © 2016-2019 Alex Litvin.\nAll rights reserved.\n\n"
-                                        "http://alexlitvin.name/\n"
                                         "http://grailapp.com/",
                                         QIcon(':/icon/256.png'))
 
-        self.preferences_dialog = PreferencesDialog()
-
-        self.actions_dialog = ActionsDialog()
-
-        self.project_dialog = ProjectDialog()
-
         self._ui_menubar()
 
+        struct = self._compose()
+
         self.view_arranger = ViewArranger()
-        self.view_arranger.compose(self._compose())
+        self.view_arranger.compose(struct)
+        self.view_arranger.updated.connect(self._arranger_updated)
 
         self.setCentralWidget(self.view_arranger)
         self.setWindowIcon(QIcon(':/icon/256.png'))
-        self.setGeometry(300, 300, 800, 480)
+        self.setGeometry(0, 0, 800, 600)
         self.setMinimumSize(320, 240)
         self.setWindowTitle("%s - Grail" % (self.app.project.location,))
         self.center()
         self.show()
+
+        window = struct[0]
+
+        if window:
+            if default_key(window, 'maximized', False):
+                self.setWindowState(Qt.WindowMaximized)
+            else:
+                self.setGeometry(default_key(window, 'x', 0),
+                                 default_key(window, 'y', 0),
+                                 default_key(window, 'width', 0),
+                                 default_key(window, 'height', 0))
 
     def _ui_menubar(self):
         """Setup menu"""
@@ -71,18 +81,23 @@ class MainWindow(QMainWindow):
         self.ui_export_action.triggered.connect(self.export_action)
 
         self.ui_new_action = QAction('New project', self)
+        self.ui_new_action.setShortcut("Ctrl+N")
         self.ui_new_action.triggered.connect(self.new_project)
         self.ui_open_action = QAction('Open project', self)
+        self.ui_open_action.setShortcut("Ctrl+O")
         self.ui_open_action.triggered.connect(self.open_project)
         self.ui_save_action = QAction('Save project', self)
+        self.ui_save_action.setShortcut("Ctrl+S")
         self.ui_save_action.triggered.connect(self.save_project)
         self.ui_save_as_action = QAction('Save project as', self)
+        self.ui_save_as_action.setShortcut("Ctrl+Shift+S")
         self.ui_save_as_action.triggered.connect(self.save_project_as)
 
         self.ui_quit_action = QAction('Quit', self)
         self.ui_quit_action.triggered.connect(self.close)
 
         self.ui_preferences_action = QAction('Preferences', self)
+        self.ui_preferences_action.setShortcut("Ctrl+P")
         self.ui_preferences_action.triggered.connect(self.preferences_action)
 
         self.ui_project_action = QAction('Project info', self)
@@ -135,7 +150,7 @@ class MainWindow(QMainWindow):
         if not OS_MAC:
             self.setMenuBar(self.ui_menubar)
 
-    def _compose(self, _root=None):
+    def _compose(self, _root=None, _depth=1):
         """Create structure from project nodes"""
 
         # default structure
@@ -170,17 +185,15 @@ class MainWindow(QMainWindow):
                     "y": 0
                 }
             ]
-
         structure = []
 
-        if not _root:
-            layout = self.project.dna.entities(filter_type=DNA.TYPE_LAYOUT,
-                                               filter_parent=0,
-                                               filter_keyword="Layout")
-            if len(layout) == 0:
+        if _root is None:
+            entities = self.project.dna.entities(filter_type=DNA.TYPE_LAYOUT, filter_parent=0, filter_keyword="Layout")
+
+            if len(entities) == 0:
                 return default
             else:
-                layout = layout[0]
+                layout = entities[0]
         else:
             layout = _root
 
@@ -190,29 +203,25 @@ class MainWindow(QMainWindow):
                 "width": layout.get("width", default=100),
                 "height": layout.get("height", default=100),
                 "x": layout.get("x", default=0),
-                "y": layout.get("y", default=0)
+                "y": layout.get("y", default=0),
+                "maximized": layout.get("maximized", default=False)
             })
 
         for entity in layout.childs():
             if entity.type == DNA.TYPE_LAYOUT:
-                structure.append(self._compose(entity))
+                structure.append(self._compose(entity, _depth + 1))
             elif entity.type == DNA.TYPE_VIEW:
                 structure.append(entity.properties())
 
-        if len(structure) > 1:
-            return structure
-        else:
-            return [default, []][1 if _root else 0]
+        return default if _root is None and len(structure) == 0 else structure
 
-    def _arranger_updated(self, _structure=None, _root=None):
+    def _arranger_updated(self, _structure=None, _root=None, _depth=1):
         """Layout of arranger is changed"""
 
         root = self.project.dna if not _root else _root
-        structure = _structure if _structure else self.view_arranger.decompose()
+        structure = _structure if _structure is not None else self.view_arranger.decompose()
         layout = structure[0] if len(structure) > 0 else {}
         views = structure[1:] if len(structure) > 0 else []
-
-        # todo: check, application may be opened without any viewers
 
         if not _root:
             # remove old layout entity
@@ -228,6 +237,12 @@ class MainWindow(QMainWindow):
                                  entity_type=DNA.TYPE_LAYOUT,
                                  parent=0,
                                  properties=layout)
+            geometry = self.geometry()
+            entity.set("x", geometry.x())
+            entity.set("y", geometry.y())
+            entity.set("width", geometry.width())
+            entity.set("height", geometry.height())
+            entity.set("maximized", self.isMaximized())
         else:
             # create child entity
             entity = root.create(name="Layout",
@@ -236,11 +251,45 @@ class MainWindow(QMainWindow):
 
         for view in views:
             if isinstance(view, list):
-                self._arranger_updated(view, entity)
+                self._arranger_updated(view, entity, _depth + 1)
             elif isinstance(view, dict):
                 entity.create(name="View",
                               entity_type=DNA.TYPE_VIEW,
                               properties=view)
+
+    def _geometry_changed(self):
+
+        maximized = not self.isMaximized()
+
+        # Get window entity
+        entities = self.project.dna.entities(filter_type=DNA.TYPE_LAYOUT, filter_parent=0, filter_keyword="Layout")
+
+        if len(entities) > 0:
+            window = entities[0]
+            geometry = self.geometry()
+            window.set("x", geometry.x())
+            window.set("y", geometry.y())
+            window.set("width", geometry.width())
+            window.set("height", geometry.height())
+
+    def resizeEvent(self, event):
+
+        self._geometry_changed()
+
+    def moveEvent(self, event):
+
+        self._geometry_changed()
+
+    def changeEvent(self, e):
+        """Save window state"""
+
+        entities = self.project.dna.entities(filter_type=DNA.TYPE_LAYOUT, filter_parent=0, filter_keyword="Layout")
+
+        if len(entities) > 0:
+            # Main window entity
+            entities[0].set("maximized", self.isMaximized())
+
+        QMainWindow.changeEvent(self, e)
 
     def center(self):
         """Move window to the center of current screen"""
@@ -427,6 +476,5 @@ class MainWindow(QMainWindow):
     def closeEvent(self, event):
         """Save project"""
 
-        self._arranger_updated()
         self.app.signals.emit('/app/close')
         self.app.project.close()

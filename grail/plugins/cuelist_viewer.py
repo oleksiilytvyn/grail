@@ -539,7 +539,6 @@ class CuelistViewer(Viewer):
 
         self._ui_tree = TreeWidget()
         self._ui_tree.setObjectName('CuelistViewer_tree')
-
         self._ui_tree.setHeaderHidden(True)
         self._ui_tree.setHeaderLabels(['Number', 'Name'])
 
@@ -818,10 +817,11 @@ class CuelistViewer(Viewer):
         def create_item(_entity):
             """Create tree item from entity"""
 
-            _item = QTreeWidgetItem(_entity)
+            name = _entity.name
 
+            _item = QTreeWidgetItem(_entity)
             _item.setText(0, str(_entity.number))
-            _item.setText(1, _entity.name)
+            _item.setText(1, name if len(name) < 50 else "%s..." % name[:50])
 
             if isinstance(_entity, CueEntity):
                 if _entity.color != CueEntity.COLOR_DEFAULT:

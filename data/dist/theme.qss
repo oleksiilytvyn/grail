@@ -474,11 +474,16 @@ QAbstractScrollArea {
 /** @section QScrollArea *****************************************************/
 
 QScrollArea {
-    background: $container;
+    background: $base;
+    padding: 0;
     }
 
+    QScrollArea QWidget {
+        background-color: $base;
+        }
+
     QScrollArea QWidget QWidget {
-        background-color: $container;
+        background-color: $base;
         }
 
     QScrollArea:disabled {
@@ -500,7 +505,7 @@ QScrollBar:horizontal {
     }
 
     QScrollBar::handle:horizontal {
-        background: $base;
+        background: $widget-active;
         min-width: 20px;
         border-radius: 3px;
         }
@@ -547,7 +552,7 @@ QScrollBar:vertical {
     }
 
     QScrollBar::handle:vertical {
-        background: $base;
+        background: $widget-active;
         min-height: 20px;
         border-radius: 3px;
         }
@@ -1122,16 +1127,16 @@ QSlider {
         }
 
 QSlider::groove:horizontal {
-    background: $container-alt;
-    border: 0px solid $container-alt;
+    background: $widget-alt;
+    border: 0px solid $widget-alt;
     height: 4px;
     margin: 0px;
     border-radius: $radius;
     }
 
 QSlider::sub-page:horizontal {
-    background: $widget;
-    border: 0px solid $widget;
+    background: $container-alt;
+    border: 0px solid $container-alt;
     height: 4px;
     margin: 0px;
     border-radius: $radius;
@@ -1142,11 +1147,11 @@ QSlider::sub-page:horizontal:disabled {
     }
 
 QSlider::handle:horizontal {
-    background: $base;
-    border: 1px solid $container;
+    background: $widget-active;
+    border: 1px solid $widget-active;
     width: 8px;
-    height: 8px;
-    margin: -3px 0;
+    height: 0px;
+    margin: 0 0;
     border-radius: $radius;
     }
 
@@ -1155,17 +1160,19 @@ QSlider::handle:horizontal:hover {
     border: 1px solid $widget-active;
     }
 
+/* Vertical */
+
 QSlider::groove:vertical {
-    background: $container-alt;
-    border: 0px solid $container-alt;
+    background: $widget-alt;
+    border: 0px solid $widget-alt;
     width: 4px;
     margin: 0px;
     border-radius: $radius;
     }
 
 QSlider::sub-page:vertical {
-    background: $widget;
-    border: 0px solid $widget;
+    background: $container-alt;
+    border: 0px solid $container-alt;
     width: 4px;
     margin: 0px;
     border-radius: $radius;
@@ -1176,11 +1183,11 @@ QSlider::sub-page:vertical:disabled {
     }
 
 QSlider::handle:vertical {
-    background: $base;
-    border: 1px solid $container;
-    width: 8px;
+    background: $widget-active;
+    border: 1px solid $widget-active;
+    width: 0;
     height: 8px;
-    margin: 0 -3px;
+    margin: 0 0;
     border-radius: $radius;
     }
 
@@ -1216,9 +1223,8 @@ QLineEdit {
     
     QLineEdit:selected {
         background: $base;
-        color: $base;
+        color: $base-alt;
         }
-
 
 
 /** @section QLineEdit *******************************************************/
@@ -1586,7 +1592,9 @@ QColumnView {
         margin: 0px;
         }
 
-    QTreeView::item {padding: 3px;}
+    QTreeView::item {
+        padding: 3px;
+        }
 
         QListView::item:selected,
         QTreeView::item:selected,

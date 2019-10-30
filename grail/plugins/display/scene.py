@@ -376,7 +376,7 @@ class DisplayScene(QGraphicsScene):
         self._background_item.setRect(QRectF(0, 0, self.width(), self.height()))
 
         self.addItem(self._background_item)
-        self._layers = [DisplaySceneLayer(self, layer=1)]
+        self._layers = [DisplaySceneLayer(self, layer=1), DisplaySceneLayer(self, layer=2)]
         self.addItem(self._text_item)
         self.addItem(self._testcard_item)
 

@@ -78,7 +78,7 @@ class TestCardTexture(QPixmap):
 
 class DisplaySceneLayer:
 
-    def __init__(self, scene):
+    def __init__(self, scene, layer=1):
 
         self._scene = scene
         self._x = 0
@@ -87,12 +87,21 @@ class DisplaySceneLayer:
         self._height = 0
         self._scale = 1.0
         self._angle = 0
+        self._layer_id = layer
 
         self._video_item = QGraphicsVideoItem()
         self._video_item.setSize(QSizeF(640, 480))
+        self._video_item.setAspectRatioMode(Qt.IgnoreAspectRatio)
 
         self._video_player = QMediaPlayer(None, QMediaPlayer.VideoSurface)
         self._video_player.setVideoOutput(self._video_item)
+        self._video_player.positionChanged.connect(self._position_cb)
+        self._video_player.durationChanged.connect(self._duration_cb)
+        self._video_player.stateChanged.connect(self._state_cb)
+
+        self.connect(f"/clip/{self._layer_id}/playback/play", lambda: self._video_player.play())
+        self.connect(f"/clip/{self._layer_id}/playback/pause", lambda: self._video_player.pause())
+        self.connect(f"/clip/{self._layer_id}/playback/stop", lambda: self._video_player.stop())
 
         self._scene.addItem(self._video_item)
 
@@ -185,26 +194,39 @@ class DisplaySceneLayer:
 
         sw, sh = self._scene.width(), self._scene.height()
         w, h = self._width, self._height
-
-        """
-        mode = 'stretch'
-        # fit
-        if mode == 'fit':
-            f = sh / h if sw / sh > w / h else sw / w
-            w, h = w * f,  h * f
-        # cover
-        if mode == 'cover':
-            f = sh / h if h < sh else sw / w
-            w, h = w * f, h * f
-        # stretch
-        if mode == 'stretch':
-            w, h = sw, sh
-        """
+        tx, ty = w / 2, h / 2
 
         self._video_item.setPos(sw / 2 - w / 2 + self._x, sh / 2 - h / 2 + self._y)
-        self._video_item.setScale(self._scale)
-        self._video_item.setRotation(self._angle)
         self._video_item.setSize(QSizeF(w, h))
+
+        t = QTransform()
+        t.translate(tx, ty)
+        t.rotate(self._angle)
+        t.scale(self._scale, self._scale)
+        t.translate(-tx, -ty)
+        self._video_item.setTransform(t)
+
+    def _position_cb(self, position):
+
+        self.emit(f"!clip/{self._layer_id}/playback/position", position)
+
+    def _duration_cb(self, length):
+
+        self.emit(f"!clip/{self._layer_id}/playback/duration", length)
+
+    def _state_cb(self, state):
+
+        self.emit(f"!clip/{self._layer_id}/playback/state", state)
+
+    def emit(self, message, *args):
+        """Emit message"""
+
+        Application.instance().signals.emit(message, *args)
+
+    def connect(self, message, fn):
+        "Connect event handler"
+
+        Application.instance().signals.connect(message, fn)
 
 
 class DisplaySceneTextItem(QGraphicsItem):
@@ -355,7 +377,7 @@ class DisplayScene(QGraphicsScene):
         self._background_item.setRect(QRectF(0, 0, self.width(), self.height()))
 
         self.addItem(self._background_item)
-        self._layers = [DisplaySceneLayer(self)]
+        self._layers = [DisplaySceneLayer(self, layer=1)]
         self.addItem(self._text_item)
         self.addItem(self._testcard_item)
 

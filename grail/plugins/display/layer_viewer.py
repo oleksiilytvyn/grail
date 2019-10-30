@@ -15,9 +15,10 @@ from grailkit.core import Signal
 
 from grail.qt import *
 from grail.qt import colors as qt_colors
+from grail.core import Viewer
 from PyQt5.QtMultimedia import *
 
-from grail.core import Viewer
+from grail.plugins.display import DisplayPlugin
 
 
 class GrabberVideoSurface(QAbstractVideoSurface):
@@ -273,6 +274,7 @@ class ClipWidget(QWidget):
         """Resize items batch size"""
 
         self.size = size
+        self.update()
 
 
 class ClipList(QScrollArea):
@@ -470,39 +472,59 @@ class DisplayLayerInspectorPreview(QWidget):
 
         self._pixmap = None
 
-        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.setMinimumSize(200, 200)
+        self.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.MinimumExpanding)
 
     def setPixmap(self, pixmap):
 
         self._pixmap = pixmap
         self.repaint()
 
+    def sizeHint(self):
+
+        return QSize(200, 200)
+
     def paintEvent(self, event):
 
         painter = QPainter()
         painter.begin(self)
         painter.fillRect(self.rect(), QColor(qt_colors.BASE))
+        scale_factor = 0.86
+        text = "Item not selected"
 
         if self._pixmap:
             pw, ph = self._pixmap.width(), self._pixmap.height()
             sw, sh = self.width(), self.height()
 
-            f = (sh / ph if sw / sh > pw / ph else sw / pw) * 0.9
+            f = (sh / ph if sw / sh > pw / ph else sw / pw) * scale_factor
             w, h = pw * f,  ph * f
 
             painter.drawPixmap(sw / 2 - w / 2, sh / 2 - h / 2, w, h, self._pixmap)
+        else:
+            s = 100
+            sw, sh = self.width(), self.height()
+            s = s * (sh / s if sw / sh > s / s else sw / s) * scale_factor
+            rect = QRect(sw / 2 - s / 2, sh / 2 - s / 2, s, s)
+
+            painter.fillRect(rect, QColor(qt_colors.WIDGET))
+            painter.setPen(QPen(QColor(qt_colors.BASE)))
+            painter.drawLine(QLine(rect.x(), rect.y(), rect.x() + rect.width(), rect.y() + rect.height()))
+            painter.drawLine(QLine(rect.x() + rect.width(), rect.y(), rect.x(), rect.y() + rect.height()))
+
+            if s >= 70:
+                painter.setPen(QPen(QColor(qt_colors.WIDGET_TEXT)))
+                painter.drawText(rect, Qt.AlignCenter | Qt.TextWordWrap, text)
 
         painter.end()
 
 
-class DisplayLayerInspector(QDialog):
+class DisplayLayerInspector(QWidget):
 
-    def __init__(self, parent=None):
-        super(DisplayLayerInspector, self).__init__(None)
+    def __init__(self, viewer, parent=None):
+        super(DisplayLayerInspector, self).__init__(parent)
 
-        self._layer_viewer = parent
+        self._layer_viewer = viewer
         self._item = None
+        self._locked = False
         self._param_row = 0
 
         self.__ui__()
@@ -521,12 +543,12 @@ class DisplayLayerInspector(QDialog):
         self._ui_open_location.clicked.connect(self._open_location)
 
         self._ui_file_layout = QHBoxLayout()
-        self._ui_file_layout.setContentsMargins(12, 12, 12, 12)
+        self._ui_file_layout.setContentsMargins(6, 6, 6, 6)
         self._ui_file_layout.addWidget(self._ui_label)
         self._ui_file_layout.addWidget(self._ui_open_location)
 
         self._ui_file_widget = QWidget()
-        self._ui_file_widget.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Preferred)
+        self._ui_file_widget.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
         self._ui_file_widget.setObjectName("DisplayLayerInspector_file")
         self._ui_file_widget.setLayout(self._ui_file_layout)
 
@@ -551,16 +573,54 @@ class DisplayLayerInspector(QDialog):
         self._ui_volume = self._add_parameter("Volume", 0, 100, 100)
         self._ui_volume.valueChanged.connect(self._volume_cb)
 
+        self._ui_fit_action = QPushButton("Fit")
+        self._ui_fit_action.clicked.connect(self._fit_action)
+
+        self._ui_fill_action = QPushButton("Fill")
+        self._ui_fill_action.clicked.connect(self._fill_action)
+
+        self._ui_stretch_action = QPushButton("Stretch")
+        self._ui_stretch_action.clicked.connect(self._stretch_action)
+
+        self._ui_auto_action = QPushButton("Auto")
+        self._ui_auto_action.clicked.connect(self._auto_action)
+
+        self._ui_reset_action = QPushButton("Reset")
+        self._ui_reset_action.clicked.connect(self._reset_action)
+
+        self._ui_toolbar = QToolBar()
+        self._ui_toolbar.addWidget(self._ui_fit_action)
+        self._ui_toolbar.addWidget(self._ui_fill_action)
+        self._ui_toolbar.addWidget(self._ui_stretch_action)
+        self._ui_toolbar.addWidget(self._ui_auto_action)
+        self._ui_toolbar.addStretch()
+        self._ui_toolbar.addWidget(self._ui_reset_action)
+
+        self._ui_scroll_widget = QWidget()
+        self._ui_scroll_widget.setMinimumSize(200, 200)
+        self._ui_scroll_widget.setMaximumHeight(250)
+        self._ui_scroll_widget.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Preferred)
+        self._ui_scroll_widget.setLayout(self._ui_grid_layout)
+
+        self._ui_scroll = QScrollArea()
+        self._ui_scroll.setFrameShape(QFrame.NoFrame)
+        self._ui_scroll.setFrameShadow(QFrame.Plain)
+        self._ui_scroll.setWidgetResizable(True)
+        self._ui_scroll.setWidget(self._ui_scroll_widget)
+        self._ui_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+
         self._ui_layout = QVBoxLayout()
         self._ui_layout.addWidget(self._ui_pixmap)
         self._ui_layout.addWidget(self._ui_file_widget)
-        self._ui_layout.addLayout(self._ui_grid_layout)
+        self._ui_layout.addWidget(self._ui_toolbar)
+        self._ui_layout.addWidget(self._ui_scroll)
 
         self.setLayout(self._ui_layout)
-        self.setMinimumWidth(200)
+        self.setMinimumSize(200, 100)
 
     def setItem(self, item):
 
+        self._locked = True
         self._item = item
 
         if item is None:
@@ -578,6 +638,8 @@ class DisplayLayerInspector(QDialog):
         self._ui_y.setValue(item.y)
         self._ui_opacity.setValue(item.opacity * 100)
 
+        self._locked = False
+
     def _open_location(self):
 
         if self._item is None:
@@ -585,9 +647,13 @@ class DisplayLayerInspector(QDialog):
 
         QDesktopServices.openUrl(QUrl("file:///" + QFileInfo(self._item.path).absolutePath()))
 
+    def is_locked(self):
+
+        return self._locked or self._item is None
+
     def _x_cb(self, value):
 
-        if self._item is None:
+        if self.is_locked():
             return
 
         self._item.x = value
@@ -595,7 +661,7 @@ class DisplayLayerInspector(QDialog):
 
     def _y_cb(self, value):
 
-        if self._item is None:
+        if self.is_locked():
             return
 
         self._item.y = value
@@ -603,7 +669,7 @@ class DisplayLayerInspector(QDialog):
 
     def _width_cb(self, value):
 
-        if self._item is None:
+        if self.is_locked():
             return
 
         self._item.width = value
@@ -611,7 +677,7 @@ class DisplayLayerInspector(QDialog):
 
     def _height_cb(self, value):
 
-        if self._item is None:
+        if self.is_locked():
             return
 
         self._item.height = value
@@ -619,7 +685,7 @@ class DisplayLayerInspector(QDialog):
 
     def _volume_cb(self, value):
 
-        if self._item is None:
+        if self.is_locked():
             return
 
         self._item.volume = value / 100
@@ -627,7 +693,7 @@ class DisplayLayerInspector(QDialog):
 
     def _opacity_cb(self, value):
 
-        if self._item is None:
+        if self.is_locked():
             return
 
         self._item.opacity = value / 100
@@ -635,7 +701,7 @@ class DisplayLayerInspector(QDialog):
 
     def _angle_cb(self, value):
 
-        if self._item is None:
+        if self.is_locked():
             return
 
         self._item.angle = value
@@ -643,11 +709,80 @@ class DisplayLayerInspector(QDialog):
 
     def _scale_cb(self, value):
 
-        if self._item is None:
+        if self.is_locked():
             return
 
         self._item.scale = value / 100
         self.emit(f"/clip/{self.layer()}/scale", value / 100)
+
+    def _fit_action(self):
+
+        scene = DisplayPlugin.instance().scene
+
+        if scene is not None:
+            sw, sh = scene.width(), scene.height()
+            w, h = self._item.width, self._item.height
+            f = sh / h if sw / sh > w / h else sw / w
+
+            self._resize_item(0, 0, w * f, h * f)
+
+    def _fill_action(self):
+
+        scene = DisplayPlugin.instance().scene
+
+        if scene is not None:
+            sw, sh = scene.width(), scene.height()
+            w, h = self._item.width, self._item.height
+            f = sh / h if h < sh else sw / w
+
+            self._resize_item(0, 0, w * f, h * f)
+
+    def _stretch_action(self):
+
+        scene = DisplayPlugin.instance().scene
+
+        if scene is not None:
+            self._resize_item(0, 0, scene.width(), scene.height())
+
+    def _auto_action(self):
+
+        if self.is_locked():
+            return
+
+        self._resize_item(self._item.x, self._item.y, self._item.original_width, self._item.original_height)
+
+    def _resize_item(self, x, y, width, height):
+
+        if self.is_locked():
+            return
+
+        item = self._item
+        item.width = width
+        item.height = height
+        item.x = x
+        item.y = y
+        item.angle = 0
+        item.scale = 1.0
+
+        self._ui_x.setValue(x)
+        self._ui_y.setValue(y)
+        self._ui_width.setValue(width)
+        self._ui_height.setValue(height)
+        self._ui_angle.setValue(0)
+        self._ui_scale.setValue(100)
+
+    def _reset_action(self):
+
+        if self.is_locked():
+            return
+
+        self._item.transport = "stop"
+        self._item.volume = 1.0
+        self._item.opacity = 1.0
+
+        self._resize_item(0, 0, self._item.original_width, self._item.original_height)
+        self._ui_opacity.setValue(100)
+        self._ui_volume.setValue(100)
 
     def emit(self, message, *args):
 
@@ -690,20 +825,61 @@ class DisplayLayerViewer(Viewer):
     def __init__(self, *args, **kwargs):
         super(DisplayLayerViewer, self).__init__(*args, **kwargs)
 
+        self._inspector = DisplayLayerInspector(self)
+        self._inspector_dialog = QDialog()
+        self._inspector_dialog.setWindowTitle("Clip Inspector")
+        self._inspector_dialog.setLayout(QVBoxLayout())
         self._layer_id = 1
+        self._media_state = 0
 
         self.connect('/app/close', self._close)
+        self.connect(f"!clip/{self._layer_id}/playback/duration", self._duration_cb)
+        self.connect(f"!clip/{self._layer_id}/playback/position", self._position_cb)
+        self.connect(f"!clip/{self._layer_id}/playback/state", self._state_cb)
 
         self.__ui__()
 
     def __ui__(self):
 
+        self._ui_show_stop_action = QAction("Show Stop button")
+        self._ui_show_stop_action.setCheckable(True)
+        self._ui_show_stop_action.setChecked(True)
+        self._ui_show_stop_action.triggered.connect(self._show_stop_action)
+
+        self._ui_dock_action = QAction("Dock Inspector")
+        self._ui_dock_action.setCheckable(True)
+        self._ui_dock_action.setChecked(True)
+        self._ui_dock_action.triggered.connect(self.dock_action)
+
+        self._ui_hide_inspector_action = QAction("Hide Inspector")
+        self._ui_hide_inspector_action.setCheckable(True)
+        self._ui_hide_inspector_action.triggered.connect(self._hide_inspector_action)
+
+        self._ui_small_action = QAction("Small items")
+        self._ui_small_action.triggered.connect(lambda: self._ui_list.setBatchSize(70))
+
+        self._ui_middle_action = QAction("Middle items")
+        self._ui_middle_action.triggered.connect(lambda: self._ui_list.setBatchSize(120))
+
+        self._ui_large_action = QAction("Large items")
+        self._ui_large_action.triggered.connect(lambda: self._ui_list.setBatchSize(200))
+
+        self._menu = QMenu("Settings", self)
+        self._menu.addAction(self._ui_show_stop_action)
+        self._menu.addAction(self._ui_dock_action)
+        self._menu.addAction(self._ui_hide_inspector_action)
+        self._menu.addSeparator()
+        self._menu.addAction(self._ui_small_action)
+        self._menu.addAction(self._ui_middle_action)
+        self._menu.addAction(self._ui_large_action)
+
         self._ui_list = ClipList()
         self._ui_list.itemClicked.connect(self.item_clicked)
         self._ui_list.itemDoubleClicked.connect(self.item_doubleclicked)
-        self.customContextMenuRequested.connect(self.context_menu)
 
-        self._inspector = DisplayLayerInspector(self)
+        self._ui_slider = QSlider(Qt.Horizontal)
+        self._ui_slider.setRange(0, 10_000)
+        self._ui_slider.setValue(0)
 
         self._ui_view_action = QToolButton()
         self._ui_view_action.setText("View")
@@ -720,23 +896,35 @@ class DisplayLayerViewer(Viewer):
         self._ui_stop_action.setIcon(Icon(':/rc/stop.png'))
         self._ui_stop_action.clicked.connect(self.stop_action)
 
-        self._ui_label = QLabel("Layer 1")
+        self._ui_menu_action = QToolButton()
+        self._ui_menu_action.setText("Menu")
+        self._ui_menu_action.setIcon(Icon(':/rc/menu.png'))
+        self._ui_menu_action.clicked.connect(self.menu_action)
+
+        self._ui_label = QLabel(f"Layer {self._layer_id}")
 
         self._ui_toolbar = QToolBar()
         self._ui_toolbar.setObjectName("DisplayMediaBinViewer_toolbar")
         self._ui_toolbar.addWidget(self._ui_view_action)
-        self._ui_toolbar.addStretch()
         self._ui_toolbar.addWidget(self._ui_label)
+        self._ui_toolbar.addStretch(12)
+        self._ui_toolbar.addWidget(self._ui_slider)
         self._ui_toolbar.addWidget(self._ui_play_action)
-        self._ui_toolbar.addWidget(self._ui_stop_action)
+        self._ui_stop_action_widget = self._ui_toolbar.addWidget(self._ui_stop_action)
+        self._ui_toolbar.addStretch(12)
+        self._ui_toolbar.addWidget(self._ui_menu_action)
 
-        self._layout = QVBoxLayout()
-        self._layout.addWidget(self._ui_list)
-        self._layout.addWidget(self._ui_toolbar)
+        self._ui_splitter = QSplitter(Qt.Horizontal)
+        self._ui_splitter.addWidget(self._ui_list)
+        self._ui_splitter.addWidget(self._inspector)
 
-        self.setLayout(self._layout)
+        self._ui_layout = QVBoxLayout()
+        self._ui_layout.addWidget(self._ui_splitter)
+        self._ui_layout.addWidget(self._ui_toolbar)
 
+        self.setLayout(self._ui_layout)
         self.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.customContextMenuRequested.connect(self.context_menu)
 
     def view_action(self):
         """Replace current view with something other"""
@@ -745,7 +933,7 @@ class DisplayLayerViewer(Viewer):
 
     def play_action(self):
 
-        playing = True
+        playing = self._media_state == QMediaPlayer.PlayingState
 
         if playing:
             self.emit(f"/clip/{self._layer_id}/playback/pause")
@@ -755,6 +943,10 @@ class DisplayLayerViewer(Viewer):
     def stop_action(self):
 
         self.emit(f"/clip/{self._layer_id}/playback/stop")
+
+    def menu_action(self):
+
+        return self._menu.exec_(self._ui_toolbar.mapToGlobal(self._ui_menu_action.pos()))
 
     def context_menu(self, pos):
 
@@ -787,9 +979,57 @@ class DisplayLayerViewer(Viewer):
 
         return menu.exec_(self.mapToGlobal(pos))
 
+    def _hide_inspector_action(self):
+
+        flag = self._ui_hide_inspector_action.isChecked()
+
+        if flag:
+            self._inspector.hide()
+            self._inspector_dialog.hide()
+        else:
+            self._inspector.show()
+            self._inspector_dialog.show()
+
+    def _show_stop_action(self):
+
+        flag = self._ui_show_stop_action.isChecked()
+
+        self._ui_stop_action_widget.setVisible(flag)
+
+    def _duration_cb(self, length):
+
+        self._ui_slider.setMaximum(length)
+
+    def _position_cb(self, position):
+
+        self._ui_slider.setValue(position)
+
+    def _state_cb(self, state):
+
+        self._media_state = state
+
+        if state == QMediaPlayer.PausedState or state == QMediaPlayer.StoppedState:
+
+            self._ui_play_action.setIcon(Icon(':/rc/play.png'))
+
+        if state == QMediaPlayer.PlayingState:
+
+            self._ui_play_action.setIcon(Icon(':/rc/pause.png'))
+
+    def dock_action(self):
+
+        flag = self._ui_dock_action.isChecked()
+
+        if flag:
+            self._inspector_dialog.close()
+            self._ui_splitter.insertWidget(1, self._inspector)
+        else:
+            self._inspector_dialog.layout().insertWidget(0, self._inspector)
+            self._inspector_dialog.show()
+
     def item_clicked(self, item):
 
-        self._inspector.setItem(item)
+        self.item_inspector(item, True)
 
     def item_doubleclicked(self, item):
 
@@ -817,13 +1057,27 @@ class DisplayLayerViewer(Viewer):
         if path:
             self._ui_list.addItem(path)
 
-    def item_inspector(self, item=None):
+    def item_inspector(self, item=None, ignore=False):
+
+        if not ignore:
+            self._ui_hide_inspector_action.setChecked(False)
+            self._inspector.show()
+            self._inspector_dialog.show()
+
+        closed = self._ui_hide_inspector_action.isChecked()
+        docked = self._ui_dock_action.isChecked()
 
         if item is None:
             return False
 
         self._inspector.setItem(item)
-        self._inspector.showWindow()
+
+        if not closed and not docked:
+            self._inspector_dialog.showWindow()
+
+        if closed:
+            self._inspector.hide()
+            self._inspector_dialog.hide()
 
     def item_remove(self, item=None):
 
@@ -832,4 +1086,5 @@ class DisplayLayerViewer(Viewer):
 
     def _close(self):
 
+        self._inspector_dialog.close()
         self._inspector.close()

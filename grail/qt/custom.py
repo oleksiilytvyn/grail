@@ -187,10 +187,15 @@ class _QToolBar(QToolBar, _QWidget):
         self.setFixedHeight(30)
         self.setIconSize(QSize(16, 16))
 
-    def addStretch(self):
+    def addStretch(self, size=0):
         """Add space stretch"""
 
-        self.addWidget(QSpacer())
+        if size > 0:
+            spacer = QSpacer(QSizePolicy.Minimum)
+            spacer.setMinimumWidth(size)
+            self.addWidget(spacer)
+        else:
+            self.addWidget(QSpacer())
 
     def paintEvent(self, event):
         """Paint component with CSS styles"""
@@ -349,10 +354,15 @@ class _QLineEdit(QT_QLINEEDIT, _QWidget):
     def __init__(self, *args, **kwargs):
         super(_QLineEdit, self).__init__(*args, **kwargs)
 
+        # fix: placeholder text color doesn't match theme color
+        palette = self.palette()
+        palette.setColor(QPalette.PlaceholderText, QColor(qt_colors.BASE_TEXT_ALT))
+
         self.setAttribute(Qt.WA_MacShowFocusRect, False)
+        self.setPalette(palette)
 
 
-class QSearchEdit(QT_QLINEEDIT):
+class QSearchEdit(_QLineEdit):
     """Basic edit input for search with clear button"""
 
     keyPressed = pyqtSignal('QKeyEvent')

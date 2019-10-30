@@ -474,11 +474,16 @@ QAbstractScrollArea {
 /** @section QScrollArea *****************************************************/
 
 QScrollArea {
-    background: #505050;
+    background: #202020;
+    padding: 0;
     }
 
+    QScrollArea QWidget {
+        background-color: #202020;
+        }
+
     QScrollArea QWidget QWidget {
-        background-color: #505050;
+        background-color: #202020;
         }
 
     QScrollArea:disabled {
@@ -500,7 +505,7 @@ QScrollBar:horizontal {
     }
 
     QScrollBar::handle:horizontal {
-        background: #202020;
+        background: #ffc907;
         min-width: 20px;
         border-radius: 3px;
         }
@@ -547,7 +552,7 @@ QScrollBar:vertical {
     }
 
     QScrollBar::handle:vertical {
-        background: #202020;
+        background: #ffc907;
         min-height: 20px;
         border-radius: 3px;
         }
@@ -1117,16 +1122,16 @@ QSlider {
         }
 
 QSlider::groove:horizontal {
-    background: #5a5a5a;
-    border: 0px solid #5a5a5a;
+    background: #3c3c3c;
+    border: 0px solid #3c3c3c;
     height: 4px;
     margin: 0px;
     border-radius: 0px;
     }
 
 QSlider::sub-page:horizontal {
-    background: #353535;
-    border: 0px solid #353535;
+    background: #5a5a5a;
+    border: 0px solid #5a5a5a;
     height: 4px;
     margin: 0px;
     border-radius: 0px;
@@ -1137,11 +1142,11 @@ QSlider::sub-page:horizontal:disabled {
     }
 
 QSlider::handle:horizontal {
-    background: #202020;
-    border: 1px solid #505050;
+    background: #ffc907;
+    border: 1px solid #ffc907;
     width: 8px;
-    height: 8px;
-    margin: -3px 0;
+    height: 0px;
+    margin: 0 0;
     border-radius: 0px;
     }
 
@@ -1150,17 +1155,19 @@ QSlider::handle:horizontal:hover {
     border: 1px solid #ffc907;
     }
 
+/* Vertical */
+
 QSlider::groove:vertical {
-    background: #5a5a5a;
-    border: 0px solid #5a5a5a;
+    background: #3c3c3c;
+    border: 0px solid #3c3c3c;
     width: 4px;
     margin: 0px;
     border-radius: 0px;
     }
 
 QSlider::sub-page:vertical {
-    background: #353535;
-    border: 0px solid #353535;
+    background: #5a5a5a;
+    border: 0px solid #5a5a5a;
     width: 4px;
     margin: 0px;
     border-radius: 0px;
@@ -1171,11 +1178,11 @@ QSlider::sub-page:vertical:disabled {
     }
 
 QSlider::handle:vertical {
-    background: #202020;
-    border: 1px solid #505050;
-    width: 8px;
+    background: #ffc907;
+    border: 1px solid #ffc907;
+    width: 0;
     height: 8px;
-    margin: 0 -3px;
+    margin: 0 0;
     border-radius: 0px;
     }
 
@@ -1211,9 +1218,8 @@ QLineEdit {
     
     QLineEdit:selected {
         background: #202020;
-        color: #202020;
+        color: #353535;
         }
-
 
 
 /** @section QLineEdit *******************************************************/
@@ -1581,7 +1587,9 @@ QColumnView {
         margin: 0px;
         }
 
-    QTreeView::item {padding: 3px;}
+    QTreeView::item {
+        padding: 3px;
+        }
 
         QListView::item:selected,
         QTreeView::item:selected,

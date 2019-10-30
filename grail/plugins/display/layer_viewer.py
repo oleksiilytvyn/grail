@@ -16,7 +16,6 @@ from grailkit.core import Signal
 from grail.qt import *
 from grail.qt import colors as qt_colors
 from grail.core import Viewer
-from PyQt5.QtMultimedia import *
 
 from grail.plugins.display import DisplayPlugin
 
@@ -156,7 +155,6 @@ class ClipWidget(QWidget):
         painter.setPen(Qt.NoPen)
         painter.drawRect(self.rect())
 
-        # todo: make it more scalable/flexible
         batch_size = self._size
         width = self.width()
         height = self.height()
@@ -510,8 +508,12 @@ class DisplayLayerInspectorPreview(QWidget):
             painter.drawLine(QLine(rect.x(), rect.y(), rect.x() + rect.width(), rect.y() + rect.height()))
             painter.drawLine(QLine(rect.x() + rect.width(), rect.y(), rect.x(), rect.y() + rect.height()))
 
+            a, b = 70, 120
+
             if s >= 70:
-                painter.setPen(QPen(QColor(qt_colors.WIDGET_TEXT)))
+                color = QColor(qt_colors.WIDGET_TEXT)
+                color.setAlphaF((s - a) / (b - a))
+                painter.setPen(QPen(color))
                 painter.drawText(rect, Qt.AlignCenter | Qt.TextWordWrap, text)
 
         painter.end()
@@ -880,6 +882,7 @@ class DisplayLayerViewer(Viewer):
         self._ui_slider = QSlider(Qt.Horizontal)
         self._ui_slider.setRange(0, 10_000)
         self._ui_slider.setValue(0)
+        self._ui_slider.valueChanged.connect(self._player_position_cb)
 
         self._ui_view_action = QToolButton()
         self._ui_view_action.setText("View")
@@ -898,7 +901,7 @@ class DisplayLayerViewer(Viewer):
 
         self._ui_menu_action = QToolButton()
         self._ui_menu_action.setText("Menu")
-        self._ui_menu_action.setIcon(Icon(':/rc/menu.png'))
+        self._ui_menu_action.setIcon(Icon(':/rc/settings.png'))
         self._ui_menu_action.clicked.connect(self.menu_action)
 
         self._ui_label = QLabel(f"Layer {self._layer_id}")
@@ -1015,6 +1018,10 @@ class DisplayLayerViewer(Viewer):
         if state == QMediaPlayer.PlayingState:
 
             self._ui_play_action.setIcon(Icon(':/rc/pause.png'))
+
+    def _player_position_cb(self, value):
+
+        self.emit(f"/clip/{self._layer_id}/playback/position", value)
 
     def dock_action(self):
 

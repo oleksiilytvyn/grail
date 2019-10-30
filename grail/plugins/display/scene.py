@@ -10,8 +10,6 @@
 """
 from grail.qt import *
 from grail.qt import colors as qt_colors
-from PyQt5.QtMultimedia import *
-from PyQt5.QtMultimediaWidgets import *
 
 
 class TestCardTexture(QPixmap):
@@ -102,6 +100,7 @@ class DisplaySceneLayer:
         self.connect(f"/clip/{self._layer_id}/playback/play", lambda: self._video_player.play())
         self.connect(f"/clip/{self._layer_id}/playback/pause", lambda: self._video_player.pause())
         self.connect(f"/clip/{self._layer_id}/playback/stop", lambda: self._video_player.stop())
+        self.connect(f"/clip/{self._layer_id}/playback/position", lambda value: self._video_player.setPosition(value))
 
         self._scene.addItem(self._video_item)
 
@@ -475,6 +474,7 @@ class DisplayScene(QGraphicsScene):
     def set_text(self, text: str):
 
         self._text_item.set_text(text)
+        self.update()
 
     def set_text_color(self, color: str):
 
@@ -743,12 +743,6 @@ class DisplayWindow(QDialog):
                                 Qt.NoDropShadowWindowHint |
                                 Qt.WindowTitleHint |
                                 Qt.WindowCloseButtonHint)
-
-    def setClippingRect(self, rect: QRect):
-
-        # todo: implement clipping
-
-        self.repaint()
 
     def setName(self, name: str):
 

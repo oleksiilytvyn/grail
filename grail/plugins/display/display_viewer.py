@@ -33,6 +33,9 @@ class DisplayViewer(Viewer):
 
         self.__ui__()
 
+        # force refresh
+        self._display_instance()
+
     def resizeEvent(self, event):
 
         super(DisplayViewer, self).resizeEvent(event)
@@ -111,8 +114,11 @@ class DisplayViewer(Viewer):
     def _display_instance(self):
         """Display plugin si available"""
 
-        self._ui_view.setScene(DisplayPlugin.instance().scene)
-        self._fit_clicked()
+        instance = DisplayPlugin.instance()
+
+        if instance and instance.scene is not None:
+            self._ui_view.setScene(instance.scene)
+            self._fit_clicked()
 
     def _comp_size_cb(self, width=1, height=1):
         """Composition scene size changed"""

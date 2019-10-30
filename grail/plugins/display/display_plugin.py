@@ -35,6 +35,8 @@ class DisplayPlugin(Plugin):
     def __init__(self):
         super(DisplayPlugin, self).__init__()
 
+        self.MAX_LAYERS = 2
+
         # Register instance
         if not DisplayPlugin._instance:
             DisplayPlugin._instance = self
@@ -86,7 +88,7 @@ class DisplayPlugin(Plugin):
         self.connect('/clip/text/transform', self._text_transform_cb)
 
         # Media clip signals
-        for layer in range(1, 2):
+        for layer in range(1, self.MAX_LAYERS):
             self.connect(f"/clip/{layer}/size", lambda w, h: self._clip_size_cb(layer, w, h))
             self.connect(f"/clip/{layer}/pos", lambda x, y: self._clip_pos_cb(layer, x, y))
             self.connect(f"/clip/{layer}/rotate", lambda angle: self._clip_angle_cb(layer, angle))
@@ -236,13 +238,13 @@ class DisplayPlugin(Plugin):
     def clear_output_action(self, action=None):
         """Clear display output"""
 
-        # todo: implement this
+        for layer in range(1, self.MAX_LAYERS):
+            self.emit(f"/clip/{layer}/playback/stop")
 
     def clear_text_action(self, action=None):
         """Clear display text"""
 
-        pass
-        # todo: implement this
+        self.emit('/clip/text', "")
 
     def close(self):
         """Close display and friends on application exit"""

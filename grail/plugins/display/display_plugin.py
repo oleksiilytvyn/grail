@@ -87,8 +87,7 @@ class DisplayPlugin(Plugin):
         self.connect('/clip/text/shadow', self._text_shadow_cb)
         self.connect('/clip/text/transform', self._text_transform_cb)
 
-        # Media clip signals
-        for layer in range(1, self.MAX_LAYERS):
+        def connect_layer(layer):
             self.connect(f"/clip/{layer}/size", lambda w, h: self._clip_size_cb(layer, w, h))
             self.connect(f"/clip/{layer}/pos", lambda x, y: self._clip_pos_cb(layer, x, y))
             self.connect(f"/clip/{layer}/rotate", lambda angle: self._clip_angle_cb(layer, angle))
@@ -99,6 +98,10 @@ class DisplayPlugin(Plugin):
             self.connect(f"/clip/{layer}/playback/position", lambda pos: self._clip_position_cb(layer, pos))
             self.connect(f"/clip/{layer}/playback/transport", lambda tr: self._clip_transport_cb(layer, tr))
             self.connect(f"/clip/{layer}/playback/play", lambda: self._clip_play_cb(layer))
+
+        # Media clip signals
+        for layer_id in range(1, self.MAX_LAYERS + 1):
+            connect_layer(layer_id)
 
         desktop = QApplication.desktop()
         desktop.resized.connect(self._screens_changed)
@@ -138,6 +141,7 @@ class DisplayPlugin(Plugin):
 
     def _clip_source_cb(self, layer, source):
 
+        print("Clip Source", layer, source)
         self._scene.clip_playback_source(layer, source)
 
     def _clip_position_cb(self, layer, pos):

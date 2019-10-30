@@ -38,6 +38,9 @@ class _PluginMeta(object):
     # Do not allow multiple instances
     single_instance = False
 
+    # How many instances can be opened, zero is unlimited
+    instances_allowed = 0
+
     def __init__(self):
         """Initialize plugin"""
 
@@ -345,7 +348,9 @@ class Viewer(QWidget, _PluginMeta, metaclass=_ComponentPluginRegistry):
             action.triggered.connect(triggered(plug.id))
 
             # don't show plugin if single_instance is True and viewer already exists
-            action.setDisabled((plug.name in active_viewers) and plug.single_instance)
+            instances = active_viewers.count(plug.name)
+            allowed = 1 if plug.single_instance else plug.instances_allowed
+            action.setDisabled(instances >= allowed)
 
             menu.addAction(action)
 

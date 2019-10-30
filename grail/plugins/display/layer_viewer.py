@@ -822,7 +822,9 @@ class DisplayLayerViewer(Viewer):
     name = "Display Layer"
     author = "Grail Team"
     description = "Manage Layers"
-    single_instance = True
+    # single_instance = True
+    instances_allowed = 2
+    counter = 1
 
     def __init__(self, *args, **kwargs):
         super(DisplayLayerViewer, self).__init__(*args, **kwargs)
@@ -831,8 +833,10 @@ class DisplayLayerViewer(Viewer):
         self._inspector_dialog = QDialog()
         self._inspector_dialog.setWindowTitle("Clip Inspector")
         self._inspector_dialog.setLayout(QVBoxLayout())
-        self._layer_id = 1
+        self._layer_id = DisplayLayerViewer.counter
         self._media_state = 0
+
+        DisplayLayerViewer.counter = DisplayLayerViewer.counter + 1
 
         self.connect('/app/close', self._close)
         self.connect(f"!clip/{self._layer_id}/playback/duration", self._duration_cb)

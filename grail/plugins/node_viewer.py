@@ -138,7 +138,7 @@ class NodeViewer(Viewer):
         current = self._ui_tree.currentItem()
 
         if current:
-            self.emit('!node/selected', current.object().id)
+            self.emit_signal('!node/selected', current.object().id)
 
     def _item_expanded(self, item):
         """Tree item expanded"""
@@ -216,7 +216,7 @@ class NodeViewer(Viewer):
         item = self._ui_tree.currentItem()
 
         if item:
-            self.emit('!node/selected', above)
+            self.emit_signal('!node/selected', above)
 
 
 class _TreeWidget(QtWidgets.QTreeWidget):

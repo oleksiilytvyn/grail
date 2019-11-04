@@ -66,38 +66,38 @@ class DisplayPlugin(Plugin):
         self.register_action("Clear Output", self.clear_text_action)
 
         # Connect signals
-        self.connect('/app/close', self.close)
-        self.connect('/clip/text', lambda text: self.scene.set_text(text))
-        self.connect('!cue/execute', self.cue_cb)
-        self.connect('/clip/1/playback/source', lambda path: self.scene.clip_playback_source(1, path))
+        self.connect_signal('/app/close', self.close)
+        self.connect_signal('/clip/text', lambda text: self.scene.set_text(text))
+        self.connect_signal('!cue/execute', self.cue_cb)
+        self.connect_signal('/clip/1/playback/source', lambda path: self.scene.clip_playback_source(1, path))
 
         # Composition signals
-        self.connect('/comp/size', self._comp_size_cb)
-        self.connect('/comp/testcard', self._comp_testcard_cb)
-        self.connect('/comp/opacity', self._comp_opacity_cb)
-        self.connect('/comp/transition', self._comp_transition_cb)
-        self.connect('/comp/volume', self._comp_volume_cb)
+        self.connect_signal('/comp/size', self._comp_size_cb)
+        self.connect_signal('/comp/testcard', self._comp_testcard_cb)
+        self.connect_signal('/comp/opacity', self._comp_opacity_cb)
+        self.connect_signal('/comp/transition', self._comp_transition_cb)
+        self.connect_signal('/comp/volume', self._comp_volume_cb)
 
         # Text layer signals
-        self.connect('/clip/text', self._text_cb)
-        self.connect('/clip/text/font', self._text_font_cb)
-        self.connect('/clip/text/color', self._text_color_cb)
-        self.connect('/clip/text/padding', self._text_padding_cb)
-        self.connect('/clip/text/align', self._text_align_cb)
-        self.connect('/clip/text/shadow', self._text_shadow_cb)
-        self.connect('/clip/text/transform', self._text_transform_cb)
+        self.connect_signal('/clip/text', self._text_cb)
+        self.connect_signal('/clip/text/font', self._text_font_cb)
+        self.connect_signal('/clip/text/color', self._text_color_cb)
+        self.connect_signal('/clip/text/padding', self._text_padding_cb)
+        self.connect_signal('/clip/text/align', self._text_align_cb)
+        self.connect_signal('/clip/text/shadow', self._text_shadow_cb)
+        self.connect_signal('/clip/text/transform', self._text_transform_cb)
 
         def connect_layer(layer):
-            self.connect(f"/clip/{layer}/size", lambda w, h: self._clip_size_cb(layer, w, h))
-            self.connect(f"/clip/{layer}/pos", lambda x, y: self._clip_pos_cb(layer, x, y))
-            self.connect(f"/clip/{layer}/rotate", lambda angle: self._clip_angle_cb(layer, angle))
-            self.connect(f"/clip/{layer}/opacity", lambda opacity: self._clip_opacity_cb(layer, opacity))
-            self.connect(f"/clip/{layer}/volume", lambda volume: self._clip_volume_cb(layer, volume))
-            self.connect(f"/clip/{layer}/scale", lambda scale: self._clip_scale_cb(layer, scale))
-            self.connect(f"/clip/{layer}/playback/source", lambda source: self._clip_source_cb(layer, source))
-            self.connect(f"/clip/{layer}/playback/position", lambda pos: self._clip_position_cb(layer, pos))
-            self.connect(f"/clip/{layer}/playback/transport", lambda tr: self._clip_transport_cb(layer, tr))
-            self.connect(f"/clip/{layer}/playback/play", lambda: self._clip_play_cb(layer))
+            self.connect_signal(f"/clip/{layer}/size", lambda w, h: self._clip_size_cb(layer, w, h))
+            self.connect_signal(f"/clip/{layer}/pos", lambda x, y: self._clip_pos_cb(layer, x, y))
+            self.connect_signal(f"/clip/{layer}/rotate", lambda angle: self._clip_angle_cb(layer, angle))
+            self.connect_signal(f"/clip/{layer}/opacity", lambda opacity: self._clip_opacity_cb(layer, opacity))
+            self.connect_signal(f"/clip/{layer}/volume", lambda volume: self._clip_volume_cb(layer, volume))
+            self.connect_signal(f"/clip/{layer}/scale", lambda scale: self._clip_scale_cb(layer, scale))
+            self.connect_signal(f"/clip/{layer}/playback/source", lambda source: self._clip_source_cb(layer, source))
+            self.connect_signal(f"/clip/{layer}/playback/position", lambda pos: self._clip_position_cb(layer, pos))
+            self.connect_signal(f"/clip/{layer}/playback/transport", lambda tr: self._clip_transport_cb(layer, tr))
+            self.connect_signal(f"/clip/{layer}/playback/play", lambda: self._clip_play_cb(layer))
 
         # Media clip signals
         for layer_id in range(1, self.MAX_LAYERS + 1):
@@ -117,7 +117,7 @@ class DisplayPlugin(Plugin):
         self._preferences_dialog = DisplayPreferencesDialog(self)
 
         # Notify other plugins and viewers that DisplayPlugin is loaded
-        self.emit("!display/instance")
+        self.emit_signal("!display/instance")
 
     def cue_cb(self, cue):
 
@@ -242,12 +242,12 @@ class DisplayPlugin(Plugin):
         """Clear display output"""
 
         for layer in range(1, self.MAX_LAYERS):
-            self.emit(f"/clip/{layer}/playback/stop")
+            self.emit_signal(f"/clip/{layer}/playback/stop")
 
     def clear_text_action(self, action=None):
         """Clear display text"""
 
-        self.emit('/clip/text', "")
+        self.emit_signal('/clip/text', "")
 
     def close(self):
         """Close display and friends on application exit"""

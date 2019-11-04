@@ -121,7 +121,7 @@ class BibleViewer(Viewer):
         """Add item to cuelist"""
 
         # xxx: cue will be added to all opened cuelists
-        self.emit('/cuelist/add', entity)
+        self.emit_signal('/cuelist/add', entity)
 
     def _item_clicked(self, item):
         """List item clicked"""
@@ -129,7 +129,7 @@ class BibleViewer(Viewer):
         if not item:
             return
 
-        self.emit('!cue/preview', item.object())
+        self.emit_signal('!cue/preview', item.object())
 
     def _item_doubleclicked(self, item):
         """List item double-clicked"""
@@ -210,7 +210,7 @@ class BibleViewer(Viewer):
             item = self._ui_list.item(0)
 
             if item:
-                self.emit('!cue/execute', item.object())
+                self.emit_signal('!cue/execute', item.object())
 
         elif event_key == QtCore.Qt.Key_Down or event_key == QtCore.Qt.Key_Up:
             # if we have number at the end increment or decrement when Up or Down keys pressed

@@ -20,7 +20,7 @@ from grail.core import Viewer
 from grail.plugins.display import DisplayPlugin
 
 
-class GrabberVideoSurface(QAbstractVideoSurface):
+class GrabberVideoSurface(QtMultimedia.QAbstractVideoSurface):
     """Video surface for grabbing frames from video"""
 
     def __init__(self, parent):
@@ -35,14 +35,14 @@ class GrabberVideoSurface(QAbstractVideoSurface):
 
     def start(self, _format):
 
-        image_format = QVideoFrame.imageFormatFromPixelFormat(_format.pixelFormat())
+        image_format = QtMultimedia.QVideoFrame.imageFormatFromPixelFormat(_format.pixelFormat())
         size = _format.frameSize()
 
         if image_format != QtGui.QImage.Format_Invalid and not size.isEmpty():
             self._format = image_format
             self._size = size
 
-            QAbstractVideoSurface.start(self, _format)
+            QtMultimedia.QAbstractVideoSurface.start(self, _format)
 
             return True
         else:
@@ -52,7 +52,7 @@ class GrabberVideoSurface(QAbstractVideoSurface):
 
         self._count += 1
 
-        if frame.map(QAbstractVideoBuffer.ReadOnly):
+        if frame.map(QtMultimedia.QAbstractVideoBuffer.ReadOnly):
             self.image = QtGui.QImage(frame.bits(), frame.width(), frame.height(), frame.bytesPerLine(), self._format)
 
             self._parent.updated.emit()
@@ -63,12 +63,12 @@ class GrabberVideoSurface(QAbstractVideoSurface):
 
     def supportedPixelFormats(self, handle_type):
 
-        if handle_type == QAbstractVideoBuffer.NoHandle:
-            return [QVideoFrame.Format_RGB32,
-                    QVideoFrame.Format_ARGB32,
-                    QVideoFrame.Format_ARGB32_Premultiplied,
-                    QVideoFrame.Format_RGB565,
-                    QVideoFrame.Format_RGB555]
+        if handle_type == QtMultimedia.QAbstractVideoBuffer.NoHandle:
+            return [QtMultimedia.QVideoFrame.Format_RGB32,
+                    QtMultimedia.QVideoFrame.Format_ARGB32,
+                    QtMultimedia.QVideoFrame.Format_ARGB32_Premultiplied,
+                    QtMultimedia.QVideoFrame.Format_RGB565,
+                    QtMultimedia.QVideoFrame.Format_RGB555]
         else:
             return []
 
@@ -82,7 +82,7 @@ class FrameGrabber:
 
         self.video_surface = GrabberVideoSurface(self)
 
-        self.player = QMediaPlayer(None, QMediaPlayer.VideoSurface)
+        self.player = QtMultimedia.QMediaPlayer(None, QtMultimedia.QMediaPlayer.VideoSurface)
         self.player.setVideoOutput(self.video_surface)
         self.player.setPlaybackRate(0.33)
         self.player.setMuted(True)
@@ -91,7 +91,7 @@ class FrameGrabber:
 
     def load(self, path):
 
-        self.player.setMedia(QMediaContent(QtCore.QUrl.fromLocalFile(path)))
+        self.player.setMedia(QtMultimedia.QMediaContent(QtCore.QUrl.fromLocalFile(path)))
         self.player.play()
         self.player.setPosition(500)
         self.player.pause()
@@ -788,7 +788,7 @@ class DisplayLayerInspector(QtWidgets.QWidget):
 
     def emit(self, message, *args):
 
-        self._layer_viewer.emit(message, *args)
+        self._layer_viewer.emit_signal(message, *args)
 
     def layer(self):
 
@@ -838,11 +838,10 @@ class DisplayLayerViewer(Viewer):
 
         DisplayLayerViewer.counter = DisplayLayerViewer.counter + 1
 
-        signals = self.app.signals
-        signals.connect('/app/close', self._close)
-        signals.connect(f"!clip/{self._layer_id}/playback/duration", self._duration_cb)
-        signals.connect(f"!clip/{self._layer_id}/playback/position", self._position_cb)
-        signals.connect(f"!clip/{self._layer_id}/playback/state", self._state_cb)
+        self.connect_signal('/app/close', self._close)
+        self.connect_signal(f"!clip/{self._layer_id}/playback/duration", self._duration_cb)
+        self.connect_signal(f"!clip/{self._layer_id}/playback/position", self._position_cb)
+        self.connect_signal(f"!clip/{self._layer_id}/playback/state", self._state_cb)
 
         self.__ui__()
 
@@ -941,16 +940,16 @@ class DisplayLayerViewer(Viewer):
 
     def play_action(self):
 
-        playing = self._media_state == QMediaPlayer.PlayingState
+        playing = self._media_state == QtMultimedia.QMediaPlayer.PlayingState
 
         if playing:
-            self.emit(f"/clip/{self._layer_id}/playback/pause")
+            self.emit_signal(f"/clip/{self._layer_id}/playback/pause")
         else:
-            self.emit(f"/clip/{self._layer_id}/playback/play")
+            self.emit_signal(f"/clip/{self._layer_id}/playback/play")
 
     def stop_action(self):
 
-        self.emit(f"/clip/{self._layer_id}/playback/stop")
+        self.emit_signal(f"/clip/{self._layer_id}/playback/stop")
 
     def menu_action(self):
 
@@ -1016,17 +1015,17 @@ class DisplayLayerViewer(Viewer):
 
         self._media_state = state
 
-        if state == QMediaPlayer.PausedState or state == QMediaPlayer.StoppedState:
+        if state == QtMultimedia.QMediaPlayer.PausedState or state == QtMultimedia.QMediaPlayer.StoppedState:
 
             self._ui_play_action.setIcon(Icon(':/rc/play.png'))
 
-        if state == QMediaPlayer.PlayingState:
+        if state == QtMultimedia.QMediaPlayer.PlayingState:
 
             self._ui_play_action.setIcon(Icon(':/rc/pause.png'))
 
     def _player_position_cb(self, value):
 
-        self.emit(f"/clip/{self._layer_id}/playback/position", value)
+        self.emit_signal(f"/clip/{self._layer_id}/playback/position", value)
 
     def dock_action(self):
 
@@ -1047,18 +1046,18 @@ class DisplayLayerViewer(Viewer):
 
         layer = self._layer_id
 
-        self.emit(f"/clip/{layer}/playback/source", item.path)
-        self.emit(f"/clip/{layer}/playback/position", 0)
-        self.emit(f"/clip/{layer}/playback/transport", item.transport)
+        self.emit_signal(f"/clip/{layer}/playback/source", item.path)
+        self.emit_signal(f"/clip/{layer}/playback/position", 0)
+        self.emit_signal(f"/clip/{layer}/playback/transport", item.transport)
 
-        self.emit(f"/clip/{layer}/size", item.width, item.height)
-        self.emit(f"/clip/{layer}/pos", item.x, item.y)
-        self.emit(f"/clip/{layer}/rotate", item.angle)
-        self.emit(f"/clip/{layer}/opacity", item.opacity)
-        self.emit(f"/clip/{layer}/volume", item.volume)
-        self.emit(f"/clip/{layer}/scale", item.scale)
+        self.emit_signal(f"/clip/{layer}/size", item.width, item.height)
+        self.emit_signal(f"/clip/{layer}/pos", item.x, item.y)
+        self.emit_signal(f"/clip/{layer}/rotate", item.angle)
+        self.emit_signal(f"/clip/{layer}/opacity", item.opacity)
+        self.emit_signal(f"/clip/{layer}/volume", item.volume)
+        self.emit_signal(f"/clip/{layer}/scale", item.scale)
 
-        self.emit(f"/clip/{layer}/playback/play")
+        self.emit_signal(f"/clip/{layer}/playback/play")
 
     def item_add(self, item=None):
 

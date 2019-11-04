@@ -87,11 +87,11 @@ class DisplaySceneLayer:
         self._angle = 0
         self._layer_id = layer
 
-        self._video_item = QGraphicsVideoItem()
+        self._video_item = QtMultimediaWidgets.QGraphicsVideoItem()
         self._video_item.setSize(QtCore.QSizeF(640, 480))
         self._video_item.setAspectRatioMode(QtCore.Qt.IgnoreAspectRatio)
 
-        self._video_player = QMediaPlayer(None, QMediaPlayer.VideoSurface)
+        self._video_player = QtMultimedia.QMediaPlayer(None, QtMultimedia.QMediaPlayer.VideoSurface)
         self._video_player.setVideoOutput(self._video_item)
         self._video_player.positionChanged.connect(self._position_cb)
         self._video_player.durationChanged.connect(self._duration_cb)
@@ -170,7 +170,7 @@ class DisplaySceneLayer:
 
     def set_source(self, path: str):
 
-        self._video_player.setMedia(QMediaContent(QtCore.QUrl.fromLocalFile(path)))
+        self._video_player.setMedia(QtMultimedia.QMediaContent(QtCore.QUrl.fromLocalFile(path)))
         self._video_item.show()
 
     def play(self):
@@ -223,7 +223,7 @@ class DisplaySceneLayer:
         Application.instance().signals.emit(message, *args)
 
     def connect(self, message, fn):
-        "Connect event handler"
+        """Connect event handler"""
 
         Application.instance().signals.connect(message, fn)
 

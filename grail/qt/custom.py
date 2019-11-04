@@ -9,14 +9,15 @@
     :copyright: (c) 2016-2019 by Alex Litvin.
     :license: GNU, see LICENSE for more details.
 """
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
+from PyQt5 import QtCore, QtNetwork, QtGui, QtWidgets
 from PyQt5.QtMultimedia import *
 from PyQt5.QtMultimediaWidgets import *
 
 from grail.qt import colors as qt_colors
 from grailkit.util import OS_MAC, OS_LINUX
+
+QtSignal = QtCore.pyqtSignal
+QtSlot = QtCore.pyqtSlot
 
 """
 from PySide2.QtCore import *
@@ -31,32 +32,24 @@ pyqtSlot = Slot
 import grailkit.core as grailkit_core
 
 Signal = grailkit_core.Signal
-
-class QSharedMemory:
-
-    def __init__(self, name: str = ""): pass
-    def attach(self): pass
-    def create(self, data=None): pass
-    def detach(self): pass
-    def isAttached(self): return False
 """
 
 
 # References to original classes
-QT_QTREEWIDGET = QTreeWidget
-QT_QLISTWIDGET = QListWidget
-QT_QTABLEWIDGET = QTableWidget
-QT_QTEXTEDIT = QTextEdit
-QT_QLINEEDIT = QLineEdit
+QT_QTREEWIDGET = QtWidgets.QTreeWidget
+QT_QLISTWIDGET = QtWidgets.QListWidget
+QT_QTABLEWIDGET = QtWidgets.QTableWidget
+QT_QTEXTEDIT = QtWidgets.QTextEdit
+QT_QLINEEDIT = QtWidgets.QLineEdit
 
 
-class Icon(QIcon):
+class Icon(QtGui.QIcon):
     """Pixmap/vector icon"""
 
     def __init__(self, path=None):
         super(Icon, self).__init__(path)
 
-    def coloredPixmap(self, width, height, color, original_color=QColor('black')):
+    def coloredPixmap(self, width, height, color, original_color=QtGui.QColor('black')):
         """Create a pixmap from original icon, changing `original_color` color to given color
 
         Args:
@@ -69,13 +62,13 @@ class Icon(QIcon):
         """
 
         pixmap = self.pixmap(width, height)
-        mask = pixmap.createMaskFromColor(original_color, Qt.MaskOutColor)
+        mask = pixmap.createMaskFromColor(original_color, QtCore.Qt.MaskOutColor)
         pixmap.fill(color)
         pixmap.setMask(mask)
 
         return pixmap
 
-    def addColoredPixmap(self, width=128, height=128, color=QColor("#000"), mode=QIcon.Normal, state=QIcon.On):
+    def addColoredPixmap(self, width=128, height=128, color=QtGui.QColor("#000"), mode=QtGui.QIcon.Normal, state=QtGui.QIcon.On):
         """Add a pixmap with given color
 
         Args:
@@ -89,7 +82,7 @@ class Icon(QIcon):
         self.addPixmap(self.coloredPixmap(width, height, color), mode, state)
 
     @staticmethod
-    def colored(path, color, original_color=QColor('black')):
+    def colored(path, color, original_color=QtGui.QColor('black')):
         """Colorize icon and return new instance
 
         Args:
@@ -99,12 +92,12 @@ class Icon(QIcon):
         """
 
         icon = Icon(path)
-        size = icon.availableSizes()[0]
+        size = icon.availableSizes()[0] if len(icon.availableSizes()) > 0 else QtCore.QSize(16, 16)
 
         return Icon(icon.coloredPixmap(size.width(), size.height(), color, original_color))
 
 
-class _QWidget(QWidget):
+class _QWidget(QtWidgets.QWidget):
     """Base widget"""
 
     def className(self):
@@ -123,7 +116,7 @@ class _QWidget(QWidget):
 class QSpacer(_QWidget):
     """Widget that simply allocate space and spread widgets"""
 
-    def __init__(self, policy_horizontal=QSizePolicy.Expanding, policy_vertical=QSizePolicy.Expanding, parent=None):
+    def __init__(self, policy_horizontal=QtWidgets.QSizePolicy.Expanding, policy_vertical=QtWidgets.QSizePolicy.Expanding, parent=None):
         """Create spacer component that allocates space and stretches another components in layout
 
         Args:
@@ -136,25 +129,25 @@ class QSpacer(_QWidget):
         self.setSizePolicy(policy_horizontal, policy_vertical)
 
 
-class _QListWidget(QListWidget, _QWidget):
+class _QListWidget(QtWidgets.QListWidget, _QWidget):
     """Simple list widget"""
 
     def __init__(self, parent=None):
         super(_QListWidget, self).__init__(parent)
 
-        self.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
-        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.setAttribute(Qt.WA_MacShowFocusRect, False)
+        self.setVerticalScrollMode(QtWidgets.QAbstractItemView.ScrollPerPixel)
+        self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.setAttribute(QtCore.Qt.WA_MacShowFocusRect, False)
         self.setAlternatingRowColors(True)
-        self.setSelectionBehavior(QAbstractItemView.SelectItems)
-        self.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectItems)
+        self.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
 
         # Fix items overlapping issue
         self.setStyleSheet("QListWidget::item {padding: 4px 12px;}")
 
         self._scrollbar_original = self.verticalScrollBar()
-        self._scrollbar = QScrollBar(Qt.Vertical, self)
+        self._scrollbar = QtWidgets.QScrollBar(QtCore.Qt.Vertical, self)
         self._scrollbar.valueChanged.connect(self._scrollbar_original.setValue)
         self._scrollbar_original.valueChanged.connect(self._scrollbar.setValue)
 
@@ -183,7 +176,7 @@ class _QListWidget(QListWidget, _QWidget):
         self._update_scrollbar()
 
 
-class _QListWidgetItem(QListWidgetItem):
+class _QListWidgetItem(QtWidgets.QListWidgetItem):
     """List item"""
 
     def __init__(self, parent=None):
@@ -206,18 +199,18 @@ class _QListWidgetItem(QListWidgetItem):
         return self._data
 
 
-class _QToolBar(QToolBar, _QWidget):
+class _QToolBar(QtWidgets.QToolBar, _QWidget):
     def __init__(self, parent=None):
         super(_QToolBar, self).__init__(parent)
 
         self.setFixedHeight(30)
-        self.setIconSize(QSize(16, 16))
+        self.setIconSize(QtCore.QSize(16, 16))
 
     def addStretch(self, size=0):
         """Add space stretch"""
 
         if size > 0:
-            spacer = QSpacer(QSizePolicy.Minimum)
+            spacer = QSpacer(QtWidgets.QSizePolicy.Minimum)
             spacer.setMinimumWidth(size)
             self.addWidget(spacer)
         else:
@@ -226,38 +219,38 @@ class _QToolBar(QToolBar, _QWidget):
     def paintEvent(self, event):
         """Paint component with CSS styles"""
 
-        option = QStyleOption()
+        option = QtWidgets.QStyleOption()
         option.initFrom(self)
 
-        painter = QPainter(self)
+        painter = QtGui.QPainter(self)
 
-        self.style().drawPrimitive(QStyle.PE_Widget, option, painter, self)
+        self.style().drawPrimitive(QtWidgets.QStyle.PE_Widget, option, painter, self)
 
     """Toolbar component"""
 
 
-class _QTreeWidget(QTreeWidget, _QWidget):
+class _QTreeWidget(QtWidgets.QTreeWidget, _QWidget):
     """Tree widget with predefined properties"""
 
     def __init__(self, parent=None):
         super(_QTreeWidget, self).__init__(parent)
 
         self.setAlternatingRowColors(True)
-        self.setAttribute(Qt.WA_MacShowFocusRect, False)
+        self.setAttribute(QtCore.Qt.WA_MacShowFocusRect, False)
         self.header().close()
-        self.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
         self.setDragEnabled(True)
         self.viewport().setAcceptDrops(True)
         self.setDropIndicatorShown(True)
-        self.setDragDropMode(QAbstractItemView.InternalMove)
+        self.setDragDropMode(QtWidgets.QAbstractItemView.InternalMove)
         self.setWordWrap(True)
         self.setAnimated(False)
         self.setSortingEnabled(False)
-        self.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
-        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setVerticalScrollMode(QtWidgets.QAbstractItemView.ScrollPerPixel)
+        self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
 
         self._scrollbar_original = self.verticalScrollBar()
-        self._scrollbar = QScrollBar(Qt.Vertical, self)
+        self._scrollbar = QtWidgets.QScrollBar(QtCore.Qt.Vertical, self)
         self._scrollbar.valueChanged.connect(self._scrollbar_original.setValue)
         self._scrollbar_original.valueChanged.connect(self._scrollbar.setValue)
 
@@ -286,7 +279,7 @@ class _QTreeWidget(QTreeWidget, _QWidget):
         self._update_scrollbar()
 
 
-class _QTreeWidgetItem(QTreeWidgetItem):
+class _QTreeWidgetItem(QtWidgets.QTreeWidgetItem):
     """Representation of node as QTreeWidgetItem"""
 
     def __init__(self, data=None):
@@ -305,18 +298,18 @@ class _QTreeWidgetItem(QTreeWidgetItem):
         self._data = data
 
 
-class _QTableWidget(QTableWidget):
+class _QTableWidget(QtWidgets.QTableWidget):
     """Table widget"""
 
     def __init__(self, parent=None):
         super(_QTableWidget, self).__init__(parent)
 
-        self.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
-        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setVerticalScrollMode(QtWidgets.QAbstractItemView.ScrollPerPixel)
+        self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
 
         self._scrollbar_original = self.verticalScrollBar()
-        self._scrollbar = QScrollBar(Qt.Vertical, self)
+        self._scrollbar = QtWidgets.QScrollBar(QtCore.Qt.Vertical, self)
         self._scrollbar.valueChanged.connect(self._scrollbar_original.setValue)
         self._scrollbar_original.valueChanged.connect(self._scrollbar.setValue)
 
@@ -345,7 +338,7 @@ class _QTableWidget(QTableWidget):
         self._update_scrollbar()
 
 
-class _QHBoxLayout(QHBoxLayout):
+class _QHBoxLayout(QtWidgets.QHBoxLayout):
     """Horizontal layout"""
 
     def __init__(self, parent=None):
@@ -355,7 +348,7 @@ class _QHBoxLayout(QHBoxLayout):
         self.setSpacing(0)
 
 
-class _QVBoxLayout(QVBoxLayout):
+class _QVBoxLayout(QtWidgets.QVBoxLayout):
     """Vertical layout"""
 
     def __init__(self, parent=None):
@@ -365,7 +358,7 @@ class _QVBoxLayout(QVBoxLayout):
         self.setSpacing(0)
 
 
-class _QSplitter(QSplitter, _QWidget):
+class _QSplitter(QtWidgets.QSplitter, _QWidget):
     """Splitter component"""
 
     def __init__(self, *args):
@@ -382,34 +375,34 @@ class _QLineEdit(QT_QLINEEDIT, _QWidget):
 
         # fix: placeholder text color doesn't match theme color
         palette = self.palette()
-        palette.setColor(QPalette.PlaceholderText, QColor(qt_colors.BASE_TEXT_ALT))
+        palette.setColor(QtGui.QPalette.PlaceholderText, QtGui.QColor(qt_colors.BASE_TEXT_ALT))
 
-        self.setAttribute(Qt.WA_MacShowFocusRect, False)
+        self.setAttribute(QtCore.Qt.WA_MacShowFocusRect, False)
         self.setPalette(palette)
 
 
 class QSearchEdit(_QLineEdit):
     """Basic edit input for search with clear button"""
 
-    keyPressed = pyqtSignal('QKeyEvent')
-    focusOut = pyqtSignal('QFocusEvent')
+    keyPressed = QtCore.pyqtSignal('QKeyEvent')
+    focusOut = QtCore.pyqtSignal('QFocusEvent')
 
     def __init__(self, parent=None):
         super(QSearchEdit, self).__init__(parent)
 
         self._placeholder = "Search"
 
-        self.setAttribute(Qt.WA_MacShowFocusRect, False)
+        self.setAttribute(QtCore.Qt.WA_MacShowFocusRect, False)
         self.textChanged.connect(self._text_changed)
 
-        self._ui_clear = QToolButton(self)
-        self._ui_clear.setIconSize(QSize(14, 14))
-        self._ui_clear.setIcon(QIcon(':/rc/search-clear.png'))
-        self._ui_clear.setCursor(Qt.ArrowCursor)
+        self._ui_clear = QtWidgets.QToolButton(self)
+        self._ui_clear.setIconSize(QtCore.QSize(14, 14))
+        self._ui_clear.setIcon(QtGui.QIcon(':/rc/search-clear.png'))
+        self._ui_clear.setCursor(QtCore.Qt.ArrowCursor)
         self._ui_clear.hide()
         self._ui_clear.clicked.connect(self.clear)
 
-        frame_width = self.style().pixelMetric(QStyle.PM_DefaultFrameWidth)
+        frame_width = self.style().pixelMetric(QtWidgets.QStyle.PM_DefaultFrameWidth)
 
         size_hint = self.minimumSizeHint()
         btn_size_hint = self._ui_clear.sizeHint()
@@ -454,23 +447,23 @@ class QSearchEdit(_QLineEdit):
 
         size = self.rect()
         btn_size = self._ui_clear.sizeHint()
-        frame_width = self.style().pixelMetric(QStyle.PM_DefaultFrameWidth)
+        frame_width = self.style().pixelMetric(QtWidgets.QStyle.PM_DefaultFrameWidth)
 
         self._ui_clear.move(size.width() - btn_size.width() - (frame_width * 2),
                             (size.height() / 2) - (btn_size.height() / 2))
 
 
-class _QTextEdit(QTextEdit, _QWidget):
+class _QTextEdit(QtWidgets.QTextEdit, _QWidget):
     """Multi-line text editor"""
 
     def __init__(self, *args):
         super(_QTextEdit, self).__init__(*args)
 
-        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
 
         # Replace default scrollbar, as it causes many stylesheet issues
         self._scrollbar_original = self.verticalScrollBar()
-        self._scrollbar = QScrollBar(Qt.Vertical, self)
+        self._scrollbar = QtWidgets.QScrollBar(QtCore.Qt.Vertical, self)
         self._scrollbar.valueChanged.connect(self._scrollbar_original.setValue)
         self._scrollbar_original.valueChanged.connect(self._scrollbar.setValue)
 
@@ -499,20 +492,20 @@ class _QTextEdit(QTextEdit, _QWidget):
         self._update_scrollbar()
 
 
-class _QDialog(QDialog, _QWidget):
+class _QDialog(QtWidgets.QDialog, _QWidget):
     """Abstract dialog window"""
 
     def __init__(self, parent=None):
         super(_QDialog, self).__init__(parent)
 
         # Set default window icon, used on Windows and some Linux distributions
-        self.setWindowIcon(QIcon(':/icon/32.png'))
+        self.setWindowIcon(QtGui.QIcon(':/icon/32.png'))
 
     def moveCenter(self):
         """Move window to the center of current screen"""
 
         geometry = self.frameGeometry()
-        geometry.moveCenter(QDesktopWidget().availableGeometry().center())
+        geometry.moveCenter(QtWidgets.QDesktopWidget().availableGeometry().center())
 
         self.move(geometry.topLeft())
 
@@ -521,7 +514,7 @@ class _QDialog(QDialog, _QWidget):
 
         self.show()
         self.raise_()
-        self.setWindowState(self.windowState() & ~Qt.WindowMinimized | Qt.WindowActive)
+        self.setWindowState(self.windowState() & ~QtCore.Qt.WindowMinimized | QtCore.Qt.WindowActive)
         self.activateWindow()
 
 
@@ -532,7 +525,7 @@ class QPopup(_QDialog):
         super(QPopup, self).__init__(parent)
 
         self.__close_on_focus_lost = True
-        self.__background_color = QColor(qt_colors.CONTAINER)
+        self.__background_color = QtGui.QColor(qt_colors.CONTAINER)
         # Shadow padding
         self.__padding = 12
         # Caret size
@@ -542,17 +535,17 @@ class QPopup(_QDialog):
         # Corner roundness
         self.__roundness = 5
 
-        self.setWindowFlags(Qt.Widget | Qt.FramelessWindowHint)
-        self.setAttribute(Qt.WA_NoSystemBackground, True)
-        self.setAttribute(Qt.WA_TranslucentBackground, True)
+        self.setWindowFlags(QtCore.Qt.Widget | QtCore.Qt.FramelessWindowHint)
+        self.setAttribute(QtCore.Qt.WA_NoSystemBackground, True)
+        self.setAttribute(QtCore.Qt.WA_TranslucentBackground, True)
         self.autoFillBackground = True
 
         self.installEventFilter(self)
 
         if not OS_MAC:
-            effect = QGraphicsDropShadowEffect()
+            effect = QtWidgets.QGraphicsDropShadowEffect()
             effect.setBlurRadius(12)
-            effect.setColor(QColor(0, 0, 0, 126))
+            effect.setColor(QtGui.QColor(0, 0, 0, 126))
             effect.setOffset(0)
 
             self.setGraphicsEffect(effect)
@@ -566,25 +559,25 @@ class QPopup(_QDialog):
         height = self.height()
         caret_offset = self.__caret_position
 
-        painter = QPainter()
+        painter = QtGui.QPainter()
         painter.begin(self)
         painter.save()
-        painter.setRenderHint(QPainter.Antialiasing)
+        painter.setRenderHint(QtGui.QPainter.Antialiasing)
 
         # Clear previous drawing
-        painter.setCompositionMode(QPainter.CompositionMode_Source)
-        painter.fillRect(self.rect(), Qt.transparent)
-        painter.setCompositionMode(QPainter.CompositionMode_SourceOver)
+        painter.setCompositionMode(QtGui.QPainter.CompositionMode_Source)
+        painter.fillRect(self.rect(), QtCore.Qt.transparent)
+        painter.setCompositionMode(QtGui.QPainter.CompositionMode_SourceOver)
 
-        painter.setPen(Qt.NoPen)
-        painter.setBrush(QColor(255, 0, 0, 127))
+        painter.setPen(QtCore.Qt.NoPen)
+        painter.setBrush(QtGui.QColor(255, 0, 0, 127))
 
-        points = [QPointF(width / 2 + caret_offset, height - self.__padding),
-                  QPointF(width / 2 - self.__caret_size + caret_offset, height - self.__caret_size - self.__padding),
-                  QPointF(width / 2 + self.__caret_size + caret_offset, height - self.__caret_size - self.__padding)]
-        triangle = QPolygonF(points)
+        points = [QtCore.QPointF(width / 2 + caret_offset, height - self.__padding),
+                  QtCore.QPointF(width / 2 - self.__caret_size + caret_offset, height - self.__caret_size - self.__padding),
+                  QtCore.QPointF(width / 2 + self.__caret_size + caret_offset, height - self.__caret_size - self.__padding)]
+        triangle = QtGui.QPolygonF(points)
 
-        rounded_rect = QPainterPath()
+        rounded_rect = QtGui.QPainterPath()
         rounded_rect.addRoundedRect(self.__padding, self.__padding,
                                     width - self.__padding * 2,
                                     height - self.__caret_size - self.__padding * 2,
@@ -592,7 +585,7 @@ class QPopup(_QDialog):
         rounded_rect.addPolygon(triangle)
 
         painter.setOpacity(1)
-        painter.fillPath(rounded_rect, QBrush(self.__background_color))
+        painter.fillPath(rounded_rect, QtGui.QBrush(self.__background_color))
 
         painter.restore()
         painter.end()
@@ -603,11 +596,11 @@ class QPopup(_QDialog):
         flag = self.__close_on_focus_lost
         type_ = event.type()
 
-        if flag and type_ == QEvent.WindowDeactivate:
+        if flag and type_ == QtCore.QEvent.WindowDeactivate:
             self.hide()
 
         # Workaround for linux
-        if flag and type_ == QEvent.Leave and OS_LINUX:
+        if flag and type_ == QtCore.QEvent.Leave and OS_LINUX:
             self.hide()
 
         return _QDialog.eventFilter(self, target, event)
@@ -615,7 +608,7 @@ class QPopup(_QDialog):
     def sizeHint(self):
         """Default minimum size"""
 
-        return QSize(300, 300)
+        return QtCore.QSize(300, 300)
 
     def closeOnFocusLost(self, value):
         """Close dialog when it looses focus
@@ -636,9 +629,9 @@ class QPopup(_QDialog):
         self.show()
         self.raise_()
 
-        desktop = QDesktopWidget()
+        desktop = QtWidgets.QDesktopWidget()
         screen = desktop.screenGeometry(point)
-        location = QPoint(point.x() - self.width() / 2, point.y() - self.height() + 12)
+        location = QtCore.QPoint(point.x() - self.width() / 2, point.y() - self.height() + 12)
 
         # calculate point location inside current screen
         if location.x() <= screen.x():
@@ -663,20 +656,20 @@ class QPopup(_QDialog):
 
 
 # Replacing default widgets
-Application = QCoreApplication
-QWidget.className = _QWidget.className
+Application = QtCore.QCoreApplication
+QtWidgets.QWidget.className = _QWidget.className
 
-QHBoxLayout = _QHBoxLayout
-QVBoxLayout = _QVBoxLayout
+QtWidgets.QHBoxLayout = _QHBoxLayout
+QtWidgets.QVBoxLayout = _QVBoxLayout
 
-QSplitter = _QSplitter
-QLineEdit = _QLineEdit
-QTextEdit = _QTextEdit
-QToolBar = _QToolBar
+QtWidgets.QSplitter = _QSplitter
+QtWidgets.QLineEdit = _QLineEdit
+QtWidgets.QTextEdit = _QTextEdit
+QtWidgets.QToolBar = _QToolBar
 
-QTableWidget = _QTableWidget
-QTreeWidget = _QTreeWidget
-QTreeWidgetItem = _QTreeWidgetItem
-QListWidget = _QListWidget
-QListWidgetItem = _QListWidgetItem
-QDialog = _QDialog
+QtWidgets.QTableWidget = _QTableWidget
+QtWidgets.QTreeWidget = _QTreeWidget
+QtWidgets.QTreeWidgetItem = _QTreeWidgetItem
+QtWidgets.QListWidget = _QListWidget
+QtWidgets.QListWidgetItem = _QListWidgetItem
+QtWidgets.QDialog = _QDialog

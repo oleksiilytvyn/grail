@@ -30,43 +30,20 @@ from grail.core import OSCHost, Viewer, Configurator, Plugin
 from grail.plugins import *
 
 
-class Grail(QApplication):
+class Grail(QtWidgets.QApplication):
     """Main application class"""
 
     def __init__(self, argv):
         super(Grail, self).__init__(argv)
 
-        self._shared_memory = None
+        self._socket = QtNetwork.QLocalSocket()
+        self._socket.connectToServer(grail.GUID, QtCore.QIODevice.ReadOnly)
+        self._socket_connected = self._socket.waitForConnected()
+
+        self._server = QtNetwork.QLocalServer()
+        self._server.listen(grail.GUID)
+
         self._sys_exception_handler = sys.excepthook
-        self.lastWindowClosed.connect(self.quit)
-        self.stylesheet = ""
-
-        # set a exception handler
-        sys.excepthook = self.unhandledException
-
-        # fix for retina displays
-        if hasattr(Qt, 'AA_UseHighDpiPixmaps'):
-            self.setAttribute(Qt.AA_UseHighDpiPixmaps)
-
-        # fix styles
-        self.setStyle(_ProxyStyle())
-
-        # use GTK style if available
-        for style in QStyleFactory.keys():
-            if "gtk" in style.lower():
-                self.setStyle(QStyleFactory.create("gtk"))
-
-        self._bind_stylesheet()
-
-        # prevent from running more than one instance
-        if not self.moreThanOneInstanceAllowed() and self.isAlreadyRunning():
-            self.quit()
-
-        BibleHost.setup()
-
-        for plug in Plugin.plugins() + Viewer.plugins() + Configurator.plugins():
-            plug.loaded()
-
         self.setQuitOnLastWindowClosed(True)
         self.lastWindowClosed.connect(self._closed)
 
@@ -74,6 +51,34 @@ class Grail(QApplication):
         self.setApplicationVersion(grail.__version__)
         self.setOrganizationName(grail.ORGANISATION_NAME)
         self.setOrganizationDomain(grail.ORGANISATION_DOMAIN)
+        self.stylesheet = ""
+
+        # set a exception handler
+        sys.excepthook = self.unhandledException
+
+        # fix for retina displays
+        if hasattr(QtCore.Qt, 'AA_UseHighDpiPixmaps'):
+            self.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps)
+
+        # fix styles
+        self.setStyle(_ProxyStyle())
+
+        # use GTK style if available
+        for style in QtWidgets.QStyleFactory.keys():
+            if "gtk" in style.lower():
+                self.setStyle(QtWidgets.QStyleFactory.create("gtk"))
+
+        self._bind_stylesheet()
+
+        # prevent from running more than one instance
+        if not self.moreThanOneInstanceAllowed() and self.isAlreadyRunning():
+            self.anotherInstanceStarted()
+            self.quit()
+
+        BibleHost.setup()
+
+        for plug in Plugin.plugins() + Viewer.plugins() + Configurator.plugins():
+            plug.loaded()
 
         # Disable logging
         root_logger = logging.getLogger()
@@ -105,10 +110,10 @@ class Grail(QApplication):
 
         # console args
         create = '-c' in argv
-        path = argv[1] if len(argv) >= 2 else False
+        path = argv[1] if len(argv) >= 2 else None
 
-        if path:
-            self.open(path, create)
+        if path is not None:
+            self.open(path, create=create)
 
     @property
     def settings(self):
@@ -175,9 +180,9 @@ class Grail(QApplication):
                 return ""
 
             data = ""
-            stream = QFile(file_path)
+            stream = QtCore.QFile(file_path)
 
-            if stream.open(QFile.ReadOnly):
+            if stream.open(QtCore.QFile.ReadOnly):
                 data = str(stream.readAll())
                 stream.close()
 
@@ -190,10 +195,8 @@ class Grail(QApplication):
     def quit(self):
         """Quit application and close all connections"""
 
-        if self._shared_memory and self._shared_memory.isAttached():
-            self._shared_memory.detach()
-
-        super(Grail, self).quit()
+        QtWidgets.QApplication.quit()
+        sys.exit(0)
 
     def unhandledException(self, exception_type, value, traceback_object):
         """Re-implement this method to catch exceptions"""
@@ -206,20 +209,10 @@ class Grail(QApplication):
         Returns: bool
         """
 
-        self._shared_memory = QSharedMemory(self.applicationName())
-
-        if self._shared_memory.attach():
-            self.anotherInstanceStarted()
-            return True
-        else:
-            self._shared_memory.create(1)
-
-        return False
+        return self._socket_connected
 
     def moreThanOneInstanceAllowed(self):
         """Do not allow multiple instances"""
-
-        # todo: Modify logic  https://stackoverflow.com/questions/12712360/qtsingleapplication-for-pyside-or-pyqt?rq=1
 
         return False
 
@@ -233,10 +226,18 @@ class Grail(QApplication):
                                 icon=MessageDialog.Critical)
         message.exec_()
 
-    def open(self, path, create=False):
+    def open(self, path: str, create:bool=False):
         """Open a file"""
 
-        if not path or len(path) == 0:
+        project_opened = True
+        project = False
+
+        try:
+            project = Project(path, create=create)
+        except:
+            pass
+
+        if not project or not path or len(path) == 0:
             message = MessageDialog(title="Can't open file",
                                     text="File at location %s not exists." % path,
                                     icon=MessageDialog.Critical)
@@ -248,8 +249,7 @@ class Grail(QApplication):
             self.welcome_dialog.show()  # trick for keeping Qt alive
             self.main_window.close()
 
-        # todo: Project may fail due to file error
-        self._project = Project(path, create=create)
+        self._project = project
         self._library = Library(grail.LIBRARY_PATH, create=True)
 
         self.settings.set('project/last', path)
@@ -291,6 +291,8 @@ class Grail(QApplication):
         if self._settings:
             self._settings.close()
 
+        self.quit()
+
     def change_bible(self, bible_id):
         """Change bible on the fly
 
@@ -321,7 +323,7 @@ class Grail(QApplication):
             os.remove(path)
 
             # copy file from qt resource to local file system
-            ref = QFile(':default/bible-en-kjv.grail-bible')
+            ref = QtCore.QFile(':default/bible-en-kjv.grail-bible')
             ref.copy(path)
             ref.close()
 
@@ -371,18 +373,18 @@ class Grail(QApplication):
         Returns: instance of QCoreApplication or Application
         """
 
-        return QCoreApplication.instance()
+        return QtCore.QCoreApplication.instance()
 
 
-class _ProxyStyle(QProxyStyle):
+class _ProxyStyle(QtWidgets.QProxyStyle):
     """Fix stylesheet issues with custom style"""
 
-    def styleHint(self, hint, option=None, widget=None, returnData=None):
+    def styleHint(self, hint, option=None, widget=None, return_data=None):
 
-        if QStyle.SH_ComboBox_Popup == hint:
+        if QtWidgets.QStyle.SH_ComboBox_Popup == hint:
             return 0
 
-        return QProxyStyle.styleHint(self, hint, option, widget, returnData)
+        return QtWidgets.QProxyStyle.styleHint(self, hint, option, widget, return_data)
 
 
 class _ConsoleOutput(io.StringIO):
@@ -407,7 +409,7 @@ class _ConsoleOutput(io.StringIO):
 
         self.changed.emit()
 
-    def read(self):
+    def read(self, *args, **kwargs):
         """Read output of console"""
 
         return self._output

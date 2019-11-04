@@ -19,7 +19,7 @@ from grail.qt import *
 from grail.ui import ActionsDialog, PreferencesDialog, ViewArranger, ProjectDialog, AboutDialog
 
 
-class MainWindow(QMainWindow):
+class MainWindow(QtWidgets.QMainWindow):
     """Grail application class"""
 
     def __init__(self, parent=None):
@@ -40,7 +40,7 @@ class MainWindow(QMainWindow):
         self.about_dialog = AboutDialog(None, "Grail %s" % (grail.__version__,),
                                         "Copyright © 2016-2019 Alex Litvin.\nAll rights reserved.\n\n"
                                         "http://grailapp.com/",
-                                        QIcon(':/icon/256.png'))
+                                        QtGui.QIcon(':/icon/256.png'))
 
         self._ui_menubar()
 
@@ -51,7 +51,7 @@ class MainWindow(QMainWindow):
         self.view_arranger.updated.connect(self._arranger_updated)
 
         self.setCentralWidget(self.view_arranger)
-        self.setWindowIcon(QIcon(':/icon/256.png'))
+        self.setWindowIcon(QtGui.QIcon(':/icon/256.png'))
         self.setGeometry(0, 0, 800, 600)
         self.setMinimumSize(320, 240)
         self.setWindowTitle("%s - Grail" % (self.app.project.location,))
@@ -62,7 +62,7 @@ class MainWindow(QMainWindow):
 
         if window:
             if default_key(window, 'maximized', False):
-                self.setWindowState(Qt.WindowMaximized)
+                self.setWindowState(QtCore.Qt.WindowMaximized)
             else:
                 self.setGeometry(default_key(window, 'x', 0),
                                  default_key(window, 'y', 0),
@@ -72,51 +72,51 @@ class MainWindow(QMainWindow):
     def _ui_menubar(self):
         """Setup menu"""
 
-        self.ui_menubar = QMenuBar(None)
+        self.ui_menubar = QtWidgets.QMenuBar(None)
 
         # File
-        self.ui_import_action = QAction('Import...', self)
+        self.ui_import_action = QtWidgets.QAction('Import...', self)
         self.ui_import_action.triggered.connect(self.import_action)
-        self.ui_export_action = QAction('Export...', self)
+        self.ui_export_action = QtWidgets.QAction('Export...', self)
         self.ui_export_action.triggered.connect(self.export_action)
 
-        self.ui_new_action = QAction('New project', self)
+        self.ui_new_action = QtWidgets.QAction('New project', self)
         self.ui_new_action.setShortcut("Ctrl+N")
         self.ui_new_action.triggered.connect(self.new_project)
-        self.ui_open_action = QAction('Open project', self)
+        self.ui_open_action = QtWidgets.QAction('Open project', self)
         self.ui_open_action.setShortcut("Ctrl+O")
         self.ui_open_action.triggered.connect(self.open_project)
-        self.ui_save_action = QAction('Save project', self)
+        self.ui_save_action = QtWidgets.QAction('Save project', self)
         self.ui_save_action.setShortcut("Ctrl+S")
         self.ui_save_action.triggered.connect(self.save_project)
-        self.ui_save_as_action = QAction('Save project as', self)
+        self.ui_save_as_action = QtWidgets.QAction('Save project as', self)
         self.ui_save_as_action.setShortcut("Ctrl+Shift+S")
         self.ui_save_as_action.triggered.connect(self.save_project_as)
 
-        self.ui_quit_action = QAction('Quit', self)
+        self.ui_quit_action = QtWidgets.QAction('Quit', self)
         self.ui_quit_action.triggered.connect(self.close)
 
-        self.ui_preferences_action = QAction('Preferences', self)
+        self.ui_preferences_action = QtWidgets.QAction('Preferences', self)
         self.ui_preferences_action.setShortcut("Ctrl+P")
         self.ui_preferences_action.triggered.connect(self.preferences_action)
 
-        self.ui_project_action = QAction('Project info', self)
+        self.ui_project_action = QtWidgets.QAction('Project info', self)
         self.ui_project_action.triggered.connect(self.project_action)
 
-        self.ui_actions_action = QAction('Show actions...', self)
+        self.ui_actions_action = QtWidgets.QAction('Show actions...', self)
         self.ui_actions_action.setShortcut("Ctrl+Alt+A")
-        self.ui_actions_action.setShortcutContext(Qt.ApplicationShortcut)
+        self.ui_actions_action.setShortcutContext(QtCore.Qt.ApplicationShortcut)
         self.ui_actions_action.triggered.connect(self.open_actions_action)
 
         # Help
-        self.ui_about_action = QAction('About Grail', self)
+        self.ui_about_action = QtWidgets.QAction('About Grail', self)
         self.ui_about_action.triggered.connect(self.about_action)
 
-        self.ui_open_web_action = QAction('Visit grailapp.com', self)
-        self.ui_open_web_action.triggered.connect(lambda: QDesktopServices.openUrl(QUrl("http://grailapp.com/")))
+        self.ui_open_web_action = QtWidgets.QAction('Visit grailapp.com', self)
+        self.ui_open_web_action.triggered.connect(lambda: QtGui.QDesktopServices.openUrl(QtCore.QUrl("http://grailapp.com/")))
 
-        self.ui_open_manual_action = QAction('View manual', self)
-        self.ui_open_manual_action.triggered.connect(lambda: QDesktopServices.openUrl(QUrl("http://grailapp.com/help")))
+        self.ui_open_manual_action = QtWidgets.QAction('View manual', self)
+        self.ui_open_manual_action.triggered.connect(lambda: QtGui.QDesktopServices.openUrl(QtCore.QUrl("http://grailapp.com/help")))
 
         # File menu
         self.ui_menu_file = self.ui_menubar.addMenu('File')
@@ -289,13 +289,13 @@ class MainWindow(QMainWindow):
             # Main window entity
             entities[0].set("maximized", self.isMaximized())
 
-        QMainWindow.changeEvent(self, e)
+        QtWidgets.QMainWindow.changeEvent(self, e)
 
     def center(self):
         """Move window to the center of current screen"""
 
         qr = self.frameGeometry()
-        cp = QDesktopWidget().availableGeometry().center()
+        cp = QtWidgets.QDesktopWidget().availableGeometry().center()
         qr.moveCenter(cp)
 
         self.move(qr.topLeft())
@@ -304,11 +304,11 @@ class MainWindow(QMainWindow):
         """Create a new project"""
 
         project_name = "untitled"
-        location = QStandardPaths.locate(QStandardPaths.DocumentsLocation, "",
-                                         QStandardPaths.LocateDirectory)
+        location = QtCore.QStandardPaths.locate(QtCore.QStandardPaths.DocumentsLocation, "",
+                                                QtCore.QStandardPaths.LocateDirectory)
         location = os.path.join(location, project_name)
 
-        path, ext = QFileDialog.getSaveFileName(self, "New project", location, "*.grail")
+        path, ext = QtWidgets.QFileDialog.getSaveFileName(self, "New project", location, "*.grail")
 
         if path and len(path) != 0:
             self.app.open(path, create=True)
@@ -316,9 +316,9 @@ class MainWindow(QMainWindow):
     def open_project(self):
         """Open an existing file"""
 
-        location = QStandardPaths.locate(QStandardPaths.DocumentsLocation, "",
-                                         QStandardPaths.LocateDirectory)
-        path, ext = QFileDialog.getOpenFileName(self, "Open File...", location, "*.grail")
+        location = QtCore.QStandardPaths.locate(QtCore.QStandardPaths.DocumentsLocation, "",
+                                                QtCore.QStandardPaths.LocateDirectory)
+        path, ext = QtWidgets.QFileDialog.getOpenFileName(self, "Open File...", location, "*.grail")
 
         if path and len(path) != 0:
             self.app.open(path, create=False)
@@ -333,11 +333,11 @@ class MainWindow(QMainWindow):
         """Save current project as another project"""
 
         project_name = "%s copy" % (self.project.name, )
-        location = QStandardPaths.locate(QStandardPaths.DocumentsLocation, "",
-                                         QStandardPaths.LocateDirectory)
+        location = QtCore.QStandardPaths.locate(QtCore.QStandardPaths.DocumentsLocation, "",
+                                                QtCore.QStandardPaths.LocateDirectory)
         location = os.path.join(location, project_name)
 
-        path, ext = QFileDialog.getSaveFileName(self, "Save project as", location, "*.grail")
+        path, ext = QtWidgets.QFileDialog.getSaveFileName(self, "Save project as", location, "*.grail")
 
         self.project.save_copy(path)
 
@@ -349,9 +349,9 @@ class MainWindow(QMainWindow):
     def import_action(self):
         """Import data into Grail library or current project"""
 
-        location = QStandardPaths.locate(QStandardPaths.DocumentsLocation, "",
-                                         QStandardPaths.LocateDirectory)
-        path, ext = QFileDialog.getOpenFileName(self, "Import...", location, "*.json, *.grail, *.grail-library")
+        location = QtCore.QStandardPaths.locate(QtCore.QStandardPaths.DocumentsLocation, "",
+                                                QtCore.QStandardPaths.LocateDirectory)
+        path, ext = QtWidgets.QFileDialog.getOpenFileName(self, "Import...", location, "*.json, *.grail, *.grail-library")
         ext = path.split('.')[-1]
         message = ""
 
@@ -441,9 +441,9 @@ class MainWindow(QMainWindow):
     def export_action(self):
         """Export grail library as single file"""
 
-        location = QStandardPaths.locate(QStandardPaths.DocumentsLocation, "",
-                                         QStandardPaths.LocateDirectory)
-        path, ext = QFileDialog.getSaveFileName(self, "Export library...", location, "*.grail-library")
+        location = QtCore.QStandardPaths.locate(QtCore.QStandardPaths.DocumentsLocation, "",
+                                                QtCore.QStandardPaths.LocateDirectory)
+        path, ext = QtWidgets.QFileDialog.getSaveFileName(self, "Export library...", location, "*.grail-library")
 
         if not path:
             return False

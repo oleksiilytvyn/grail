@@ -12,7 +12,7 @@ from grail.qt import *
 from grail.qt import colors as qt_colors
 
 
-class TestCardTexture(QPixmap):
+class TestCardTexture(QtGui.QPixmap):
 
     def __init__(self, width: int, height: int):
         """Generate test card QPixmap
@@ -25,16 +25,16 @@ class TestCardTexture(QPixmap):
         """
         super(TestCardTexture, self).__init__(width, height)
 
-        comp = QRect(0, 0, width, height)
+        comp = QtCore.QRect(0, 0, width, height)
         offset = 50
 
-        painter = QPainter()
+        painter = QtGui.QPainter()
         painter.begin(self)
-        painter.setRenderHints(QPainter.Antialiasing | QPainter.TextAntialiasing | QPainter.SmoothPixmapTransform)
+        painter.setRenderHints(QtGui.QPainter.Antialiasing | QtGui.QPainter.TextAntialiasing | QtGui.QPainter.SmoothPixmapTransform)
 
-        painter.fillRect(comp, QColor(qt_colors.CONTAINER_ALT))
+        painter.fillRect(comp, QtGui.QColor(qt_colors.CONTAINER_ALT))
 
-        pen = QPen(Qt.white)
+        pen = QtGui.QPen(QtCore.Qt.white)
         pen.setWidth(1)
 
         painter.setPen(pen)
@@ -46,7 +46,7 @@ class TestCardTexture(QPixmap):
             painter.drawLine(0, comp.height() / 2 + o, comp.width(), comp.height() / 2 + o)
             painter.drawLine(comp.width() / 2 + o, 0, comp.width() / 2 + o, comp.height())
 
-        pen = QPen(QColor(qt_colors.BASE))
+        pen = QtGui.QPen(QtGui.QColor(qt_colors.BASE))
         pen.setWidth(3)
         painter.setPen(pen)
 
@@ -62,14 +62,14 @@ class TestCardTexture(QPixmap):
         for index in range(-circles, circles + 1):
             ox = index * (radius * 1.25)
 
-            painter.drawEllipse(QPoint(comp.width() / 2 + ox, comp.height() / 2), radius, radius)
+            painter.drawEllipse(QtCore.QPoint(comp.width() / 2 + ox, comp.height() / 2), radius, radius)
 
-        box = QRect(comp.topLeft(), comp.bottomRight())
+        box = QtCore.QRect(comp.topLeft(), comp.bottomRight())
         box.adjust(10, 10, -10, -10)
 
-        painter.setPen(Qt.white)
-        painter.setFont(QFont("decorative", 24))
-        painter.drawText(box, Qt.AlignCenter | Qt.TextWordWrap, "Composition %d x %d" % (comp.width(), comp.height()))
+        painter.setPen(QtCore.Qt.white)
+        painter.setFont(QtGui.QFont("decorative", 24))
+        painter.drawText(box, QtCore.Qt.AlignCenter | QtCore.Qt.TextWordWrap, "Composition %d x %d" % (comp.width(), comp.height()))
 
         painter.end()
 
@@ -88,8 +88,8 @@ class DisplaySceneLayer:
         self._layer_id = layer
 
         self._video_item = QGraphicsVideoItem()
-        self._video_item.setSize(QSizeF(640, 480))
-        self._video_item.setAspectRatioMode(Qt.IgnoreAspectRatio)
+        self._video_item.setSize(QtCore.QSizeF(640, 480))
+        self._video_item.setAspectRatioMode(QtCore.Qt.IgnoreAspectRatio)
 
         self._video_player = QMediaPlayer(None, QMediaPlayer.VideoSurface)
         self._video_player.setVideoOutput(self._video_item)
@@ -170,7 +170,7 @@ class DisplaySceneLayer:
 
     def set_source(self, path: str):
 
-        self._video_player.setMedia(QMediaContent(QUrl.fromLocalFile(path)))
+        self._video_player.setMedia(QMediaContent(QtCore.QUrl.fromLocalFile(path)))
         self._video_item.show()
 
     def play(self):
@@ -196,9 +196,9 @@ class DisplaySceneLayer:
         tx, ty = w / 2, h / 2
 
         self._video_item.setPos(sw / 2 - w / 2 + self._x, sh / 2 - h / 2 + self._y)
-        self._video_item.setSize(QSizeF(w, h))
+        self._video_item.setSize(QtCore.QSizeF(w, h))
 
-        t = QTransform()
+        t = QtGui.QTransform()
         t.translate(tx, ty)
         t.rotate(self._angle)
         t.scale(self._scale, self._scale)
@@ -228,21 +228,21 @@ class DisplaySceneLayer:
         Application.instance().signals.connect(message, fn)
 
 
-class DisplaySceneTextItem(QGraphicsItem):
+class DisplaySceneTextItem(QtWidgets.QGraphicsItem):
 
     def __init__(self, text=""):
         super(DisplaySceneTextItem, self).__init__()
 
         self._text = text
-        self._rect = QRectF(0, 0, 100, 100)
-        self._alignment = Qt.AlignCenter
-        self._padding = QMarginsF(0, 0, 0, 0)
-        self._font = QFont("decorative", 12)
-        self._color = QColor("#fff")
+        self._rect = QtCore.QRectF(0, 0, 100, 100)
+        self._alignment = QtCore.Qt.AlignCenter
+        self._padding = QtCore.QMarginsF(0, 0, 0, 0)
+        self._font = QtGui.QFont("decorative", 12)
+        self._color = QtGui.QColor("#fff")
         self._transform = None
         self._shadow_blur = 0
-        self._shadow_color = QColor("#000")
-        self._shadow_position = QPointF(0, 0)
+        self._shadow_color = QtGui.QColor("#000")
+        self._shadow_position = QtCore.QPointF(0, 0)
 
     def set_text(self, text):
 
@@ -278,7 +278,7 @@ class DisplaySceneTextItem(QGraphicsItem):
 
     def set_padding(self, l, t, r, b):
 
-        self._padding = QMarginsF(l, t, r, b)
+        self._padding = QtCore.QMarginsF(l, t, r, b)
 
     def set_size(self, size_pt):
 
@@ -296,17 +296,17 @@ class DisplaySceneTextItem(QGraphicsItem):
 
         return self._rect
 
-    def set_rect(self, rect: QRectF):
+    def set_rect(self, rect: QtCore.QRectF):
 
-        self._rect = QRectF(rect.x(), rect.y(), rect.width(), rect.height())
+        self._rect = QtCore.QRectF(rect.x(), rect.y(), rect.width(), rect.height())
 
         self.update()
 
     def set_shadow(self, x: int, y: int, blur: int, color: str):
 
         self._shadow_blur = blur
-        self._shadow_position = QPointF(x, y)
-        self._shadow_color = QColor(color)
+        self._shadow_position = QtCore.QPointF(x, y)
+        self._shadow_color = QtGui.QColor(color)
 
     def shadow_blur(self):
 
@@ -341,20 +341,20 @@ class DisplaySceneTextItem(QGraphicsItem):
         elif self._transform == "capitalize":
             text = text.capitalize()
 
-        box = QRect(0, 0, rect.width(), rect.height())
+        box = QtCore.QRect(0, 0, rect.width(), rect.height())
         box.adjust(p.left(), p.top(), -p.right(), -p.bottom())
 
-        box_shadow = QRect(self._shadow_position.x(), self._shadow_position.y(), rect.width(), rect.height())
+        box_shadow = QtCore.QRect(self._shadow_position.x(), self._shadow_position.y(), rect.width(), rect.height())
         box_shadow.adjust(p.left(), p.top(), -p.right(), -p.bottom())
 
         painter.setPen(self._shadow_color)
-        painter.drawText(box_shadow, self._alignment | Qt.TextWordWrap, text)
+        painter.drawText(box_shadow, self._alignment | QtCore.Qt.TextWordWrap, text)
 
         painter.setPen(self._color)
-        painter.drawText(box, self._alignment | Qt.TextWordWrap, text)
+        painter.drawText(box, self._alignment | QtCore.Qt.TextWordWrap, text)
 
 
-class DisplayScene(QGraphicsScene):
+class DisplayScene(QtWidgets.QGraphicsScene):
 
     def __init__(self):
         super(DisplayScene, self).__init__()
@@ -370,10 +370,10 @@ class DisplayScene(QGraphicsScene):
         # Internal
         self._text_item = DisplaySceneTextItem("")
         self._testcard_pixmap = TestCardTexture(self._width, self._height)
-        self._testcard_item = QGraphicsPixmapItem(self._testcard_pixmap)
-        self._background_item = QGraphicsRectItem()
-        self._background_item.setBrush(QBrush(QColor("#000")))
-        self._background_item.setRect(QRectF(0, 0, self.width(), self.height()))
+        self._testcard_item = QtWidgets.QGraphicsPixmapItem(self._testcard_pixmap)
+        self._background_item = QtWidgets.QGraphicsRectItem()
+        self._background_item.setBrush(QtGui.QBrush(QtGui.QColor("#000")))
+        self._background_item.setRect(QtCore.QRectF(0, 0, self.width(), self.height()))
 
         self.addItem(self._background_item)
         self._layers = [DisplaySceneLayer(self, layer=1), DisplaySceneLayer(self, layer=2)]
@@ -415,7 +415,7 @@ class DisplayScene(QGraphicsScene):
         self._width = max(1, width)
         self._height = max(1, height)
 
-        size_rect = QRectF(0, 0, self._width, self._height)
+        size_rect = QtCore.QRectF(0, 0, self._width, self._height)
 
         self.setSceneRect(size_rect)
         self._background_item.setRect(size_rect)
@@ -478,7 +478,7 @@ class DisplayScene(QGraphicsScene):
 
     def set_text_color(self, color: str):
 
-        self._text_item.set_color(QColor(color))
+        self._text_item.set_color(QtGui.QColor(color))
 
     def set_text_padding(self, l: float, t: float, r: float, b: float):
 
@@ -487,21 +487,21 @@ class DisplayScene(QGraphicsScene):
     def set_text_align(self, horizontal: str, vertical: str):
         # "left", "center", "right", "top", "middle", "bottom"
 
-        alignment = Qt.AlignCenter
+        alignment = QtCore.Qt.AlignCenter
 
         if horizontal == "left":
-            alignment = Qt.AlignLeft
+            alignment = QtCore.Qt.AlignLeft
         elif horizontal == "center":
-            alignment = Qt.AlignHCenter
+            alignment = QtCore.Qt.AlignHCenter
         elif horizontal == "right":
-            alignment = Qt.AlignRight
+            alignment = QtCore.Qt.AlignRight
 
         if vertical == "top":
-            alignment |= Qt.AlignTop
+            alignment |= QtCore.Qt.AlignTop
         elif vertical == "middle":
-            alignment |= Qt.AlignVCenter
+            alignment |= QtCore.Qt.AlignVCenter
         elif vertical == "bottom":
-            alignment |= Qt.AlignBottom
+            alignment |= QtCore.Qt.AlignBottom
 
         self._text_item.set_alignment(alignment)
 
@@ -553,7 +553,7 @@ class DisplayScene(QGraphicsScene):
 
     def set_text_font(self, size_pt: float, name: str, style: str):
 
-        font = QFont(name, size_pt)
+        font = QtGui.QFont(name, size_pt)
         font.setStyleName(style)
 
         self._text_item.set_font(font)
@@ -669,7 +669,7 @@ class DisplayScene(QGraphicsScene):
             item.set_transport(value)
 
 
-class DisplayWindow(QDialog):
+class DisplayWindow(QtWidgets.QDialog):
     """Display full scene or portion of it"""
 
     def __init__(self, plugin=None):
@@ -677,8 +677,8 @@ class DisplayWindow(QDialog):
 
         self._plugin = plugin
         self._scene = self._plugin.scene
-        self._position = QPoint(0, 0)
-        self._transformation = QTransform()
+        self._position = QtCore.QPoint(0, 0)
+        self._transformation = QtGui.QTransform()
         self._transformation_points = None
 
         self._scene.changed.connect(lambda _: self.repaint())
@@ -690,22 +690,22 @@ class DisplayWindow(QDialog):
 
     def paintEvent(self, event):
 
-        painter = QPainter()
+        painter = QtGui.QPainter()
         painter.begin(self)
-        painter.setRenderHints(QPainter.Antialiasing | QPainter.TextAntialiasing)
+        painter.setRenderHints(QtGui.QPainter.Antialiasing | QtGui.QPainter.TextAntialiasing)
 
         # draw background
-        painter.fillRect(event.rect(), Qt.black)
+        painter.fillRect(event.rect(), QtCore.Qt.black)
 
         # todo: draw clipping mask
 
-        target = QRectF(0, 0, self.width(), self.height())
-        source = QRectF(0, 0, self._scene.width(), self._scene.height())
+        target = QtCore.QRectF(0, 0, self.width(), self.height())
+        source = QtCore.QRectF(0, 0, self._scene.width(), self._scene.height())
 
         painter.setTransform(self._transformation)
 
         # draw scene items
-        self._scene.render(painter, target, source, Qt.IgnoreAspectRatio)
+        self._scene.render(painter, target, source, QtCore.Qt.IgnoreAspectRatio)
 
         painter.end()
 
@@ -722,7 +722,7 @@ class DisplayWindow(QDialog):
 
         event.ignore()
 
-    def setTransform(self, transform: QTransform):
+    def setTransform(self, transform: QtGui.QTransform):
 
         self._transformation = transform
 
@@ -731,18 +731,18 @@ class DisplayWindow(QDialog):
     def setFrameless(self, flag: bool = True):
 
         if flag:
-            self.setWindowFlags(Qt.Window |
-                                Qt.FramelessWindowHint |
-                                Qt.WindowSystemMenuHint |
-                                Qt.WindowStaysOnTopHint |
-                                Qt.NoDropShadowWindowHint)
+            self.setWindowFlags(QtCore.Qt.Window |
+                                QtCore.Qt.FramelessWindowHint |
+                                QtCore.Qt.WindowSystemMenuHint |
+                                QtCore.Qt.WindowStaysOnTopHint |
+                                QtCore.Qt.NoDropShadowWindowHint)
         else:
-            self.setWindowFlags(Qt.Window |
-                                Qt.WindowSystemMenuHint |
-                                Qt.WindowStaysOnTopHint |
-                                Qt.NoDropShadowWindowHint |
-                                Qt.WindowTitleHint |
-                                Qt.WindowCloseButtonHint)
+            self.setWindowFlags(QtCore.Qt.Window |
+                                QtCore.Qt.WindowSystemMenuHint |
+                                QtCore.Qt.WindowStaysOnTopHint |
+                                QtCore.Qt.NoDropShadowWindowHint |
+                                QtCore.Qt.WindowTitleHint |
+                                QtCore.Qt.WindowCloseButtonHint)
 
     def setName(self, name: str):
 

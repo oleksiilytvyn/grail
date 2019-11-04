@@ -17,13 +17,13 @@ from grail.qt import *
 from grail.core import Viewer
 
 
-class SongDialog(QDialog):
+class SongDialog(QtWidgets.QDialog):
     """Song edit dialog"""
 
     MODE_CREATE = 0
     MODE_UPDATE = 1
 
-    changed = pyqtSignal()
+    changed = QtSignal()
 
     def __init__(self, parent=None, song=None):
         super(SongDialog, self).__init__(parent)
@@ -37,49 +37,49 @@ class SongDialog(QDialog):
         """Create UI of this dialog"""
 
         # header
-        self._ui_head_title = QLabel("Song title")
+        self._ui_head_title = QtWidgets.QLabel("Song title")
         self._ui_head_title.setObjectName("SongDialog_head_title")
 
-        self._ui_head_subtitle = QLabel("Artist - Album - year")
+        self._ui_head_subtitle = QtWidgets.QLabel("Artist - Album - year")
         self._ui_head_subtitle.setObjectName("SongDialog_head_subtitle")
 
-        self._ui_head_layout = QVBoxLayout()
+        self._ui_head_layout = QtWidgets.QVBoxLayout()
         self._ui_head_layout.setSpacing(2)
         self._ui_head_layout.setContentsMargins(8, 4, 8, 8)
         self._ui_head_layout.addWidget(self._ui_head_title)
         self._ui_head_layout.addWidget(self._ui_head_subtitle)
 
-        self._ui_head = QWidget()
+        self._ui_head = QtWidgets.QWidget()
         self._ui_head.setObjectName("SongDialog_head")
         self._ui_head.setLayout(self._ui_head_layout)
 
         # body
-        self._ui_title = QLineEdit()
+        self._ui_title = QtWidgets.QLineEdit()
         self._ui_title.textChanged.connect(self._text_changed)
         self._ui_title.setPlaceholderText("Song title")
 
-        self._ui_artist = QLineEdit()
+        self._ui_artist = QtWidgets.QLineEdit()
         self._ui_artist.textChanged.connect(self._text_changed)
         self._ui_artist.setPlaceholderText("Artist name")
 
-        self._ui_album = QLineEdit()
+        self._ui_album = QtWidgets.QLineEdit()
         self._ui_album.textChanged.connect(self._text_changed)
         self._ui_album.setPlaceholderText("Album")
 
-        self._ui_year = QLineEdit()
+        self._ui_year = QtWidgets.QLineEdit()
         self._ui_year.textChanged.connect(self._text_changed)
         self._ui_year.setPlaceholderText("Year")
 
-        self._ui_genre = QLineEdit()
+        self._ui_genre = QtWidgets.QLineEdit()
         self._ui_genre.setPlaceholderText("Genre")
 
-        self._ui_track = QLineEdit()
+        self._ui_track = QtWidgets.QLineEdit()
         self._ui_track.setPlaceholderText("Track")
 
-        self._ui_language = QLineEdit()
+        self._ui_language = QtWidgets.QLineEdit()
         self._ui_language.setPlaceholderText("Language")
 
-        self._ui_lyrics = QTextEdit()
+        self._ui_lyrics = QtWidgets.QTextEdit()
         self._ui_lyrics.setPlaceholderText("Lyrics")
         self._ui_lyrics.setAcceptRichText(False)
 
@@ -88,23 +88,23 @@ class SongDialog(QDialog):
 
         self._ui_lyrics.setSizePolicy(policy)
 
-        self._ui_button_ok = QPushButton("Ok")
+        self._ui_button_ok = QtWidgets.QPushButton("Ok")
         self._ui_button_ok.clicked.connect(self.accept_action)
 
-        self._ui_button_cancel = QPushButton("Cancel")
+        self._ui_button_cancel = QtWidgets.QPushButton("Cancel")
         self._ui_button_cancel.clicked.connect(self.reject_action)
 
-        self._ui_buttons_layout = QHBoxLayout()
+        self._ui_buttons_layout = QtWidgets.QHBoxLayout()
         self._ui_buttons_layout.setSpacing(10)
         self._ui_buttons_layout.setContentsMargins(14, 0, 14, 14)
         self._ui_buttons_layout.addStretch()
         self._ui_buttons_layout.addWidget(self._ui_button_cancel)
         self._ui_buttons_layout.addWidget(self._ui_button_ok)
 
-        self._ui_buttons = QWidget()
+        self._ui_buttons = QtWidgets.QWidget()
         self._ui_buttons.setLayout(self._ui_buttons_layout)
 
-        self._ui_body_layout = QGridLayout()
+        self._ui_body_layout = QtWidgets.QGridLayout()
         self._ui_body_layout.setSpacing(8)
         self._ui_body_layout.setContentsMargins(12, 12, 12, 10)
 
@@ -117,11 +117,11 @@ class SongDialog(QDialog):
         self._ui_body_layout.addWidget(self._ui_track, 3, 2)
         self._ui_body_layout.addWidget(self._ui_lyrics, 4, 0, 1, 3)
 
-        self._ui_body = QWidget()
+        self._ui_body = QtWidgets.QWidget()
         self._ui_body.setLayout(self._ui_body_layout)
 
         # main layout
-        self._ui_layout = QVBoxLayout()
+        self._ui_layout = QtWidgets.QVBoxLayout()
         self._ui_layout.addWidget(self._ui_head)
         self._ui_layout.addWidget(self._ui_body)
         self._ui_layout.addWidget(self._ui_buttons)
@@ -131,7 +131,7 @@ class SongDialog(QDialog):
         self.setWindowTitle('Add song')
         self.setGeometry(300, 300, 300, 400)
         self.setMinimumSize(300, 400)
-        self.setWindowFlags(Qt.WindowCloseButtonHint)
+        self.setWindowFlags(QtCore.Qt.WindowCloseButtonHint)
 
     def closeEvent(self, event):
         """Reject on close"""
@@ -273,7 +273,7 @@ class LibraryViewer(Viewer):
 
         self.setObjectName("LibraryViewer")
 
-        self._ui_layout = QVBoxLayout()
+        self._ui_layout = QtWidgets.QVBoxLayout()
 
         self._ui_search = QSearchEdit()
         self._ui_search.setObjectName("LibraryViewer_search")
@@ -282,31 +282,31 @@ class LibraryViewer(Viewer):
         self._ui_search.keyPressed.connect(self._search_key_event)
         self._ui_search.focusOut.connect(self._search_focus_out)
 
-        self._ui_search_layout = QVBoxLayout()
+        self._ui_search_layout = QtWidgets.QVBoxLayout()
         self._ui_search_layout.setContentsMargins(4, 4, 4, 4)
         self._ui_search_layout.addWidget(self._ui_search)
 
-        self._ui_search_widget = QWidget()
+        self._ui_search_widget = QtWidgets.QWidget()
         self._ui_search_widget.setObjectName("LibraryViewer_search_widget")
         self._ui_search_widget.setLayout(self._ui_search_layout)
 
-        self._ui_list = QListWidget()
+        self._ui_list = QtWidgets.QListWidget()
         self._ui_list.setWordWrap(True)
-        self._ui_list.setContextMenuPolicy(Qt.CustomContextMenu)
+        self._ui_list.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self._ui_list.currentItemChanged.connect(self._item_clicked)
         self._ui_list.itemDoubleClicked.connect(self._item_doubleclicked)
         self._ui_list.customContextMenuRequested.connect(self._context_menu)
 
-        self._ui_add_action = QAction(Icon(':/rc/add.png'), 'Add', self)
+        self._ui_add_action = QtWidgets.QAction(Icon(':/rc/add.png'), 'Add', self)
         self._ui_add_action.setIconVisibleInMenu(True)
         self._ui_add_action.triggered.connect(self.add_action)
 
-        self._ui_view_action = QToolButton()
+        self._ui_view_action = QtWidgets.QToolButton()
         self._ui_view_action.setText("View")
         self._ui_view_action.setIcon(Icon(':/rc/menu.png'))
         self._ui_view_action.clicked.connect(self.view_action)
 
-        self._ui_toolbar = QToolBar()
+        self._ui_toolbar = QtWidgets.QToolBar()
         self._ui_toolbar.addWidget(self._ui_view_action)
         self._ui_toolbar.addStretch()
         self._ui_toolbar.addAction(self._ui_add_action)
@@ -330,14 +330,14 @@ class LibraryViewer(Viewer):
 
         self._ui_list.clear()
 
-        icon_song = Icon.colored(':/rc/txt.png', QColor('#ffffff'), QColor('#e3e3e3'))
-        icon_bible = Icon.colored(':/rc/book.png', QColor('#03A9F4'), QColor('#e3e3e3'))
+        icon_song = Icon.colored(':/rc/txt.png', QtGui.QColor('#ffffff'), QtGui.QColor('#e3e3e3'))
+        icon_bible = Icon.colored(':/rc/book.png', QtGui.QColor('#03A9F4'), QtGui.QColor('#e3e3e3'))
 
         if not keyword:
 
             # show songs from library
             for song in self.library.items(filter_type=DNA.TYPE_SONG):
-                item = QListWidgetItem()
+                item = QtWidgets.QListWidgetItem()
                 item.setText("%s" % (song.name,))
                 item.setObject(song)
 
@@ -347,7 +347,7 @@ class LibraryViewer(Viewer):
 
         # show bible references (limit to 3)
         for verse in self.bible.match_reference(keyword):
-            item = QListWidgetItem()
+            item = QtWidgets.QListWidgetItem()
             item.setIcon(icon_bible)
             item.setText("%s" % (verse.reference,))
             item.setObject(verse)
@@ -356,7 +356,7 @@ class LibraryViewer(Viewer):
 
         # Show bible full text search
         for verse in self.bible.match_text(keyword, limit=3):
-            item = QListWidgetItem()
+            item = QtWidgets.QListWidgetItem()
             item.setIcon(icon_bible)
             item.setText(verse.text)
             item.setObject(verse)
@@ -366,7 +366,7 @@ class LibraryViewer(Viewer):
         # show songs from library (limit to 9)
         for song in self.library.items(filter_keyword=keyword, filter_type=DNA.TYPE_SONG,
                                        sort="name", reverse=True, limit=9):
-            item = QListWidgetItem()
+            item = QtWidgets.QListWidgetItem()
             item.setIcon(icon_song)
             item.setText("%s" % (song.name,))
             item.setObject(song)
@@ -380,15 +380,15 @@ class LibraryViewer(Viewer):
 
         event_key = event.key()
 
-        if event_key == Qt.Key_Return:
+        if event_key == QtCore.Qt.Key_Return:
             item = self._ui_list.item(0)
             self.emit('!cue/execute', item.object())
 
-        elif event_key == Qt.Key_Z and event.modifiers() & Qt.ControlModifier:
+        elif event_key == QtCore.Qt.Key_Z and event.modifiers() & QtCore.Qt.ControlModifier:
             # todo: self.blackoutAction()
             pass
 
-        elif event_key == Qt.Key_Down or event_key == Qt.Key_Up:
+        elif event_key == QtCore.Qt.Key_Down or event_key == QtCore.Qt.Key_Up:
             # if we have number at the end increment or decrement when Up or Down keys pressed
             keyword = str(self._ui_search.text())
 
@@ -398,18 +398,18 @@ class LibraryViewer(Viewer):
             def up(match):
                 return str(int(match.group(0)) + 1)
 
-            keyword = re.sub(r'([0-9]+)$', down if event_key == Qt.Key_Down else up, keyword)
+            keyword = re.sub(r'([0-9]+)$', down if event_key == QtCore.Qt.Key_Down else up, keyword)
 
             self._ui_search.setText(keyword)
 
-        elif event_key == Qt.Key_Escape:
+        elif event_key == QtCore.Qt.Key_Escape:
             # clear field on Escape key
             self._ui_search.setText("")
 
     def _search_focus_out(self, event):
         """Focus on first item in list after Tab pressed"""
 
-        if event.reason() == Qt.TabFocusReason and event.lostFocus():
+        if event.reason() == QtCore.Qt.TabFocusReason and event.lostFocus():
             self._ui_list.setCurrentRow(0)
             self._ui_list.setFocus()
 
@@ -422,7 +422,7 @@ class LibraryViewer(Viewer):
             return
 
         entity = item.object()
-        menu = QMenu("Context Menu", self)
+        menu = QtWidgets.QMenu("Context Menu", self)
 
         def trigger(m, a):
             """Wrap action callback"""
@@ -433,15 +433,15 @@ class LibraryViewer(Viewer):
             pass
         else:
             if isinstance(entity, SongEntity):
-                edit_action = QAction('Song info', menu)
+                edit_action = QtWidgets.QAction('Song info', menu)
                 edit_action.triggered.connect(trigger(self.edit_item_action, entity))
                 menu.addAction(edit_action)
 
-            delete_action = QAction('Delete', menu)
+            delete_action = QtWidgets.QAction('Delete', menu)
             delete_action.triggered.connect(trigger(self.delete_item_action, entity))
             menu.addAction(delete_action)
 
-        add_action = QAction('Add to Cuelist', menu)
+        add_action = QtWidgets.QAction('Add to Cuelist', menu)
         add_action.triggered.connect(trigger(self.add_item_action, entity))
         menu.addAction(add_action)
 

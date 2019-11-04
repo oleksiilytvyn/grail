@@ -58,25 +58,25 @@ class PropertyViewer(Viewer):
         self._ui_properties.setEntityFollow(True)
 
         # Action
-        self._ui_follow_action = QAction(Icon(':/rc/at.png'), 'Follow', self)
+        self._ui_follow_action = QtWidgets.QAction(Icon(':/rc/at.png'), 'Follow', self)
         self._ui_follow_action.setIconVisibleInMenu(True)
         self._ui_follow_action.triggered.connect(self.follow_action)
 
-        self._ui_add_action = QAction(Icon(':/rc/add.png'), 'Add property', self)
+        self._ui_add_action = QtWidgets.QAction(Icon(':/rc/add.png'), 'Add property', self)
         self._ui_add_action.setIconVisibleInMenu(True)
         self._ui_add_action.triggered.connect(self._ui_properties.addProperty)
 
-        self._ui_remove_action = QAction(Icon(':/rc/remove-white.png'), 'Remove property', self)
+        self._ui_remove_action = QtWidgets.QAction(Icon(':/rc/remove-white.png'), 'Remove property', self)
         self._ui_remove_action.setIconVisibleInMenu(True)
         self._ui_remove_action.triggered.connect(self._ui_properties.removeSelected)
 
-        self._ui_view_action = QToolButton()
+        self._ui_view_action = QtWidgets.QToolButton()
         self._ui_view_action.setText("View")
         self._ui_view_action.setIcon(Icon(':/rc/menu.png'))
         self._ui_view_action.clicked.connect(self.view_action)
 
         # Toolbar
-        self._ui_toolbar = QToolBar()
+        self._ui_toolbar = QtWidgets.QToolBar()
         self._ui_toolbar.setObjectName("PropertyViewer_toolbar")
         self._ui_toolbar.addWidget(self._ui_view_action)
         self._ui_toolbar.addStretch()
@@ -85,7 +85,7 @@ class PropertyViewer(Viewer):
         self._ui_toolbar.addAction(self._ui_add_action)
 
         # Layout
-        self._ui_layout = QVBoxLayout()
+        self._ui_layout = QtWidgets.QVBoxLayout()
 
         self._ui_layout.addWidget(self._ui_properties)
         self._ui_layout.addWidget(self._ui_toolbar)
@@ -101,7 +101,7 @@ class PropertyViewer(Viewer):
         self.set('follow', self._follow)
 
         if self._follow:
-            self._ui_follow_action.setIcon(Icon.colored(':/rc/at.png', QColor('#aeca4b'), QColor('#e3e3e3')))
+            self._ui_follow_action.setIcon(Icon.colored(':/rc/at.png', QtGui.QColor('#aeca4b'), QtGui.QColor('#e3e3e3')))
         else:
             self._ui_follow_action.setIcon(Icon(':/rc/at.png'))
 

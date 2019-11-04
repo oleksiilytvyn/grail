@@ -32,28 +32,28 @@ class NotesViewer(Viewer):
 
         self.setObjectName('NotesViewer')
 
-        self._ui_notes = QTextEdit()
+        self._ui_notes = QtWidgets.QTextEdit()
         self._ui_notes.setObjectName('NotesViewer_text')
         self._ui_notes.setPlainText(text)
         self._ui_notes.setAcceptRichText(False)
         self._ui_notes.textChanged.connect(self._text_changed)
 
-        self._ui_label = QLabel("Notes")
+        self._ui_label = QtWidgets.QLabel("Notes")
         self._ui_label.setObjectName('NotesViewer_label')
-        self._ui_label.setAlignment(Qt.AlignCenter)
-        self._ui_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self._ui_label.setAlignment(QtCore.Qt.AlignCenter)
+        self._ui_label.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
 
-        self._ui_view_action = QToolButton()
+        self._ui_view_action = QtWidgets.QToolButton()
         self._ui_view_action.setText("View")
         self._ui_view_action.setIcon(Icon(':/rc/menu.png'))
         self._ui_view_action.clicked.connect(self.view_action)
 
-        self._ui_toolbar = QToolBar()
+        self._ui_toolbar = QtWidgets.QToolBar()
         self._ui_toolbar.setObjectName("NotesViewer_toolbar")
         self._ui_toolbar.addWidget(self._ui_view_action)
         self._ui_toolbar.addWidget(self._ui_label)
 
-        self._ui_layout = QVBoxLayout()
+        self._ui_layout = QtWidgets.QVBoxLayout()
         self._ui_layout.addWidget(self._ui_notes)
         self._ui_layout.addWidget(self._ui_toolbar)
 

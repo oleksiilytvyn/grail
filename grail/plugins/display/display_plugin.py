@@ -9,7 +9,7 @@
     :license: GNU, see LICENSE for more details.
 """
 from grail.qt import *
-from grail.core import Plugin, debug
+from grail.core import Plugin
 
 from .preferences_dialog import DisplayPreferencesDialog
 from .scene import DisplayWindow, DisplayScene
@@ -103,7 +103,7 @@ class DisplayPlugin(Plugin):
         for layer_id in range(1, self.MAX_LAYERS + 1):
             connect_layer(layer_id)
 
-        desktop = QApplication.desktop()
+        desktop = QtWidgets.QApplication.desktop()
         desktop.resized.connect(self._screens_changed)
         desktop.screenCountChanged.connect(self._screens_changed)
         desktop.workAreaResized.connect(self._screens_changed)
@@ -141,7 +141,6 @@ class DisplayPlugin(Plugin):
 
     def _clip_source_cb(self, layer, source):
 
-        print("Clip Source", layer, source)
         self._scene.clip_playback_source(layer, source)
 
     def _clip_position_cb(self, layer, pos):

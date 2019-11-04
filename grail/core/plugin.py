@@ -204,7 +204,7 @@ class Plugin(_PluginMeta, metaclass=PluginRegistry):
 
                 return lambda: _fn(_action)
 
-            action = QAction(name, menubar)
+            action = QtWidgets.QAction(name, menubar)
             action.triggered.connect(trigger(fn, action))
 
             if checkable:
@@ -213,7 +213,7 @@ class Plugin(_PluginMeta, metaclass=PluginRegistry):
 
             if shortcut:
                 action.setShortcut(shortcut)
-                action.setShortcutContext(Qt.ApplicationShortcut)
+                action.setShortcutContext(QtCore.Qt.ApplicationShortcut)
 
             self.__create_action(menubar, items, action, before)
 
@@ -245,7 +245,7 @@ class Plugin(_PluginMeta, metaclass=PluginRegistry):
         if action_target:
             action_target = action_target.menu()
         elif not action_target and before_action:
-            action_target = menu.insertMenu(before_action, QMenu(action_name, menu)).menu()
+            action_target = menu.insertMenu(before_action, QtWidgets.QMenu(action_name, menu)).menu()
         else:
             action_target = menu.addMenu(action_name)
 
@@ -271,7 +271,7 @@ class Plugin(_PluginMeta, metaclass=PluginRegistry):
             self.__create_action(action_target, location_tokens[1:], new_action, before_tokens[1:])
 
 
-class _ComponentPluginRegistry(type(QWidget), PluginRegistry):
+class _ComponentPluginRegistry(type(QtWidgets.QWidget), PluginRegistry):
     """Meta class for visual plugins
     Combines properties of grailkit.qt.Component and grailkit.plug.PluginRegistry"""
 
@@ -283,18 +283,18 @@ class _ComponentPluginRegistry(type(QWidget), PluginRegistry):
             bases (tuple): class parents
             attrs (dict): attributes
         """
-        type(QWidget).__init__(cls, name, bases, attrs)
+        type(QtWidgets.QWidget).__init__(cls, name, bases, attrs)
         PluginRegistry.__init__(cls, name, bases, attrs)
 
 
-class Viewer(QWidget, _PluginMeta, metaclass=_ComponentPluginRegistry):
+class Viewer(QtWidgets.QWidget, _PluginMeta, metaclass=_ComponentPluginRegistry):
     """Visual component plugin that will be available in view arranger
 
     Viewer class can only create self and listen/emit global events
     """
 
     def __init__(self, parent=None, properties=None):
-        QWidget.__init__(self, parent)
+        QtWidgets.QWidget.__init__(self, parent)
         _PluginMeta.__init__(self)
 
         # viewer properties
@@ -322,17 +322,17 @@ class Viewer(QWidget, _PluginMeta, metaclass=_ComponentPluginRegistry):
 
         super(Viewer, self).paintEvent(event)
 
-        option = QStyleOption()
+        option = QtWidgets.QStyleOption()
         option.initFrom(self)
 
-        painter = QPainter(self)
+        painter = QtGui.QPainter(self)
 
-        self.style().drawPrimitive(QStyle.PE_Widget, option, painter, self)
+        self.style().drawPrimitive(QtWidgets.QStyle.PE_Widget, option, painter, self)
 
     def plugin_menu(self):
         """Returns QMenu with list of viewers, split options and action to remove current viewer"""
 
-        menu = QMenu("Viewers", self)
+        menu = QtWidgets.QMenu("Viewers", self)
         active_viewers = [v.name for v in self.app.main_window.view_arranger._viewers]
 
         def triggered(plugin_id):
@@ -345,26 +345,24 @@ class Viewer(QWidget, _PluginMeta, metaclass=_ComponentPluginRegistry):
             if plug.private:
                 continue
 
-            action = QAction(plug.name, menu)
+            action = QtWidgets.QAction(plug.name, menu)
             action.triggered.connect(triggered(plug.id))
 
             # don't show plugin if single_instance is True and viewer already exists
             instances = active_viewers.count(plug.name)
             allowed = 1 if plug.single_instance else plug.instances_allowed
 
-            print("Plugin: ", plug.single_instance, plug.instances_allowed, instances, plug.name)
-
             action.setDisabled(instances >= allowed if allowed > 0 else False)
 
             menu.addAction(action)
 
-        remove_action = QAction('Remove', menu)
+        remove_action = QtWidgets.QAction('Remove', menu)
         remove_action.triggered.connect(lambda: self.__arranger.remove(self))
 
-        split_v_action = QAction('Split vertically', menu)
+        split_v_action = QtWidgets.QAction('Split vertically', menu)
         split_v_action.triggered.connect(lambda: self.__arranger.split(self, 'v'))
 
-        split_h_action = QAction('Split horizontally', menu)
+        split_h_action = QtWidgets.QAction('Split horizontally', menu)
         split_h_action.triggered.connect(lambda: self.__arranger.split(self, 'h'))
 
         menu.addSeparator()
@@ -407,13 +405,13 @@ class Viewer(QWidget, _PluginMeta, metaclass=_ComponentPluginRegistry):
         return self.__properties
 
 
-class Configurator(QWidget, _PluginMeta, metaclass=_ComponentPluginRegistry):
+class Configurator(QtWidgets.QWidget, _PluginMeta, metaclass=_ComponentPluginRegistry):
     """Visual plugin that will be shown in settings dialog as page"""
 
     index = 0
 
     def __init__(self, parent=None):
-        QWidget.__init__(self, parent)
+        QtWidgets.QWidget.__init__(self, parent)
         _PluginMeta.__init__(self)
 
     def __ui__(self):

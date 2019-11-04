@@ -11,7 +11,7 @@
 from grail.qt import *
 
 
-class ProjectDialog(QDialog):
+class ProjectDialog(QtWidgets.QDialog):
     """Project information"""
 
     def __init__(self, parent=None):
@@ -24,27 +24,27 @@ class ProjectDialog(QDialog):
 
     def __ui__(self):
 
-        self._ui_title = QLineEdit()
+        self._ui_title = QtWidgets.QLineEdit()
         self._ui_title.setPlaceholderText("Project title")
         self._ui_title.textChanged.connect(self.title_changed)
 
-        self._ui_author = QLineEdit()
+        self._ui_author = QtWidgets.QLineEdit()
         self._ui_author.setPlaceholderText("Project author")
         self._ui_author.setMaximumWidth(160)
         self._ui_author.textChanged.connect(self.author_changed)
 
-        self._ui_description = QTextEdit()
+        self._ui_description = QtWidgets.QTextEdit()
         self._ui_description.setPlaceholderText("Description")
         self._ui_description.textChanged.connect(self.description_changed)
 
-        self._ui_title_layout = QHBoxLayout()
+        self._ui_title_layout = QtWidgets.QHBoxLayout()
         self._ui_title_layout.setSpacing(8)
         self._ui_title_layout.setContentsMargins(8, 8, 8, 8)
 
         self._ui_title_layout.addWidget(self._ui_title)
         self._ui_title_layout.addWidget(self._ui_author)
 
-        self._ui_layout = QVBoxLayout()
+        self._ui_layout = QtWidgets.QVBoxLayout()
         self._ui_layout.addLayout(self._ui_title_layout)
         self._ui_layout.addWidget(self._ui_description)
 

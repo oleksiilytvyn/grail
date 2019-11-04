@@ -55,42 +55,42 @@ class OSCInConfigurator(Configurator):
 
         self.setObjectName("OSCInConfigurator")
 
-        self._ui_list = QTableWidget()
+        self._ui_list = QtWidgets.QTableWidget()
         self._ui_list.setObjectName("OSCInConfigurator_list")
         self._ui_list.setShowGrid(False)
         self._ui_list.setColumnCount(2)
         self._ui_list.horizontalHeader().setVisible(False)
         self._ui_list.verticalHeader().setVisible(False)
         self._ui_list.setHorizontalHeaderLabels(["Host", "Port"])
-        self._ui_list.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self._ui_list.setSelectionMode(QAbstractItemView.SingleSelection)
+        self._ui_list.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
+        self._ui_list.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
         self._ui_list.itemChanged.connect(self._updated)
-        self._ui_list.setContextMenuPolicy(Qt.CustomContextMenu)
+        self._ui_list.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self._ui_list.customContextMenuRequested.connect(self._context_menu)
 
         header = self._ui_list.horizontalHeader()
-        header.setSectionResizeMode(0, QHeaderView.Stretch)
-        header.setSectionResizeMode(1, QHeaderView.Stretch)
+        header.setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
+        header.setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
 
-        self._ui_clear_action = QAction(Icon(':/rc/remove-white.png'), 'Clear', self)
+        self._ui_clear_action = QtWidgets.QAction(Icon(':/rc/remove-white.png'), 'Clear', self)
         self._ui_clear_action.triggered.connect(self.clear_action)
 
-        self._ui_add_action = QAction(Icon(':/rc/add.png'), 'Add', self)
+        self._ui_add_action = QtWidgets.QAction(Icon(':/rc/add.png'), 'Add', self)
         self._ui_add_action.setIconVisibleInMenu(True)
         self._ui_add_action.triggered.connect(self.add_action)
 
-        self._ui_toolbar_label = QLabel("0 Inputs")
+        self._ui_toolbar_label = QtWidgets.QLabel("0 Inputs")
         self._ui_toolbar_label.setObjectName("OSCInConfigurator_label")
-        self._ui_toolbar_label.setAlignment(Qt.AlignCenter)
-        self._ui_toolbar_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self._ui_toolbar_label.setAlignment(QtCore.Qt.AlignCenter)
+        self._ui_toolbar_label.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
 
-        self._ui_toolbar = QToolBar()
+        self._ui_toolbar = QtWidgets.QToolBar()
         self._ui_toolbar.setObjectName("OSCInConfigurator_toolbar")
         self._ui_toolbar.addAction(self._ui_clear_action)
         self._ui_toolbar.addWidget(self._ui_toolbar_label)
         self._ui_toolbar.addAction(self._ui_add_action)
 
-        self._ui_layout = QVBoxLayout()
+        self._ui_layout = QtWidgets.QVBoxLayout()
         self._ui_layout.setObjectName("OSCInConfigurator_layout")
         self._ui_layout.addWidget(self._ui_list)
         self._ui_layout.addWidget(self._ui_toolbar)
@@ -112,9 +112,9 @@ class OSCInConfigurator(Configurator):
         for index, client in enumerate(clients):
             host, port = client
 
-            host_item = QTableWidgetItem(host)
-            port_item = QTableWidgetItem()
-            port_item.setData(Qt.EditRole, int(port))
+            host_item = QtWidgets.QTableWidgetItem(host)
+            port_item = QtWidgets.QTableWidgetItem()
+            port_item.setData(QtCore.Qt.EditRole, int(port))
 
             self._ui_list.setItem(index, 0, host_item)
             self._ui_list.setItem(index, 1, port_item)
@@ -159,13 +159,13 @@ class OSCInConfigurator(Configurator):
         position = self._ui_list.mapToGlobal(point)
         item = self._ui_list.itemAt(point)
 
-        delete_action = QAction('Delete', self)
+        delete_action = QtWidgets.QAction('Delete', self)
         delete_action.triggered.connect(lambda action: self.delete_action(item))
 
-        add_action = QAction('Add', self)
+        add_action = QtWidgets.QAction('Add', self)
         add_action.triggered.connect(lambda action: self.add_action())
 
-        menu = QMenu()
+        menu = QtWidgets.QMenu()
         menu.addAction(delete_action)
         menu.addAction(add_action)
 
@@ -258,42 +258,42 @@ class OSCOutConfigurator(Configurator):
 
         self.setObjectName("OSCOutConfigurator")
 
-        self._ui_list = QTableWidget()
+        self._ui_list = QtWidgets.QTableWidget()
         self._ui_list.setObjectName("OSCOutConfigurator_list")
         self._ui_list.setShowGrid(False)
         self._ui_list.setColumnCount(2)
         self._ui_list.horizontalHeader().setVisible(False)
         self._ui_list.verticalHeader().setVisible(False)
         self._ui_list.setHorizontalHeaderLabels(["Host", "Port"])
-        self._ui_list.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self._ui_list.setSelectionMode(QAbstractItemView.SingleSelection)
+        self._ui_list.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
+        self._ui_list.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
         self._ui_list.itemChanged.connect(self._updated)
-        self._ui_list.setContextMenuPolicy(Qt.CustomContextMenu)
+        self._ui_list.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self._ui_list.customContextMenuRequested.connect(self._context_menu)
 
         header = self._ui_list.horizontalHeader()
-        header.setSectionResizeMode(0, QHeaderView.Stretch)
-        header.setSectionResizeMode(1, QHeaderView.Stretch)
+        header.setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
+        header.setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
 
-        self._ui_clear_action = QAction(Icon(':/rc/remove-white.png'), 'Clear', self)
+        self._ui_clear_action = QtWidgets.QAction(Icon(':/rc/remove-white.png'), 'Clear', self)
         self._ui_clear_action.triggered.connect(self.clear_action)
 
-        self._ui_add_action = QAction(Icon(':/rc/add.png'), 'Add', self)
+        self._ui_add_action = QtWidgets.QAction(Icon(':/rc/add.png'), 'Add', self)
         self._ui_add_action.setIconVisibleInMenu(True)
         self._ui_add_action.triggered.connect(self.add_action)
 
-        self._ui_toolbar_label = QLabel("0 sources")
+        self._ui_toolbar_label = QtWidgets.QLabel("0 sources")
         self._ui_toolbar_label.setObjectName("OSCOutConfigurator_label")
-        self._ui_toolbar_label.setAlignment(Qt.AlignCenter)
-        self._ui_toolbar_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self._ui_toolbar_label.setAlignment(QtCore.Qt.AlignCenter)
+        self._ui_toolbar_label.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
 
-        self._ui_toolbar = QToolBar()
+        self._ui_toolbar = QtWidgets.QToolBar()
         self._ui_toolbar.setObjectName("OSCOutConfigurator_toolbar")
         self._ui_toolbar.addAction(self._ui_clear_action)
         self._ui_toolbar.addWidget(self._ui_toolbar_label)
         self._ui_toolbar.addAction(self._ui_add_action)
 
-        self._ui_layout = QVBoxLayout()
+        self._ui_layout = QtWidgets.QVBoxLayout()
         self._ui_layout.setObjectName("OSCOutConfigurator_layout")
         self._ui_layout.addWidget(self._ui_list)
         self._ui_layout.addWidget(self._ui_toolbar)
@@ -311,9 +311,9 @@ class OSCOutConfigurator(Configurator):
         for index, client in enumerate(clients):
             host, port = client
 
-            host_item = QTableWidgetItem(host)
-            port_item = QTableWidgetItem()
-            port_item.setData(Qt.EditRole, port)
+            host_item = QtWidgets.QTableWidgetItem(host)
+            port_item = QtWidgets.QTableWidgetItem()
+            port_item.setData(QtCore.Qt.EditRole, port)
 
             self._ui_list.setItem(index, 0, host_item)
             self._ui_list.setItem(index, 1, port_item)
@@ -358,13 +358,13 @@ class OSCOutConfigurator(Configurator):
         position = self._ui_list.mapToGlobal(point)
         item = self._ui_list.itemAt(point)
 
-        delete_action = QAction('Delete', self)
+        delete_action = QtWidgets.QAction('Delete', self)
         delete_action.triggered.connect(lambda action: self.delete_action(item))
 
-        add_action = QAction('Add', self)
+        add_action = QtWidgets.QAction('Add', self)
         add_action.triggered.connect(lambda action: self.add_action())
 
-        menu = QMenu()
+        menu = QtWidgets.QMenu()
         menu.addAction(delete_action)
         menu.addAction(add_action)
 

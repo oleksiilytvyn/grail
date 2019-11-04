@@ -11,7 +11,7 @@
 import logging
 import socketserver
 
-from grail.qt import QThread, pyqtSignal, QCoreApplication
+from grail.qt import QtCore, QtSignal
 
 from grailkit.osc import *
 
@@ -98,7 +98,7 @@ class _OSCServer:
 
         logging.info("OSC received from %s:%d by %s" % (address[0], address[1], self))
 
-        signals = QCoreApplication.instance().signals
+        signals = QtCore.QCoreApplication.instance().signals
 
         # forward messages to application
         if isinstance(message, OSCBundle):
@@ -127,10 +127,10 @@ class _OSCListener(OSCServer, socketserver.ThreadingMixIn):
         self._parent.handle(address, message, date)
 
 
-class _ListenerThread(QThread):
+class _ListenerThread(QtCore.QThread):
     """Qt thread with OSCServer"""
 
-    received = pyqtSignal(object, object, object)
+    received = QtSignal(object, object, object)
 
     def __init__(self, port, parent):
         super(_ListenerThread, self).__init__()

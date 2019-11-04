@@ -45,7 +45,7 @@ class BibleViewer(Viewer):
 
         self.setObjectName("BibleViewer")
 
-        self._ui_layout = QVBoxLayout()
+        self._ui_layout = QtWidgets.QVBoxLayout()
 
         self._ui_search = QSearchEdit()
         self._ui_search.setObjectName("BibleViewer_search")
@@ -54,32 +54,32 @@ class BibleViewer(Viewer):
         self._ui_search.keyPressed.connect(self._search_key_event)
         self._ui_search.focusOut.connect(self._search_focus_out)
 
-        self._ui_search_layout = QVBoxLayout()
+        self._ui_search_layout = QtWidgets.QVBoxLayout()
         self._ui_search_layout.setContentsMargins(4, 4, 4, 4)
         self._ui_search_layout.addWidget(self._ui_search)
 
-        self._ui_search_widget = QWidget()
+        self._ui_search_widget = QtWidgets.QWidget()
         self._ui_search_widget.setObjectName("BibleViewer_search_widget")
         self._ui_search_widget.setLayout(self._ui_search_layout)
 
-        self._ui_list = QListWidget()
+        self._ui_list = QtWidgets.QListWidget()
         self._ui_list.setWordWrap(True)
-        self._ui_list.setContextMenuPolicy(Qt.CustomContextMenu)
+        self._ui_list.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self._ui_list.currentItemChanged.connect(self._item_clicked)
         self._ui_list.itemDoubleClicked.connect(self._item_doubleclicked)
         self._ui_list.customContextMenuRequested.connect(self._context_menu)
 
-        self._ui_view_action = QToolButton()
+        self._ui_view_action = QtWidgets.QToolButton()
         self._ui_view_action.setText("View")
         self._ui_view_action.setIcon(Icon(':/rc/menu.png'))
         self._ui_view_action.clicked.connect(self.view_action)
 
-        self._ui_label = QLabel("")
+        self._ui_label = QtWidgets.QLabel("")
         self._ui_label.setObjectName("BibleViewer_label")
-        self._ui_label.setAlignment(Qt.AlignCenter)
-        self._ui_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self._ui_label.setAlignment(QtCore.Qt.AlignCenter)
+        self._ui_label.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
 
-        self._ui_toolbar = QToolBar()
+        self._ui_toolbar = QtWidgets.QToolBar()
         self._ui_toolbar.addWidget(self._ui_view_action)
         self._ui_toolbar.addWidget(self._ui_label)
 
@@ -106,7 +106,7 @@ class BibleViewer(Viewer):
                 self._ui_label.setText("%s %d" % (verse.book, chapter))
                 flag = False
 
-            item = QListWidgetItem()
+            item = QtWidgets.QListWidgetItem()
             item.setText("%d. %s" % (verse.verse, verse.text))
             item.setObject(verse)
 
@@ -148,12 +148,12 @@ class BibleViewer(Viewer):
             return
 
         entity = item.object()
-        menu = QMenu("Context Menu", self)
+        menu = QtWidgets.QMenu("Context Menu", self)
 
         def trigger(m, a):
             return lambda i: m(a)
 
-        add_action = QAction('Add to Cuelist', menu)
+        add_action = QtWidgets.QAction('Add to Cuelist', menu)
         add_action.triggered.connect(trigger(self.add_item_action, entity))
 
         menu.addAction(add_action)
@@ -166,7 +166,7 @@ class BibleViewer(Viewer):
         self._ui_list.clear()
         self._ui_label.setText("")
 
-        icon_bible = Icon.colored(':/rc/book.png', QColor('#03A9F4'), QColor('#e3e3e3'))
+        icon_bible = Icon.colored(':/rc/book.png', QtGui.QColor('#03A9F4'), QtGui.QColor('#e3e3e3'))
 
         if not keyword:
             self.update_list(self.book, self.chapter)
@@ -179,7 +179,7 @@ class BibleViewer(Viewer):
             striped_text = verse.text.lower()
             start_index = striped_text.index(striped_keyword)
 
-            item = QListWidgetItem()
+            item = QtWidgets.QListWidgetItem()
             item.setIcon(icon_bible)
             item.setText("...%s" % verse.text[start_index:])
             item.setObject(verse)
@@ -195,7 +195,7 @@ class BibleViewer(Viewer):
             self._ui_label.setText("%s %d" % (ref.book, ref.chapter))
 
             for verse in self.bible.chapter(ref.book_id, ref.chapter):
-                item = QListWidgetItem()
+                item = QtWidgets.QListWidgetItem()
                 item.setText("%d. %s" % (verse.verse, verse.text))
                 item.setObject(verse)
 
@@ -206,13 +206,13 @@ class BibleViewer(Viewer):
 
         event_key = event.key()
 
-        if event_key == Qt.Key_Return:
+        if event_key == QtCore.Qt.Key_Return:
             item = self._ui_list.item(0)
 
             if item:
                 self.emit('!cue/execute', item.object())
 
-        elif event_key == Qt.Key_Down or event_key == Qt.Key_Up:
+        elif event_key == QtCore.Qt.Key_Down or event_key == QtCore.Qt.Key_Up:
             # if we have number at the end increment or decrement when Up or Down keys pressed
             keyword = str(self._ui_search.text())
 
@@ -222,17 +222,17 @@ class BibleViewer(Viewer):
             def up(match):
                 return str(int(match.group(0)) + 1)
 
-            keyword = re.sub(r'([0-9]+)$', down if event_key == Qt.Key_Down else up, keyword)
+            keyword = re.sub(r'([0-9]+)$', down if event_key == QtCore.Qt.Key_Down else up, keyword)
 
             self._ui_search.setText(keyword)
 
-        elif event_key == Qt.Key_Escape:
+        elif event_key == QtCore.Qt.Key_Escape:
             # clear field on Escape key
             self._ui_search.setText("")
 
     def _search_focus_out(self, event):
         """Focus on first item in list after Tab pressed"""
 
-        if event.reason() == Qt.TabFocusReason and event.lostFocus():
+        if event.reason() == QtCore.Qt.TabFocusReason and event.lostFocus():
             self._ui_list.setCurrentRow(0)
             self._ui_list.setFocus()

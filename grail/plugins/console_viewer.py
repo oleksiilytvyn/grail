@@ -18,13 +18,13 @@ from grail.core import Viewer
 def create_format(color, style=''):
     """Return a QTextCharFormat with the given attributes.
     """
-    _color = QColor(color)
+    _color = QtGui.QColor(color)
 
-    _format = QTextCharFormat()
+    _format = QtGui.QTextCharFormat()
     _format.setForeground(_color)
 
     if 'bold' in style:
-        _format.setFontWeight(QFont.Bold)
+        _format.setFontWeight(QtGui.QFont.Bold)
 
     if 'italic' in style:
         _format.setFontItalic(True)
@@ -46,7 +46,7 @@ STYLES = {
 }
 
 
-class PythonHighlighter(QSyntaxHighlighter):
+class PythonHighlighter(QtGui.QSyntaxHighlighter):
     """Syntax highlighter for the Python language."""
 
     # Python keywords
@@ -78,13 +78,13 @@ class PythonHighlighter(QSyntaxHighlighter):
     ]
 
     def __init__(self, document):
-        QSyntaxHighlighter.__init__(self, document)
+        QtGui.QSyntaxHighlighter.__init__(self, document)
 
         # Multi-line strings (expression, flag, style)
         # FIXME: The triple-quotes in these two lines will mess up the
         # syntax highlighting from this point onward
-        self.tri_single = (QRegExp("'''"), 1, STYLES['string2'])
-        self.tri_double = (QRegExp('"""'), 2, STYLES['string2'])
+        self.tri_single = (QtCore.QRegExp("'''"), 1, STYLES['string2'])
+        self.tri_double = (QtCore.QRegExp('"""'), 2, STYLES['string2'])
 
         rules = []
 
@@ -118,7 +118,7 @@ class PythonHighlighter(QSyntaxHighlighter):
         ]
 
         # Build a QRegExp for each pattern
-        self.rules = [(QRegExp(pat), index, fmt) for (pat, index, fmt) in rules]
+        self.rules = [(QtCore.QRegExp(pat), index, fmt) for (pat, index, fmt) in rules]
 
     def highlightBlock(self, text):
         """Apply syntax highlighting to the given block of text.
@@ -143,7 +143,7 @@ class PythonHighlighter(QSyntaxHighlighter):
         in_multiline = self.match_multiline(text, *self.tri_single)
 
         if not in_multiline:
-            in_multiline = self.match_multiline(text, *self.tri_double)
+            self.match_multiline(text, *self.tri_double)
 
     def match_multiline(self, text, delimiter, in_state, style):
         """Do highlighting of multi-line strings. ``delimiter`` should be a
@@ -210,29 +210,29 @@ class ConsoleViewer(Viewer):
     def __ui__(self):
         """Build UI"""
 
-        self._ui_output = QTextEdit()
+        self._ui_output = QtWidgets.QTextEdit()
         self._ui_output.setObjectName("ConsoleViewer_text")
         self._ui_output.setAcceptRichText(False)
         self._ui_output.setReadOnly(True)
-        self._ui_output.setTextInteractionFlags(self._ui_output.textInteractionFlags() | Qt.TextSelectableByKeyboard)
+        self._ui_output.setTextInteractionFlags(self._ui_output.textInteractionFlags() | QtCore.Qt.TextSelectableByKeyboard)
 
-        font = QFont()
+        font = QtGui.QFont()
         font.setFamily("Courier")
-        font.setStyleHint(QFont.Monospace)
+        font.setStyleHint(QtGui.QFont.Monospace)
         font.setFixedPitch(True)
         font.setPointSize(10)
 
-        self._ui_input = QTextEdit()
+        self._ui_input = QtWidgets.QTextEdit()
         self._ui_input.setPlaceholderText("Enter Python code")
         self._ui_input.setObjectName("ConsoleViewer_text")
         self._ui_input.setFont(font)
         self._ui_input.setAcceptRichText(False)
         self._ui_input.keyPressEvent = self._key_pressed
-        self._ui_input.setTabStopWidth(4 * QFontMetrics(font).width(' '))
+        self._ui_input.setTabStopWidth(4 * QtGui.QFontMetrics(font).width(' '))
 
         self._ui_input_highlight = PythonHighlighter(self._ui_input.document())
 
-        self._ui_splitter = QSplitter(Qt.Vertical)
+        self._ui_splitter = QtWidgets.QSplitter(QtCore.Qt.Vertical)
         self._ui_splitter.setHandleWidth(2)
         self._ui_splitter.addWidget(self._ui_output)
         self._ui_splitter.addWidget(self._ui_input)
@@ -241,34 +241,34 @@ class ConsoleViewer(Viewer):
         self._ui_splitter.setSizes([size * 0.8, size * 0.2])
         self._ui_splitter.setCollapsible(0, False)
 
-        self._ui_label = QLabel("Console")
+        self._ui_label = QtWidgets.QLabel("Console")
         self._ui_label.setObjectName("ConsoleViewer_label")
-        self._ui_label.setAlignment(Qt.AlignCenter)
-        self._ui_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self._ui_label.setAlignment(QtCore.Qt.AlignCenter)
+        self._ui_label.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
 
-        self._ui_view_action = QToolButton()
+        self._ui_view_action = QtWidgets.QToolButton()
         self._ui_view_action.setText("View")
         self._ui_view_action.setIcon(Icon(':/rc/menu.png'))
         self._ui_view_action.clicked.connect(self.view_action)
 
-        self._ui_follow_action = QToolButton()
+        self._ui_follow_action = QtWidgets.QToolButton()
         self._ui_follow_action.setText("Enter")
         self._ui_follow_action.setIcon(Icon(':/rc/at.png'))
         self._ui_follow_action.clicked.connect(self.follow_action)
 
-        self._ui_run_action = QToolButton()
+        self._ui_run_action = QtWidgets.QToolButton()
         self._ui_run_action.setText("Run")
         self._ui_run_action.setIcon(Icon(':/rc/play.png'))
         self._ui_run_action.clicked.connect(self.run_action)
 
-        self._ui_toolbar = QToolBar()
+        self._ui_toolbar = QtWidgets.QToolBar()
         self._ui_toolbar.setObjectName("ConsoleViewer_toolbar")
         self._ui_toolbar.addWidget(self._ui_view_action)
         self._ui_toolbar.addWidget(self._ui_label)
         self._ui_toolbar.addWidget(self._ui_follow_action)
         self._ui_toolbar.addWidget(self._ui_run_action)
 
-        self._ui_layout = QVBoxLayout()
+        self._ui_layout = QtWidgets.QVBoxLayout()
         self._ui_layout.addWidget(self._ui_splitter)
         self._ui_layout.addWidget(self._ui_toolbar)
 
@@ -309,7 +309,7 @@ class ConsoleViewer(Viewer):
         self.set('follow', self._follow)
 
         if self._follow:
-            self._ui_follow_action.setIcon(Icon.colored(':/rc/at.png', QColor('#aeca4b'), QColor('#e3e3e3')))
+            self._ui_follow_action.setIcon(Icon.colored(':/rc/at.png', QtGui.QColor('#aeca4b'), QtGui.QColor('#e3e3e3')))
         else:
             self._ui_follow_action.setIcon(Icon(':/rc/at.png'))
 
@@ -323,7 +323,7 @@ class ConsoleViewer(Viewer):
     def _key_pressed(self, event):
         """Process key event on  console input"""
 
-        if (event.key() == Qt.Key_Enter or event.key() == Qt.Key_Return) and self._follow:
+        if (event.key() == QtCore.Qt.Key_Enter or event.key() == QtCore.Qt.Key_Return) and self._follow:
             self.run_action()
         else:
-            QTextEdit.keyPressEvent(self._ui_input, event)
+            QtWidgets.QTextEdit.keyPressEvent(self._ui_input, event)

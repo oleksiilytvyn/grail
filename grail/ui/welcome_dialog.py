@@ -14,7 +14,7 @@ import grail
 from grail.qt import *
 
 
-class Welcome(QWidget):
+class Welcome(QtWidgets.QWidget):
     """Widget with title, icon and actions below"""
 
     def __init__(self, title="Welcome", description="Choose action bellow", icon=None, parent=None):
@@ -37,27 +37,27 @@ class Welcome(QWidget):
 
         self.setMinimumWidth(300)
 
-        self._ui_icon = QLabel(self)
-        self._ui_icon.setAlignment(Qt.AlignCenter)
+        self._ui_icon = QtWidgets.QLabel(self)
+        self._ui_icon.setAlignment(QtCore.Qt.AlignCenter)
         self._ui_icon.setGeometry(0, 0, 64, 64)
 
-        self._ui_title = QLabel("Welcome")
+        self._ui_title = QtWidgets.QLabel("Welcome")
         self._ui_title.setObjectName("gk_welcome_title")
-        self._ui_title.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self._ui_title.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
 
-        self._ui_description = QLabel("Choose some action below")
+        self._ui_description = QtWidgets.QLabel("Choose some action below")
         self._ui_description.setObjectName("gk_welcome_description")
-        self._ui_description.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self._ui_description.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
 
-        self._ui_actions_layout = QVBoxLayout()
+        self._ui_actions_layout = QtWidgets.QVBoxLayout()
         self._ui_actions_layout.setSpacing(14)
         self._ui_actions_layout.setContentsMargins(0, 0, 0, 0)
 
-        self._ui_actions = QWidget()
+        self._ui_actions = QtWidgets.QWidget()
         self._ui_actions.setContentsMargins(50, 0, 50, 0)
         self._ui_actions.setLayout(self._ui_actions_layout)
 
-        self._ui_layout = QVBoxLayout()
+        self._ui_layout = QtWidgets.QVBoxLayout()
         self._ui_layout.setSpacing(0)
         self._ui_layout.setContentsMargins(0, 0, 0, 0)
 
@@ -107,10 +107,10 @@ class Welcome(QWidget):
 
         size = 128
 
-        if isinstance(icon, QIcon):
+        if isinstance(icon, QtGui.QIcon):
             self._icon = icon.pixmap(size)
 
-        if isinstance(icon, QPixmap):
+        if isinstance(icon, QtGui.QPixmap):
             self._icon = icon.scaledToWidth(size)
 
         self._ui_icon.setPixmap(self._icon)
@@ -148,15 +148,15 @@ class Welcome(QWidget):
     def paintEvent(self, event):
         """Paint component with CSS styles"""
 
-        option = QStyleOption()
+        option = QtWidgets.QStyleOption()
         option.initFrom(self)
 
-        painter = QPainter(self)
+        painter = QtGui.QPainter(self)
 
-        self.style().drawPrimitive(QStyle.PE_Widget, option, painter, self)
+        self.style().drawPrimitive(QtWidgets.QStyle.PE_Widget, option, painter, self)
 
 
-class WelcomeAction(QPushButton, QWidget):
+class WelcomeAction(QtWidgets.QPushButton, QtWidgets.QWidget):
     """Action for Welcome"""
 
     def __init__(self, title="Action", text="Take some action", icon=None, parent=None):
@@ -167,13 +167,13 @@ class WelcomeAction(QPushButton, QWidget):
         self._text = text
         self._icon_size = 48
 
-        self._ui_title = QLabel(self._title)
+        self._ui_title = QtWidgets.QLabel(self._title)
         self._ui_title.setObjectName("gk_welcome_action_title")
 
-        self._ui_text = QLabel(self._text)
+        self._ui_text = QtWidgets.QLabel(self._text)
         self._ui_text.setObjectName("gk_welcome_action_text")
 
-        self._ui_layout = QVBoxLayout()
+        self._ui_layout = QtWidgets.QVBoxLayout()
         self._ui_layout.setContentsMargins(0, 0, 0, 0)
         self._ui_layout.setSpacing(0)
         self._ui_layout.addStretch(1)
@@ -189,19 +189,19 @@ class WelcomeAction(QPushButton, QWidget):
     def sizeHint(self):
         """Default size of widget"""
 
-        return QSize(64, 64)
+        return QtCore.QSize(64, 64)
 
     def paintEvent(self, event):
         """Custom painting"""
 
-        o = QStyleOption()
+        o = QtWidgets.QStyleOption()
         o.initFrom(self)
 
-        p = QPainter(self)
-        self.style().drawPrimitive(QStyle.PE_Widget, o, p, self)
+        p = QtGui.QPainter(self)
+        self.style().drawPrimitive(QtWidgets.QStyle.PE_Widget, o, p, self)
 
         if self._icon:
-            p.drawPixmap(QPoint(64 / 2 - self._icon_size / 2, self.height() / 2 - self._icon_size / 2), self._icon)
+            p.drawPixmap(QtCore.QPoint(64 / 2 - self._icon_size / 2, self.height() / 2 - self._icon_size / 2), self._icon)
 
         p.end()
 
@@ -212,10 +212,10 @@ class WelcomeAction(QPushButton, QWidget):
             icon (QIcon, QPixmap): icon of action
         """
 
-        if isinstance(icon, QIcon):
+        if isinstance(icon, QtGui.QIcon):
             self._icon = icon.pixmap(self._icon_size)
 
-        if isinstance(icon, QPixmap):
+        if isinstance(icon, QtGui.QPixmap):
             self._icon = icon.scaledToWidth(self._icon_size)
 
     def icon(self):
@@ -224,7 +224,7 @@ class WelcomeAction(QPushButton, QWidget):
         Returns: QIcon
         """
 
-        return QIcon(self._icon)
+        return QtGui.QIcon(self._icon)
 
     def setTitle(self, title):
         """Set a title of action
@@ -265,7 +265,7 @@ class WelcomeAction(QPushButton, QWidget):
         return self._text
 
 
-class WelcomeDialog(QDialog):
+class WelcomeDialog(QtWidgets.QDialog):
     """Welcome dialog that shown on Grail startup"""
 
     def __init__(self, app):
@@ -281,14 +281,14 @@ class WelcomeDialog(QDialog):
         def std_icon(name):
             # scale standard icon to default size
 
-            return QIcon(QPixmap(QApplication.style().standardIcon(name).pixmap(32, 32)).scaled(48, 48))
+            return QtGui.QIcon(QtGui.QPixmap(QtWidgets.QApplication.style().standardIcon(name).pixmap(32, 32)).scaled(48, 48))
 
-        grail_icon = QIcon(':/icon/256.png')
+        grail_icon = QtGui.QIcon(':/icon/256.png')
 
-        create_action = WelcomeAction("Create", "New project", std_icon(QStyle.SP_FileIcon))
+        create_action = WelcomeAction("Create", "New project", std_icon(QtWidgets.QStyle.SP_FileIcon))
         create_action.clicked.connect(self._create)
 
-        open_action = WelcomeAction("Open", "Existing project", std_icon(QStyle.SP_DirIcon))
+        open_action = WelcomeAction("Open", "Existing project", std_icon(QtWidgets.QStyle.SP_DirIcon))
         open_action.clicked.connect(self._open)
 
         last_project = self.app.settings.get('project/last', default="")
@@ -309,7 +309,7 @@ class WelcomeDialog(QDialog):
 
             widget.addWidget(continue_action)
 
-        layout = QHBoxLayout()
+        layout = QtWidgets.QHBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
         layout.addWidget(widget)
 
@@ -323,9 +323,9 @@ class WelcomeDialog(QDialog):
     def _open(self):
         """Open a existing project"""
 
-        location = QStandardPaths.locate(QStandardPaths.DocumentsLocation, "",
-                                         QStandardPaths.LocateDirectory)
-        path, ext = QFileDialog.getOpenFileName(self, "Open File...", location, "*.grail")
+        location = QtCore.QStandardPaths.locate(QtCore.QStandardPaths.DocumentsLocation, "",
+                                                QtCore.QStandardPaths.LocateDirectory)
+        path, ext = QtWidgets.QFileDialog.getOpenFileName(self, "Open File...", location, "*.grail")
 
         if path:
             self.app.open(path)
@@ -334,11 +334,11 @@ class WelcomeDialog(QDialog):
         """Create a new project"""
 
         project_name = "untitled"
-        location = QStandardPaths.locate(QStandardPaths.DocumentsLocation, "",
-                                         QStandardPaths.LocateDirectory)
+        location = QtCore.QStandardPaths.locate(QtCore.QStandardPaths.DocumentsLocation, "",
+                                                QtCore.QStandardPaths.LocateDirectory)
         location = os.path.join(location, project_name)
 
-        path, ext = QFileDialog.getSaveFileName(self, "New project", location, "*.grail")
+        path, ext = QtWidgets.QFileDialog.getSaveFileName(self, "New project", location, "*.grail")
 
         if path:
             self.app.open(path, create=True)

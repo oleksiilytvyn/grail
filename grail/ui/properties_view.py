@@ -14,7 +14,7 @@ import random
 from grail.qt import *
 
 
-class PropertiesView(QWidget):
+class PropertiesView(QtWidgets.QWidget):
     """View for editing entity properties"""
 
     def __init__(self, parent=None):
@@ -27,54 +27,54 @@ class PropertiesView(QWidget):
         self._follow = False
 
         # Properties
-        self._ui_properties = QTableWidget(self)
+        self._ui_properties = QtWidgets.QTableWidget(self)
         self._ui_properties.setShowGrid(False)
         self._ui_properties.setColumnCount(2)
         self._ui_properties.setAlternatingRowColors(True)
         self._ui_properties.verticalHeader().setVisible(False)
         self._ui_properties.setHorizontalHeaderLabels(["Key", "Value"])
-        self._ui_properties.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self._ui_properties.setSelectionMode(QAbstractItemView.SingleSelection)
+        self._ui_properties.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
+        self._ui_properties.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
         self._ui_properties.itemChanged.connect(self._item_changed)
         self._ui_properties.itemClicked.connect(self._item_clicked)
         self._ui_properties.itemSelectionChanged.connect(self._selection_changed)
         self._ui_properties.setItemDelegateForColumn(1, _PropertyDelegate(self))
-        self._ui_properties.setContextMenuPolicy(Qt.CustomContextMenu)
+        self._ui_properties.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self._ui_properties.customContextMenuRequested.connect(self._context_menu)
 
         header = self._ui_properties.horizontalHeader()
         header.setVisible(True)
         header.setStretchLastSection(True)
-        header.setSectionResizeMode(0, QHeaderView.ResizeToContents)
-        header.setSectionResizeMode(1, QHeaderView.Stretch)
-        header.setSectionResizeMode(QHeaderView.Interactive)
+        header.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeToContents)
+        header.setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
+        header.setSectionResizeMode(QtWidgets.QHeaderView.Interactive)
 
         # Empty
-        self._ui_empty_title = QLabel("No properties")
+        self._ui_empty_title = QtWidgets.QLabel("No properties")
         self._ui_empty_title.setObjectName('PropertiesView_empty_title')
 
-        self._ui_empty_info = QLabel("Node not selected or don't have properties.")
+        self._ui_empty_info = QtWidgets.QLabel("Node not selected or don't have properties.")
         self._ui_empty_info.setObjectName('PropertiesView_empty_info')
         self._ui_empty_info.setWordWrap(True)
 
-        self._ui_empty_layout = QVBoxLayout()
+        self._ui_empty_layout = QtWidgets.QVBoxLayout()
         self._ui_empty_layout.setContentsMargins(12, 12, 12, 12)
-        self._ui_empty_layout.setAlignment(Qt.AlignHCenter)
+        self._ui_empty_layout.setAlignment(QtCore.Qt.AlignHCenter)
         self._ui_empty_layout.addStretch()
         self._ui_empty_layout.addWidget(self._ui_empty_title)
         self._ui_empty_layout.addWidget(self._ui_empty_info)
         self._ui_empty_layout.addStretch()
 
-        self._ui_empty = QWidget()
+        self._ui_empty = QtWidgets.QWidget()
         self._ui_empty.setObjectName('PropertiesView_empty')
         self._ui_empty.setLayout(self._ui_empty_layout)
 
-        self._ui_stack = QStackedWidget()
+        self._ui_stack = QtWidgets.QStackedWidget()
         self._ui_stack.addWidget(self._ui_empty)
         self._ui_stack.addWidget(self._ui_properties)
         self._ui_stack.setCurrentIndex(0)
 
-        self._ui_layout = QVBoxLayout()
+        self._ui_layout = QtWidgets.QVBoxLayout()
         self._ui_layout.addWidget(self._ui_stack)
 
         self.setLayout(self._ui_layout)
@@ -95,12 +95,12 @@ class PropertiesView(QWidget):
         if not self._ui_properties.itemAt(point):
             return False
 
-        menu = QMenu("Context menu", self)
+        menu = QtWidgets.QMenu("Context menu", self)
 
-        remove_action = QAction('Remove property', menu)
+        remove_action = QtWidgets.QAction('Remove property', menu)
         remove_action.triggered.connect(lambda: self.removeSelected())
 
-        add_action = QAction('Add property', menu)
+        add_action = QtWidgets.QAction('Add property', menu)
         add_action.triggered.connect(lambda: self.addProperty())
 
         menu.addAction(add_action)
@@ -232,36 +232,36 @@ class PropertiesView(QWidget):
             key = item[0]
             value = item[1]
 
-            item_key = QTableWidgetItem(key)
+            item_key = QtWidgets.QTableWidgetItem(key)
             item_key.entity_id = self._entity_id
             item_key.entity_key = key
 
-            item_value = QTableWidgetItem(str(value))
-            item_value.setData(Qt.UserRole, value)
+            item_value = QtWidgets.QTableWidgetItem(str(value))
+            item_value.setData(QtCore.Qt.UserRole, value)
             item_value.entity_id = self._entity_id
             item_value.entity_key = key
 
             # True and False
             if isinstance(value, bool) and value is True:
-                color = QColor('#8BC34A')
+                color = QtGui.QColor('#8BC34A')
             elif isinstance(value, bool) and value is False:
-                color = QColor('#B71C1C')
+                color = QtGui.QColor('#B71C1C')
             # Number
             elif isinstance(value, int):
-                color = QColor('#EF6C00')
+                color = QtGui.QColor('#EF6C00')
             elif isinstance(value, float):
-                color = QColor('#FFEB3B')
+                color = QtGui.QColor('#FFEB3B')
             # String
             elif isinstance(value, str):
-                color = QColor('#03A9F4')
+                color = QtGui.QColor('#03A9F4')
             # JSON
             elif isinstance(value, dict) or isinstance(value, list):
-                color = QColor('#673AB7')
+                color = QtGui.QColor('#673AB7')
             # None
             else:
-                color = QColor('#BDBDBD')
+                color = QtGui.QColor('#BDBDBD')
 
-            item_value.setIcon(Icon.colored(':/rc/live.png', color, QColor('#e3e3e3')))
+            item_value.setIcon(Icon.colored(':/rc/live.png', color, QtGui.QColor('#e3e3e3')))
 
             self._ui_properties.setItem(index, 0, item_key)
             self._ui_properties.setItem(index, 1, item_value)
@@ -308,7 +308,7 @@ class PropertiesView(QWidget):
 
         if item.column() == 1:
             key = item.entity_key
-            value = item.data(Qt.UserRole)
+            value = item.data(QtCore.Qt.UserRole)
             entity = self._dna.entity(item.entity_id)
 
             if key in std_props:
@@ -330,7 +330,7 @@ class PropertiesView(QWidget):
         self._update()
 
 
-class _PropertyEdit(QLineEdit):
+class _PropertyEdit(QtWidgets.QLineEdit):
     """Editor for PropertiesView"""
 
     TYPES = {
@@ -351,13 +351,13 @@ class _PropertyEdit(QLineEdit):
         self._type = 'type_none'
         self._data = None
 
-        self.setAttribute(Qt.WA_MacShowFocusRect, False)
+        self.setAttribute(QtCore.Qt.WA_MacShowFocusRect, False)
         self.textChanged.connect(self._text_changed)
 
-        self._ui_clear = QToolButton(self)
-        self._ui_clear.setIconSize(QSize(14, 14))
-        self._ui_clear.setIcon(QIcon(':/rc/branch-open.png'))
-        self._ui_clear.setCursor(Qt.ArrowCursor)
+        self._ui_clear = QtWidgets.QToolButton(self)
+        self._ui_clear.setIconSize(QtCore.QSize(14, 14))
+        self._ui_clear.setIcon(QtGui.QIcon(':/rc/branch-open.png'))
+        self._ui_clear.setCursor(QtCore.Qt.ArrowCursor)
         self._ui_clear.setStyleSheet("""
             QToolButton {
                 background: none;
@@ -366,7 +366,7 @@ class _PropertyEdit(QLineEdit):
             """)
         self._ui_clear.clicked.connect(self._context_menu)
 
-        frame_width = self.style().pixelMetric(QStyle.PM_DefaultFrameWidth)
+        frame_width = self.style().pixelMetric(QtWidgets.QStyle.PM_DefaultFrameWidth)
 
         self.setStyleSheet("""
                 QLineEdit {
@@ -408,7 +408,7 @@ class _PropertyEdit(QLineEdit):
 
         size = self.rect()
         btn_size = self._ui_clear.sizeHint()
-        frame_width = self.style().pixelMetric(QStyle.PM_DefaultFrameWidth)
+        frame_width = self.style().pixelMetric(QtWidgets.QStyle.PM_DefaultFrameWidth)
 
         self._ui_clear.move(size.width() - btn_size.width() - frame_width * 2,
                             size.height() / 2 - btn_size.height() / 2)
@@ -416,7 +416,7 @@ class _PropertyEdit(QLineEdit):
     def _context_menu(self):
         """Open context menu"""
 
-        menu = QMenu("Select Type", self)
+        menu = QtWidgets.QMenu("Select Type", self)
 
         def wrap(_type, _name):
             """Action context closure"""
@@ -425,7 +425,7 @@ class _PropertyEdit(QLineEdit):
 
         for name in self.TYPES_ORDER:
             _type = self.TYPES[name]
-            action = QAction(name, menu)
+            action = QtWidgets.QAction(name, menu)
             action.triggered.connect(wrap(name, _type))
 
             menu.addAction(action)
@@ -505,7 +505,7 @@ class _PropertyEdit(QLineEdit):
             return {}
 
 
-class _PropertyDelegate(QStyledItemDelegate):
+class _PropertyDelegate(QtWidgets.QStyledItemDelegate):
 
     def __init__(self, *args):
         super(_PropertyDelegate, self).__init__(*args)
@@ -521,9 +521,9 @@ class _PropertyDelegate(QStyledItemDelegate):
         """Set"""
         super(_PropertyDelegate, self).setEditorData(editor, index)
 
-        editor.setData(index.data(Qt.UserRole))
+        editor.setData(index.data(QtCore.Qt.UserRole))
 
     def setModelData(self, editor, model, index):
         """Store data"""
 
-        index.model().setData(index, editor.data(), Qt.UserRole)
+        index.model().setData(index, editor.data(), QtCore.Qt.UserRole)

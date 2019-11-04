@@ -26,8 +26,8 @@ class GrabberVideoSurface(QAbstractVideoSurface):
     def __init__(self, parent):
         super(GrabberVideoSurface, self).__init__()
 
-        self._size = QSize(0, 0)
-        self._format = QImage.Format_Invalid
+        self._size = QtCore.QSize(0, 0)
+        self._format = QtGui.QImage.Format_Invalid
         self._count = 0
         self._parent = parent
 
@@ -38,7 +38,7 @@ class GrabberVideoSurface(QAbstractVideoSurface):
         image_format = QVideoFrame.imageFormatFromPixelFormat(_format.pixelFormat())
         size = _format.frameSize()
 
-        if image_format != QImage.Format_Invalid and not size.isEmpty():
+        if image_format != QtGui.QImage.Format_Invalid and not size.isEmpty():
             self._format = image_format
             self._size = size
 
@@ -53,7 +53,7 @@ class GrabberVideoSurface(QAbstractVideoSurface):
         self._count += 1
 
         if frame.map(QAbstractVideoBuffer.ReadOnly):
-            self.image = QImage(frame.bits(), frame.width(), frame.height(), frame.bytesPerLine(), self._format)
+            self.image = QtGui.QImage(frame.bits(), frame.width(), frame.height(), frame.bytesPerLine(), self._format)
 
             self._parent.updated.emit()
 
@@ -91,13 +91,13 @@ class FrameGrabber:
 
     def load(self, path):
 
-        self.player.setMedia(QMediaContent(QUrl.fromLocalFile(path)))
+        self.player.setMedia(QMediaContent(QtCore.QUrl.fromLocalFile(path)))
         self.player.play()
         self.player.setPosition(500)
         self.player.pause()
 
     def grab(self):
-        """Returns QImage, a random frame from video"""
+        """Returns QtGui.QImage, a random frame from video"""
 
         return self.video_surface.image
 
@@ -129,7 +129,7 @@ class ClipItem:
         self.transport = "stop"
 
 
-class ClipWidget(QWidget):
+class ClipWidget(QtWidgets.QWidget):
 
     def __init__(self, parent=None):
         super(ClipWidget, self).__init__(parent)
@@ -141,18 +141,18 @@ class ClipWidget(QWidget):
         self._size = 90
         self.size = self._size
 
-        self.COLOR_NORMAL = QColor(qt_colors.BASE_ALT)
-        self.COLOR_ACTIVE = QColor(qt_colors.WIDGET_ACTIVE)
-        self.COLOR_TEXT = QColor(qt_colors.WIDGET_TEXT)
-        self.COLOR_TEXT_ACTIVE = QColor(qt_colors.BASE)
+        self.COLOR_NORMAL = QtGui.QColor(qt_colors.BASE_ALT)
+        self.COLOR_ACTIVE = QtGui.QColor(qt_colors.WIDGET_ACTIVE)
+        self.COLOR_TEXT = QtGui.QColor(qt_colors.WIDGET_TEXT)
+        self.COLOR_TEXT_ACTIVE = QtGui.QColor(qt_colors.BASE)
 
         # self.setMouseTracking(True)
 
     def paintEvent(self, event):
 
-        painter = QPainter(self)
+        painter = QtGui.QPainter(self)
         painter.setBrush(self.COLOR_NORMAL)
-        painter.setPen(Qt.NoPen)
+        painter.setPen(QtCore.Qt.NoPen)
         painter.drawRect(self.rect())
 
         batch_size = self._size
@@ -176,28 +176,28 @@ class ClipWidget(QWidget):
 
             bo = 3
             bx, by, bw, bh = column * batch_size, row * batch_size, batch_size, batch_size
-            size = item.pixmap.size().scaled(QSize(bw, bh - text_height), Qt.KeepAspectRatio)
+            size = item.pixmap.size().scaled(QtCore.QSize(bw, bh - text_height), QtCore.Qt.KeepAspectRatio)
             ox = bw / 2 - size.width() / 2
             oy = (bh - text_height) / 2 - size.height() / 2
-            text_box = QRect(bx + bo, by + bo + bh - text_height, bw - bo * 2, text_height - bo * 2)
+            text_box = QtCore.QRect(bx + bo, by + bo + bh - text_height, bw - bo * 2, text_height - bo * 2)
             label = os.path.basename(item.path)
 
-            painter.setPen(Qt.NoPen)
-            painter.setBrush(QBrush(self.COLOR_TEXT_ACTIVE if not selected else self.COLOR_ACTIVE, Qt.SolidPattern))
+            painter.setPen(QtCore.Qt.NoPen)
+            painter.setBrush(QtGui.QBrush(self.COLOR_TEXT_ACTIVE if not selected else self.COLOR_ACTIVE, QtCore.Qt.SolidPattern))
 
             # Frame
             painter.drawRect(bx, by, bw, bh)
 
             # Image
-            painter.setBrush(QBrush(self.COLOR_NORMAL, Qt.SolidPattern))
+            painter.setBrush(QtGui.QBrush(self.COLOR_NORMAL, QtCore.Qt.SolidPattern))
             painter.drawRect(bx + bo, by + bo, bw - bo * 2, bh - bo * 2)
             painter.drawPixmap(bx + bo + ox, by + bo + oy, size.width() - bo * 2, size.height() - bo * 2, item.pixmap)
 
             # Text label
-            painter.setBrush(QBrush(self.COLOR_ACTIVE if selected else self.COLOR_TEXT_ACTIVE, Qt.SolidPattern))
+            painter.setBrush(QtGui.QBrush(self.COLOR_ACTIVE if selected else self.COLOR_TEXT_ACTIVE, QtCore.Qt.SolidPattern))
             painter.drawRect(text_box)
-            painter.setPen(QPen(self.COLOR_TEXT_ACTIVE if selected else self.COLOR_TEXT, 0, Qt.SolidLine, Qt.SquareCap))
-            painter.drawText(text_box, Qt.AlignLeft | Qt.AlignVCenter, label)
+            painter.setPen(QtGui.QPen(self.COLOR_TEXT_ACTIVE if selected else self.COLOR_TEXT, 0, QtCore.Qt.SolidLine, QtCore.Qt.SquareCap))
+            painter.drawText(text_box, QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter, label)
 
     def update(self):
         super(ClipWidget, self).update()
@@ -229,7 +229,7 @@ class ClipWidget(QWidget):
         self._selected = self.itemIndexAt(event.pos())
         self.repaint()
 
-        QWidget.mousePressEvent(self, event)
+        QtWidgets.QWidget.mousePressEvent(self, event)
 
     def addItem(self, item):
         """Add item to list"""
@@ -275,10 +275,10 @@ class ClipWidget(QWidget):
         self.update()
 
 
-class ClipList(QScrollArea):
+class ClipList(QtWidgets.QScrollArea):
 
-    itemDoubleClicked = pyqtSignal(object)
-    itemClicked = pyqtSignal(object)
+    itemDoubleClicked = QtSignal(object)
+    itemClicked = QtSignal(object)
 
     def __init__(self, parent=None):
         super(ClipList, self).__init__(parent)
@@ -289,17 +289,17 @@ class ClipList(QScrollArea):
         self._files_stack = []
 
         self.setAcceptDrops(True)
-        self.setAttribute(Qt.WA_MacShowFocusRect, False)
-        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setAttribute(QtCore.Qt.WA_MacShowFocusRect, False)
+        self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.setContentsMargins(0, 0, 0, 0)
-        self.setFrameShape(QFrame.NoFrame)
+        self.setFrameShape(QtWidgets.QFrame.NoFrame)
 
         # fix inside padding
         self.setStyleSheet("QScrollArea { margin: 0; padding: 0; }")
 
         original = self.verticalScrollBar()
-        self.scrollbar = QScrollBar(Qt.Vertical, self)
+        self.scrollbar = QtWidgets.QScrollBar(QtCore.Qt.Vertical, self)
         self.scrollbar.valueChanged.connect(original.setValue)
         original.valueChanged.connect(self.scrollbar.setValue)
 
@@ -327,7 +327,7 @@ class ClipList(QScrollArea):
 
     def paintEvent(self, event):
 
-        QScrollArea.paintEvent(self, event)
+        QtWidgets.QScrollArea.paintEvent(self, event)
         self.update_scrollbar()
 
     def dragEnterEvent(self, event):
@@ -412,8 +412,8 @@ class ClipList(QScrollArea):
 
     def _normalize_path(self, path):
 
-        if type(path) == QUrl:
-            result = os.path.abspath(str(QUrl(path).toLocalFile()))
+        if type(path) == QtCore.QUrl:
+            result = os.path.abspath(str(QtCore.QUrl(path).toLocalFile()))
         elif type(path) == str:
             result = os.path.abspath(path)
         else:
@@ -442,7 +442,7 @@ class ClipList(QScrollArea):
         ext = str(path.split('.')[-1]).lower()
 
         if ext in ['jpg', 'jpeg', 'png', 'gif']:
-            pixmap = QPixmap(path)
+            pixmap = QtGui.QPixmap(path)
             path = self._files_stack.pop(0)
 
             self._add(path, pixmap)
@@ -456,21 +456,21 @@ class ClipList(QScrollArea):
         if len(self._files_stack) <= 0:
             return False
 
-        pixmap = QPixmap(self.grabber.grab())
+        pixmap = QtGui.QPixmap(self.grabber.grab())
         path = self._files_stack.pop(0)
 
         self._add(path, pixmap)
         self._process_files()
 
 
-class DisplayLayerInspectorPreview(QWidget):
+class DisplayLayerInspectorPreview(QtWidgets.QWidget):
 
     def __init__(self, parent=None):
         super(DisplayLayerInspectorPreview, self).__init__(parent)
 
         self._pixmap = None
 
-        self.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.MinimumExpanding)
+        self.setSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.MinimumExpanding)
 
     def setPixmap(self, pixmap):
 
@@ -479,13 +479,13 @@ class DisplayLayerInspectorPreview(QWidget):
 
     def sizeHint(self):
 
-        return QSize(200, 200)
+        return QtCore.QSize(200, 200)
 
     def paintEvent(self, event):
 
-        painter = QPainter()
+        painter = QtGui.QPainter()
         painter.begin(self)
-        painter.fillRect(self.rect(), QColor(qt_colors.BASE))
+        painter.fillRect(self.rect(), QtGui.QColor(qt_colors.BASE))
         scale_factor = 0.86
         text = "Item not selected"
 
@@ -501,25 +501,25 @@ class DisplayLayerInspectorPreview(QWidget):
             s = 100
             sw, sh = self.width(), self.height()
             s = s * (sh / s if sw / sh > s / s else sw / s) * scale_factor
-            rect = QRect(sw / 2 - s / 2, sh / 2 - s / 2, s, s)
+            rect = QtCore.QRect(sw / 2 - s / 2, sh / 2 - s / 2, s, s)
 
-            painter.fillRect(rect, QColor(qt_colors.WIDGET))
-            painter.setPen(QPen(QColor(qt_colors.BASE)))
-            painter.drawLine(QLine(rect.x(), rect.y(), rect.x() + rect.width(), rect.y() + rect.height()))
-            painter.drawLine(QLine(rect.x() + rect.width(), rect.y(), rect.x(), rect.y() + rect.height()))
+            painter.fillRect(rect, QtGui.QColor(qt_colors.WIDGET))
+            painter.setPen(QtGui.QPen(QtGui.QColor(qt_colors.BASE)))
+            painter.drawLine(QtCore.QLine(rect.x(), rect.y(), rect.x() + rect.width(), rect.y() + rect.height()))
+            painter.drawLine(QtCore.QLine(rect.x() + rect.width(), rect.y(), rect.x(), rect.y() + rect.height()))
 
             a, b = 70, 120
 
             if s >= 70:
-                color = QColor(qt_colors.WIDGET_TEXT)
+                color = QtGui.QColor(qt_colors.WIDGET_TEXT)
                 color.setAlphaF(max(min((s - a) / (b - a), 1.0), 0.0))
-                painter.setPen(QPen(color))
-                painter.drawText(rect, Qt.AlignCenter | Qt.TextWordWrap, text)
+                painter.setPen(QtGui.QPen(color))
+                painter.drawText(rect, QtCore.Qt.AlignCenter | QtCore.Qt.TextWordWrap, text)
 
         painter.end()
 
 
-class DisplayLayerInspector(QWidget):
+class DisplayLayerInspector(QtWidgets.QWidget):
 
     def __init__(self, viewer, parent=None):
         super(DisplayLayerInspector, self).__init__(parent)
@@ -537,24 +537,24 @@ class DisplayLayerInspector(QWidget):
 
         self._ui_pixmap = DisplayLayerInspectorPreview()
 
-        self._ui_label = QLabel("No item")
-        self._ui_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        self._ui_label = QtWidgets.QLabel("No item")
+        self._ui_label.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
         self._ui_label.setWordWrap(True)
 
-        self._ui_open_location = QPushButton("Open")
+        self._ui_open_location = QtWidgets.QPushButton("Open")
         self._ui_open_location.clicked.connect(self._open_location)
 
-        self._ui_file_layout = QHBoxLayout()
+        self._ui_file_layout = QtWidgets.QHBoxLayout()
         self._ui_file_layout.setContentsMargins(6, 6, 6, 6)
         self._ui_file_layout.addWidget(self._ui_label)
         self._ui_file_layout.addWidget(self._ui_open_location)
 
-        self._ui_file_widget = QWidget()
-        self._ui_file_widget.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
+        self._ui_file_widget = QtWidgets.QWidget()
+        self._ui_file_widget.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
         self._ui_file_widget.setObjectName("DisplayLayerInspector_file")
         self._ui_file_widget.setLayout(self._ui_file_layout)
 
-        self._ui_grid_layout = QGridLayout()
+        self._ui_grid_layout = QtWidgets.QGridLayout()
         self._ui_grid_layout.setContentsMargins(12, 12, 12, 12)
         self._ui_grid_layout.setSpacing(4)
 
@@ -575,22 +575,22 @@ class DisplayLayerInspector(QWidget):
         self._ui_volume = self._add_parameter("Volume", 0, 100, 100)
         self._ui_volume.valueChanged.connect(self._volume_cb)
 
-        self._ui_fit_action = QPushButton("Fit")
+        self._ui_fit_action = QtWidgets.QPushButton("Fit")
         self._ui_fit_action.clicked.connect(self._fit_action)
 
-        self._ui_fill_action = QPushButton("Fill")
+        self._ui_fill_action = QtWidgets.QPushButton("Fill")
         self._ui_fill_action.clicked.connect(self._fill_action)
 
-        self._ui_stretch_action = QPushButton("Stretch")
+        self._ui_stretch_action = QtWidgets.QPushButton("Stretch")
         self._ui_stretch_action.clicked.connect(self._stretch_action)
 
-        self._ui_auto_action = QPushButton("Auto")
+        self._ui_auto_action = QtWidgets.QPushButton("Auto")
         self._ui_auto_action.clicked.connect(self._auto_action)
 
-        self._ui_reset_action = QPushButton("Reset")
+        self._ui_reset_action = QtWidgets.QPushButton("Reset")
         self._ui_reset_action.clicked.connect(self._reset_action)
 
-        self._ui_toolbar = QToolBar()
+        self._ui_toolbar = QtWidgets.QToolBar()
         self._ui_toolbar.addWidget(self._ui_fit_action)
         self._ui_toolbar.addWidget(self._ui_fill_action)
         self._ui_toolbar.addWidget(self._ui_stretch_action)
@@ -598,20 +598,20 @@ class DisplayLayerInspector(QWidget):
         self._ui_toolbar.addStretch()
         self._ui_toolbar.addWidget(self._ui_reset_action)
 
-        self._ui_scroll_widget = QWidget()
+        self._ui_scroll_widget = QtWidgets.QWidget()
         self._ui_scroll_widget.setMinimumSize(200, 200)
         self._ui_scroll_widget.setMaximumHeight(250)
-        self._ui_scroll_widget.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Preferred)
+        self._ui_scroll_widget.setSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Preferred)
         self._ui_scroll_widget.setLayout(self._ui_grid_layout)
 
-        self._ui_scroll = QScrollArea()
-        self._ui_scroll.setFrameShape(QFrame.NoFrame)
-        self._ui_scroll.setFrameShadow(QFrame.Plain)
+        self._ui_scroll = QtWidgets.QScrollArea()
+        self._ui_scroll.setFrameShape(QtWidgets.QFrame.NoFrame)
+        self._ui_scroll.setFrameShadow(QtWidgets.QFrame.Plain)
         self._ui_scroll.setWidgetResizable(True)
         self._ui_scroll.setWidget(self._ui_scroll_widget)
-        self._ui_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self._ui_scroll.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
 
-        self._ui_layout = QVBoxLayout()
+        self._ui_layout = QtWidgets.QVBoxLayout()
         self._ui_layout.addWidget(self._ui_pixmap)
         self._ui_layout.addWidget(self._ui_file_widget)
         self._ui_layout.addWidget(self._ui_toolbar)
@@ -647,7 +647,7 @@ class DisplayLayerInspector(QWidget):
         if self._item is None:
             return
 
-        QDesktopServices.openUrl(QUrl("file:///" + QFileInfo(self._item.path).absolutePath()))
+        QtGui.QDesktopServices.openUrl(QtCore.QUrl("file:///" + QtCore.QFileInfo(self._item.path).absolutePath()))
 
     def is_locked(self):
 
@@ -796,19 +796,19 @@ class DisplayLayerInspector(QWidget):
 
     def _add_parameter(self, name: str, minimum: float, maximum: float, value: float):
 
-        slider = QSlider(Qt.Horizontal)
+        slider = QtWidgets.QSlider(QtCore.Qt.Horizontal)
         slider.setRange(minimum, maximum)
-        slider.setTickPosition(QSlider.NoTicks)
+        slider.setTickPosition(QtWidgets.QSlider.NoTicks)
         slider.setValue(value)
         slider.valueChanged.connect(lambda v: spin.setValue(v))
 
-        spin = QSpinBox()
+        spin = QtWidgets.QSpinBox()
         spin.setReadOnly(True)
         spin.setValue(value)
         spin.setRange(minimum, maximum)
         # spin.valueChanged.connect(lambda v: slider.setValue(v))
 
-        self._ui_grid_layout.addWidget(QLabel(name), self._param_row, 0)
+        self._ui_grid_layout.addWidget(QtWidgets.QLabel(name), self._param_row, 0)
         self._ui_grid_layout.addWidget(slider, self._param_row, 1)
         self._ui_grid_layout.addWidget(spin, self._param_row, 2)
         self._param_row += 1
@@ -830,9 +830,9 @@ class DisplayLayerViewer(Viewer):
         super(DisplayLayerViewer, self).__init__(*args, **kwargs)
 
         self._inspector = DisplayLayerInspector(self)
-        self._inspector_dialog = QDialog()
+        self._inspector_dialog = QtWidgets.QDialog()
         self._inspector_dialog.setWindowTitle("Clip Inspector")
-        self._inspector_dialog.setLayout(QVBoxLayout())
+        self._inspector_dialog.setLayout(QtWidgets.QVBoxLayout())
         self._layer_id = DisplayLayerViewer.counter
         self._media_state = 0
 
@@ -848,30 +848,30 @@ class DisplayLayerViewer(Viewer):
 
     def __ui__(self):
 
-        self._ui_show_stop_action = QAction("Show Stop button")
+        self._ui_show_stop_action = QtWidgets.QAction("Show Stop button")
         self._ui_show_stop_action.setCheckable(True)
         self._ui_show_stop_action.setChecked(True)
         self._ui_show_stop_action.triggered.connect(self._show_stop_action)
 
-        self._ui_dock_action = QAction("Dock Inspector")
+        self._ui_dock_action = QtWidgets.QAction("Dock Inspector")
         self._ui_dock_action.setCheckable(True)
         self._ui_dock_action.setChecked(True)
         self._ui_dock_action.triggered.connect(self.dock_action)
 
-        self._ui_hide_inspector_action = QAction("Hide Inspector")
+        self._ui_hide_inspector_action = QtWidgets.QAction("Hide Inspector")
         self._ui_hide_inspector_action.setCheckable(True)
         self._ui_hide_inspector_action.triggered.connect(self._hide_inspector_action)
 
-        self._ui_small_action = QAction("Small items")
+        self._ui_small_action = QtWidgets.QAction("Small items")
         self._ui_small_action.triggered.connect(lambda: self._ui_list.setBatchSize(70))
 
-        self._ui_middle_action = QAction("Middle items")
+        self._ui_middle_action = QtWidgets.QAction("Middle items")
         self._ui_middle_action.triggered.connect(lambda: self._ui_list.setBatchSize(120))
 
-        self._ui_large_action = QAction("Large items")
+        self._ui_large_action = QtWidgets.QAction("Large items")
         self._ui_large_action.triggered.connect(lambda: self._ui_list.setBatchSize(200))
 
-        self._menu = QMenu("Settings", self)
+        self._menu = QtWidgets.QMenu("Settings", self)
         self._menu.addAction(self._ui_show_stop_action)
         self._menu.addAction(self._ui_dock_action)
         self._menu.addAction(self._ui_hide_inspector_action)
@@ -884,34 +884,34 @@ class DisplayLayerViewer(Viewer):
         self._ui_list.itemClicked.connect(self.item_clicked)
         self._ui_list.itemDoubleClicked.connect(self.item_doubleclicked)
 
-        self._ui_slider = QSlider(Qt.Horizontal)
+        self._ui_slider = QtWidgets.QSlider(QtCore.Qt.Horizontal)
         self._ui_slider.setRange(0, 10_000)
         self._ui_slider.setValue(0)
         self._ui_slider.valueChanged.connect(self._player_position_cb)
 
-        self._ui_view_action = QToolButton()
+        self._ui_view_action = QtWidgets.QToolButton()
         self._ui_view_action.setText("View")
         self._ui_view_action.setIcon(Icon(':/rc/menu.png'))
         self._ui_view_action.clicked.connect(self.view_action)
 
-        self._ui_play_action = QToolButton()
+        self._ui_play_action = QtWidgets.QToolButton()
         self._ui_play_action.setText("Play/pause")
         self._ui_play_action.setIcon(Icon(':/rc/play.png'))
         self._ui_play_action.clicked.connect(self.play_action)
 
-        self._ui_stop_action = QToolButton()
+        self._ui_stop_action = QtWidgets.QToolButton()
         self._ui_stop_action.setText("Stop")
         self._ui_stop_action.setIcon(Icon(':/rc/stop.png'))
         self._ui_stop_action.clicked.connect(self.stop_action)
 
-        self._ui_menu_action = QToolButton()
+        self._ui_menu_action = QtWidgets.QToolButton()
         self._ui_menu_action.setText("Menu")
         self._ui_menu_action.setIcon(Icon(':/rc/settings.png'))
         self._ui_menu_action.clicked.connect(self.menu_action)
 
-        self._ui_label = QLabel(f"Layer {self._layer_id}")
+        self._ui_label = QtWidgets.QLabel(f"Layer {self._layer_id}")
 
-        self._ui_toolbar = QToolBar()
+        self._ui_toolbar = QtWidgets.QToolBar()
         self._ui_toolbar.setObjectName("DisplayMediaBinViewer_toolbar")
         self._ui_toolbar.addWidget(self._ui_view_action)
         self._ui_toolbar.addWidget(self._ui_label)
@@ -922,16 +922,16 @@ class DisplayLayerViewer(Viewer):
         self._ui_toolbar.addStretch(12)
         self._ui_toolbar.addWidget(self._ui_menu_action)
 
-        self._ui_splitter = QSplitter(Qt.Horizontal)
+        self._ui_splitter = QtWidgets.QSplitter(QtCore.Qt.Horizontal)
         self._ui_splitter.addWidget(self._ui_list)
         self._ui_splitter.addWidget(self._inspector)
 
-        self._ui_layout = QVBoxLayout()
+        self._ui_layout = QtWidgets.QVBoxLayout()
         self._ui_layout.addWidget(self._ui_splitter)
         self._ui_layout.addWidget(self._ui_toolbar)
 
         self.setLayout(self._ui_layout)
-        self.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.context_menu)
 
     def view_action(self):
@@ -960,19 +960,19 @@ class DisplayLayerViewer(Viewer):
 
         item = self._ui_list.itemAt(pos)
 
-        add_action = QAction("Add")
+        add_action = QtWidgets.QAction("Add")
         add_action.triggered.connect(lambda: self.item_add(item))
 
-        edit_action = QAction("Edit")
+        edit_action = QtWidgets.QAction("Edit")
         edit_action.triggered.connect(lambda: self.item_inspector(item))
 
-        remove_action = QAction("Remove")
+        remove_action = QtWidgets.QAction("Remove")
         remove_action.triggered.connect(lambda: self.item_remove(item))
 
-        inspector_action = QAction("Inspector")
+        inspector_action = QtWidgets.QAction("Inspector")
         inspector_action.triggered.connect(lambda: self.item_inspector(item))
 
-        menu = QMenu("Clip", self)
+        menu = QtWidgets.QMenu("Clip", self)
 
         if item:
             menu.addAction(add_action)
@@ -1062,9 +1062,9 @@ class DisplayLayerViewer(Viewer):
 
     def item_add(self, item=None):
 
-        location = QStandardPaths.locate(QStandardPaths.DocumentsLocation, "",
-                                         QStandardPaths.LocateDirectory)
-        path, ext = QFileDialog.getOpenFileName(self, "Add File...", location, "*")
+        location = QtCore.QStandardPaths.locate(QtCore.QStandardPaths.DocumentsLocation, "",
+                                                QtCore.QStandardPaths.LocateDirectory)
+        path, ext = QtWidgets.QFileDialog.getOpenFileName(self, "Add File...", location, "*")
 
         if path:
             self._ui_list.addItem(path)

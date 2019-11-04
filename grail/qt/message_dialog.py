@@ -12,7 +12,7 @@ from grail.qt import *
 from grailkit.util import OS_MAC
 
 
-class MessageDialog(QDialog):
+class MessageDialog(QtWidgets.QDialog):
     """Message dialog, replacement of a default dialog"""
 
     # default icons
@@ -87,7 +87,7 @@ class MessageDialog(QDialog):
         19: (NoButton, "Button")
         }
 
-    buttonClicked = pyqtSignal(object)
+    buttonClicked = QtSignal(object)
 
     def __init__(self, parent=None,
                  title="Primary text providing basic information and a suggestion",
@@ -119,41 +119,41 @@ class MessageDialog(QDialog):
     def __ui__(self):
         """Create UI components"""
 
-        self._ui_icon = QLabel(self)
-        self._ui_icon.setAlignment(Qt.AlignCenter)
+        self._ui_icon = QtWidgets.QLabel(self)
+        self._ui_icon.setAlignment(QtCore.Qt.AlignCenter)
         self._ui_icon.setGeometry(20, 18, 64, 64)
 
-        self._ui_title = QLabel(self._title)
+        self._ui_title = QtWidgets.QLabel(self._title)
         self._ui_title.setObjectName("g_message_title")
         self._ui_title.setWordWrap(True)
         self._ui_title.setIndent(88)
 
-        self._ui_text = QLabel(self._text)
+        self._ui_text = QtWidgets.QLabel(self._text)
         self._ui_text.setObjectName("g_message_text")
         self._ui_text.setWordWrap(True)
         self._ui_text.setIndent(88)
 
-        self._ui_buttons_layout = QBoxLayout(QBoxLayout.LeftToRight)
+        self._ui_buttons_layout = QtWidgets.QBoxLayout(QtWidgets.QBoxLayout.LeftToRight)
         self._ui_buttons_layout.setSpacing(6)
         self._ui_buttons_layout.setContentsMargins(0, 0, 0, 0)
         self._ui_buttons_layout.addStretch(1)
 
-        self._ui_buttons = QWidget(self)
+        self._ui_buttons = QtWidgets.QWidget(self)
         self._ui_buttons.setMinimumHeight(30)
         self._ui_buttons.setLayout(self._ui_buttons_layout)
 
-        self._ui_layout = QVBoxLayout()
+        self._ui_layout = QtWidgets.QVBoxLayout()
         self._ui_layout.setContentsMargins(12, 24, 12, 8)
 
-        self._ui_layout.addWidget(self._ui_title, 0, Qt.AlignTop)
-        self._ui_layout.addWidget(self._ui_text, 1, Qt.AlignTop)
-        self._ui_layout.addWidget(self._ui_buttons, 0, Qt.AlignBottom)
+        self._ui_layout.addWidget(self._ui_title, 0, QtCore.Qt.AlignTop)
+        self._ui_layout.addWidget(self._ui_text, 1, QtCore.Qt.AlignTop)
+        self._ui_layout.addWidget(self._ui_buttons, 0, QtCore.Qt.AlignBottom)
 
         self.setLayout(self._ui_layout)
         self._ui_icon.raise_()
         self.setWindowTitle(self._title if not OS_MAC else "")
         self.setMinimumSize(360, 60)
-        self.setWindowFlags(Qt.WindowCloseButtonHint | Qt.MSWindowsFixedSizeDialogHint)
+        self.setWindowFlags(QtCore.Qt.WindowCloseButtonHint | QtCore.Qt.MSWindowsFixedSizeDialogHint)
         self._update_size()
 
     def title(self):
@@ -169,7 +169,7 @@ class MessageDialog(QDialog):
     def icon(self):
         """Get a icon of dialog"""
 
-        return QIcon(self._icon)
+        return QtGui.QIcon(self._icon)
 
     def setTitle(self, title):
         """Set dialog title
@@ -202,23 +202,23 @@ class MessageDialog(QDialog):
 
         # pick a standard icon
         if icon in MessageDialog.Icon or icon is None:
-            standard_icon = QStyle.SP_MessageBoxInformation
+            standard_icon = QtWidgets.QStyle.SP_MessageBoxInformation
 
             if icon == MessageDialog.Information:
-                standard_icon = QStyle.SP_MessageBoxInformation
+                standard_icon = QtWidgets.QStyle.SP_MessageBoxInformation
             elif icon == MessageDialog.Question:
-                standard_icon = QStyle.SP_MessageBoxQuestion
+                standard_icon = QtWidgets.QStyle.SP_MessageBoxQuestion
             elif icon == MessageDialog.Warning:
-                standard_icon = QStyle.SP_MessageBoxWarning
+                standard_icon = QtWidgets.QStyle.SP_MessageBoxWarning
             elif icon == MessageDialog.Critical:
-                standard_icon = QStyle.SP_MessageBoxCritical
+                standard_icon = QtWidgets.QStyle.SP_MessageBoxCritical
 
-            icon = QApplication.style().standardIcon(standard_icon)
+            icon = QtWidgets.QApplication.style().standardIcon(standard_icon)
 
-        if isinstance(icon, QIcon):
+        if isinstance(icon, QtGui.QIcon):
             self._icon = icon.pixmap(size)
 
-        if isinstance(icon, QPixmap):
+        if isinstance(icon, QtGui.QPixmap):
             self._icon = icon.scaledToWidth(size)
 
         self._ui_icon.setPixmap(self._icon)
@@ -264,7 +264,7 @@ class MessageDialog(QDialog):
             name = MessageDialog.StandardButtonRoleName[button][1]
             role = button
             value = button
-        elif isinstance(button, QPushButton):
+        elif isinstance(button, QtWidgets.QPushButton):
             name = button.text()
             value = -1
         else:
@@ -275,7 +275,7 @@ class MessageDialog(QDialog):
 
             return lambda flag: _self.button_clicked(_btn)
 
-        btn = button if isinstance(button, QPushButton) else QPushButton(name)
+        btn = button if isinstance(button, QtWidgets.QPushButton) else QtWidgets.QPushButton(name)
         btn.role = role
         btn.clicked.connect(triggered(self, btn))
 

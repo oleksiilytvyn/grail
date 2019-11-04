@@ -11,7 +11,7 @@
 from grail.qt import *
 
 
-class AboutDialog(QDialog):
+class AboutDialog(QtWidgets.QDialog):
     """Default about dialog"""
 
     def __init__(self, parent=None, title="Application", description="version 1.0", icon=None):
@@ -33,30 +33,30 @@ class AboutDialog(QDialog):
 
     def __ui__(self):
 
-        self._ui_pixmap = QApplication.style().standardIcon(QStyle.SP_MessageBoxInformation)
+        self._ui_pixmap = QtWidgets.QApplication.style().standardIcon(QtWidgets.QStyle.SP_MessageBoxInformation)
 
-        self._ui_icon = QLabel(self)
+        self._ui_icon = QtWidgets.QLabel(self)
         self._ui_icon.setPixmap(self._ui_pixmap.pixmap(64))
-        self._ui_icon.setAlignment(Qt.AlignCenter)
+        self._ui_icon.setAlignment(QtCore.Qt.AlignCenter)
         self._ui_icon.setGeometry(48, 52, 64, 64)
 
         if self._icon:
             self._ui_icon.setPixmap(self._icon.pixmap(64))
 
-        self._ui_title = QLabel(self._title, self)
+        self._ui_title = QtWidgets.QLabel(self._title, self)
         self._ui_title.setObjectName("g_about_title")
         self._ui_title.setGeometry(160, 34, 311, 26)
 
-        self._ui_description = QPlainTextEdit(self._description, self)
+        self._ui_description = QtWidgets.QPlainTextEdit(self._description, self)
         self._ui_description.setObjectName("g_about_description")
-        self._ui_description.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self._ui_description.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self._ui_description.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self._ui_description.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self._ui_description.setReadOnly(True)
-        self._ui_description.setTextInteractionFlags(Qt.NoTextInteraction)
-        self._ui_description.viewport().setCursor(Qt.ArrowCursor)
+        self._ui_description.setTextInteractionFlags(QtCore.Qt.NoTextInteraction)
+        self._ui_description.viewport().setCursor(QtCore.Qt.ArrowCursor)
         self._ui_description.setGeometry(156, 74, 311, 100)
 
         self.setWindowTitle("About %s" % (self._title,))
-        self.setWindowFlags(Qt.WindowCloseButtonHint)
+        self.setWindowFlags(QtCore.Qt.WindowCloseButtonHint)
         self.setGeometry(100, 100, 484, 224)
         self.setFixedSize(484, 190)

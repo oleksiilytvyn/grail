@@ -37,7 +37,7 @@ def guard_lock(func):
 class CuelistDialog(QPopup):
     """Displays list of Cuelist's"""
 
-    selected = pyqtSignal(int)
+    selected = QtSignal(int)
 
     def __init__(self):
         super(CuelistDialog, self).__init__()
@@ -50,10 +50,10 @@ class CuelistDialog(QPopup):
 
     def __ui__(self):
 
-        self.setBackgroundColor(QColor("#222"))
+        self.setBackgroundColor(QtGui.QColor("#222"))
         self.setObjectName('cuelist_dialog')
 
-        self._ui_layout = QVBoxLayout()
+        self._ui_layout = QtWidgets.QVBoxLayout()
         self._ui_layout.setSpacing(0)
         self._ui_layout.setContentsMargins(0, 0, 0, 0)
 
@@ -62,14 +62,14 @@ class CuelistDialog(QPopup):
         self._ui_list.cellChanged.connect(self._list_cell_changed)
         self._ui_list.itemSelectionChanged.connect(self._list_item_selected)
 
-        self._ui_edit_action = QAction(Icon(':/rc/edit.png'), 'Edit', self)
+        self._ui_edit_action = QtWidgets.QAction(Icon(':/rc/edit.png'), 'Edit', self)
         self._ui_edit_action.triggered.connect(self.edit_action)
 
-        self._ui_add_action = QAction(Icon(':/rc/add.png'), 'Add', self)
+        self._ui_add_action = QtWidgets.QAction(Icon(':/rc/add.png'), 'Add', self)
         self._ui_add_action.setIconVisibleInMenu(True)
         self._ui_add_action.triggered.connect(self.add_action)
 
-        self._ui_toolbar = QToolBar()
+        self._ui_toolbar = QtWidgets.QToolBar()
         self._ui_toolbar.setObjectName("cuelist_dialog_toolbar")
         self._ui_toolbar.addAction(self._ui_edit_action)
         self._ui_toolbar.addStretch()
@@ -153,31 +153,31 @@ class CuelistDialog(QPopup):
         self._ui_list.editItem(self._ui_list.item(self._ui_list.rowCount() - 1, 0))
 
 
-class CuelistsListItem(QTableWidgetItem):
+class CuelistsListItem(QtWidgets.QTableWidgetItem):
     """Playlist item inside playlist dialog"""
 
     def __init__(self, title):
         super(CuelistsListItem, self).__init__(title)
 
-        self.setFlags(Qt.ItemIsEditable | Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+        self.setFlags(QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
 
 
-class CuelistsListButton(QWidget):
+class CuelistsListButton(QtWidgets.QWidget):
     """Button widget used in list of Cuelist's"""
 
-    clicked = pyqtSignal("QWidget")
+    clicked = QtSignal("QWidget")
 
     def __init__(self, parent):
         super(CuelistsListButton, self).__init__(parent)
 
-        self._icon = QPixmap(':/rc/remove-white.png')
+        self._icon = QtGui.QPixmap(':/rc/remove-white.png')
 
     def paintEvent(self, event):
         """Draw button widget"""
 
         size = 18
 
-        p = QPainter()
+        p = QtGui.QPainter()
         p.begin(self)
 
         p.drawPixmap(self.width() / 2 - size / 2, self.height() / 2 - size / 2, size, size, self._icon)
@@ -190,7 +190,7 @@ class CuelistsListButton(QWidget):
         self.clicked.emit(self)
 
 
-class CuelistsListWidget(QTableWidget):
+class CuelistsListWidget(QtWidgets.QTableWidget):
     """Cuelist list widget used in CuelistDialog"""
 
     def __init__(self, parent=None):
@@ -198,8 +198,8 @@ class CuelistsListWidget(QTableWidget):
 
         super(CuelistsListWidget, self).__init__(parent)
 
-        self.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
-        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setVerticalScrollMode(QtWidgets.QAbstractItemView.ScrollPerPixel)
+        self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.setAutoScroll(False)
 
         self.setColumnCount(2)
@@ -209,17 +209,17 @@ class CuelistsListWidget(QTableWidget):
         self.setShowGrid(False)
 
         header = self.horizontalHeader()
-        header.setSectionResizeMode(0, QHeaderView.Stretch)
-        header.setSectionResizeMode(1, QHeaderView.Fixed)
+        header.setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
+        header.setSectionResizeMode(1, QtWidgets.QHeaderView.Fixed)
 
         self.setColumnWidth(1, 42)
         self.setAlternatingRowColors(True)
-        self.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
+        self.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
 
         original = self.verticalScrollBar()
 
-        self._scrollbar = QScrollBar(Qt.Vertical, self)
+        self._scrollbar = QtWidgets.QScrollBar(QtCore.Qt.Vertical, self)
         self._scrollbar.valueChanged.connect(original.setValue)
         self._scrollbar.rangeChanged.connect(self.scroll_to_selected)
 
@@ -230,7 +230,7 @@ class CuelistsListWidget(QTableWidget):
     def paintEvent(self, event):
         """Draw widget"""
 
-        QTableWidget.paintEvent(self, event)
+        QtWidgets.QTableWidget.paintEvent(self, event)
 
     def update(self, **kwargs):
         """Update ui components"""
@@ -271,7 +271,7 @@ class CuelistsListWidget(QTableWidget):
         self.scrollToItem(self.item(x, 0))
 
 
-class CueDialog(QDialog):
+class CueDialog(QtWidgets.QDialog):
     """Cue editor dialog"""
 
     def __init__(self, viewer):
@@ -304,71 +304,71 @@ class CueDialog(QDialog):
             return lambda: self._follow_changed(menu_action.data())
 
         # General section
-        self._ui_text = QTextEdit()
+        self._ui_text = QtWidgets.QTextEdit()
         self._ui_text.setPlaceholderText("Name")
-        self._ui_text.setAttribute(Qt.WA_MacShowFocusRect, 0)
+        self._ui_text.setAttribute(QtCore.Qt.WA_MacShowFocusRect, 0)
         self._ui_text.setAcceptRichText(False)
         self._ui_text.sizePolicy().setVerticalStretch(1)
         self._ui_text.setMinimumHeight(120)
 
-        self._ui_number = QLineEdit()
+        self._ui_number = QtWidgets.QLineEdit()
         self._ui_number.setPlaceholderText("Number")
-        self._ui_number.setValidator(QDoubleValidator(0, 1000, 2, self))
+        self._ui_number.setValidator(QtGui.QDoubleValidator(0, 1000, 2, self))
         self._ui_number.setMaximumWidth(80)
 
-        self._ui_color_menu = QMenu(self)
+        self._ui_color_menu = QtWidgets.QMenu(self)
 
         for color, name in zip(CueEntity.COLORS, CueEntity.COLOR_NAMES):
-            action = QAction(name, self._ui_color_menu)
+            action = QtWidgets.QAction(name, self._ui_color_menu)
             action.setData(color)
             action.triggered.connect(color_triggered(action))
 
             self._ui_color_menu.addAction(action)
 
-        self._ui_color = QPushButton("")
+        self._ui_color = QtWidgets.QPushButton("")
         self._ui_color.setObjectName("CueDialog_color_btn")
         self._ui_color.setIcon(Icon(":/rc/live.png"))
         self._ui_color.setMenu(self._ui_color_menu)
 
-        self._ui_follow_menu = QMenu(self)
+        self._ui_follow_menu = QtWidgets.QMenu(self)
 
         for name, value in self.follow_options.items():
-            action = QAction(name, self._ui_follow_menu)
+            action = QtWidgets.QAction(name, self._ui_follow_menu)
             action.setData(value)
             action.triggered.connect(follow_triggered(action))
 
             self._ui_follow_menu.addAction(action)
 
-        self._ui_follow = QPushButton("Follow")
+        self._ui_follow = QtWidgets.QPushButton("Follow")
         self._ui_follow.setObjectName("CueDialog_follow_btn")
         self._ui_follow.setMenu(self._ui_follow_menu)
 
-        self._ui_pre_wait = QLineEdit()
-        self._ui_pre_wait.setValidator(QDoubleValidator(0, 1000, 2, self))
+        self._ui_pre_wait = QtWidgets.QLineEdit()
+        self._ui_pre_wait.setValidator(QtGui.QDoubleValidator(0, 1000, 2, self))
         self._ui_pre_wait.setPlaceholderText("Pre wait")
         self._ui_pre_wait.setMaximumWidth(80)
 
-        self._ui_post_wait = QLineEdit()
-        self._ui_post_wait.setValidator(QDoubleValidator(0, 1000, 2, self))
+        self._ui_post_wait = QtWidgets.QLineEdit()
+        self._ui_post_wait.setValidator(QtGui.QDoubleValidator(0, 1000, 2, self))
         self._ui_post_wait.setPlaceholderText("Post wait")
         self._ui_post_wait.setMaximumWidth(80)
 
-        self._ui_opt_layout = QGridLayout()
+        self._ui_opt_layout = QtWidgets.QGridLayout()
         self._ui_opt_layout.setSpacing(6)
         self._ui_opt_layout.setContentsMargins(0, 0, 0, 0)
         self._ui_opt_layout.addWidget(self._ui_number, 1, 0)
-        self._ui_opt_layout.addWidget(QLabel("Number"), 0, 0, Qt.AlignHCenter)
+        self._ui_opt_layout.addWidget(QtWidgets.QLabel("Number"), 0, 0, QtCore.Qt.AlignHCenter)
         self._ui_opt_layout.addWidget(self._ui_pre_wait, 1, 1)
-        self._ui_opt_layout.addWidget(QLabel("Pre"), 0, 1, Qt.AlignHCenter)
+        self._ui_opt_layout.addWidget(QtWidgets.QLabel("Pre"), 0, 1, QtCore.Qt.AlignHCenter)
         self._ui_opt_layout.addWidget(self._ui_post_wait, 1, 2)
-        self._ui_opt_layout.addWidget(QLabel("Post"), 0, 2, Qt.AlignHCenter)
+        self._ui_opt_layout.addWidget(QtWidgets.QLabel("Post"), 0, 2, QtCore.Qt.AlignHCenter)
         self._ui_opt_layout.setColumnStretch(3, 1)
         self._ui_opt_layout.addWidget(self._ui_color, 1, 4)
-        self._ui_opt_layout.addWidget(QLabel("Color"), 0, 4, Qt.AlignHCenter)
+        self._ui_opt_layout.addWidget(QtWidgets.QLabel("Color"), 0, 4, QtCore.Qt.AlignHCenter)
         self._ui_opt_layout.addWidget(self._ui_follow, 1, 5)
-        self._ui_opt_layout.addWidget(QLabel("Execution"), 0, 5, Qt.AlignHCenter)
+        self._ui_opt_layout.addWidget(QtWidgets.QLabel("Execution"), 0, 5, QtCore.Qt.AlignHCenter)
 
-        self._ui_opt_widget = QWidget()
+        self._ui_opt_widget = QtWidgets.QWidget()
         self._ui_opt_widget.setObjectName("CueDialog_options")
         self._ui_opt_widget.setLayout(self._ui_opt_layout)
 
@@ -377,18 +377,18 @@ class CueDialog(QDialog):
         self._ui_properties.setEntityFollow(True)
 
         # Toolbar
-        self._ui_add_action = QAction(Icon(':/rc/add.png'), 'Add property', self)
+        self._ui_add_action = QtWidgets.QAction(Icon(':/rc/add.png'), 'Add property', self)
         self._ui_add_action.setIconVisibleInMenu(True)
         self._ui_add_action.triggered.connect(self._ui_properties.addProperty)
 
-        self._ui_remove_action = QAction(Icon(':/rc/remove-white.png'), 'Remove property', self)
+        self._ui_remove_action = QtWidgets.QAction(Icon(':/rc/remove-white.png'), 'Remove property', self)
         self._ui_remove_action.setIconVisibleInMenu(True)
         self._ui_remove_action.triggered.connect(self._ui_properties.removeSelected)
 
-        self._ui_done_action = QPushButton('Done', self)
+        self._ui_done_action = QtWidgets.QPushButton('Done', self)
         self._ui_done_action.clicked.connect(self.accept_action)
 
-        self._ui_toolbar = QToolBar()
+        self._ui_toolbar = QtWidgets.QToolBar()
         self._ui_toolbar.setObjectName("CueDialog_toolbar")
         self._ui_toolbar.setMinimumHeight(40)
         self._ui_toolbar.addAction(self._ui_remove_action)
@@ -397,19 +397,19 @@ class CueDialog(QDialog):
         self._ui_toolbar.addWidget(self._ui_done_action)
 
         # Layout
-        self._ui_layout = QVBoxLayout()
+        self._ui_layout = QtWidgets.QVBoxLayout()
 
-        self._ui_general_layout = QVBoxLayout()
+        self._ui_general_layout = QtWidgets.QVBoxLayout()
         self._ui_general_layout.setSpacing(8)
         self._ui_general_layout.setContentsMargins(12, 12, 12, 10)
         self._ui_general_layout.addWidget(self._ui_text)
         self._ui_general_layout.addWidget(self._ui_opt_widget)
 
-        self._ui_general = QWidget()
+        self._ui_general = QtWidgets.QWidget()
         self._ui_general.setObjectName("CueDialog_layout")
         self._ui_general.setLayout(self._ui_general_layout)
 
-        self._ui_splitter = QSplitter(Qt.Vertical)
+        self._ui_splitter = QtWidgets.QSplitter(QtCore.Qt.Vertical)
         self._ui_splitter.setHandleWidth(2)
         self._ui_splitter.addWidget(self._ui_general)
         self._ui_splitter.addWidget(self._ui_properties)
@@ -424,7 +424,7 @@ class CueDialog(QDialog):
         self.setWindowTitle('Cue Inspector')
         self.setMinimumSize(300, 400)
         self.setGeometry(200, 200, 300, 400)
-        self.setWindowFlags(Qt.WindowCloseButtonHint)
+        self.setWindowFlags(QtCore.Qt.WindowCloseButtonHint)
 
     def _follow_changed(self, value):
 
@@ -442,7 +442,7 @@ class CueDialog(QDialog):
         self._color = value
 
         if value:
-            self._ui_color.setIcon(Icon.colored(':/rc/live.png', QColor(value), QColor('#e3e3e3')))
+            self._ui_color.setIcon(Icon.colored(':/rc/live.png', QtGui.QColor(value), QtGui.QColor('#e3e3e3')))
         else:
             self._ui_color.setIcon(Icon(':/rc/live.png'))
 
@@ -512,7 +512,7 @@ class CuelistViewer(Viewer):
         self._selected_id = None
         self._update_lock = False
 
-        self._cue_timer = QTimer()
+        self._cue_timer = QtCore.QTimer()
         self._cue_timer.setSingleShot(True)
         self._cue_timer.timeout.connect(self._cue_timer_execute)
 
@@ -532,7 +532,7 @@ class CuelistViewer(Viewer):
 
         self.setObjectName("CuelistViewer")
 
-        self._ui_layout = QVBoxLayout()
+        self._ui_layout = QtWidgets.QVBoxLayout()
         self._ui_layout.setObjectName("CuelistViewer_layout")
         self._ui_layout.setSpacing(0)
         self._ui_layout.setContentsMargins(0, 0, 0, 0)
@@ -542,7 +542,7 @@ class CuelistViewer(Viewer):
         self._ui_tree.setHeaderHidden(True)
         self._ui_tree.setHeaderLabels(['Number', 'Name'])
 
-        self._ui_tree.setContextMenuPolicy(Qt.CustomContextMenu)
+        self._ui_tree.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self._ui_tree.customContextMenuRequested.connect(self._context_menu)
         self._ui_tree.itemExpanded.connect(self.item_expanded)
         self._ui_tree.itemCollapsed.connect(self.item_collapsed)
@@ -552,51 +552,51 @@ class CuelistViewer(Viewer):
         self._ui_tree.keyPressEvent = self._key_event
 
         # Empty
-        self._ui_empty_title = QLabel("No Cuelist")
+        self._ui_empty_title = QtWidgets.QLabel("No Cuelist")
         self._ui_empty_title.setObjectName('CuelistViewer_empty_title')
 
-        self._ui_empty_info = QLabel("Cuelist not selected or there are no cuelist.")
+        self._ui_empty_info = QtWidgets.QLabel("Cuelist not selected or there are no cuelist.")
         self._ui_empty_info.setObjectName('CuelistViewer_empty_info')
         self._ui_empty_info.setWordWrap(True)
 
-        self._ui_empty_layout = QVBoxLayout()
+        self._ui_empty_layout = QtWidgets.QVBoxLayout()
         self._ui_empty_layout.setContentsMargins(12, 12, 12, 12)
-        self._ui_empty_layout.setAlignment(Qt.AlignHCenter)
+        self._ui_empty_layout.setAlignment(QtCore.Qt.AlignHCenter)
         self._ui_empty_layout.addStretch()
         self._ui_empty_layout.addWidget(self._ui_empty_title)
         self._ui_empty_layout.addWidget(self._ui_empty_info)
         self._ui_empty_layout.addStretch()
 
-        self._ui_empty = QWidget()
+        self._ui_empty = QtWidgets.QWidget()
         self._ui_empty.setObjectName('CuelistViewer_empty')
         self._ui_empty.setLayout(self._ui_empty_layout)
 
-        self._ui_stack = QStackedWidget()
+        self._ui_stack = QtWidgets.QStackedWidget()
         self._ui_stack.addWidget(self._ui_empty)
         self._ui_stack.addWidget(self._ui_tree)
         self._ui_stack.setCurrentIndex(0)
 
-        self._ui_label = QLabel("...")
+        self._ui_label = QtWidgets.QLabel("...")
         self._ui_label.setObjectName("CuelistViewer_label")
-        self._ui_label.setAlignment(Qt.AlignCenter)
-        self._ui_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self._ui_label.setContextMenuPolicy(Qt.CustomContextMenu)
+        self._ui_label.setAlignment(QtCore.Qt.AlignCenter)
+        self._ui_label.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        self._ui_label.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self._ui_label.mousePressEvent = lambda event: self.menu_action()
 
-        self._ui_view_action = QToolButton()
+        self._ui_view_action = QtWidgets.QToolButton()
         self._ui_view_action.setText("View")
         self._ui_view_action.setIcon(Icon(':/rc/menu.png'))
         self._ui_view_action.clicked.connect(self.view_action)
 
-        self._ui_lock_action = QAction(Icon(':/rc/unlock.png'), 'Lock cuelist', self)
+        self._ui_lock_action = QtWidgets.QAction(Icon(':/rc/unlock.png'), 'Lock cuelist', self)
         self._ui_lock_action.setIconVisibleInMenu(True)
         self._ui_lock_action.triggered.connect(self.lock_action)
 
-        self._ui_add_action = QAction(Icon(':/rc/add.png'), 'Add new Cue', self)
+        self._ui_add_action = QtWidgets.QAction(Icon(':/rc/add.png'), 'Add new Cue', self)
         self._ui_add_action.setIconVisibleInMenu(True)
         self._ui_add_action.triggered.connect(self.add_action)
 
-        self._ui_toolbar = QToolBar()
+        self._ui_toolbar = QtWidgets.QToolBar()
         self._ui_toolbar.addWidget(self._ui_view_action)
         self._ui_toolbar.addWidget(self._ui_label)
         self._ui_toolbar.addAction(self._ui_lock_action)
@@ -615,7 +615,7 @@ class CuelistViewer(Viewer):
     def menu_action(self):
         """Open a list of all cuelists"""
 
-        point = QPoint(self.rect().width() / 2, self.rect().height() - 16)
+        point = QtCore.QPoint(self.rect().width() / 2, self.rect().height() - 16)
 
         self._dialog.update_list()
         self._dialog.showAt(self.mapToGlobal(point))
@@ -626,9 +626,9 @@ class CuelistViewer(Viewer):
         self._locked = not self._locked
 
         if self._locked:
-            self._ui_lock_action.setIcon(Icon.colored(':/rc/lock.png', QColor('#aeca4b'), QColor('#e3e3e3')))
+            self._ui_lock_action.setIcon(Icon.colored(':/rc/lock.png', QtGui.QColor('#aeca4b'), QtGui.QColor('#e3e3e3')))
         else:
-            self._ui_lock_action.setIcon(QIcon(':/rc/unlock.png'))
+            self._ui_lock_action.setIcon(QtGui.QIcon(':/rc/unlock.png'))
 
         self._ui_tree.setDragEnabled(not self._locked)
 
@@ -696,7 +696,7 @@ class CuelistViewer(Viewer):
         entity = item.object()
         new_entity = entity.parent.insert(entity.index + 1, entity)
 
-        match = re.match('^([\s\w]+)copy(\ ([\d]+))?$', new_entity.name, re.MULTILINE|re.IGNORECASE)
+        match = re.match('^([sw]+)copy( ([d]+))?$', new_entity.name, re.MULTILINE|re.IGNORECASE)
 
         if match:
             name = match.group(1)
@@ -825,8 +825,8 @@ class CuelistViewer(Viewer):
 
             if isinstance(_entity, CueEntity):
                 if _entity.color != CueEntity.COLOR_DEFAULT:
-                    bg = QBrush(QColor(_entity.color))
-                    fg = QBrush(QColor("#222" if _entity.color == CueEntity.COLOR_YELLOW else "#fff"))
+                    bg = QtGui.QBrush(QtGui.QColor(_entity.color))
+                    fg = QtGui.QBrush(QtGui.QColor("#222" if _entity.color == CueEntity.COLOR_YELLOW else "#fff"))
 
                     _item.setBackground(0, bg)
                     _item.setForeground(0, fg)
@@ -941,20 +941,20 @@ class CuelistViewer(Viewer):
         def create_color_action(this, action_index, name, menu_ref):
             """Create, connect and return QAction."""
 
-            action = QAction(name, menu_ref)
+            action = QtWidgets.QAction(name, menu_ref)
             action.triggered.connect(lambda: this.item_color(item, CueEntity.COLORS[action_index]))
 
             return action
 
-        menu = QMenu("Context Menu", self)
+        menu = QtWidgets.QMenu("Context Menu", self)
 
-        delete_action = QAction('Delete Cue', menu)
+        delete_action = QtWidgets.QAction('Delete Cue', menu)
         delete_action.triggered.connect(lambda: self.item_delete(item))
 
-        edit_action = QAction('Edit Cue', menu)
+        edit_action = QtWidgets.QAction('Edit Cue', menu)
         edit_action.triggered.connect(lambda: self.item_edit(item))
 
-        duplicate_action = QAction('Duplicate Cue', menu)
+        duplicate_action = QtWidgets.QAction('Duplicate Cue', menu)
         duplicate_action.triggered.connect(lambda: self.item_duplicate(item))
 
         menu.addAction(edit_action)
@@ -976,15 +976,15 @@ class CuelistViewer(Viewer):
         key = event.key()
 
         if item:
-            if key == Qt.Key_Return:
+            if key == QtCore.Qt.Key_Return:
                 self.item_double_clicked(item)
                 return
-            elif key == Qt.Key_Delete or key == Qt.Key_Backspace:
+            elif key == QtCore.Qt.Key_Delete or key == QtCore.Qt.Key_Backspace:
                 self.item_delete(item)
                 return
-            elif key == Qt.Key_Up:
+            elif key == QtCore.Qt.Key_Up:
                 self.item_clicked(item)
-            elif key == Qt.Key_Down:
+            elif key == QtCore.Qt.Key_Down:
                 self.item_clicked(item)
 
         # call default event handler
@@ -1083,7 +1083,7 @@ class CuelistViewer(Viewer):
         self._dialog.close()
 
 
-class TreeWidget(QTreeWidget):
+class TreeWidget(QtWidgets.QTreeWidget):
     """Tree widget used in CuelistViewer"""
 
     def __init__(self, *args):
@@ -1108,16 +1108,16 @@ class TreeWidget(QTreeWidget):
             return
 
         # manage a boolean for the case when you are above an item
-        if drop_indicator == QAbstractItemView.AboveItem:
+        if drop_indicator == QtWidgets.QAbstractItemView.AboveItem:
             dragging.object().index = dropping.object().index - 1
         # something when being below an item
-        elif drop_indicator == QAbstractItemView.BelowItem:
+        elif drop_indicator == QtWidgets.QAbstractItemView.BelowItem:
             dragging.object().index = dropping.object().index + 1
         # you're on an item, maybe add the current one as a child
-        elif drop_indicator == QAbstractItemView.OnItem:
+        elif drop_indicator == QtWidgets.QAbstractItemView.OnItem:
             dragging.object().parent_id = dropping.object().id
         # you are not on your tree
-        elif drop_indicator == QAbstractItemView.OnViewport:
+        elif drop_indicator == QtWidgets.QAbstractItemView.OnViewport:
             pass
 
         QTreeWidget.dropEvent(self, event)

@@ -15,17 +15,17 @@ from grail.core import Viewer
 from grail.plugins import EmptyViewer
 
 
-class ViewArranger(QWidget):
+class ViewArranger(QtWidgets.QWidget):
     """Widget that manages grail layout and visual representation of plugins"""
 
     def __init__(self, parent=None):
         super(ViewArranger, self).__init__(parent)
 
         self._viewers = []
-        self._layout = QHBoxLayout()
+        self._layout = QtWidgets.QHBoxLayout()
         self._root = None
         self._lock = False
-        self._timer = QTimer()
+        self._timer = QtCore.QTimer()
         self._timer.timeout.connect(self._timeout)
         self._timer.setInterval(500)
 
@@ -39,7 +39,7 @@ class ViewArranger(QWidget):
         views = structure[1:]
         layout = structure[0]
         horizontal = layout['layout/orientation'] == 'horizontal'
-        splitter = _Splitter(Qt.Horizontal if horizontal else Qt.Vertical)
+        splitter = _Splitter(QtCore.Qt.Horizontal if horizontal else QtCore.Qt.Vertical)
         splitter.splitterMoved.connect(self._splitter_moved)
         sizes = []
 
@@ -81,7 +81,7 @@ class ViewArranger(QWidget):
             return structure
 
         sizes = splitter.sizes()
-        vertical = splitter.orientation() == Qt.Vertical
+        vertical = splitter.orientation() == QtCore.Qt.Vertical
 
         structure.append({
             'layout/type': 'layout',
@@ -170,7 +170,7 @@ class ViewArranger(QWidget):
         splitter = viewer.parentWidget()
         index = splitter.indexOf(viewer)
         view = self._create('empty', splitter)
-        orientation = Qt.Horizontal if direction == 'h' else Qt.Vertical
+        orientation = QtCore.Qt.Horizontal if direction == 'h' else QtCore.Qt.Vertical
 
         if splitter.orientation() == orientation:
 
@@ -237,7 +237,7 @@ class ViewArranger(QWidget):
         self._update()
 
 
-class _Splitter(QSplitter):
+class _Splitter(QtWidgets.QSplitter):
     """Customized splitter for ViewArranger"""
 
     def __init__(self, orientation):

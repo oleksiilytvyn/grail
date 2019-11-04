@@ -51,33 +51,33 @@ class NodeViewer(Viewer):
         self.setObjectName("NodeViewer")
 
         self._ui_tree = _TreeWidget()
-        self._ui_tree.setContextMenuPolicy(Qt.CustomContextMenu)
+        self._ui_tree.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self._ui_tree.itemSelectionChanged.connect(self._selection_changed)
         self._ui_tree.itemExpanded.connect(self._item_expanded)
         self._ui_tree.itemCollapsed.connect(self._item_collapsed)
         self._ui_tree.customContextMenuRequested.connect(self._context_menu)
 
-        self._ui_add_action = QAction(QIcon(':/rc/add.png'), 'Add node', self)
+        self._ui_add_action = QtWidgets.QAction(QtGui.QIcon(':/rc/add.png'), 'Add node', self)
         self._ui_add_action.setIconVisibleInMenu(True)
         self._ui_add_action.triggered.connect(self.add_action)
 
-        self._ui_remove_action = QAction(QIcon(':/rc/remove-white.png'), 'Remove node', self)
+        self._ui_remove_action = QtWidgets.QAction(QtGui.QIcon(':/rc/remove-white.png'), 'Remove node', self)
         self._ui_remove_action.setIconVisibleInMenu(True)
         self._ui_remove_action.triggered.connect(self.remove_action)
 
-        self._ui_view_action = QToolButton()
+        self._ui_view_action = QtWidgets.QToolButton()
         self._ui_view_action.setText("View")
-        self._ui_view_action.setIcon(QIcon(':/rc/menu.png'))
+        self._ui_view_action.setIcon(QtGui.QIcon(':/rc/menu.png'))
         self._ui_view_action.clicked.connect(self.view_action)
 
-        self._ui_toolbar = QToolBar()
+        self._ui_toolbar = QtWidgets.QToolBar()
         self._ui_toolbar.setObjectName("NodeViewer_toolbar")
         self._ui_toolbar.addWidget(self._ui_view_action)
         self._ui_toolbar.addStretch()
         self._ui_toolbar.addAction(self._ui_remove_action)
         self._ui_toolbar.addAction(self._ui_add_action)
 
-        self._ui_layout = QVBoxLayout()
+        self._ui_layout = QtWidgets.QVBoxLayout()
         self._ui_layout.addWidget(self._ui_tree)
         self._ui_layout.addWidget(self._ui_toolbar)
 
@@ -88,7 +88,7 @@ class NodeViewer(Viewer):
 
         dna = self.app.project.dna
         selected_item = None
-        system_icon = Icon.colored(':/rc/unlock.png', QColor('#aeca4b'), QColor('#e3e3e3'))
+        system_icon = Icon.colored(':/rc/unlock.png', QtGui.QColor('#aeca4b'), QtGui.QColor('#e3e3e3'))
 
         self._ui_tree.clear()
 
@@ -98,7 +98,7 @@ class NodeViewer(Viewer):
             nonlocal system_icon
 
             for child in dna.childs(parent_id):
-                child_item = QTreeWidgetItem(child)
+                child_item = QtWidgets.QTreeWidgetItem(child)
                 child_item.setText(0, child.name)
 
                 if child.type in self._system_types:
@@ -111,7 +111,7 @@ class NodeViewer(Viewer):
                 tree_item.addChild(child_item)
 
         for entity in dna.childs(0):
-            item = QTreeWidgetItem(entity)
+            item = QtWidgets.QTreeWidgetItem(entity)
             item.setText(0, entity.name)
 
             add_childs(item, entity.id)
@@ -125,7 +125,7 @@ class NodeViewer(Viewer):
             self._ui_tree.addTopLevelItem(item)
 
         # expand items
-        for item in self._ui_tree.findItems('', Qt.MatchContains | Qt.MatchRecursive):
+        for item in self._ui_tree.findItems('', QtCore.Qt.MatchContains | QtCore.Qt.MatchRecursive):
             item.setExpanded(self._folded[item.object().id])
 
         if selected_item:
@@ -166,12 +166,12 @@ class NodeViewer(Viewer):
         if item.object().type in self._system_types:
             return False
 
-        menu = QMenu("Context menu", self)
+        menu = QtWidgets.QMenu("Context menu", self)
 
-        remove_action = QAction('Remove', menu)
+        remove_action = QtWidgets.QAction('Remove', menu)
         remove_action.triggered.connect(lambda: self.remove_action())
 
-        add_action = QAction('Add', menu)
+        add_action = QtWidgets.QAction('Add', menu)
         add_action.triggered.connect(lambda: self.add_action())
 
         menu.addAction(remove_action)
@@ -219,7 +219,7 @@ class NodeViewer(Viewer):
             self.emit('!node/selected', above)
 
 
-class _TreeWidget(QTreeWidget):
+class _TreeWidget(QtWidgets.QTreeWidget):
 
     def __init__(self, *args):
         super(_TreeWidget, self).__init__(*args)
@@ -242,17 +242,17 @@ class _TreeWidget(QTreeWidget):
             return
 
         # manage a boolean for the case when you are above an item
-        if drop_indicator == QAbstractItemView.AboveItem:
+        if drop_indicator == QtWidgets.QAbstractItemView.AboveItem:
             dragging.object().index = dropping.object().index - 1
         # something when being below an item
-        elif drop_indicator == QAbstractItemView.BelowItem:
+        elif drop_indicator == QtWidgets.QAbstractItemView.BelowItem:
             dragging.object().index = dropping.object().index + 1
         # you're on an item, maybe add the current one as a child
-        elif drop_indicator == QAbstractItemView.OnItem:
+        elif drop_indicator == QtWidgets.QAbstractItemView.OnItem:
             dragging.object().parent_id = dropping.object().id
             # dragging.object().index = dropping.object().id
         # you are not on your tree
-        elif drop_indicator == QAbstractItemView.OnViewport:
+        elif drop_indicator == QtWidgets.QAbstractItemView.OnViewport:
             pass
 
-        QTreeWidget.dropEvent(self, event)
+        QtWidgets.QTreeWidget.dropEvent(self, event)

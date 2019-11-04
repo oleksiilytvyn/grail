@@ -44,36 +44,36 @@ class DisplayViewer(Viewer):
 
     def __ui__(self):
 
-        self._ui_view = QGraphicsView()
-        self._ui_view.setAlignment(Qt.AlignCenter)
-        self._ui_view.setDragMode(QGraphicsView.ScrollHandDrag)
-        self._ui_view.setBackgroundBrush(QBrush(QColor(qt_colors.WIDGET)))
-        self._ui_view.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self._ui_view.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self._ui_view = QtWidgets.QGraphicsView()
+        self._ui_view.setAlignment(QtCore.Qt.AlignCenter)
+        self._ui_view.setDragMode(QtWidgets.QGraphicsView.ScrollHandDrag)
+        self._ui_view.setBackgroundBrush(QtGui.QBrush(QtGui.QColor(qt_colors.WIDGET)))
+        self._ui_view.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self._ui_view.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
 
-        self._ui_fit = QPushButton("fit")
+        self._ui_fit = QtWidgets.QPushButton("fit")
         self._ui_fit.clicked.connect(self._fit_clicked)
 
-        self._ui_scale_factor = QDoubleSpinBox()
+        self._ui_scale_factor = QtWidgets.QDoubleSpinBox()
         self._ui_scale_factor.setMinimum(10)
         self._ui_scale_factor.setMaximum(200)
         self._ui_scale_factor.setValue(100)
         self._ui_scale_factor.setMaximumWidth(70)
         self._ui_scale_factor.valueChanged.connect(self._scale_changed)
 
-        self._ui_view_action = QToolButton()
+        self._ui_view_action = QtWidgets.QToolButton()
         self._ui_view_action.setText("View")
         self._ui_view_action.setIcon(Icon(':/rc/menu.png'))
         self._ui_view_action.clicked.connect(self.view_action)
 
-        self._ui_toolbar = QToolBar()
+        self._ui_toolbar = QtWidgets.QToolBar()
         self._ui_toolbar.setObjectName("DisplayPreviewViewer_toolbar")
         self._ui_toolbar.addWidget(self._ui_view_action)
         self._ui_toolbar.addStretch()
         self._ui_toolbar.addWidget(self._ui_fit)
         self._ui_toolbar.addWidget(self._ui_scale_factor)
 
-        self._ui_layout = QVBoxLayout()
+        self._ui_layout = QtWidgets.QVBoxLayout()
         self._ui_layout.addWidget(self._ui_view)
         self._ui_layout.addWidget(self._ui_toolbar)
 
@@ -124,4 +124,4 @@ class DisplayViewer(Viewer):
         """Composition scene size changed"""
 
         # Wait composition to refresh and then fit
-        QTimer.singleShot(50, lambda: self._fit_clicked())
+        QtCore.QTimer.singleShot(50, lambda: self._fit_clicked())

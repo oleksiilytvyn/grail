@@ -21,7 +21,7 @@ APPLICATION_NAME = "Grail"
 APPLICATION_WEB = "http://grailapp.com/"
 ORGANISATION_NAME = "Grail"
 ORGANISATION_DOMAIN = "grailapp.com"
-
+GUID = "{1f82a4c1-681d-43c3-b1b6-d63788c147a0}"
 LIBRARY_PATH = grailkit.PATH_LIBRARY
 SETTINGS_PATH = os.path.join(data_location("grail"), "app.grail")
 

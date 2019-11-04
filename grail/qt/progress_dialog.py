@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 """
-    grail.qt.progress_dialog
+    grail.QtCore.Qt.progress_dialog
     ~~~~~~~~~~~~~~~~~~~~~~~~
 
     Dialog for displaying any progress
@@ -11,7 +11,7 @@
 from grail.qt import *
 
 
-class ProgressDialog(QDialog):
+class ProgressDialog(QtWidgets.QDialog):
     """Progress dialog with cancel button, title and description text"""
 
     def __init__(self, parent=None,
@@ -37,41 +37,41 @@ class ProgressDialog(QDialog):
 
     def __ui__(self):
 
-        self._ui_icon = QLabel(self)
-        self._ui_icon.setAlignment(Qt.AlignCenter)
+        self._ui_icon = QtWidgets.QLabel(self)
+        self._ui_icon.setAlignment(QtCore.Qt.AlignCenter)
         self._ui_icon.setGeometry(12, 12, 56, 56)
 
-        self._ui_cancel_btn = QToolButton(self)
-        self._ui_cancel_btn.setIconSize(QSize(14, 14))
-        self._ui_cancel_btn.setIcon(QIcon(':/rc/search-clear.png'))
-        self._ui_cancel_btn.setCursor(Qt.ArrowCursor)
+        self._ui_cancel_btn = QtWidgets.QToolButton(self)
+        self._ui_cancel_btn.setIconSize(QtCore.QSize(14, 14))
+        self._ui_cancel_btn.setIcon(QtGui.QIcon(':/rc/search-clear.png'))
+        self._ui_cancel_btn.setCursor(QtCore.Qt.ArrowCursor)
         self._ui_cancel_btn.setGeometry(0, 0, 14, 14)
         self._ui_cancel_btn.clicked.connect(self.cancel)
 
-        self._ui_title = QLabel(self._title)
+        self._ui_title = QtWidgets.QLabel(self._title)
         self._ui_title.setObjectName("g_progress_title")
 
-        self._ui_text = QLabel(self._text)
+        self._ui_text = QtWidgets.QLabel(self._text)
         self._ui_text.setObjectName("g_progress_text")
 
-        self._ui_progress = QProgressBar()
+        self._ui_progress = QtWidgets.QProgressBar()
         self._ui_progress.setMinimum(0)
         self._ui_progress.setMaximum(100)
         self._ui_progress.setValue(50)
 
-        self._ui_layout = QVBoxLayout()
+        self._ui_layout = QtWidgets.QVBoxLayout()
         self._ui_layout.setContentsMargins(82, 0, 36, 0)
         self._ui_layout.setSpacing(0)
 
-        self._ui_layout.addWidget(self._ui_title, 1, Qt.AlignBottom)
-        self._ui_layout.addWidget(self._ui_progress, 0, Qt.AlignVCenter)
-        self._ui_layout.addWidget(self._ui_text, 1, Qt.AlignTop)
+        self._ui_layout.addWidget(self._ui_title, 1, QtCore.Qt.AlignBottom)
+        self._ui_layout.addWidget(self._ui_progress, 0, QtCore.Qt.AlignVCenter)
+        self._ui_layout.addWidget(self._ui_text, 1, QtCore.Qt.AlignTop)
 
         self.setLayout(self._ui_layout)
         self.setWindowTitle(self._title)
         self.setMinimumSize(420, 82)
         self.setGeometry(100, 100, 420, 82)
-        self.setWindowFlags(Qt.WindowCloseButtonHint | Qt.MSWindowsFixedSizeDialogHint)
+        self.setWindowFlags(QtCore.Qt.WindowCloseButtonHint | QtCore.Qt.MSWindowsFixedSizeDialogHint)
         self.setFixedSize(self.size().width(), self.size().height())
 
     def resizeEvent(self, event):
@@ -89,7 +89,7 @@ class ProgressDialog(QDialog):
     def icon(self):
         """Get a icon of dialog"""
 
-        return QIcon(self._icon)
+        return QtGui.QIcon(self._icon)
 
     def setIcon(self, icon):
         """Set dialog icon
@@ -100,12 +100,12 @@ class ProgressDialog(QDialog):
 
         size = 56
 
-        if isinstance(icon, QIcon):
+        if isinstance(icon, QtGui.QIcon):
             self._icon = icon.pixmap(size)
-        elif isinstance(icon, QPixmap):
+        elif isinstance(icon, QtGui.QPixmap):
             self._icon = icon.scaledToWidth(size)
         else:
-            self._icon = QApplication.style().standardIcon(QStyle.SP_MessageBoxInformation).pixmap(size)
+            self._icon = QtWidgets.QApplication.style().standardIcon(QtWidgets.QStyle.SP_MessageBoxInformation).pixmap(size)
 
         self._ui_icon.setPixmap(self._icon)
 

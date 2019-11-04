@@ -32,40 +32,40 @@ class GeneralConfigurator(Configurator):
 
     def __ui__(self):
 
-        self.ui_layout = QGridLayout()
+        self.ui_layout = QtWidgets.QGridLayout()
 
         # Reset
-        self.ui_reset_btn = QPushButton("Restore")
+        self.ui_reset_btn = QtWidgets.QPushButton("Restore")
         self.ui_reset_btn.clicked.connect(self.restore_action)
-        self.ui_reset_label = QLabel("Restore Grail to it's original state")
+        self.ui_reset_label = QtWidgets.QLabel("Restore Grail to it's original state")
 
-        self.ui_layout.addWidget(self.ui_reset_btn, 0, 1, Qt.AlignRight)
-        self.ui_layout.addWidget(self.ui_reset_label, 0, 0, Qt.AlignLeft)
+        self.ui_layout.addWidget(self.ui_reset_btn, 0, 1, QtCore.Qt.AlignRight)
+        self.ui_layout.addWidget(self.ui_reset_label, 0, 0, QtCore.Qt.AlignLeft)
 
         # Import
-        self.ui_import_btn = QPushButton("Import library")
+        self.ui_import_btn = QtWidgets.QPushButton("Import library")
         self.ui_import_btn.clicked.connect(self.import_action)
-        self.ui_import_label = QLabel("Add songs from a library file.")
+        self.ui_import_label = QtWidgets.QLabel("Add songs from a library file.")
 
-        self.ui_layout.addWidget(self.ui_import_btn, 1, 1, Qt.AlignRight)
-        self.ui_layout.addWidget(self.ui_import_label, 1, 0, Qt.AlignLeft)
+        self.ui_layout.addWidget(self.ui_import_btn, 1, 1, QtCore.Qt.AlignRight)
+        self.ui_layout.addWidget(self.ui_import_label, 1, 0, QtCore.Qt.AlignLeft)
 
         # Export
-        self.ui_export_btn = QPushButton("Export library")
+        self.ui_export_btn = QtWidgets.QPushButton("Export library")
         self.ui_export_btn.clicked.connect(self.export_action)
-        self.ui_export_label = QLabel("Save my library of songs to file.")
+        self.ui_export_label = QtWidgets.QLabel("Save my library of songs to file.")
 
-        self.ui_layout.addWidget(self.ui_export_btn, 2, 1, Qt.AlignRight)
-        self.ui_layout.addWidget(self.ui_export_label, 2, 0, Qt.AlignLeft)
+        self.ui_layout.addWidget(self.ui_export_btn, 2, 1, QtCore.Qt.AlignRight)
+        self.ui_layout.addWidget(self.ui_export_label, 2, 0, QtCore.Qt.AlignLeft)
 
         # Continue last project
         cont_flag = self.app.settings.get('project/continue', default=False)
-        self.ui_continue = QPushButton("On" if cont_flag else "Off")
+        self.ui_continue = QtWidgets.QPushButton("On" if cont_flag else "Off")
         self.ui_continue.clicked.connect(self.continue_action)
-        self.ui_continue_label = QLabel("Continue last project on startup")
+        self.ui_continue_label = QtWidgets.QLabel("Continue last project on startup")
 
-        self.ui_layout.addWidget(self.ui_continue, 3, 1, Qt.AlignRight)
-        self.ui_layout.addWidget(self.ui_continue_label, 3, 0, Qt.AlignLeft)
+        self.ui_layout.addWidget(self.ui_continue, 3, 1, QtCore.Qt.AlignRight)
+        self.ui_layout.addWidget(self.ui_continue_label, 3, 0, QtCore.Qt.AlignLeft)
 
         self.ui_layout.addWidget(QSpacer(), 4, 0)
         self.ui_layout.setColumnStretch(0, 1)
@@ -92,9 +92,9 @@ class GeneralConfigurator(Configurator):
     def import_action(self):
         """Import a library of songs to grail"""
 
-        location = QStandardPaths.locate(QStandardPaths.DocumentsLocation, "",
-                                         QStandardPaths.LocateDirectory)
-        path, ext = QFileDialog.getOpenFileName(self, "Import...", location, "*.grail-library")
+        location = QtCore.QStandardPaths.locate(QtCore.QStandardPaths.DocumentsLocation, "",
+                                                QtCore.QStandardPaths.LocateDirectory)
+        path, ext = QtWidgets.QFileDialog.getOpenFileName(self, "Import...", location, "*.grail-library")
 
         if not path:
             return False
@@ -122,9 +122,9 @@ class GeneralConfigurator(Configurator):
     def export_action(self):
         """Create a library file"""
 
-        location = QStandardPaths.locate(QStandardPaths.DocumentsLocation, "",
-                                         QStandardPaths.LocateDirectory)
-        path, ext = QFileDialog.getSaveFileName(self, "Export library...", location, "*.grail-library")
+        location = QtCore.QStandardPaths.locate(QtCore.QStandardPaths.DocumentsLocation, "",
+                                                QtCore.QStandardPaths.LocateDirectory)
+        path, ext = QtWidgets.QFileDialog.getSaveFileName(self, "Export library...", location, "*.grail-library")
 
         if not path:
             return False
@@ -159,27 +159,27 @@ class BibleConfigurator(Configurator):
 
         self.setObjectName("BibleConfigurator")
 
-        self._ui_layout = QVBoxLayout()
-        self._ui_list = QListWidget()
+        self._ui_layout = QtWidgets.QVBoxLayout()
+        self._ui_list = QtWidgets.QListWidget()
         self._ui_list.setObjectName("BibleConfigurator_list")
 
-        self._ui_toolbar_label = QLabel("0 installed")
-        self._ui_toolbar_label.setAlignment(Qt.AlignCenter)
-        self._ui_toolbar_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self._ui_toolbar_label = QtWidgets.QLabel("0 installed")
+        self._ui_toolbar_label.setAlignment(QtCore.Qt.AlignCenter)
+        self._ui_toolbar_label.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
 
-        self._ui_install_action = QAction(Icon(':/rc/add.png'), 'Install', self)
+        self._ui_install_action = QtWidgets.QAction(Icon(':/rc/add.png'), 'Install', self)
         self._ui_install_action.setIconVisibleInMenu(True)
         self._ui_install_action.triggered.connect(self.install_action)
 
-        self._ui_uninstall_action = QAction(Icon(':/rc/remove.png'), 'Uninstall', self)
+        self._ui_uninstall_action = QtWidgets.QAction(Icon(':/rc/remove.png'), 'Uninstall', self)
         self._ui_uninstall_action.setIconVisibleInMenu(True)
         self._ui_uninstall_action.triggered.connect(self.uninstall_action)
 
-        self._ui_primary_action = QAction(Icon(':/rc/save.png'), 'Set as primary', self)
+        self._ui_primary_action = QtWidgets.QAction(Icon(':/rc/save.png'), 'Set as primary', self)
         self._ui_primary_action.setIconVisibleInMenu(True)
         self._ui_primary_action.triggered.connect(self.primary_action)
 
-        self._ui_toolbar = QToolBar()
+        self._ui_toolbar = QtWidgets.QToolBar()
         self._ui_toolbar.addAction(self._ui_install_action)
         self._ui_toolbar.addAction(self._ui_uninstall_action)
         self._ui_toolbar.addWidget(self._ui_toolbar_label)
@@ -193,9 +193,9 @@ class BibleConfigurator(Configurator):
     def install_action(self):
         """Install new bible"""
 
-        location = QStandardPaths.locate(QStandardPaths.DocumentsLocation, "",
-                                         QStandardPaths.LocateDirectory)
-        path, ext = QFileDialog.getOpenFileName(self, "Open File...", location, "*.grail-bible")
+        location = QtCore.QStandardPaths.locate(QtCore.QStandardPaths.DocumentsLocation, "",
+                                                QtCore.QStandardPaths.LocateDirectory)
+        path, ext = QtWidgets.QFileDialog.getOpenFileName(self, "Open File...", location, "*.grail-bible")
 
         try:
             BibleHost.install(path)
@@ -252,7 +252,7 @@ class BibleConfigurator(Configurator):
 
             bible = bibles[key]
 
-            item = QListWidgetItem()
+            item = QtWidgets.QListWidgetItem()
             item.bible_id = bible.identifier
             item.setText("%s (%s)%s" % (bible.title, bible.identifier,
                                         " - selected" if bible_selected_id == bible.identifier else ""))

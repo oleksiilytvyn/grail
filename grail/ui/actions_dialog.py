@@ -11,7 +11,7 @@
 from grail.qt import *
 
 
-class ActionsDialog(QDialog):
+class ActionsDialog(QtWidgets.QDialog):
     """Display actions registered by plugins"""
 
     def __init__(self, parent=None):
@@ -28,16 +28,16 @@ class ActionsDialog(QDialog):
 
     def __ui__(self):
 
-        self._ui_list = QListWidget()
-        self._ui_list.setContextMenuPolicy(Qt.CustomContextMenu)
+        self._ui_list = QtWidgets.QListWidget()
+        self._ui_list.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self._ui_list.itemDoubleClicked.connect(self.run_action)
         self._ui_list.customContextMenuRequested.connect(self._context_menu)
 
-        self._ui_label = QLabel("0 Actions")
-        self._ui_label.setAlignment(Qt.AlignCenter)
-        self._ui_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self._ui_label = QtWidgets.QLabel("0 Actions")
+        self._ui_label.setAlignment(QtCore.Qt.AlignCenter)
+        self._ui_label.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
 
-        self._ui_go_action = QAction(QIcon(':/rc/play.png'), "Run selected", self)
+        self._ui_go_action = QtWidgets.QAction(QtGui.QIcon(':/rc/play.png'), "Run selected", self)
         self._ui_go_action.setIconVisibleInMenu(True)
         self._ui_go_action.triggered.connect(self.run_action)
 
@@ -45,19 +45,19 @@ class ActionsDialog(QDialog):
         self._ui_search.setPlaceholderText("Search actions...")
         self._ui_search.textChanged.connect(self._search_event)
 
-        self._ui_search_layout = QVBoxLayout()
+        self._ui_search_layout = QtWidgets.QVBoxLayout()
         self._ui_search_layout.setContentsMargins(4, 4, 4, 4)
         self._ui_search_layout.addWidget(self._ui_search)
 
-        self._ui_search_widget = QWidget()
+        self._ui_search_widget = QtWidgets.QWidget()
         self._ui_search_widget.setObjectName("ActionsDialog_search_widget")
         self._ui_search_widget.setLayout(self._ui_search_layout)
 
-        self._ui_toolbar = QToolBar()
+        self._ui_toolbar = QtWidgets.QToolBar()
         self._ui_toolbar.addWidget(self._ui_label)
         self._ui_toolbar.addAction(self._ui_go_action)
 
-        self._ui_layout = QVBoxLayout()
+        self._ui_layout = QtWidgets.QVBoxLayout()
         self._ui_layout.addWidget(self._ui_search_widget)
         self._ui_layout.addWidget(self._ui_list)
         self._ui_layout.addWidget(self._ui_toolbar)
@@ -80,7 +80,7 @@ class ActionsDialog(QDialog):
             if len(self._keyword) > 0 and (self._keyword not in action.plugin.name + " " + action.name):
                 continue
 
-            item = QListWidgetItem("%s → %s" % (action.plugin.name, action.name))
+            item = QtWidgets.QListWidgetItem("%s → %s" % (action.plugin.name, action.name))
             item.action = action
 
             self._ui_list.addItem(item)
@@ -95,9 +95,9 @@ class ActionsDialog(QDialog):
         if not item:
             return
 
-        menu = QMenu("Context Menu", self)
+        menu = QtWidgets.QMenu("Context Menu", self)
 
-        run_action = QAction('Run action', menu)
+        run_action = QtWidgets.QAction('Run action', menu)
         run_action.triggered.connect(self.run_action)
         menu.addAction(run_action)
 

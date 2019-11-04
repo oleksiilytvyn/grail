@@ -561,17 +561,17 @@ class AlignPopup(QPopup):
         except ValueError:
             v_index = Qt.AlignVCenter
 
-        self.ui_horizontal.addItem("Left", QVariant("left"))
-        self.ui_horizontal.addItem("Center", QVariant("center"))
-        self.ui_horizontal.addItem("Right", QVariant("right"))
+        self.ui_horizontal.addItem("Left", "left")
+        self.ui_horizontal.addItem("Center", "center")
+        self.ui_horizontal.addItem("Right", "right")
         self.ui_horizontal.setCurrentIndex(h_index)
 
         self.ui_vertical = QComboBox()
         self.ui_vertical.activated.connect(self._value_changed)
 
-        self.ui_vertical.addItem("Top", QVariant("top"))
-        self.ui_vertical.addItem("Middle", QVariant("middle"))
-        self.ui_vertical.addItem("Bottom", QVariant("bottom"))
+        self.ui_vertical.addItem("Top", "top")
+        self.ui_vertical.addItem("Middle", "middle")
+        self.ui_vertical.addItem("Bottom", "bottom")
         self.ui_vertical.setCurrentIndex(v_index)
 
         self.ui_layout = QGridLayout()
@@ -808,11 +808,11 @@ class CasePopup(QPopup):
 
         h_index = [0, 1, 2, 3].index(self.case)
 
-        self.ui_case.addItem("Normal", QVariant("normal"))
-        self.ui_case.addItem("Title", QVariant("title"))
-        self.ui_case.addItem("Upper", QVariant("upper"))
-        self.ui_case.addItem("Lower", QVariant("lower"))
-        self.ui_case.addItem("Capitalize", QVariant("capitalize"))
+        self.ui_case.addItem("Normal", "normal")
+        self.ui_case.addItem("Title", "title")
+        self.ui_case.addItem("Upper", "upper")
+        self.ui_case.addItem("Lower", "lower")
+        self.ui_case.addItem("Capitalize", "capitalize")
         self.ui_case.setCurrentIndex(h_index)
 
         self.ui_layout = QGridLayout()
@@ -1091,7 +1091,7 @@ class DisplayPreferencesDialog(QDialog):
                 continue
 
             action = QAction(mode.name, self)
-            action.setProperty('mode', QVariant(mode))
+            action.setProperty('mode', mode)
             action.triggered.connect(triggered(action))
 
             self._ui_display_menu.addAction(action)

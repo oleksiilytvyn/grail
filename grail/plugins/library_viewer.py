@@ -261,7 +261,7 @@ class LibraryViewer(Viewer):
         self.song_dialog = SongDialog()
         self.song_dialog.changed.connect(self._update)
 
-        self.connect('/app/close', self._close)
+        self.app.signals.connect('/app/close', self._close)
 
         self.library.entity_added.connect(self._update)
         self.library.entity_changed.connect(self._update)

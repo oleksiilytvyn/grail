@@ -320,7 +320,7 @@ class CueDialog(QDialog):
 
         for color, name in zip(CueEntity.COLORS, CueEntity.COLOR_NAMES):
             action = QAction(name, self._ui_color_menu)
-            action.setData(QVariant(color))
+            action.setData(color)
             action.triggered.connect(color_triggered(action))
 
             self._ui_color_menu.addAction(action)
@@ -334,7 +334,7 @@ class CueDialog(QDialog):
 
         for name, value in self.follow_options.items():
             action = QAction(name, self._ui_follow_menu)
-            action.setData(QVariant(value))
+            action.setData(value)
             action.triggered.connect(follow_triggered(action))
 
             self._ui_follow_menu.addAction(action)
@@ -522,8 +522,8 @@ class CuelistViewer(Viewer):
         self.project.property_changed.connect(self._update_property)
 
         # Application signals
-        self.connect('/app/close', self._close)
-        self.connect('/cuelist/add', self._add_entity)
+        self.app.signals.connect('/app/close', self._close)
+        self.app.signals.connect('/cuelist/add', self._add_entity)
 
         self.__ui__()
         self.cuelist_selected(self._cuelist_id)

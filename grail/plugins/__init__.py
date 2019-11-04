@@ -10,8 +10,8 @@
 """
 
 # configurators
-from .configurators import *
-from .osc_configurators import *
+from .configurators import BibleConfigurator, GeneralConfigurator
+from .osc_configurators import OSCInConfigurator, OSCOutConfigurator
 
 # viewers
 from .empty_viewer import EmptyViewer

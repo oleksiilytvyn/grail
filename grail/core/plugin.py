@@ -295,6 +295,7 @@ class Viewer(QWidget, _PluginMeta, metaclass=_ComponentPluginRegistry):
 
     def __init__(self, parent=None, properties=None):
         QWidget.__init__(self, parent)
+        _PluginMeta.__init__(self)
 
         # viewer properties
         if properties and isinstance(properties, dict):
@@ -350,7 +351,10 @@ class Viewer(QWidget, _PluginMeta, metaclass=_ComponentPluginRegistry):
             # don't show plugin if single_instance is True and viewer already exists
             instances = active_viewers.count(plug.name)
             allowed = 1 if plug.single_instance else plug.instances_allowed
-            action.setDisabled(instances >= allowed)
+
+            print("Plugin: ", plug.single_instance, plug.instances_allowed, instances, plug.name)
+
+            action.setDisabled(instances >= allowed if allowed > 0 else False)
 
             menu.addAction(action)
 
@@ -410,6 +414,7 @@ class Configurator(QWidget, _PluginMeta, metaclass=_ComponentPluginRegistry):
 
     def __init__(self, parent=None):
         QWidget.__init__(self, parent)
+        _PluginMeta.__init__(self)
 
     def __ui__(self):
         """Please define UI code here and call from `__init__` method"""

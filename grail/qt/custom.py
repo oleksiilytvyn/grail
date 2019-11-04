@@ -18,6 +18,30 @@ from PyQt5.QtMultimediaWidgets import *
 from grail.qt import colors as qt_colors
 from grailkit.util import OS_MAC, OS_LINUX
 
+"""
+from PySide2.QtCore import *
+from PySide2.QtGui import *
+from PySide2.QtWidgets import *
+from PySide2.QtMultimedia import *
+from PySide2.QtMultimediaWidgets import *
+
+pyqtSignal = Signal
+pyqtSlot = Slot
+
+import grailkit.core as grailkit_core
+
+Signal = grailkit_core.Signal
+
+class QSharedMemory:
+
+    def __init__(self, name: str = ""): pass
+    def attach(self): pass
+    def create(self, data=None): pass
+    def detach(self): pass
+    def isAttached(self): return False
+"""
+
+
 # References to original classes
 QT_QTREEWIDGET = QTreeWidget
 QT_QLISTWIDGET = QListWidget

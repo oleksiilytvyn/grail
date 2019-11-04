@@ -512,7 +512,7 @@ class DisplayLayerInspectorPreview(QWidget):
 
             if s >= 70:
                 color = QColor(qt_colors.WIDGET_TEXT)
-                color.setAlphaF((s - a) / (b - a))
+                color.setAlphaF(max(min((s - a) / (b - a), 1.0), 0.0))
                 painter.setPen(QPen(color))
                 painter.drawText(rect, Qt.AlignCenter | Qt.TextWordWrap, text)
 
@@ -838,10 +838,11 @@ class DisplayLayerViewer(Viewer):
 
         DisplayLayerViewer.counter = DisplayLayerViewer.counter + 1
 
-        self.connect('/app/close', self._close)
-        self.connect(f"!clip/{self._layer_id}/playback/duration", self._duration_cb)
-        self.connect(f"!clip/{self._layer_id}/playback/position", self._position_cb)
-        self.connect(f"!clip/{self._layer_id}/playback/state", self._state_cb)
+        signals = self.app.signals
+        signals.connect('/app/close', self._close)
+        signals.connect(f"!clip/{self._layer_id}/playback/duration", self._duration_cb)
+        signals.connect(f"!clip/{self._layer_id}/playback/position", self._position_cb)
+        signals.connect(f"!clip/{self._layer_id}/playback/state", self._state_cb)
 
         self.__ui__()
 

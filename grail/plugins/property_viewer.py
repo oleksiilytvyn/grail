@@ -43,7 +43,7 @@ class PropertyViewer(Viewer):
         self._follow = not self.get('follow', default=True)
 
         # connect signals
-        self.connect('!node/selected', self._ui_properties.setEntityId)
+        self.connect_signal('!node/selected', self._ui_properties.setEntityId)
 
         # update view
         self.follow_action()

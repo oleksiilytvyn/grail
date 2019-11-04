@@ -51,7 +51,7 @@ class _PluginMeta(object):
         self.__destroyed = False
         self.__app = Application.instance()
 
-    def emit(self, message, *args):
+    def emit_signal(self, message, *args):
         """Emit a message with arguments
 
         Args:
@@ -61,7 +61,7 @@ class _PluginMeta(object):
 
         self.__app.signals.emit(message, *args)
 
-    def connect(self, message, fn):
+    def connect_signal(self, message, fn):
         """Connect a message listener
 
         Args:

@@ -873,7 +873,7 @@ class DisplayPreferencesDialog(QtWidgets.QDialog):
 
         self.__ui__()
 
-        self._plugin.connect('/comp/testcard', self.testcard_cb)
+        self._plugin.connect_signal('/comp/testcard', self.testcard_cb)
 
         self._fit_view()
         self._update_output_list()
@@ -1217,22 +1217,22 @@ class DisplayPreferencesDialog(QtWidgets.QDialog):
     def padding_updated(self, left_padding, top_padding, right_padding, bottom_padding):
         """Text padding updated"""
 
-        self.emit('/clip/text/padding', left_padding, top_padding, right_padding, bottom_padding)
+        self.emit_signal('/clip/text/padding', left_padding, top_padding, right_padding, bottom_padding)
 
     def shadow_updated(self, offset, blur, color):
         """Shadow properties changed"""
 
-        self.emit('/clip/text/shadow', offset.x(), offset.y(), blur, color.name())
+        self.emit_signal('/clip/text/shadow', offset.x(), offset.y(), blur, color.name())
 
     def align_updated(self, horizontal, vertical):
         """Align changed"""
 
-        self.emit('/clip/text/align', horizontal, vertical)
+        self.emit_signal('/clip/text/align', horizontal, vertical)
 
     def case_updated(self, index):
         """Text case changed"""
 
-        self.emit('/clip/text/transform', index)
+        self.emit_signal('/clip/text/transform', index)
 
     def composition_updated(self, size):
         """Composition size updated"""
@@ -1247,7 +1247,7 @@ class DisplayPreferencesDialog(QtWidgets.QDialog):
 
         if accept:
             # <size_pt:float> <family:str> <style:str>
-            self.emit('/clip/text/font', font.pointSize(), str(font.family()), str(font.styleName()))
+            self.emit_signal('/clip/text/font', font.pointSize(), str(font.family()), str(font.styleName()))
 
         self.showWindow()
 
@@ -1259,7 +1259,7 @@ class DisplayPreferencesDialog(QtWidgets.QDialog):
     def testcard_action(self):
         """Testcard action clicked"""
 
-        self.emit('/comp/testcard', not self._ui_testcard_action.isChecked())
+        self.emit_signal('/comp/testcard', not self._ui_testcard_action.isChecked())
 
     def testcard_cb(self, flag=False):
         """Receive test card update"""
@@ -1277,7 +1277,7 @@ class DisplayPreferencesDialog(QtWidgets.QDialog):
         color = QtGui.QColorDialog.getColor()
 
         if color:
-            self.emit('/clip/text/color', color.name())
+            self.emit_signal('/clip/text/color', color.name())
 
         self.showWindow()
 

@@ -9,30 +9,18 @@
     :copyright: (c) 2016-2019 by Alex Litvin.
     :license: GNU, see LICENSE for more details.
 """
-from PyQt5 import QtCore, QtNetwork, QtGui, QtWidgets
-from PyQt5.QtMultimedia import *
-from PyQt5.QtMultimediaWidgets import *
-
 from grail.qt import colors as qt_colors
 from grailkit.util import OS_MAC, OS_LINUX
+
+from PyQt5 import QtCore, QtNetwork, QtGui, QtWidgets, QtMultimedia, QtMultimediaWidgets
 
 QtSignal = QtCore.pyqtSignal
 QtSlot = QtCore.pyqtSlot
 
-"""
-from PySide2.QtCore import *
-from PySide2.QtGui import *
-from PySide2.QtWidgets import *
-from PySide2.QtMultimedia import *
-from PySide2.QtMultimediaWidgets import *
+# from PySide2 import QtCore, QtNetwork, QtGui, QtWidgets, QtMultimedia, QtMultimediaWidgets
 
-pyqtSignal = Signal
-pyqtSlot = Slot
-
-import grailkit.core as grailkit_core
-
-Signal = grailkit_core.Signal
-"""
+# QtSignal = QtCore.Signal
+# QtSlot = QtCore.Slot
 
 
 # References to original classes
@@ -384,8 +372,8 @@ class _QLineEdit(QT_QLINEEDIT, _QWidget):
 class QSearchEdit(_QLineEdit):
     """Basic edit input for search with clear button"""
 
-    keyPressed = QtCore.pyqtSignal('QKeyEvent')
-    focusOut = QtCore.pyqtSignal('QFocusEvent')
+    keyPressed = QtSignal('QKeyEvent')
+    focusOut = QtSignal('QFocusEvent')
 
     def __init__(self, parent=None):
         super(QSearchEdit, self).__init__(parent)

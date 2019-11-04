@@ -28,8 +28,8 @@ class DisplayViewer(Viewer):
     def __init__(self, *args, **kwargs):
         super(DisplayViewer, self).__init__(*args, **kwargs)
 
-        self.connect("!display/instance", self._display_instance)
-        self.connect('/comp/size', self._comp_size_cb)
+        self.app.signals.connect("!display/instance", self._display_instance)
+        self.app.signals.connect('/comp/size', self._comp_size_cb)
 
         self.__ui__()
 

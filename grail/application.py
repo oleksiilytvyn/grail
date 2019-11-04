@@ -24,7 +24,7 @@ import grail.resources
 
 from grail.qt import *
 from grail.ui import MainWindow, WelcomeDialog
-from grail.core import OSCHost
+from grail.core import OSCHost, Viewer, Configurator, Plugin
 
 # load internal plugins and viewers
 from grail.plugins import *

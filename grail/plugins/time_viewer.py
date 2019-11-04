@@ -183,7 +183,7 @@ class _PropertiesPopup(QPopup):
         super(_PropertiesPopup, self).__init__()
 
         self._viewer = parent
-        self._viewer.connect('/app/close', self.close)
+        self._viewer.app.signals.connect('/app/close', self.close)
 
         self.__ui__()
 

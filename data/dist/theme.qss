@@ -1129,7 +1129,7 @@ QSlider {
 QSlider::groove:horizontal {
     background: $widget-alt;
     border: 0px solid $widget-alt;
-    height: 4px;
+    height: 5px;
     margin: 0px;
     border-radius: $radius;
     }
@@ -1148,7 +1148,7 @@ QSlider::sub-page:horizontal:disabled {
 
 QSlider::handle:horizontal {
     background: $widget-active;
-    border: 1px solid $widget-active;
+    border: 3px solid $widget-active;
     width: 8px;
     height: 0px;
     margin: 0 0;
@@ -1157,7 +1157,6 @@ QSlider::handle:horizontal {
 
 QSlider::handle:horizontal:hover {
     background: $widget-active;
-    border: 1px solid $widget-active;
     }
 
 /* Vertical */

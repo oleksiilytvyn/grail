@@ -56,7 +56,8 @@ class Icon(QtGui.QIcon):
 
         return pixmap
 
-    def addColoredPixmap(self, width=128, height=128, color=QtGui.QColor("#000"), mode=QtGui.QIcon.Normal, state=QtGui.QIcon.On):
+    def addColoredPixmap(self, width=128, height=128, color=QtGui.QColor("#000"), mode=QtGui.QIcon.Normal,
+                         state=QtGui.QIcon.On):
         """Add a pixmap with given color
 
         Args:
@@ -104,7 +105,8 @@ class _QWidget(QtWidgets.QWidget):
 class QSpacer(_QWidget):
     """Widget that simply allocate space and spread widgets"""
 
-    def __init__(self, policy_horizontal=QtWidgets.QSizePolicy.Expanding, policy_vertical=QtWidgets.QSizePolicy.Expanding, parent=None):
+    def __init__(self, policy_horizontal=QtWidgets.QSizePolicy.Expanding,
+                 policy_vertical=QtWidgets.QSizePolicy.Expanding, parent=None):
         """Create spacer component that allocates space and stretches another components in layout
 
         Args:
@@ -561,8 +563,10 @@ class QPopup(_QDialog):
         painter.setBrush(QtGui.QColor(255, 0, 0, 127))
 
         points = [QtCore.QPointF(width / 2 + caret_offset, height - self.__padding),
-                  QtCore.QPointF(width / 2 - self.__caret_size + caret_offset, height - self.__caret_size - self.__padding),
-                  QtCore.QPointF(width / 2 + self.__caret_size + caret_offset, height - self.__caret_size - self.__padding)]
+                  QtCore.QPointF(width / 2 - self.__caret_size + caret_offset,
+                                 height - self.__caret_size - self.__padding),
+                  QtCore.QPointF(width / 2 + self.__caret_size + caret_offset,
+                                 height - self.__caret_size - self.__padding)]
         triangle = QtGui.QPolygonF(points)
 
         rounded_rect = QtGui.QPainterPath()
@@ -661,3 +665,6 @@ QtWidgets.QTreeWidgetItem = _QTreeWidgetItem
 QtWidgets.QListWidget = _QListWidget
 QtWidgets.QListWidgetItem = _QListWidgetItem
 QtWidgets.QDialog = _QDialog
+
+QtDocumentsLocation = QtCore.QStandardPaths.locate(QtCore.QStandardPaths.DocumentsLocation, "",
+                                                   QtCore.QStandardPaths.LocateDirectory)

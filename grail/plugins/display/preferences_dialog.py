@@ -12,6 +12,7 @@ import math
 
 from grail.qt import *
 from grail.qt import colors as qt_colors
+from .scene import DisplaySceneView
 
 
 class OutputConfiguration:
@@ -418,8 +419,10 @@ class TransformWidget(QtWidgets.QWidget):
         w, h = self._rect.width(), self._rect.height()
 
         # Source polygon, Destination Polygon, reference to QTransform
-        QtGui.QTransform.quadToQuad(QtGui.QPolygonF([QtCore.QPointF(0, 0), QtCore.QPointF(w, 0), QtCore.QPointF(w, h), QtCore.QPointF(0, h)]),
-                              QtGui.QPolygonF(self._points), t)
+        QtGui.QTransform.quadToQuad(QtGui.QPolygonF([QtCore.QPointF(0, 0),
+                                                     QtCore.QPointF(w, 0),
+                                                     QtCore.QPointF(w, h),
+                                                     QtCore.QPointF(0, h)]), QtGui.QPolygonF(self._points), t)
 
         return t
 
@@ -427,13 +430,13 @@ class TransformWidget(QtWidgets.QWidget):
         """Returns points mapped to given rectangle"""
 
         if raw:
-            l = []
+            values = []
 
             for p in self._points:
-                l.append(p.x())
-                l.append(p.y())
+                values.append(p.x())
+                values.append(p.y())
 
-            return l
+            return values
         else:
             return [QtCore.QPointF(p.x(), p.y()) for p in self._points]
 
@@ -671,7 +674,7 @@ class ShadowPopup(QPopup):
     def _color_action(self):
         """Value of color picker changed"""
 
-        self.color = QtGui.QColorDialog.getColor(self.color)
+        self.color = QtWidgets.QColorDialog.getColor(self.color)
         self.updated.emit(self.offset, self.blur, self.color)
 
     def _value_changed(self, i):
@@ -912,13 +915,8 @@ class DisplayPreferencesDialog(QtWidgets.QDialog):
         self._ui_display.setLayout(self._ui_display_layout)
 
         # Composition
-        self._ui_view = QtWidgets.QGraphicsView(self._plugin.scene)
-        self._ui_view.setAlignment(QtCore.Qt.AlignCenter)
-        self._ui_view.setRenderHints(QtGui.QPainter.Antialiasing | QtGui.QPainter.HighQualityAntialiasing)
-        self._ui_view.setDragMode(QtWidgets.QGraphicsView.ScrollHandDrag)
-        self._ui_view.setBackgroundBrush(QtGui.QBrush(QtGui.QColor(qt_colors.WIDGET)))
-        self._ui_view.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self._ui_view.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self._ui_view = DisplaySceneView()
+        self._ui_view.setScene(self._plugin.scene)
         self._ui_view.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
 
         self._ui_font_action = QtWidgets.QToolButton(self)
@@ -1044,11 +1042,7 @@ class DisplayPreferencesDialog(QtWidgets.QDialog):
         scene = self._plugin.scene
         factor = min(self._ui_view.width() / scene.width(), self._ui_view.height() / scene.height()) * 0.9
 
-        t = self._ui_view.transform()
-        t.reset()
-        t.scale(factor, factor)
-
-        self._ui_view.setTransform(t)
+        self._ui_view.setScale(factor)
 
     def _update_outputs(self):
 
@@ -1123,10 +1117,10 @@ class DisplayPreferencesDialog(QtWidgets.QDialog):
 
         self._ui_display_transform.setRect(QtCore.QRectF(0, 0, mode.width, mode.height))
 
-    def emit(self, message, *args, **kwargs):
+    def emit_signal(self, message, *args, **kwargs):
         """Emit messages to plugin"""
 
-        self._plugin.emit(message, *args)
+        self._plugin.emit_signal(message, *args)
 
     def transform_updated(self):
 
@@ -1237,7 +1231,7 @@ class DisplayPreferencesDialog(QtWidgets.QDialog):
     def composition_updated(self, size):
         """Composition size updated"""
 
-        self._plugin.emit('/comp/size', size.width(), size.height())
+        self._plugin.emit_signal('/comp/size', size.width(), size.height())
         self._fit_view()
 
     def font_action(self):
@@ -1274,7 +1268,7 @@ class DisplayPreferencesDialog(QtWidgets.QDialog):
     def color_action(self):
         """Handle color action click"""
 
-        color = QtGui.QColorDialog.getColor()
+        color = QtWidgets.QColorDialog.getColor()
 
         if color:
             self.emit_signal('/clip/text/color', color.name())

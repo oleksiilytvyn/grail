@@ -287,9 +287,8 @@ class _PropertiesPopup(QPopup):
     def background_image_action(self):
         """Update background image"""
 
-        location = QtCore.QStandardPaths.locate(QtCore.QStandardPaths.DocumentsLocation, "",
-                                                QtCore.QStandardPaths.LocateDirectory)
-        path, ext = QtWidgets.QFileDialog.getOpenFileName(self, "Open File...", location, "Images (*.png *.jpg *.jpeg)")
+        path, ext = QtWidgets.QFileDialog.getOpenFileName(self, "Open File...", QtDocumentsLocation,
+                                                          "Images (*.png *.jpg *.jpeg)")
 
         if path:
             self._viewer.style_image = str(path)

@@ -214,7 +214,8 @@ class ConsoleViewer(Viewer):
         self._ui_output.setObjectName("ConsoleViewer_text")
         self._ui_output.setAcceptRichText(False)
         self._ui_output.setReadOnly(True)
-        self._ui_output.setTextInteractionFlags(self._ui_output.textInteractionFlags() | QtCore.Qt.TextSelectableByKeyboard)
+        self._ui_output.setTextInteractionFlags(
+            self._ui_output.textInteractionFlags() | QtCore.Qt.TextSelectableByKeyboard)
 
         font = QtGui.QFont()
         font.setFamily("Courier")
@@ -309,7 +310,8 @@ class ConsoleViewer(Viewer):
         self.set('follow', self._follow)
 
         if self._follow:
-            self._ui_follow_action.setIcon(Icon.colored(':/rc/at.png', QtGui.QColor('#aeca4b'), QtGui.QColor('#e3e3e3')))
+            self._ui_follow_action.setIcon(
+                Icon.colored(':/rc/at.png', QtGui.QColor('#aeca4b'), QtGui.QColor('#e3e3e3')))
         else:
             self._ui_follow_action.setIcon(Icon(':/rc/at.png'))
 

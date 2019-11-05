@@ -38,6 +38,7 @@ def get_revision():
         repository = hgapi.Repo(os.path.abspath(os.curdir))
         revision = "%s.%d" % (grail.__version__, repository['tip'].rev)
     except ImportError:
+        hgapi = None
         print("Failed to get revision number. Install 'hgapi' module.")
     except Exception as error:
         print("Unable to get revision number, following error occurred:")
@@ -190,8 +191,9 @@ def update_stylesheet(watcher, app, path=""):
 
         # setup stylesheet
         app.setStyleSheet(stylesheet)
-    except Exception:
+    except OSError:
         print("Retry in 0.5 sec")
+        # noinspection PyTypeChecker
         QTimer.singleShot(500, lambda: update_stylesheet(watcher, app, path))
 
     watcher.addPath(THEME_FILE)

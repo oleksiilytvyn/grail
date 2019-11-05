@@ -626,7 +626,8 @@ class CuelistViewer(Viewer):
         self._locked = not self._locked
 
         if self._locked:
-            self._ui_lock_action.setIcon(Icon.colored(':/rc/lock.png', QtGui.QColor('#aeca4b'), QtGui.QColor('#e3e3e3')))
+            self._ui_lock_action.setIcon(
+                Icon.colored(':/rc/lock.png', QtGui.QColor('#aeca4b'), QtGui.QColor('#e3e3e3')))
         else:
             self._ui_lock_action.setIcon(QtGui.QIcon(':/rc/unlock.png'))
 
@@ -696,7 +697,7 @@ class CuelistViewer(Viewer):
         entity = item.object()
         new_entity = entity.parent.insert(entity.index + 1, entity)
 
-        match = re.match('^([sw]+)copy( ([d]+))?$', new_entity.name, re.MULTILINE|re.IGNORECASE)
+        match = re.match('^([sw]+)copy( ([d]+))?$', new_entity.name, re.MULTILINE | re.IGNORECASE)
 
         if match:
             name = match.group(1)
@@ -739,8 +740,8 @@ class CuelistViewer(Viewer):
 
         self._selected_id = item.object().id
 
-        self.emit('!node/selected', item.object().id)
-        self.emit('!cue/preview', item.object())
+        self.emit_signal('!node/selected', item.object().id)
+        self.emit_signal('!cue/preview', item.object())
 
     def item_double_clicked(self, item):
         """Send cue text
@@ -819,7 +820,7 @@ class CuelistViewer(Viewer):
 
             name = _entity.name
 
-            _item = QTreeWidgetItem(_entity)
+            _item = QtWidgets.QTreeWidgetItem(_entity)
             _item.setText(0, str(_entity.number))
             _item.setText(1, name if len(name) < 50 else "%s..." % name[:50])
 
@@ -988,13 +989,13 @@ class CuelistViewer(Viewer):
                 self.item_clicked(item)
 
         # call default event handler
-        QTreeWidget.keyPressEvent(self._ui_tree, event)
+        QtWidgets.QTreeWidget.keyPressEvent(self._ui_tree, event)
 
     def _cue_timer_execute(self):
 
         cue = self._cue_timer.cue
 
-        self.emit('!cue/execute', cue)
+        self.emit_signal('!cue/execute', cue)
         self._osc_execute(cue)
 
         # Do not execute next cue
@@ -1120,4 +1121,4 @@ class TreeWidget(QtWidgets.QTreeWidget):
         elif drop_indicator == QtWidgets.QAbstractItemView.OnViewport:
             pass
 
-        QTreeWidget.dropEvent(self, event)
+        QtWidgets.QTreeWidget.dropEvent(self, event)

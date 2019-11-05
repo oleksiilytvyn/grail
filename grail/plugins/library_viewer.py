@@ -235,7 +235,7 @@ class SongDialog(QtWidgets.QDialog):
 
         try:
             return int(re.sub(r'[^0-9]', '', str(value)))
-        except:
+        except ValueError:
             return default
 
 
@@ -382,11 +382,11 @@ class LibraryViewer(Viewer):
 
         if event_key == QtCore.Qt.Key_Return:
             item = self._ui_list.item(0)
-            self.emit('!cue/execute', item.object())
+            self.emit_signal('!cue/execute', item.object())
 
         elif event_key == QtCore.Qt.Key_Z and event.modifiers() & QtCore.Qt.ControlModifier:
-            # todo: self.blackoutAction()
-            pass
+
+            self.emit_signal('!comp/blackout')
 
         elif event_key == QtCore.Qt.Key_Down or event_key == QtCore.Qt.Key_Up:
             # if we have number at the end increment or decrement when Up or Down keys pressed
@@ -453,7 +453,7 @@ class LibraryViewer(Viewer):
         if not item:
             return
 
-        self.emit('!cue/preview', item.object())
+        self.emit_signal('!cue/preview', item.object())
 
     def _item_doubleclicked(self, item):
         """List item double-clicked"""
@@ -478,7 +478,7 @@ class LibraryViewer(Viewer):
         """Add item to cuelist"""
 
         # xxx: cue will be added to all opened cuelists
-        self.emit('/cuelist/add', entity)
+        self.emit_signal('/cuelist/add', entity)
 
     def delete_item_action(self, entity):
         """Delete item from library"""

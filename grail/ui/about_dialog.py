@@ -33,10 +33,7 @@ class AboutDialog(QtWidgets.QDialog):
 
     def __ui__(self):
 
-        self._ui_pixmap = QtWidgets.QApplication.style().standardIcon(QtWidgets.QStyle.SP_MessageBoxInformation)
-
         self._ui_icon = QtWidgets.QLabel(self)
-        self._ui_icon.setPixmap(self._ui_pixmap.pixmap(64))
         self._ui_icon.setAlignment(QtCore.Qt.AlignCenter)
         self._ui_icon.setGeometry(48, 52, 64, 64)
 

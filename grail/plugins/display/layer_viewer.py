@@ -183,7 +183,8 @@ class ClipWidget(QtWidgets.QWidget):
             label = os.path.basename(item.path)
 
             painter.setPen(QtCore.Qt.NoPen)
-            painter.setBrush(QtGui.QBrush(self.COLOR_TEXT_ACTIVE if not selected else self.COLOR_ACTIVE, QtCore.Qt.SolidPattern))
+            painter.setBrush(QtGui.QBrush(self.COLOR_TEXT_ACTIVE if not selected else self.COLOR_ACTIVE,
+                                          QtCore.Qt.SolidPattern))
 
             # Frame
             painter.drawRect(bx, by, bw, bh)
@@ -194,9 +195,11 @@ class ClipWidget(QtWidgets.QWidget):
             painter.drawPixmap(bx + bo + ox, by + bo + oy, size.width() - bo * 2, size.height() - bo * 2, item.pixmap)
 
             # Text label
-            painter.setBrush(QtGui.QBrush(self.COLOR_ACTIVE if selected else self.COLOR_TEXT_ACTIVE, QtCore.Qt.SolidPattern))
+            painter.setBrush(QtGui.QBrush(self.COLOR_ACTIVE if selected else self.COLOR_TEXT_ACTIVE,
+                                          QtCore.Qt.SolidPattern))
             painter.drawRect(text_box)
-            painter.setPen(QtGui.QPen(self.COLOR_TEXT_ACTIVE if selected else self.COLOR_TEXT, 0, QtCore.Qt.SolidLine, QtCore.Qt.SquareCap))
+            painter.setPen(QtGui.QPen(self.COLOR_TEXT_ACTIVE if selected else self.COLOR_TEXT, 0,
+                                      QtCore.Qt.SolidLine, QtCore.Qt.SquareCap))
             painter.drawText(text_box, QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter, label)
 
     def update(self):
@@ -792,7 +795,7 @@ class DisplayLayerInspector(QtWidgets.QWidget):
 
     def layer(self):
 
-        return self._layer_viewer._layer_id
+        return self._layer_viewer.layer_id
 
     def _add_parameter(self, name: str, minimum: float, maximum: float, value: float):
 
@@ -849,12 +852,10 @@ class DisplayLayerViewer(Viewer):
 
         self._ui_show_stop_action = QtWidgets.QAction("Show Stop button")
         self._ui_show_stop_action.setCheckable(True)
-        self._ui_show_stop_action.setChecked(True)
         self._ui_show_stop_action.triggered.connect(self._show_stop_action)
 
         self._ui_dock_action = QtWidgets.QAction("Dock Inspector")
         self._ui_dock_action.setCheckable(True)
-        self._ui_dock_action.setChecked(True)
         self._ui_dock_action.triggered.connect(self.dock_action)
 
         self._ui_hide_inspector_action = QtWidgets.QAction("Hide Inspector")
@@ -886,7 +887,7 @@ class DisplayLayerViewer(Viewer):
         self._ui_slider = QtWidgets.QSlider(QtCore.Qt.Horizontal)
         self._ui_slider.setRange(0, 10_000)
         self._ui_slider.setValue(0)
-        self._ui_slider.valueChanged.connect(self._player_position_cb)
+        self._ui_slider.sliderMoved.connect(self._player_position_cb)
 
         self._ui_view_action = QtWidgets.QToolButton()
         self._ui_view_action.setText("View")
@@ -929,9 +930,23 @@ class DisplayLayerViewer(Viewer):
         self._ui_layout.addWidget(self._ui_splitter)
         self._ui_layout.addWidget(self._ui_toolbar)
 
+        # Recall state
+        self._ui_show_stop_action.setChecked(self.get('show-stop', default=True))
+        self._ui_dock_action.setChecked(self.get('dock-inspector', default=True))
+        self._ui_hide_inspector_action.setChecked(self.get('hide-inspector', default=False))
+        self._hide_inspector_action()
+        self._show_stop_action()
+        self.dock_action()
+
         self.setLayout(self._ui_layout)
         self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.context_menu)
+
+    @property
+    def layer_id(self):
+        """Returns layer Id"""
+
+        return self._layer_id
 
     def view_action(self):
         """Replace current view with something other"""
@@ -997,11 +1012,14 @@ class DisplayLayerViewer(Viewer):
             self._inspector.show()
             self._inspector_dialog.show()
 
+        self.set('hide-inspector', flag)
+
     def _show_stop_action(self):
 
         flag = self._ui_show_stop_action.isChecked()
 
         self._ui_stop_action_widget.setVisible(flag)
+        self.set('show-stop', flag)
 
     def _duration_cb(self, length):
 
@@ -1038,6 +1056,8 @@ class DisplayLayerViewer(Viewer):
             self._inspector_dialog.layout().insertWidget(0, self._inspector)
             self._inspector_dialog.show()
 
+        self.set('dock-inspector', flag)
+
     def item_clicked(self, item):
 
         self.item_inspector(item, True)
@@ -1061,9 +1081,7 @@ class DisplayLayerViewer(Viewer):
 
     def item_add(self, item=None):
 
-        location = QtCore.QStandardPaths.locate(QtCore.QStandardPaths.DocumentsLocation, "",
-                                                QtCore.QStandardPaths.LocateDirectory)
-        path, ext = QtWidgets.QFileDialog.getOpenFileName(self, "Add File...", location, "*")
+        path, ext = QtWidgets.QFileDialog.getOpenFileName(self, "Add File...", QtDocumentsLocation, "*")
 
         if path:
             self._ui_list.addItem(path)

@@ -105,7 +105,8 @@ class ProgressDialog(QtWidgets.QDialog):
         elif isinstance(icon, QtGui.QPixmap):
             self._icon = icon.scaledToWidth(size)
         else:
-            self._icon = QtWidgets.QApplication.style().standardIcon(QtWidgets.QStyle.SP_MessageBoxInformation).pixmap(size)
+            self._icon = QtWidgets.QApplication.style().standardIcon(QtWidgets.QStyle.SP_MessageBoxInformation)\
+                .pixmap(size)
 
         self._ui_icon.setPixmap(self._icon)
 

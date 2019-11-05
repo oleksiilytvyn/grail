@@ -1,6 +1,5 @@
 
 import re
-import sys
 from grailkit.util import OS_MAC, OS_LINUX, OS_WIN, default_key
 
 

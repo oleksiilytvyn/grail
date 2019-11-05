@@ -13,7 +13,7 @@ from grailkit import dna
 from grailkit.bible import BibleHost, BibleHostError
 
 from grail.qt import *
-from grail.core import Configurator, Plugin, Viewer
+from grail.core import Configurator
 
 
 class GeneralConfigurator(Configurator):
@@ -92,9 +92,7 @@ class GeneralConfigurator(Configurator):
     def import_action(self):
         """Import a library of songs to grail"""
 
-        location = QtCore.QStandardPaths.locate(QtCore.QStandardPaths.DocumentsLocation, "",
-                                                QtCore.QStandardPaths.LocateDirectory)
-        path, ext = QtWidgets.QFileDialog.getOpenFileName(self, "Import...", location, "*.grail-library")
+        path, ext = QtWidgets.QFileDialog.getOpenFileName(self, "Import...", QtDocumentsLocation, "*.grail-library")
 
         if not path:
             return False
@@ -122,9 +120,8 @@ class GeneralConfigurator(Configurator):
     def export_action(self):
         """Create a library file"""
 
-        location = QtCore.QStandardPaths.locate(QtCore.QStandardPaths.DocumentsLocation, "",
-                                                QtCore.QStandardPaths.LocateDirectory)
-        path, ext = QtWidgets.QFileDialog.getSaveFileName(self, "Export library...", location, "*.grail-library")
+        path, ext = QtWidgets.QFileDialog.getSaveFileName(self, "Export library...", QtDocumentsLocation,
+                                                          "*.grail-library")
 
         if not path:
             return False
@@ -193,9 +190,7 @@ class BibleConfigurator(Configurator):
     def install_action(self):
         """Install new bible"""
 
-        location = QtCore.QStandardPaths.locate(QtCore.QStandardPaths.DocumentsLocation, "",
-                                                QtCore.QStandardPaths.LocateDirectory)
-        path, ext = QtWidgets.QFileDialog.getOpenFileName(self, "Open File...", location, "*.grail-bible")
+        path, ext = QtWidgets.QFileDialog.getOpenFileName(self, "Open File...", QtDocumentsLocation, "*.grail-bible")
 
         try:
             BibleHost.install(path)

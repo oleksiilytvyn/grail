@@ -9,11 +9,10 @@
     :license: GNU, see LICENSE for more details.
 """
 from grail.qt import *
-from grail.qt import colors as qt_colors
-
 from grail.core import Viewer
 
 from .display_plugin import DisplayPlugin
+from .scene import DisplaySceneView
 
 
 class DisplayViewer(Viewer):
@@ -44,12 +43,7 @@ class DisplayViewer(Viewer):
 
     def __ui__(self):
 
-        self._ui_view = QtWidgets.QGraphicsView()
-        self._ui_view.setAlignment(QtCore.Qt.AlignCenter)
-        self._ui_view.setDragMode(QtWidgets.QGraphicsView.ScrollHandDrag)
-        self._ui_view.setBackgroundBrush(QtGui.QBrush(QtGui.QColor(qt_colors.WIDGET)))
-        self._ui_view.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self._ui_view.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self._ui_view = DisplaySceneView()
 
         self._ui_fit = QtWidgets.QPushButton("fit")
         self._ui_fit.clicked.connect(self._fit_clicked)
@@ -104,11 +98,7 @@ class DisplayViewer(Viewer):
     def _scale_scene(self, factor):
         """Scale scene by factor, 1.0 is actual size"""
 
-        t = self._ui_view.transform()
-        t.reset()
-        t.scale(factor, factor)
-
-        self._ui_view.setTransform(t)
+        self._ui_view.setScale(factor)
         self._ui_scale_factor.setValue(factor * 100)
 
     def _display_instance(self):
@@ -124,4 +114,5 @@ class DisplayViewer(Viewer):
         """Composition scene size changed"""
 
         # Wait composition to refresh and then fit
+        # noinspection PyTypeChecker
         QtCore.QTimer.singleShot(50, lambda: self._fit_clicked())

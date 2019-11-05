@@ -201,7 +201,8 @@ class WelcomeAction(QtWidgets.QPushButton, QtWidgets.QWidget):
         self.style().drawPrimitive(QtWidgets.QStyle.PE_Widget, o, p, self)
 
         if self._icon:
-            p.drawPixmap(QtCore.QPoint(64 / 2 - self._icon_size / 2, self.height() / 2 - self._icon_size / 2), self._icon)
+            p.drawPixmap(QtCore.QPoint(64 / 2 - self._icon_size / 2, self.height() / 2 - self._icon_size / 2),
+                         self._icon)
 
         p.end()
 
@@ -281,7 +282,9 @@ class WelcomeDialog(QtWidgets.QDialog):
         def std_icon(name):
             # scale standard icon to default size
 
-            return QtGui.QIcon(QtGui.QPixmap(QtWidgets.QApplication.style().standardIcon(name).pixmap(32, 32)).scaled(48, 48))
+            return QtGui.QIcon(QtGui.QPixmap(QtWidgets.QApplication.style()
+                                             .standardIcon(name)
+                                             .pixmap(32, 32)).scaled(48, 48))
 
         grail_icon = QtGui.QIcon(':/icon/256.png')
 
@@ -323,9 +326,7 @@ class WelcomeDialog(QtWidgets.QDialog):
     def _open(self):
         """Open a existing project"""
 
-        location = QtCore.QStandardPaths.locate(QtCore.QStandardPaths.DocumentsLocation, "",
-                                                QtCore.QStandardPaths.LocateDirectory)
-        path, ext = QtWidgets.QFileDialog.getOpenFileName(self, "Open File...", location, "*.grail")
+        path, ext = QtWidgets.QFileDialog.getOpenFileName(self, "Open File...", QtDocumentsLocation, "*.grail")
 
         if path:
             self.app.open(path)
@@ -334,9 +335,7 @@ class WelcomeDialog(QtWidgets.QDialog):
         """Create a new project"""
 
         project_name = "untitled"
-        location = QtCore.QStandardPaths.locate(QtCore.QStandardPaths.DocumentsLocation, "",
-                                                QtCore.QStandardPaths.LocateDirectory)
-        location = os.path.join(location, project_name)
+        location = os.path.join(QtDocumentsLocation, project_name)
 
         path, ext = QtWidgets.QFileDialog.getSaveFileName(self, "New project", location, "*.grail")
 

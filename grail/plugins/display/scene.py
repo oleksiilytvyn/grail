@@ -30,7 +30,8 @@ class TestCardTexture(QtGui.QPixmap):
 
         painter = QtGui.QPainter()
         painter.begin(self)
-        painter.setRenderHints(QtGui.QPainter.Antialiasing | QtGui.QPainter.TextAntialiasing | QtGui.QPainter.SmoothPixmapTransform)
+        painter.setRenderHints(
+            QtGui.QPainter.Antialiasing | QtGui.QPainter.TextAntialiasing | QtGui.QPainter.SmoothPixmapTransform)
 
         painter.fillRect(comp, QtGui.QColor(qt_colors.CONTAINER_ALT))
 
@@ -69,7 +70,8 @@ class TestCardTexture(QtGui.QPixmap):
 
         painter.setPen(QtCore.Qt.white)
         painter.setFont(QtGui.QFont("decorative", 24))
-        painter.drawText(box, QtCore.Qt.AlignCenter | QtCore.Qt.TextWordWrap, "Composition %d x %d" % (comp.width(), comp.height()))
+        painter.drawText(box, QtCore.Qt.AlignCenter | QtCore.Qt.TextWordWrap,
+                         "Composition %d x %d" % (comp.width(), comp.height()))
 
         painter.end()
 
@@ -435,7 +437,6 @@ class DisplayScene(QtWidgets.QGraphicsScene):
         self._testcard = flag
 
         if flag:
-            # todo: ensure correct test card size
             self._testcard_item.show()
         else:
             self._testcard_item.hide()
@@ -697,8 +698,6 @@ class DisplayWindow(QtWidgets.QDialog):
         # draw background
         painter.fillRect(event.rect(), QtCore.Qt.black)
 
-        # todo: draw clipping mask
-
         target = QtCore.QRectF(0, 0, self.width(), self.height())
         source = QtCore.QRectF(0, 0, self._scene.width(), self._scene.height())
 
@@ -755,3 +754,103 @@ class DisplayWindow(QtWidgets.QDialog):
     def points(self):
 
         return self._transformation_points
+
+
+class DisplaySceneView(QtWidgets.QWidget):
+
+    def __init__(self, parent=None):
+        super(DisplaySceneView, self).__init__(parent)
+
+        self._scale = 1.0
+        self._position = QtCore.QPoint(0, 0)
+        self._press_point = QtCore.QPoint(0, 0)
+        self._background_color = QtGui.QColor(qt_colors.WIDGET)
+
+        self._scene = None
+
+    def scene(self):
+
+        return self._scene
+
+    def setScene(self, scene: QtWidgets.QGraphicsScene):
+
+        if scene is None:
+            return False
+
+        if self._scene is not None:
+            self._scene.changed.disconnect(self._scene_changed)
+            self._scene.sceneRectChanged.disconnect(self._scene_rect_changed)
+
+        self._scene = scene
+        self._scene.changed.connect(self._scene_changed)
+        self._scene.sceneRectChanged.connect(self._scene_rect_changed)
+
+    def setScale(self, factor: float):
+
+        self._scale = factor
+        self._position = QtCore.QPoint(0, 0)
+        self.repaint()
+
+    def paintEvent(self, event):
+
+        scene_width, scene_height = self._scene.width() * self._scale, self._scene.height() * self._scale
+        width, height = self.width(), self.height()
+
+        painter = QtGui.QPainter()
+        painter.begin(self)
+        # draw background
+        painter.fillRect(event.rect(), self._background_color)
+
+        target = QtCore.QRectF(self._position.x() + width / 2 - scene_width / 2,
+                               self._position.y() + height / 2 - scene_height / 2, scene_width, scene_height)
+        source = QtCore.QRectF(0, 0, self._scene.width(), self._scene.height())
+
+        # draw scene items
+        self._scene.render(painter, target, source, QtCore.Qt.IgnoreAspectRatio)
+
+        painter.end()
+
+    def mouseMoveEvent(self, event):
+
+        sw = self._scene.width() * self._scale
+        sh = self._scene.height() * self._scale
+
+        # DO nothing if scene fits in view
+        if sw < self.width() and sh < self.height():
+            self._position = QtCore.QPoint(0, 0)
+
+            return
+
+        dx = event.x() - self._press_point.x()
+        dy = event.y() - self._press_point.y()
+
+        f = 30  # space from edge of widget to scene image
+        x = dx + self.width() / 2 - sw / 2
+        y = dy + self.height() / 2 - sh / 2
+
+        if f >= x >= self.width() - sw - f:
+            self._position.setX(dx)
+
+        if f >= y >= self.height() - sh - f:
+            self._position.setY(dy)
+
+        self.repaint()
+
+    def mousePressEvent(self, event):
+
+        dx = event.x() - self._position.x()
+        dy = event.y() - self._position.y()
+
+        self._press_point = QtCore.QPoint(dx, dy)
+
+    def mouseReleaseEvent(self, event):
+
+        pass
+
+    def _scene_changed(self, scene):
+
+        self.repaint()
+
+    def _scene_rect_changed(self, rect):
+
+        self.repaint()

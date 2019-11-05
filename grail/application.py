@@ -15,7 +15,7 @@ import sys
 import logging
 import tempfile
 
-from grailkit.dna import SettingsFile, Project, Library
+from grailkit.dna import SettingsFile, Project, Library, ProjectError, DNAError
 from grailkit.bible import BibleHost
 from grailkit.core import Signalable, Signal
 
@@ -54,7 +54,7 @@ class Grail(QtWidgets.QApplication):
         self.stylesheet = ""
 
         # set a exception handler
-        sys.excepthook = self.unhandledException
+        sys.excepthook = self.unhandled_exception
 
         # fix for retina displays
         if hasattr(QtCore.Qt, 'AA_UseHighDpiPixmaps'):
@@ -71,8 +71,8 @@ class Grail(QtWidgets.QApplication):
         self._bind_stylesheet()
 
         # prevent from running more than one instance
-        if not self.moreThanOneInstanceAllowed() and self.isAlreadyRunning():
-            self.anotherInstanceStarted()
+        if not self.more_than_one_instance_allowed and self.is_already_running():
+            self.another_instance_started()
             self.quit()
 
         BibleHost.setup()
@@ -198,12 +198,12 @@ class Grail(QtWidgets.QApplication):
         QtWidgets.QApplication.quit()
         sys.exit(0)
 
-    def unhandledException(self, exception_type, value, traceback_object):
+    def unhandled_exception(self, exception_type, value, traceback_object):
         """Re-implement this method to catch exceptions"""
 
         self._sys_exception_handler(exception_type, value, traceback_object)
 
-    def isAlreadyRunning(self):
+    def is_already_running(self):
         """Check for another instances of this application
 
         Returns: bool
@@ -211,12 +211,13 @@ class Grail(QtWidgets.QApplication):
 
         return self._socket_connected
 
-    def moreThanOneInstanceAllowed(self):
+    @property
+    def more_than_one_instance_allowed(self):
         """Do not allow multiple instances"""
 
         return False
 
-    def anotherInstanceStarted(self):
+    def another_instance_started(self):
         """Show a warning dialog when user try to
         launch multiple instances of Grail
         """
@@ -226,15 +227,16 @@ class Grail(QtWidgets.QApplication):
                                 icon=MessageDialog.Critical)
         message.exec_()
 
-    def open(self, path: str, create:bool=False):
+    def open(self, path: str, create: bool = False):
         """Open a file"""
 
-        project_opened = True
         project = False
 
         try:
             project = Project(path, create=create)
-        except:
+        except ProjectError:
+            pass
+        except DNAError:
             pass
 
         if not project or not path or len(path) == 0:

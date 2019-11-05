@@ -113,10 +113,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui_about_action.triggered.connect(self.about_action)
 
         self.ui_open_web_action = QtWidgets.QAction('Visit grailapp.com', self)
-        self.ui_open_web_action.triggered.connect(lambda: QtGui.QDesktopServices.openUrl(QtCore.QUrl("http://grailapp.com/")))
+        self.ui_open_web_action.triggered.connect(
+            lambda: QtGui.QDesktopServices.openUrl(QtCore.QUrl("http://grailapp.com/")))
 
         self.ui_open_manual_action = QtWidgets.QAction('View manual', self)
-        self.ui_open_manual_action.triggered.connect(lambda: QtGui.QDesktopServices.openUrl(QtCore.QUrl("http://grailapp.com/help")))
+        self.ui_open_manual_action.triggered.connect(
+            lambda: QtGui.QDesktopServices.openUrl(QtCore.QUrl("http://grailapp.com/help")))
 
         # File menu
         self.ui_menu_file = self.ui_menubar.addMenu('File')
@@ -259,8 +261,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def _geometry_changed(self):
 
-        maximized = not self.isMaximized()
-
         # Get window entity
         entities = self.project.dna.entities(filter_type=DNA.TYPE_LAYOUT, filter_parent=0, filter_keyword="Layout")
 
@@ -304,9 +304,7 @@ class MainWindow(QtWidgets.QMainWindow):
         """Create a new project"""
 
         project_name = "untitled"
-        location = QtCore.QStandardPaths.locate(QtCore.QStandardPaths.DocumentsLocation, "",
-                                                QtCore.QStandardPaths.LocateDirectory)
-        location = os.path.join(location, project_name)
+        location = os.path.join(QtDocumentsLocation, project_name)
 
         path, ext = QtWidgets.QFileDialog.getSaveFileName(self, "New project", location, "*.grail")
 
@@ -316,9 +314,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def open_project(self):
         """Open an existing file"""
 
-        location = QtCore.QStandardPaths.locate(QtCore.QStandardPaths.DocumentsLocation, "",
-                                                QtCore.QStandardPaths.LocateDirectory)
-        path, ext = QtWidgets.QFileDialog.getOpenFileName(self, "Open File...", location, "*.grail")
+        path, ext = QtWidgets.QFileDialog.getOpenFileName(self, "Open File...", QtDocumentsLocation, "*.grail")
 
         if path and len(path) != 0:
             self.app.open(path, create=False)
@@ -333,9 +329,7 @@ class MainWindow(QtWidgets.QMainWindow):
         """Save current project as another project"""
 
         project_name = "%s copy" % (self.project.name, )
-        location = QtCore.QStandardPaths.locate(QtCore.QStandardPaths.DocumentsLocation, "",
-                                                QtCore.QStandardPaths.LocateDirectory)
-        location = os.path.join(location, project_name)
+        location = os.path.join(QtDocumentsLocation, project_name)
 
         path, ext = QtWidgets.QFileDialog.getSaveFileName(self, "Save project as", location, "*.grail")
 
@@ -349,9 +343,8 @@ class MainWindow(QtWidgets.QMainWindow):
     def import_action(self):
         """Import data into Grail library or current project"""
 
-        location = QtCore.QStandardPaths.locate(QtCore.QStandardPaths.DocumentsLocation, "",
-                                                QtCore.QStandardPaths.LocateDirectory)
-        path, ext = QtWidgets.QFileDialog.getOpenFileName(self, "Import...", location, "*.json, *.grail, *.grail-library")
+        path, ext = QtWidgets.QFileDialog.getOpenFileName(self, "Import...", QtDocumentsLocation,
+                                                          "*.json, *.grail, *.grail-library")
         ext = path.split('.')[-1]
         message = ""
 
@@ -441,9 +434,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def export_action(self):
         """Export grail library as single file"""
 
-        location = QtCore.QStandardPaths.locate(QtCore.QStandardPaths.DocumentsLocation, "",
-                                                QtCore.QStandardPaths.LocateDirectory)
-        path, ext = QtWidgets.QFileDialog.getSaveFileName(self, "Export library...", location, "*.grail-library")
+        path, ext = QtWidgets.QFileDialog.getSaveFileName(self, "Export library...", QtDocumentsLocation, "*.grail-library")
 
         if not path:
             return False

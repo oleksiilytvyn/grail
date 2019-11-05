@@ -2614,15 +2614,15 @@ class Ui_MainWindow(object):
 
 
 # Back up the reference to the exceptionhook
-sys._excepthook = sys.excepthook
+original_excepthook = sys.excepthook
 
 
 def my_exception_hook(exctype, value, traceback):
     # Print the error and traceback
     print(exctype, value, traceback)
+
     # Call the normal Exception hook after
-    sys._excepthook(exctype, value, traceback)
-    # sys.exit(1)
+    original_excepthook(exctype, value, traceback)
 
 
 # Set the exception hook to our wrapping function

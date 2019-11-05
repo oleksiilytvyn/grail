@@ -140,7 +140,7 @@ class _ListenerThread(QtCore.QThread):
 
         try:
             self.listener = _OSCListener(port, self)
-        except OSError as e:
+        except OSError:
             self.terminate()
 
     def handle(self, address, message, date):

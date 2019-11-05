@@ -333,7 +333,6 @@ class Viewer(QtWidgets.QWidget, _PluginMeta, metaclass=_ComponentPluginRegistry)
         """Returns QMenu with list of viewers, split options and action to remove current viewer"""
 
         menu = QtWidgets.QMenu("Viewers", self)
-        active_viewers = [v.name for v in self.app.main_window.view_arranger._viewers]
 
         def triggered(plugin_id):
             """Action callback closure"""
@@ -349,7 +348,7 @@ class Viewer(QtWidgets.QWidget, _PluginMeta, metaclass=_ComponentPluginRegistry)
             action.triggered.connect(triggered(plug.id))
 
             # don't show plugin if single_instance is True and viewer already exists
-            instances = active_viewers.count(plug.name)
+            instances = self.app.main_window.view_arranger.view_names().count(plug.name)
             allowed = 1 if plug.single_instance else plug.instances_allowed
 
             action.setDisabled(instances >= allowed if allowed > 0 else False)

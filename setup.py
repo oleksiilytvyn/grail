@@ -10,9 +10,6 @@
     Additional build arguments:
         !fix-png: fix PNG color profile errors
 """
-import sys
-import shutil
-
 from cx_Freeze import setup, Executable
 from PyQt5.QtGui import QGuiApplication
 
@@ -83,7 +80,7 @@ setup(
     keywords='open source osc church lyrics projection song bible display',
     license='GNU General Public License v3',
 
-    requires=['grailkit', 'PyQt5', 'cx_Freeze'],
+    requires=['grailkit', 'PyQt5', 'cx_Freeze', 'hgapi'],
 
     classifiers=[
         'Development Status :: 4 - Beta',

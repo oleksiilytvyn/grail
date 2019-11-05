@@ -10,9 +10,6 @@
 """
 import re
 
-from grailkit.bible import BibleHost, Verse, Book
-from grailkit.dna import DNA
-
 from grail.qt import *
 from grail.core import Viewer
 

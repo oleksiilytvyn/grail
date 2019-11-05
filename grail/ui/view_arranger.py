@@ -33,32 +33,10 @@ class ViewArranger(QtWidgets.QWidget):
 
         self.setLayout(self._layout)
 
-    def _build(self, structure):
-        """Create widgets and splitter corresponding to given structure"""
+    def view_names(self):
+        """Returns list of view names"""
 
-        views = structure[1:]
-        layout = structure[0]
-        horizontal = layout['layout/orientation'] == 'horizontal'
-        splitter = _Splitter(QtCore.Qt.Horizontal if horizontal else QtCore.Qt.Vertical)
-        splitter.splitterMoved.connect(self._splitter_moved)
-        sizes = []
-
-        for view in views:
-            if not view:
-                continue
-
-            if isinstance(view, dict):
-                viewer = self._create(view['view/id'], splitter, view)
-
-                splitter.addWidget(viewer)
-                sizes.append(view['width'] if horizontal else view['height'])
-            elif isinstance(view, list):
-                splitter.addWidget(self._build(view))
-                sizes.append(view[0]['width'] if horizontal else view[0]['height'])
-
-        splitter.setSizes(sizes)
-
-        return splitter
+        return [plug.name for plug in self._viewers]
 
     def compose(self, structure):
         """Build layouts and load viewers corresponding to given structure
@@ -187,6 +165,33 @@ class ViewArranger(QtWidgets.QWidget):
             splitter.insertWidget(index, sub)
 
         self._update()
+
+    def _build(self, structure):
+        """Create widgets and splitter corresponding to given structure"""
+
+        views = structure[1:]
+        layout = structure[0]
+        horizontal = layout['layout/orientation'] == 'horizontal'
+        splitter = _Splitter(QtCore.Qt.Horizontal if horizontal else QtCore.Qt.Vertical)
+        splitter.splitterMoved.connect(self._splitter_moved)
+        sizes = []
+
+        for view in views:
+            if not view:
+                continue
+
+            if isinstance(view, dict):
+                viewer = self._create(view['view/id'], splitter, view)
+
+                splitter.addWidget(viewer)
+                sizes.append(view['width'] if horizontal else view['height'])
+            elif isinstance(view, list):
+                splitter.addWidget(self._build(view))
+                sizes.append(view[0]['width'] if horizontal else view[0]['height'])
+
+        splitter.setSizes(sizes)
+
+        return splitter
 
     def _destroy(self, viewer):
         """Destroy viewer and remove from list"""

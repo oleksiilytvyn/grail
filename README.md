@@ -8,15 +8,14 @@ The goal of project to provide beautiful, simple and fast application for christ
 
 ## Dependencies ##
 
-* Python 3.3+
+* Python 3.4+
 * PyQt 5
 * grailkit (https://bitbucket.org/alexlitvin/grailkit)
 
 If you want to build from source, you also need:
 
-* cx_Freeze 5.0 or higher
-* hgapi
-* pyrcc5 terminal utility (bundled with Qt)
+* pyinstaller
+* pyrcc5 - terminal utility (bundled with Qt)
 
 ## Running from sources ##
 

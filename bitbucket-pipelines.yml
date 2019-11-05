@@ -1,0 +1,15 @@
+# This is a simple configuration to build Grail application
+image: python:3.6
+
+pipelines:
+
+  default:
+    - step:
+        script:
+            # Install dependencies
+          - pip install -r requirements.txt
+            # Build Python Package
+          - python build.py build
+            # Install pyinstaller
+          - pip install pyinstaller
+          - pyinstaller grail.spec

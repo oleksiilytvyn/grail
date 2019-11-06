@@ -326,7 +326,7 @@ class WelcomeDialog(QtWidgets.QDialog):
     def _open(self):
         """Open a existing project"""
 
-        path, ext = QtWidgets.QFileDialog.getOpenFileName(self, "Open File...", QtDocumentsLocation, "*.grail")
+        path = QtGetOpenFileName(self, "Open File...", QtDocumentsLocation, "*.grail")
 
         if path:
             self.app.open(path)
@@ -337,7 +337,7 @@ class WelcomeDialog(QtWidgets.QDialog):
         project_name = "untitled"
         location = os.path.join(QtDocumentsLocation, project_name)
 
-        path, ext = QtWidgets.QFileDialog.getSaveFileName(self, "New project", location, "*.grail")
+        path = QtGetSaveFileName(self, "New project", location, "*.grail")
 
         if path:
             self.app.open(path, create=True)

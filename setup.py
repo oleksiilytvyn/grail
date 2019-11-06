@@ -13,9 +13,7 @@ import sys
 import distutils.cmd
 import distutils.log
 import setuptools
-import subprocess
 
-# todo: make PyQt imports optional
 from PyQt5.QtCore import QFile, QIODevice, QTimer, QFileSystemWatcher
 from PyQt5.QtGui import QPixmap, QGuiApplication
 
@@ -160,8 +158,8 @@ class BuildResourcesCommand(distutils.cmd.Command):
     def finalize_options(self):
         """Post-process options."""
 
-        if self.data:
-            assert os.path.exists(self.data), ('Given location (%s) does not exist.' % self.data)
+        if not self.data or not os.path.exists(self.data):
+            raise ValueError('Given location (%s) does not exist.' % self.data)
 
     def run(self):
         """Run command."""
@@ -299,8 +297,8 @@ class FixImagesCommand(distutils.cmd.Command):
     def finalize_options(self):
         """Post-process options."""
 
-        if self.path:
-            assert os.path.exists(self.path), ('Given location (%s) does not exist.' % self.path)
+        if not self.path or not os.path.exists(self.path):
+            raise ValueError('Given location (%s) does not exist.' % self.path)
 
     def run(self):
         """Run command."""

@@ -115,4 +115,4 @@ class DisplayViewer(Viewer):
 
         # Wait composition to refresh and then fit
         # noinspection PyTypeChecker
-        QtCore.QTimer.singleShot(50, lambda: self._fit_clicked())
+        QtCore.QTimer.singleShot(50, self._fit_clicked)

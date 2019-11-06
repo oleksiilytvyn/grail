@@ -8,7 +8,7 @@
     :copyright: (c) 2016-2019 by Alex Litvin.
     :license: GNU, see LICENSE for more details.
 """
-from grail.qt import *
+from grail.qt import QtWidgets, QtCore, QtGui
 
 
 class ProgressDialog(QtWidgets.QDialog):

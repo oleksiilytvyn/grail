@@ -1140,7 +1140,7 @@ class DisplayPreferencesDialog(QtWidgets.QDialog):
     def add_action(self):
         """Add output action"""
 
-        output = self._plugin.add_output()
+        self._plugin.add_output()
         self._update_output_list()
 
         # select last item
@@ -1153,8 +1153,7 @@ class DisplayPreferencesDialog(QtWidgets.QDialog):
 
         if index > 0:
             self._ui_list.takeItem(index)
-
-            output = self._plugin.outputs.pop(index - 1)
+            self._plugin.outputs.pop(index - 1)
 
         # select previous item
         self._select_item(max(0, index - 1))

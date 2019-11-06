@@ -306,7 +306,7 @@ class MainWindow(QtWidgets.QMainWindow):
         project_name = "untitled"
         location = os.path.join(QtDocumentsLocation, project_name)
 
-        path, ext = QtWidgets.QFileDialog.getSaveFileName(self, "New project", location, "*.grail")
+        path = QtGetSaveFileName(self, "New project", location, "*.grail")
 
         if path and len(path) != 0:
             self.app.open(path, create=True)
@@ -314,7 +314,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def open_project(self):
         """Open an existing file"""
 
-        path, ext = QtWidgets.QFileDialog.getOpenFileName(self, "Open File...", QtDocumentsLocation, "*.grail")
+        path = QtGetOpenFileName(self, "Open File...", QtDocumentsLocation, "*.grail")
 
         if path and len(path) != 0:
             self.app.open(path, create=False)
@@ -331,7 +331,7 @@ class MainWindow(QtWidgets.QMainWindow):
         project_name = "%s copy" % (self.project.name, )
         location = os.path.join(QtDocumentsLocation, project_name)
 
-        path, ext = QtWidgets.QFileDialog.getSaveFileName(self, "Save project as", location, "*.grail")
+        path = QtGetSaveFileName(self, "Save project as", location, "*.grail")
 
         self.project.save_copy(path)
 
@@ -343,7 +343,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def import_action(self):
         """Import data into Grail library or current project"""
 
-        path, ext = QtWidgets.QFileDialog.getOpenFileName(self, "Import...", QtDocumentsLocation,
+        path = QtGetOpenFileName(self, "Import...", QtDocumentsLocation,
                                                           "*.json, *.grail, *.grail-library")
         ext = path.split('.')[-1]
         message = ""
@@ -434,8 +434,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def export_action(self):
         """Export grail library as single file"""
 
-        path, ext = QtWidgets.QFileDialog.getSaveFileName(self, "Export library...",
-                                                          QtDocumentsLocation, "*.grail-library")
+        path = QtGetSaveFileName(self, "Export library...", QtDocumentsLocation, "*.grail-library")
 
         if not path:
             return False

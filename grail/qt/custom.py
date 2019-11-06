@@ -676,4 +676,16 @@ QtWidgets.QDialog = _QDialog
 QtDocumentsLocation = QtCore.QStandardPaths.locate(QtCore.QStandardPaths.DocumentsLocation, "",
                                                    QtCore.QStandardPaths.LocateDirectory)
 
-# todo: add custom QFileDialog.getSaveFileName
+
+def QtGetSaveFileName(parent=None, title="Save", location=QtDocumentsLocation, ext=""):
+
+    path, _ = QtWidgets.QFileDialog.getSaveFileName(parent, title, location, ext)
+
+    return path
+
+
+def QtGetOpenFileName(parent=None, title="Save", location=QtDocumentsLocation, ext=""):
+
+    path, _ = QtWidgets.QFileDialog.getOpenFileName(parent, title, location, ext)
+
+    return path

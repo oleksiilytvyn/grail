@@ -222,7 +222,8 @@ class SongDialog(QtWidgets.QDialog):
                                         self.__strip_default(self._ui_album.text(), "Unknown"),
                                         self.__strip_default(self._ui_year.text(), "-")))
 
-    def __strip_default(self, value, default=""):
+    @staticmethod
+    def __strip_default(value, default=""):
 
         title = str(value).lstrip().rstrip()
 
@@ -231,7 +232,8 @@ class SongDialog(QtWidgets.QDialog):
 
         return value
 
-    def __parse_int(self, value, default=0):
+    @staticmethod
+    def __parse_int(value, default=0):
 
         try:
             return int(re.sub(r'[^0-9]', '', str(value)))

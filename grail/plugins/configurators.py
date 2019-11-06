@@ -92,7 +92,7 @@ class GeneralConfigurator(Configurator):
     def import_action(self):
         """Import a library of songs to grail"""
 
-        path, ext = QtWidgets.QFileDialog.getOpenFileName(self, "Import...", QtDocumentsLocation, "*.grail-library")
+        path = QtGetOpenFileName(self, "Import...", QtDocumentsLocation, "*.grail-library")
 
         if not path:
             return False
@@ -120,8 +120,7 @@ class GeneralConfigurator(Configurator):
     def export_action(self):
         """Create a library file"""
 
-        path, ext = QtWidgets.QFileDialog.getSaveFileName(self, "Export library...", QtDocumentsLocation,
-                                                          "*.grail-library")
+        path = QtGetSaveFileName(self, "Export library...", QtDocumentsLocation, "*.grail-library")
 
         if not path:
             return False
@@ -190,7 +189,7 @@ class BibleConfigurator(Configurator):
     def install_action(self):
         """Install new bible"""
 
-        path, ext = QtWidgets.QFileDialog.getOpenFileName(self, "Open File...", QtDocumentsLocation, "*.grail-bible")
+        path = QtGetOpenFileName(self, "Open File...", QtDocumentsLocation, "*.grail-bible")
 
         try:
             BibleHost.install(path)

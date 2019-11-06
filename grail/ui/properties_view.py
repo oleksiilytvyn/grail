@@ -10,6 +10,7 @@
 """
 import json
 import random
+import itertools
 
 from grail.qt import *
 
@@ -25,6 +26,7 @@ class PropertiesView(QtWidgets.QWidget):
         self._entity_id = None
         self._property = None
         self._follow = False
+        self._property_id = itertools.count()
 
         # Properties
         self._ui_properties = QtWidgets.QTableWidget(self)
@@ -98,10 +100,10 @@ class PropertiesView(QtWidgets.QWidget):
         menu = QtWidgets.QMenu("Context menu", self)
 
         remove_action = QtWidgets.QAction('Remove property', menu)
-        remove_action.triggered.connect(lambda: self.removeSelected())
+        remove_action.triggered.connect(self.removeSelected)
 
         add_action = QtWidgets.QAction('Add property', menu)
-        add_action.triggered.connect(lambda: self.addProperty())
+        add_action.triggered.connect(self.addProperty)
 
         menu.addAction(add_action)
         menu.addAction(remove_action)
@@ -111,11 +113,11 @@ class PropertiesView(QtWidgets.QWidget):
     def addProperty(self):
         """Add a new property"""
 
-        property_key = 'Property-%d' % random.randint(1000, 9999)
+        property_key = 'Property-%d' % next(self._property_id)
         entity = self._dna.entity(self._entity_id)
 
         if not entity:
-            return False
+            return
 
         self._dna.set(self._entity_id, property_key, None)
 
@@ -138,7 +140,7 @@ class PropertiesView(QtWidgets.QWidget):
         entity = self._dna.entity(self._entity_id)
 
         if not entity:
-            return False
+            return
 
         indexes = self._ui_properties.selectionModel().selectedIndexes()
         count = self._ui_properties.rowCount()
@@ -158,7 +160,7 @@ class PropertiesView(QtWidgets.QWidget):
         """
 
         if not self._follow:
-            return False
+            return
 
         self._entity_id = entity.id
         self._property = None

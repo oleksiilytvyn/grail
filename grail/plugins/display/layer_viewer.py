@@ -1078,7 +1078,7 @@ class DisplayLayerViewer(Viewer):
 
     def item_add(self, item=None):
 
-        path, ext = QtWidgets.QFileDialog.getOpenFileName(self, "Add File...", QtDocumentsLocation, "*")
+        path = QtGetOpenFileName(self, "Add File...", QtDocumentsLocation, "*")
 
         if path:
             self._ui_list.addItem(path)

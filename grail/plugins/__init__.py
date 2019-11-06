@@ -24,7 +24,6 @@ from .bible_viewer import BibleViewer
 
 from .property_viewer import PropertyViewer
 from .node_viewer import NodeViewer
-from .console_viewer import ConsoleViewer
 
 # plugins
 from .display import *

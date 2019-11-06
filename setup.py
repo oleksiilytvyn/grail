@@ -137,8 +137,8 @@ class BuildResourcesCommand(distutils.cmd.Command):
     def __init__(self, dist):
         super(BuildResourcesCommand, self).__init__(dist)
 
-        self._input_file_ext = ".qss"
-        self._outut_file_ext = ".css"
+        self._INPUT_FILE_EXT = ".qss"
+        self._OUTPUT_FILE_EXT = ".css"
 
         self.data = './data'
         self.data_exclude = './dist;.'
@@ -192,14 +192,14 @@ class BuildResourcesCommand(distutils.cmd.Command):
         new_files = []
 
         for file_path in files:
-            if file_path.endswith(".qss"):
+            if file_path.endswith(self._INPUT_FILE_EXT):
                 source_file = os.path.abspath(os.path.join(source, file_path))
-                dest_file = source_file[:-4] + '.css'
+                dest_file = source_file[:-len(self._INPUT_FILE_EXT)] + self._OUTPUT_FILE_EXT
 
                 self.print("-->", source_file, dest_file)
                 self.compile_css(source_file, dest_file)
 
-                file_path = file_path[:-4] + '.css'
+                file_path = file_path[:-len(self._INPUT_FILE_EXT)] + self._OUTPUT_FILE_EXT
 
             if file_path not in new_files:
                 new_files.append(file_path)

@@ -19,11 +19,12 @@ from grailkit.osc import *
 class OSCHost:
     """Wrapper for OSC client and server"""
 
-    def __init__(self):
+    def __init__(self, application):
         """Take care of OSC in/out"""
 
-        self._client = _OSCClient()
-        self._server = _OSCServer()
+        self._app = application
+        self._client = _OSCClient(self._app)
+        self._server = _OSCServer(self._app)
 
     @property
     def input(self):
@@ -41,10 +42,11 @@ class OSCHost:
 class _OSCServer:
     """Handle incoming messages"""
 
-    def __init__(self):
+    def __init__(self, application):
 
         self._clients = []
         self._ports = {}
+        self._app = application
 
     @property
     def clients(self):
@@ -68,7 +70,7 @@ class _OSCServer:
         self._clients.append((address, port))
 
         if port not in self._ports:
-            thread = _ListenerThread(port, self)
+            thread = _ListenerThread(address, port, self)
             thread.received.connect(self.handle)
             thread.start()
 
@@ -98,7 +100,7 @@ class _OSCServer:
 
         logging.info("OSC received from %s:%d by %s" % (address[0], address[1], self))
 
-        signals = QtCore.QCoreApplication.instance().signals
+        signals = self._app.signals
 
         # forward messages to application
         if isinstance(message, OSCBundle):
@@ -116,8 +118,8 @@ class _OSCServer:
 class _OSCListener(OSCServer, socketserver.ThreadingMixIn):
     """Listen for incoming OSC messages on certain port"""
 
-    def __init__(self, port, parent):
-        super(_OSCListener, self).__init__('0.0.0.0', port)
+    def __init__(self, host, port, parent):
+        super(_OSCListener, self).__init__(host, port)
 
         self._parent = parent
 
@@ -132,14 +134,14 @@ class _ListenerThread(QtCore.QThread):
 
     received = QtSignal(object, object, object)
 
-    def __init__(self, port, parent):
+    def __init__(self, host, port, parent: object):
         super(_ListenerThread, self).__init__()
 
         self.listener = None
         self.parent = parent
 
         try:
-            self.listener = _OSCListener(port, self)
+            self.listener = _OSCListener(host, port, self)
         except OSError:
             self.terminate()
 
@@ -158,5 +160,7 @@ class _ListenerThread(QtCore.QThread):
 class _OSCClient(OSCClient):
     """Send OSC messages to multiple hosts"""
 
-    def __init__(self):
+    def __init__(self, application):
         super(_OSCClient, self).__init__()
+
+        self._app = application

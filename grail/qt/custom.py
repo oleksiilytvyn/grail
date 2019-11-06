@@ -31,6 +31,7 @@ QT_QTEXTEDIT = QtWidgets.QTextEdit
 QT_QLINEEDIT = QtWidgets.QLineEdit
 
 
+# noinspection PyPep8Naming,PyPep8Naming
 class Icon(QtGui.QIcon):
     """Pixmap/vector icon"""
 
@@ -86,6 +87,7 @@ class Icon(QtGui.QIcon):
         return Icon(icon.coloredPixmap(size.width(), size.height(), color, original_color))
 
 
+# noinspection PyPep8Naming
 class _QWidget(QtWidgets.QWidget):
     """Base widget"""
 
@@ -166,6 +168,7 @@ class _QListWidget(QtWidgets.QListWidget, _QWidget):
         self._update_scrollbar()
 
 
+# noinspection PyPep8Naming
 class _QListWidgetItem(QtWidgets.QListWidgetItem):
     """List item"""
 
@@ -189,6 +192,7 @@ class _QListWidgetItem(QtWidgets.QListWidgetItem):
         return self._data
 
 
+# noinspection PyPep8Naming
 class _QToolBar(QtWidgets.QToolBar, _QWidget):
     def __init__(self, parent=None):
         super(_QToolBar, self).__init__(parent)
@@ -269,6 +273,7 @@ class _QTreeWidget(QtWidgets.QTreeWidget, _QWidget):
         self._update_scrollbar()
 
 
+# noinspection PyPep8Naming
 class _QTreeWidgetItem(QtWidgets.QTreeWidgetItem):
     """Representation of node as QTreeWidgetItem"""
 
@@ -482,6 +487,7 @@ class _QTextEdit(QtWidgets.QTextEdit, _QWidget):
         self._update_scrollbar()
 
 
+# noinspection PyPep8Naming,PyPep8Naming
 class _QDialog(QtWidgets.QDialog, _QWidget):
     """Abstract dialog window"""
 
@@ -508,6 +514,7 @@ class _QDialog(QtWidgets.QDialog, _QWidget):
         self.activateWindow()
 
 
+# noinspection PyPep8Naming,PyPep8Naming,PyPep8Naming
 class QPopup(_QDialog):
     """Dialog without title bar and frame, but with rounded corners and pointing triangle"""
 
@@ -668,3 +675,5 @@ QtWidgets.QDialog = _QDialog
 
 QtDocumentsLocation = QtCore.QStandardPaths.locate(QtCore.QStandardPaths.DocumentsLocation, "",
                                                    QtCore.QStandardPaths.LocateDirectory)
+
+# todo: add custom QFileDialog.getSaveFileName

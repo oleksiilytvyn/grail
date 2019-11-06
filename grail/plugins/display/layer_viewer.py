@@ -61,9 +61,9 @@ class GrabberVideoSurface(QtMultimedia.QAbstractVideoSurface):
 
         return True
 
-    def supportedPixelFormats(self, handle_type):
+    def supportedPixelFormats(self, _type=None):
 
-        if handle_type == QtMultimedia.QAbstractVideoBuffer.NoHandle:
+        if _type == QtMultimedia.QAbstractVideoBuffer.NoHandle:
             return [QtMultimedia.QVideoFrame.Format_RGB32,
                     QtMultimedia.QVideoFrame.Format_ARGB32,
                     QtMultimedia.QVideoFrame.Format_ARGB32_Premultiplied,
@@ -129,6 +129,7 @@ class ClipItem:
         self.transport = "stop"
 
 
+# noinspection PyPep8Naming
 class ClipWidget(QtWidgets.QWidget):
 
     def __init__(self, parent=None):
@@ -156,12 +157,7 @@ class ClipWidget(QtWidgets.QWidget):
         painter.drawRect(self.rect())
 
         batch_size = self._size
-        width = self.width()
-        height = self.height()
-
-        length = len(self._items)
         columns = self._columns
-        rows = self._rows
         row = 0
         column = -1
         text_height = 20
@@ -278,6 +274,7 @@ class ClipWidget(QtWidgets.QWidget):
         self.update()
 
 
+# noinspection PyPep8Naming
 class ClipList(QtWidgets.QScrollArea):
 
     itemDoubleClicked = QtSignal(object)
@@ -413,14 +410,15 @@ class ClipList(QtWidgets.QScrollArea):
 
         return self._normalize_path(path) in self._files
 
-    def _normalize_path(self, path):
+    @classmethod
+    def _normalize_path(cls, path):
+
+        result = None
 
         if type(path) == QtCore.QUrl:
             result = os.path.abspath(str(QtCore.QUrl(path).toLocalFile()))
         elif type(path) == str:
             result = os.path.abspath(path)
-        else:
-            result = None
 
         return result
 
@@ -504,12 +502,12 @@ class DisplayLayerInspectorPreview(QtWidgets.QWidget):
             s = 100
             sw, sh = self.width(), self.height()
             s = s * (sh / s if sw / sh > s / s else sw / s) * scale_factor
-            rect = QtCore.QRect(sw / 2 - s / 2, sh / 2 - s / 2, s, s)
+            rect = QtCore.QRectF(sw / 2 - s / 2, sh / 2 - s / 2, s, s)
 
             painter.fillRect(rect, QtGui.QColor(qt_colors.WIDGET))
             painter.setPen(QtGui.QPen(QtGui.QColor(qt_colors.BASE)))
-            painter.drawLine(QtCore.QLine(rect.x(), rect.y(), rect.x() + rect.width(), rect.y() + rect.height()))
-            painter.drawLine(QtCore.QLine(rect.x() + rect.width(), rect.y(), rect.x(), rect.y() + rect.height()))
+            painter.drawLine(QtCore.QLineF(rect.x(), rect.y(), rect.x() + rect.width(), rect.y() + rect.height()))
+            painter.drawLine(QtCore.QLineF(rect.x() + rect.width(), rect.y(), rect.x(), rect.y() + rect.height()))
 
             a, b = 70, 120
 
@@ -799,17 +797,16 @@ class DisplayLayerInspector(QtWidgets.QWidget):
 
     def _add_parameter(self, name: str, minimum: float, maximum: float, value: float):
 
+        spin = QtWidgets.QSpinBox()
+        spin.setReadOnly(True)
+        spin.setValue(value)
+        spin.setRange(minimum, maximum)
+
         slider = QtWidgets.QSlider(QtCore.Qt.Horizontal)
         slider.setRange(minimum, maximum)
         slider.setTickPosition(QtWidgets.QSlider.NoTicks)
         slider.setValue(value)
         slider.valueChanged.connect(lambda v: spin.setValue(v))
-
-        spin = QtWidgets.QSpinBox()
-        spin.setReadOnly(True)
-        spin.setValue(value)
-        spin.setRange(minimum, maximum)
-        # spin.valueChanged.connect(lambda v: slider.setValue(v))
 
         self._ui_grid_layout.addWidget(QtWidgets.QLabel(name), self._param_row, 0)
         self._ui_grid_layout.addWidget(slider, self._param_row, 1)
@@ -999,7 +996,7 @@ class DisplayLayerViewer(Viewer):
             menu.addSeparator()
             menu.addAction(inspector_action)
 
-        return menu.exec_(self.mapToGlobal(pos))
+        menu.exec_(self.mapToGlobal(pos))
 
     def _hide_inspector_action(self):
 
@@ -1097,7 +1094,7 @@ class DisplayLayerViewer(Viewer):
         docked = self._ui_dock_action.isChecked()
 
         if item is None:
-            return False
+            return
 
         self._inspector.setItem(item)
 

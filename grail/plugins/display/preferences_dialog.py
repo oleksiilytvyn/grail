@@ -28,6 +28,7 @@ class OutputConfiguration:
         self.frameless = frameless
 
 
+# noinspection PyPep8Naming
 class TransformWidget(QtWidgets.QWidget):
     """Corner-pin transformation with composition display"""
 

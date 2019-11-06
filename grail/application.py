@@ -87,7 +87,7 @@ class Grail(QtWidgets.QApplication):
         self._plugins = []
         self._actions = []
         self._settings = SettingsFile(grail.SETTINGS_PATH, create=True)
-        self._osc_host = OSCHost()
+        self._osc_host = OSCHost(self)
         self._midi_host = None
         self._project = None
         self._library = None

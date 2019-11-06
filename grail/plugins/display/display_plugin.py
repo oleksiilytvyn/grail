@@ -93,9 +93,12 @@ class DisplayPlugin(Plugin):
             self._connect_signal_proxy(f"/clip/{layer}/opacity", lambda opacity: self._clip_opacity_cb(layer, opacity))
             self._connect_signal_proxy(f"/clip/{layer}/volume", lambda volume: self._clip_volume_cb(layer, volume))
             self._connect_signal_proxy(f"/clip/{layer}/scale", lambda scale: self._clip_scale_cb(layer, scale))
-            self._connect_signal_proxy(f"/clip/{layer}/playback/source", lambda source: self._clip_source_cb(layer, source))
-            self._connect_signal_proxy(f"/clip/{layer}/playback/position", lambda pos: self._clip_position_cb(layer, pos))
-            self._connect_signal_proxy(f"/clip/{layer}/playback/transport", lambda tr: self._clip_transport_cb(layer, tr))
+            self._connect_signal_proxy(f"/clip/{layer}/playback/source",
+                                       lambda source: self._clip_source_cb(layer, source))
+            self._connect_signal_proxy(f"/clip/{layer}/playback/position",
+                                       lambda pos: self._clip_position_cb(layer, pos))
+            self._connect_signal_proxy(f"/clip/{layer}/playback/transport",
+                                       lambda tr: self._clip_transport_cb(layer, tr))
             self._connect_signal_proxy(f"/clip/{layer}/playback/play", lambda: self._clip_play_cb(layer))
 
         # Media clip signals

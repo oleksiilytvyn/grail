@@ -16,7 +16,7 @@ class NotesViewer(Viewer):
     """View text notes"""
 
     id = 'notes'
-    name = 'Notes'
+    name = 'Text'
     author = 'Alex Litvin'
     description = 'Create text notes'
 

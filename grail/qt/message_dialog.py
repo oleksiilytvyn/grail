@@ -12,6 +12,7 @@ from grail.qt import *
 from grailkit.util import OS_MAC
 
 
+# noinspection PyPep8Naming
 class MessageDialog(QtWidgets.QDialog):
     """Message dialog, replacement of a default dialog"""
 

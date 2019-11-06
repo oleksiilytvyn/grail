@@ -99,10 +99,10 @@ class DisplaySceneLayer:
         self._video_player.durationChanged.connect(self._duration_cb)
         self._video_player.stateChanged.connect(self._state_cb)
 
-        self.connect(f"/clip/{self._layer_id}/playback/play", lambda: self._video_player.play())
-        self.connect(f"/clip/{self._layer_id}/playback/pause", lambda: self._video_player.pause())
-        self.connect(f"/clip/{self._layer_id}/playback/stop", lambda: self._video_player.stop())
-        self.connect(f"/clip/{self._layer_id}/playback/position", lambda value: self._video_player.setPosition(value))
+        self.connect(f"/clip/{self._layer_id}/playback/play", self._video_player.play)
+        self.connect(f"/clip/{self._layer_id}/playback/pause", self._video_player.pause)
+        self.connect(f"/clip/{self._layer_id}/playback/stop", self._video_player.stop)
+        self.connect(f"/clip/{self._layer_id}/playback/position", self._video_player.setPosition)
 
         self._scene.addItem(self._video_item)
 

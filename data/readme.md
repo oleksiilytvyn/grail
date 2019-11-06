@@ -12,4 +12,3 @@ Data directory
 **qt** - Qt stylesheets & related files
 
 **rc** - Resources for UI
-

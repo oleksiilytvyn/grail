@@ -434,7 +434,8 @@ class MainWindow(QtWidgets.QMainWindow):
     def export_action(self):
         """Export grail library as single file"""
 
-        path, ext = QtWidgets.QFileDialog.getSaveFileName(self, "Export library...", QtDocumentsLocation, "*.grail-library")
+        path, ext = QtWidgets.QFileDialog.getSaveFileName(self, "Export library...",
+                                                          QtDocumentsLocation, "*.grail-library")
 
         if not path:
             return False

@@ -634,7 +634,7 @@ class CuelistViewer(Viewer):
         self._ui_tree.setDragEnabled(not self._locked)
 
     @guard_lock
-    def add_action(self, *args):
+    def add_action(self, *_):
         """Add new entity to current cuelist"""
 
         cuelist = self.project.cuelist(self._cuelist_id)
@@ -874,7 +874,7 @@ class CuelistViewer(Viewer):
             index = self._ui_tree.indexFromItem(selected_item)
             self._ui_tree.setCurrentIndex(index)
 
-    def _update(self, *args):
+    def _update(self, *_):
         """Internal update"""
 
         if not self._update_lock:

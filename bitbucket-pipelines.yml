@@ -5,13 +5,17 @@ pipelines:
 
   default:
     - step:
+        name: Install dependencies
         script:
-            # Install dependencies
           - pip install -r requirements.txt
 
-            # Build Python Package
-          - python setup.py build
+    # - step:
+    #    name: Build QRC, compile QSS, generate python RCC
+    #    script:
+    #      - python setup.py build_png
+    #      - python setup.py build_data
 
-            # Install pyinstaller
-          - pip install pyinstaller
+    - step:
+        name: Py installer
+        script:
           - pyinstaller grail.spec

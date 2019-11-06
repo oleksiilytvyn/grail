@@ -1,11 +1,7 @@
 <!DOCTYPE RCC>
 <RCC version="1.0">
 	<qresource>
-
-		<!-- ./default/ -->
 		<file alias="default\bible-en-kjv.grail-bible">default\bible-en-kjv.grail-bible</file>
-
-		<!-- ./icon/ -->
 		<file alias="icon\1024.png">icon\1024.png</file>
 		<file alias="icon\128.png">icon\128.png</file>
 		<file alias="icon\16.png">icon\16.png</file>
@@ -15,8 +11,6 @@
 		<file alias="icon\64.png">icon\64.png</file>
 		<file alias="icon\grail.icns">icon\grail.icns</file>
 		<file alias="icon\grail.ico">icon\grail.ico</file>
-
-		<!-- ./qt/ -->
 		<file alias="qt\branch_closed-on.png">qt\branch_closed-on.png</file>
 		<file alias="qt\branch_closed.png">qt\branch_closed.png</file>
 		<file alias="qt\branch_open-on.png">qt\branch_open-on.png</file>
@@ -49,7 +43,7 @@
 		<file alias="qt\stylesheet-branch-end.png">qt\stylesheet-branch-end.png</file>
 		<file alias="qt\stylesheet-branch-more.png">qt\stylesheet-branch-more.png</file>
 		<file alias="qt\stylesheet-vline.png">qt\stylesheet-vline.png</file>
-		<file alias="qt\theme.qss">qt\theme.qss</file>
+		<file alias="qt\theme.css">qt\theme.css</file>
 		<file alias="qt\toolbar-h-move.png">qt\toolbar-h-move.png</file>
 		<file alias="qt\toolbar-h-separator.png">qt\toolbar-h-separator.png</file>
 		<file alias="qt\toolbar-v-move.png">qt\toolbar-v-move.png</file>
@@ -58,8 +52,6 @@
 		<file alias="qt\undock.png">qt\undock.png</file>
 		<file alias="qt\up_arrow.png">qt\up_arrow.png</file>
 		<file alias="qt\up_arrow_disabled.png">qt\up_arrow_disabled.png</file>
-
-		<!-- ./rc/ -->
 		<file alias="rc\add.png">rc\add.png</file>
 		<file alias="rc\align.png">rc\align.png</file>
 		<file alias="rc\at.png">rc\at.png</file>

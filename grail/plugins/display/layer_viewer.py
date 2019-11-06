@@ -304,7 +304,7 @@ class ClipList(QtWidgets.QScrollArea):
         original.valueChanged.connect(self.scrollbar.setValue)
 
         self.grabber = FrameGrabber.instance()
-        self.grabber.updated.connect(lambda: self._frame_received())
+        self.grabber.updated.connect(self._frame_received)
 
         self.update_scrollbar()
 

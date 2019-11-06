@@ -2,7 +2,6 @@
 
 This document explains how Grail OSC works.
 
-
 ## Grail display specification
 
 Following document describes how Grail compatible display should work.
@@ -43,7 +42,6 @@ Configure render output window
 	display/output <display_name:str>
 	display/disabled <flag:bool>
 
-
 #### Composition
 
 Virtual composition
@@ -54,7 +52,6 @@ Virtual composition
 	comp/volume <level:float>
 	comp/testcard <flag:bool>
 
-
 #### Cue text
 
 Cue Information, not used in rendering but may be used for debugging.
@@ -63,7 +60,6 @@ Cue Information, not used in rendering but may be used for debugging.
     cue/name <name:str>
     cue/color <hex:str>
     cue/number <number:str>
-
 
 #### Clip
 

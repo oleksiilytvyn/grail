@@ -220,8 +220,6 @@ class _QToolBar(QtWidgets.QToolBar, _QWidget):
 
         self.style().drawPrimitive(QtWidgets.QStyle.PE_Widget, option, painter, self)
 
-    """Toolbar component"""
-
 
 class _QTreeWidget(QtWidgets.QTreeWidget, _QWidget):
     """Tree widget with predefined properties"""

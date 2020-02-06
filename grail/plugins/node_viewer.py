@@ -169,10 +169,10 @@ class NodeViewer(Viewer):
         menu = QtWidgets.QMenu("Context menu", self)
 
         remove_action = QtWidgets.QAction('Remove', menu)
-        remove_action.triggered.connect(lambda: self.remove_action())
+        remove_action.triggered.connect(self.remove_action)
 
         add_action = QtWidgets.QAction('Add', menu)
-        add_action.triggered.connect(lambda: self.add_action())
+        add_action.triggered.connect(self.add_action)
 
         menu.addAction(remove_action)
         menu.addAction(add_action)
@@ -204,7 +204,7 @@ class NodeViewer(Viewer):
                                     icon=MessageDialog.Warning)
             message.exec_()
 
-            return False
+            return
 
         if above:
             self._selected_id = above.object().id

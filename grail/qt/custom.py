@@ -367,11 +367,13 @@ class _QLineEdit(QT_QLINEEDIT, _QWidget):
         super(_QLineEdit, self).__init__(*args, **kwargs)
 
         # fix: placeholder text color doesn't match theme color
-        palette = self.palette()
-        palette.setColor(QtGui.QPalette.PlaceholderText, QtGui.QColor(qt_colors.BASE_TEXT_ALT))
+        if hasattr(QtGui.QPalette, 'PlaceholderText'):
+            palette = self.palette()
+            palette.setColor(QtGui.QPalette.PlaceholderText, QtGui.QColor(qt_colors.BASE_TEXT_ALT))
+
+            self.setPalette(palette)
 
         self.setAttribute(QtCore.Qt.WA_MacShowFocusRect, False)
-        self.setPalette(palette)
 
 
 class QSearchEdit(_QLineEdit):

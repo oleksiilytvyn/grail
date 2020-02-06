@@ -1,0 +1,23 @@
+/*
+ * Syphon server implementation
+ * change extension of this file to pde to use Syphon
+ */
+
+import codeanticode.syphon.*;
+
+class Server {
+  
+  SyphonServer server;
+  
+  Server ( PApplet applet, String name, int w, int h ){
+    this.server = new SyphonServer( applet, name );
+  }
+  
+  void sendImage( PGraphics image ){
+    this.server.sendImage( image );
+  }
+  
+  void close(){
+  }
+  
+}

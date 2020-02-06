@@ -1,0 +1,8 @@
+syntax: glob
+
+bin/*
+dist/*
+build/*
+
+*~
+Thumbs.db

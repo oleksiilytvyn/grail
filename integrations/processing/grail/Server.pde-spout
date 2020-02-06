@@ -1,0 +1,25 @@
+/*
+ * Spout server implementation
+ * change extension of this file to pde to use this as Spout sender
+ */
+
+import spout.*;
+
+class Server {
+  
+  Spout server;
+  PGraphicsOpenGL graphics;
+
+  Server ( PApplet applet, String name, int w, int h ){
+    this.server = new Spout( applet  );
+  }
+  
+  void sendImage( PGraphics image ){
+    this.server.sendTexture( image );
+  }
+
+  void close(){
+    this.server.closeSender();
+  }
+  
+}

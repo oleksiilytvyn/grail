@@ -5,7 +5,7 @@
 
     2d graphics display
 
-    :copyright: (c) 2016-2019 by Alex Litvin.
+    :copyright: (c) 2016-2020 by Oleksii Lytvyn (http://alexlitvin.name)
     :license: GNU, see LICENSE for more details.
 """
 from grail.qt import *
@@ -27,7 +27,7 @@ class DisplayPlugin(Plugin):
 
     id = 'display'
     name = 'Display'
-    author = 'Alex Litvin'
+    author = 'Oleksii Lytvyn'
     description = 'Display 2d graphics in window or in full screen mode'
 
     _instance = None

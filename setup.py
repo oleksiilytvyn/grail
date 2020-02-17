@@ -356,7 +356,7 @@ setuptools.setup(
     version=VERSION,
     url='http://grailapp.com/',
 
-    author='Alex Litvin',
+    author='Oleksii Lytvyn',
     author_email='programer95@gmail.com',
     description="Simple and fast lyrics application.",
     long_description="Simple and powerful media software for churches",

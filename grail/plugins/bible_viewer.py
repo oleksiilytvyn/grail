@@ -5,7 +5,7 @@
 
     View and search bible
 
-    :copyright: (c) 2016-2019 by Alex Litvin.
+    :copyright: (c) 2016-2020 by Oleksii Lytvyn (http://alexlitvin.name)
     :license: GNU, see LICENSE for more details.
 """
 import re
@@ -27,7 +27,7 @@ class BibleViewer(Viewer):
 
     id = 'bible'
     name = 'Bible'
-    author = 'Alex Litvin'
+    author = 'Oleksii Lytvyn'
     description = 'View and search bible'
 
     def __init__(self, *args):

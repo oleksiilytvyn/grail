@@ -5,7 +5,7 @@
 
     This plugin for developers who want to see whats going on with nodes
 
-    :copyright: (c) 2016-2019 by Alex Litvin.
+    :copyright: (c) 2016-2020 by Oleksii Lytvyn (http://alexlitvin.name)
     :license: GNU, see LICENSE for more details.
 """
 from collections import defaultdict
@@ -27,7 +27,7 @@ class NodeViewer(Viewer):
 
     id = 'node'
     name = 'Nodes'
-    author = 'Alex Litvin'
+    author = 'Oleksii Lytvyn'
     description = 'View all nodes in grail file'
     single_instance = True
 

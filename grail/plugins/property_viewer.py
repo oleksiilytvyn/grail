@@ -5,7 +5,7 @@
 
     Node properties viewer
 
-    :copyright: (c) 2016-2019 by Alex Litvin.
+    :copyright: (c) 2016-2020 by Oleksii Lytvyn (http://alexlitvin.name)
     :license: GNU, see LICENSE for more details.
 """
 from grail.qt import *
@@ -28,7 +28,7 @@ class PropertyViewer(Viewer):
 
     id = 'property'
     name = 'Properties'
-    author = 'Alex Litvin'
+    author = 'Oleksii Lytvyn'
     description = 'View properties of selected entities'
     single_instance = True
 

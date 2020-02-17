@@ -5,7 +5,7 @@
 
     2D Graphics scene
 
-    :copyright: (c) 2016-2019 by Alex Litvin.
+    :copyright: (c) 2016-2020 by Oleksii Lytvyn (http://alexlitvin.name)
     :license: GNU, see LICENSE for more details.
 """
 from grail.qt import *

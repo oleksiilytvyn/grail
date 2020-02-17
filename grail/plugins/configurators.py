@@ -5,7 +5,7 @@
 
     Core configurators
 
-    :copyright: (c) 2016-2019 by Alex Litvin.
+    :copyright: (c) 2016-2020 by Oleksii Lytvyn (http://alexlitvin.name)
     :license: GNU, see LICENSE for more details.
 """
 
@@ -22,7 +22,7 @@ class GeneralConfigurator(Configurator):
     id = 'general-configurator'
     name = 'General'
     index = -100
-    author = 'Alex Litvin'
+    author = 'Oleksii Lytvyn'
     description = 'General configuration page'
 
     def __init__(self, parent=None):
@@ -141,7 +141,7 @@ class BibleConfigurator(Configurator):
     id = 'bible-configurator'
     name = 'Bible'
     index = -98
-    author = 'Alex Litvin'
+    author = 'Oleksii Lytvyn'
     description = 'Configuration page for bibles'
 
     def __init__(self, parent=None):

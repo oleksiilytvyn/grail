@@ -1,5 +1,4 @@
-Data directory
---------------
+# Data directory
 
 **default** - contains files for default installation
 **dist** - contains files for build and generation of executables

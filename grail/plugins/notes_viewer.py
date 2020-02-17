@@ -5,7 +5,7 @@
 
     Create text notes
 
-    :copyright: (c) 2016-2019 by Alex Litvin.
+    :copyright: (c) 2016-2020 by Oleksii Lytvyn (http://alexlitvin.name)
     :license: GNU, see LICENSE for more details.
 """
 from grail.qt import *
@@ -17,7 +17,7 @@ class NotesViewer(Viewer):
 
     id = 'notes'
     name = 'Text'
-    author = 'Alex Litvin'
+    author = 'Oleksii Lytvyn'
     description = 'Create text notes'
 
     def __init__(self, *args):

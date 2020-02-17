@@ -5,7 +5,7 @@
 
     Empty viewer
 
-    :copyright: (c) 2016-2019 by Alex Litvin.
+    :copyright: (c) 2016-2020 by Oleksii Lytvyn (http://alexlitvin.name)
     :license: GNU, see LICENSE for more details.
 """
 from grail.qt import *
@@ -17,7 +17,7 @@ class EmptyViewer(Viewer):
 
     id = 'empty'
     name = 'Empty'
-    author = 'Alex Litvin'
+    author = 'Oleksii Lytvyn'
     description = 'This viewer created after split or if viewer not found'
     private = True
 

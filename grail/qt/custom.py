@@ -6,7 +6,7 @@
     Replacement for some of Qt components as they not work as desired,
     plus some methods or new components in PyQt code style
 
-    :copyright: (c) 2016-2019 by Alex Litvin.
+    :copyright: (c) 2016-2020 by Oleksii Lytvyn (http://alexlitvin.name)
     :license: GNU, see LICENSE for more details.
 """
 from grail.qt import colors as qt_colors

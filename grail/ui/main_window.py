@@ -5,7 +5,7 @@
 
     Main window of Grail application
 
-    :copyright: (c) 2016-2019 by Alex Litvin.
+    :copyright: (c) 2016-2020 by Oleksii Lytvyn (http://alexlitvin.name)
     :license: GNU, see LICENSE for more details.
 """
 import json
@@ -38,7 +38,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.actions_dialog = ActionsDialog()
         self.project_dialog = ProjectDialog()
         self.about_dialog = AboutDialog(None, "Grail %s" % (grail.__version__,),
-                                        "Copyright © 2016-2019 Alex Litvin.\nAll rights reserved.\n\n"
+                                        "Copyright © 2016-2020 Oleksii Lytvyn.\nAll rights reserved.\n\n"
                                         "http://grailapp.com/",
                                         QtGui.QIcon(':/icon/256.png'))
 

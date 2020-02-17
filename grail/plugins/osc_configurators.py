@@ -5,7 +5,7 @@
 
     Configurators for OSC I/O
 
-    :copyright: (c) 2016-2019 by Alex Litvin.
+    :copyright: (c) 2016-2020 by Oleksii Lytvyn (http://alexlitvin.name)
     :license: GNU, see LICENSE for more details.
 """
 from grail.qt import *
@@ -18,7 +18,7 @@ class OSCInConfigurator(Configurator):
     id = 'osc-in-configurator'
     name = 'OSC Input'
     index = 10
-    author = 'Alex Litvin'
+    author = 'Oleksii Lytvyn'
     description = 'Manage OSC input'
 
     def __init__(self, parent=None):
@@ -221,7 +221,7 @@ class OSCOutConfigurator(Configurator):
     id = 'osc-out-configurator'
     name = 'OSC Output'
     index = 11
-    author = 'Alex Litvin'
+    author = 'Oleksii Lytvyn'
     description = 'Manage OSC output'
 
     def __init__(self, parent=None):

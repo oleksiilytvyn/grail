@@ -3,9 +3,9 @@
     grail.application
     ~~~~~~~~~~~~~~~~~
 
-    Extended GApplication class and add some grail specific methods
+    Main Grail application instance class
 
-    :copyright: (c) 2016-2019 by Alex Litvin.
+    :copyright: (c) 2016-2020 by Oleksii Lytvyn (http://alexlitvin.name)
     :license: GNU, see LICENSE for more details.
 """
 import io
@@ -239,7 +239,7 @@ class Grail(QtWidgets.QApplication):
         except DNAError:
             pass
 
-        if not project or not path or len(path) == 0:
+        if project is False or not path or len(path) == 0:
             message = MessageDialog(title="Can't open file",
                                     text="File at location %s not exists." % path,
                                     icon=MessageDialog.Critical)

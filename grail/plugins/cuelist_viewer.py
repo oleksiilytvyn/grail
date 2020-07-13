@@ -821,7 +821,8 @@ class CuelistViewer(Viewer):
             name = _entity.name
 
             _item = QtWidgets.QTreeWidgetItem(_entity)
-            _item.setText(0, str(_entity.number))
+            # todo: Add number to song entity or add CueEntity instead
+            _item.setText(0, str(_entity.number) if hasattr(_entity, 'number') else "")
             _item.setText(1, name if len(name) < 50 else "%s..." % name[:50])
 
             if isinstance(_entity, CueEntity):
@@ -999,7 +1000,7 @@ class CuelistViewer(Viewer):
         self._osc_execute(cue)
 
         # Do not execute next cue
-        if cue.follow == CueEntity.FOLLOW_OFF:
+        if hasattr(cue, 'follow') and cue.follow == CueEntity.FOLLOW_OFF:
             return False
 
         next_cue = None
@@ -1043,10 +1044,15 @@ class CuelistViewer(Viewer):
 
         self._selected_id = cue.id
 
+        pause = 0
+
+        if hasattr(cue, "pre_wait"):
+            pause = (cue.pre_wait + wait) * 1000
+
         # pre wait
         self._cue_timer.cue = cue
         self._cue_timer.stop()
-        self._cue_timer.start((cue.pre_wait + wait) * 1000)
+        self._cue_timer.start(pause)
 
         # update list show what is currently running
         self._update()

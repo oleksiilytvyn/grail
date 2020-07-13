@@ -112,7 +112,7 @@ class _OSCServer:
 
             # fix: accept old style messages
             if message.address == "/grail/message":
-                signals.emit("/clip/text/source", str(message.args[0], "utf-8"))
+                signals.emit("/clip/text", str(message.args[0], "utf-8"))
 
 
 class _OSCListener(OSCServer, socketserver.ThreadingMixIn):

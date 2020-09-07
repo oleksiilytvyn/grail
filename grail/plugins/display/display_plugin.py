@@ -162,7 +162,11 @@ class DisplayPlugin(Plugin):
 
     def cue_cb(self, cue):
 
-        self.scene.set_text(cue.name)
+        if hasattr(cue, 'text') and cue.text:
+           self.scene.set_text(cue.text)
+
+        if hasattr(cue, 'name') and cue.name:
+            self.scene.set_text(cue.name)
 
     def _blackout_cb(self):
 

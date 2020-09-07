@@ -296,8 +296,10 @@ class LibraryViewer(Viewer):
         self._ui_list.setWordWrap(True)
         self._ui_list.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self._ui_list.currentItemChanged.connect(self._item_clicked)
+        self._ui_list.itemClicked.connect(self._item_clicked)
         self._ui_list.itemDoubleClicked.connect(self._item_doubleclicked)
         self._ui_list.customContextMenuRequested.connect(self._context_menu)
+        self._ui_list.keyPressEvent = self._list_key_press_event
 
         self._ui_add_action = QtWidgets.QAction(Icon(':/rc/add.png'), 'Add', self)
         self._ui_add_action.setIconVisibleInMenu(True)
@@ -326,6 +328,22 @@ class LibraryViewer(Viewer):
         """Update panel"""
 
         self._search_event(str(self._ui_search.text()))
+
+    def _list_key_press_event(self, event):
+
+        item = self._ui_list.currentItem()
+        entity = item.object()
+        event_key = event.key()
+
+        # Add item to cuelist if Return/Enter key and Control (Command on Mac) is pressed
+        if event_key == QtCore.Qt.Key_Return and event.modifiers() & QtCore.Qt.ControlModifier:
+            self.add_item_action(entity)
+
+        # Execute if Return/Enter key is pressed
+        elif event_key == QtCore.Qt.Key_Return:
+            self.execute_item_action(entity)
+
+        QtWidgets.QListWidget.keyPressEvent(self._ui_list, event)
 
     def _search_event(self, keyword):
         """Triggered when user types something in search field"""
@@ -375,7 +393,7 @@ class LibraryViewer(Viewer):
 
             self._ui_list.addItem(item)
 
-        # xxx: show media items from library (limit to 6)
+        # todo: show media items from library (limit to 6)
 
     def _search_key_event(self, event):
         """Process key evens before search menu_action begins"""
@@ -384,7 +402,9 @@ class LibraryViewer(Viewer):
 
         if event_key == QtCore.Qt.Key_Return:
             item = self._ui_list.item(0)
-            self.emit_signal('!cue/execute', item.object())
+            cue = item.object()
+
+            self.emit_signal('!cue/execute', cue)
 
         elif event_key == QtCore.Qt.Key_Z and event.modifiers() & QtCore.Qt.ControlModifier:
 
@@ -447,6 +467,10 @@ class LibraryViewer(Viewer):
         add_action.triggered.connect(trigger(self.add_item_action, entity))
         menu.addAction(add_action)
 
+        execute_action = QtWidgets.QAction('Execute', menu)
+        execute_action.triggered.connect(trigger(self.execute_item_action, entity))
+        menu.addAction(execute_action)
+
         menu.exec_(self._ui_list.mapToGlobal(pos))
 
     def _item_clicked(self, item):
@@ -475,6 +499,11 @@ class LibraryViewer(Viewer):
 
         self.song_dialog.set_entity(None)
         self.song_dialog.showWindow()
+
+    def execute_item_action(self, entity):
+        """Add item to cuelist"""
+
+        self.emit_signal('!cue/execute', entity)
 
     def add_item_action(self, entity):
         """Add item to cuelist"""

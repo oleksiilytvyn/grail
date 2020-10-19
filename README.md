@@ -9,7 +9,7 @@ The goal of project to provide beautiful, simple and fast application for christ
 
 *   Python 3.4+
 *   PyQt 5
-*   grailkit (<https://bitbucket.org/alexlitvin/grailkit>)
+*   GrailKit (<https://github.com/oleksiilytvyn/grailkit>)
 
 If you want to build from source, you also need:
 
@@ -27,4 +27,4 @@ execute following command in terminal:
 
 Just run in terminal following command to build for your current platform
 
-    python setup.py build
+    pyinstaller grail.spec

@@ -398,7 +398,7 @@ QMenu {
 
     QMenu::item:checked,
     QMenu::item:unchecked {
-        padding-left: 0;
+        padding-left: 24;
         }
 
     QMenu::indicator:non-exclusive:unchecked {

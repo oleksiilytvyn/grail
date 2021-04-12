@@ -540,7 +540,11 @@ class CuelistViewer(Viewer):
         self._ui_tree = TreeWidget()
         self._ui_tree.setObjectName('CuelistViewer_tree')
         self._ui_tree.setHeaderHidden(True)
-        self._ui_tree.setHeaderLabels(['Number', 'Name'])
+        self._ui_tree.setHeaderLabels(['Icon', 'Number', 'Name'])
+        self._ui_tree.setColumnWidth(0, 0)
+        self._ui_tree.setColumnWidth(1, 48)
+        # todo: add setting to sho/hide first column
+        self._ui_tree.setColumnHidden(1, True)
 
         self._ui_tree.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self._ui_tree.customContextMenuRequested.connect(self._context_menu)
@@ -822,8 +826,9 @@ class CuelistViewer(Viewer):
 
             _item = QtWidgets.QTreeWidgetItem(_entity)
             # todo: Add number to song entity or add CueEntity instead
-            _item.setText(0, str(_entity.number) if hasattr(_entity, 'number') else "")
-            _item.setText(1, name if len(name) < 50 else "%s..." % name[:50])
+            _item.setText(0, "")
+            _item.setText(1, str(_entity.number) if hasattr(_entity, 'number') else "")
+            _item.setText(2, name if len(name) < 50 else "%s..." % name[:50])
 
             if isinstance(_entity, CueEntity):
                 if _entity.color != CueEntity.COLOR_DEFAULT:
@@ -836,11 +841,11 @@ class CuelistViewer(Viewer):
                     _item.setForeground(1, fg)
 
                 if _entity.follow == CueEntity.FOLLOW_OFF:
-                    _item.setIcon(0, Icon(':/rc/follow-off.png'))
+                    _item.setIcon(1, Icon(':/rc/follow-off.png'))
                 elif _entity.follow == CueEntity.FOLLOW_ON:
-                    _item.setIcon(0, Icon(':/rc/follow-on.png'))
+                    _item.setIcon(1, Icon(':/rc/follow-on.png'))
                 elif _entity.follow == CueEntity.FOLLOW_CONTINUE:
-                    _item.setIcon(0, Icon(':/rc/follow-cont.png'))
+                    _item.setIcon(1, Icon(':/rc/follow-cont.png'))
 
             return _item
 

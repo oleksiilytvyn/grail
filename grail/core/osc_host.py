@@ -70,7 +70,8 @@ class _OSCServer:
         self._clients.append((address, port))
 
         if port not in self._ports:
-            thread = _ListenerThread(address, port, self)
+            # TODO: IP address ignored, do some work around to accept only from given IP
+            thread = _ListenerThread("0.0.0.0", port, self)
             thread.received.connect(self.handle)
             thread.start()
 

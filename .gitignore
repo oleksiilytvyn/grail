@@ -1,5 +1,6 @@
 syntax: glob
 
+# Ignore temporary files
 *~
 .db
 *.db
@@ -11,6 +12,7 @@ Thumbs.db
 .db-journal
 *.db-journal
 
+# Ignore dist & build
 bin/*
 venv/*
 dist/*.exe
@@ -27,4 +29,5 @@ build/*/*
 __pycache__/*
 .mypy_cache/*
 
-node_modules/*
+# Ignore Node modules
+node_modules/
